@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 
 /**
@@ -57,4 +58,6 @@ public interface ValidationContext<T> {
 	Set<ConstraintViolation<T>> getFailingConstraints();
 
 	ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, MutablePath path);
+
+	void markConstraintProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint);
 }

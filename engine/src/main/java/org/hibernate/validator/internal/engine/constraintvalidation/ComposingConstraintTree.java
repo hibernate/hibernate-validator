@@ -27,6 +27,8 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
+import org.jboss.logging.Logger;
+
 /**
  * A constraint tree for composing constraints. Has children corresponding to the composed constraints.
  *
@@ -90,7 +92,7 @@ final class ComposingConstraintTree<B extends Annotation> extends ConstraintTree
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
 		if ( mainConstraintNeedsEvaluation( validationContext, violatedConstraintValidatorContexts ) ) {
 
-			if ( LOG.isTraceEnabled() ) {
+			if ( LOG.isEnabled( Logger.Level.TRACE ) ) {
 				if ( validationContext.isShowValidatedValuesInTraceLogs() ) {
 					LOG.tracef(
 							"Validating value %s against constraint defined by %s.",

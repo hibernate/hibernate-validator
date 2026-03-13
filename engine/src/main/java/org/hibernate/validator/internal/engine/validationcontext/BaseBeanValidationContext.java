@@ -39,8 +39,6 @@ public interface BaseBeanValidationContext<T> extends ValidationContext<T> {
 
 	boolean hasMetaConstraintBeenProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint);
 
-	void markConstraintProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint);
-
 	/**
 	 * @return {@code true} if current validation context can and should process passed meta constraint. Is used in
 	 * {@link ValidatorImpl} to check if validation is required in case of calls to

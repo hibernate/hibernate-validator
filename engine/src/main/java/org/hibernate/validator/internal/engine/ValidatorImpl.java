@@ -591,7 +591,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private boolean validateMetaConstraint(BaseBeanValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
 		valueContext.updateNode( metaConstraint.getLocation() );
-		boolean success = true;
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 
@@ -599,12 +598,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueContext.setCurrentValidatedValue( valueContext.getValue( parent, metaConstraint.getLocation() ) );
 			}
 
-			success = metaConstraint.validateConstraint( validationContext, valueContext );
-
-			validationContext.markConstraintProcessed( valueContext, metaConstraint );
+			return metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
-		return success;
+		return true;
 	}
 
 	/**
