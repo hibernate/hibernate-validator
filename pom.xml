@@ -188,7 +188,7 @@
         <version.org.openjfx>17.0.18</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.10.0.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.10.1.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
         <version.shrinkwrap.resolvers>3.3.5</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
@@ -199,7 +199,7 @@
         <version.io.rest-assured>6.0.0</version.io.rest-assured>
         <version.org.apache.groovy>5.0.4</version.org.apache.groovy>
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>7.0.5</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>7.0.6</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.tools.jackson.core.jackson-bom>3.1.0</version.tools.jackson.core.jackson-bom>
         <version.net.bytebuddy.byte-buddy>1.18.7</version.net.bytebuddy.byte-buddy>
@@ -411,7 +411,7 @@
                 - update README
                 - run mvn wrapper:wrapper to re-generate the maven wrapper
             -->
-        <maven.min.version>3.9.13</maven.min.version>
+        <maven.min.version>3.9.14</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
