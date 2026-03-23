@@ -3,6 +3,7 @@
 
 # Our build scripts - necessary for our release jobs
 hibernate-noorm-release-scripts
+hibernate-release-scripts
 
 # Gradle work directory
 .gradle
@@ -58,3 +59,5 @@ maven-eclipse.xml
 # Gradle Enterprise/Develocity
 /.mvn/.gradle-enterprise
 /.mvn/.develocity
+
+.scannerwork

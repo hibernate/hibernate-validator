@@ -92,6 +92,7 @@
         <module>cdi</module>
         <module>modules</module>
         <module>integration</module>
+        <module>build/reports</module>
     </modules>
 
     <properties>

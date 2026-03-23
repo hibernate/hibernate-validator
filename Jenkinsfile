@@ -310,6 +310,75 @@ stage('Non-default environments') {
 	}
 }
 
+stage('Sonar analysis') {
+	def sonarCredentialsId = helper.configuration.file?.sonar?.credentials
+    def sonarCliVersion = helper.configuration.file?.sonar?.cli?.version
+    def sonarCliInstallerHash = helper.configuration.file?.sonar?.cli?.hash
+	if (sonarCredentialsId) {
+		runBuildOnNode {
+			withMavenWorkspace {
+				if (enableDefaultBuild && enableDefaultBuildIT) {
+					unstash name: "default-build-jacoco-reports"
+				}
+				environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+				environments.content.wildflyTck.enabled.each { JdkBuildEnvironment buildEnv ->
+					unstash name: "${buildEnv.tag}-build-jacoco-reports"
+				}
+
+				// we don't clean to keep the unstashed jacoco reports:
+				sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestJdkArg(environments.content.jdk.default)}"
+
+                dir('.sonar') {
+                    sh "curl --create-dirs -sSLo \"\$(pwd)\"/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${sonarCliVersion}.zip"
+                    def downloadedHash = sh(script: 'sha256sum $(pwd)/sonar-scanner.zip | awk \'{print $1}\'', returnStdout: true).trim()
+                    if (downloadedHash != sonarCliInstallerHash) {
+                        echo "Downloaded CLI sha256: $downloadedHash"
+                        echo "Expected CLI sha256: $sonarCliInstallerHash"
+                        throw new Exception("Downloaded CLI has an unexpected checksum. Stopping the build!")
+                    }
+                    sh "unzip -o \$(pwd)/sonar-scanner.zip -d \$(pwd)"
+                    sh "mv \"\$(pwd)/sonar-scanner-$sonarCliVersion\"/* \"\$(pwd)\""
+
+                }
+
+				// WARNING: Make sure credentials are evaluated by sh, not Groovy.
+				// To that end, escape the '$' when referencing the variables.
+				// See https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#string-interpolation
+				withCredentials([usernamePassword(
+						credentialsId: sonarCredentialsId,
+						usernameVariable: 'SONARCLOUD_ORGANIZATION',
+						// https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/scanners/sonarscanner-for-maven/#analyzing
+						passwordVariable: 'SONAR_TOKEN'
+				)]) {
+					// We don't want to use the build cache or build scans for this execution
+					def sonarCliArgs = ''
+
+                    if (helper.scmSource.pullRequest) {
+                        sonarCliArgs+=" -Dsonar.pullrequest.branch=${helper.scmSource.branch.name}"
+                        sonarCliArgs+=" -Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id}"
+                        sonarCliArgs+=" -Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name}"
+                        if (helper.scmSource.gitHubRepoId) {
+                            sonarCliArgs+=" -Dsonar.pullrequest.provider=GitHub"
+                            sonarCliArgs+=" -Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId}"
+                        }
+                    } else {
+                        sonarCliArgs+=" -Dsonar.branch.name=${helper.scmSource.branch.name}"
+                    }
+
+                    sh """.sonar/bin/sonar-scanner $sonarCliArgs \\
+                        -Dsonar.java.libraries="\$(pwd)/build/reports/target/sonar-dependencies/*.jar" \\
+                        -Dsonar.coverage.jacoco.xmlReportPaths="\$(pwd)/build/reports/target/site/jacoco-aggregate/jacoco.xml"
+                    """
+				}
+			}
+		}
+	} else {
+		echo "Skipping Sonar report: no credentials."
+	}
+}
+
 } // End of helper.runWithNotification
 
 // Job-specific helpers
