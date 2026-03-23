@@ -57,3 +57,5 @@ maven-eclipse.xml
 
 # develocity cache related:
 .mvn/.develocity
+
+.scannerwork
