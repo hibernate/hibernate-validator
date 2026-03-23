@@ -96,6 +96,7 @@
         <module>cdi</module>
         <module>modules</module>
         <module>integration</module>
+        <module>build/reports</module>
     </modules>
 
     <properties>
@@ -737,6 +738,18 @@
                             <compilerArg>-Aorg.jboss.logging.tools.addGeneratedAnnotation=false</compilerArg>
                         </compilerArgs>
                         <testCompilerArgument>-parameters</testCompilerArgument>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.jboss.logging</groupId>
+                                <artifactId>jboss-logging-processor</artifactId>
+                                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+                            </path>
+                            <path>
+                                <groupId>org.jboss.logging</groupId>
+                                <artifactId>jboss-logging</artifactId>
+                                <version>${version.org.jboss.logging.jboss-logging}</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                     <executions>
                         <execution>
