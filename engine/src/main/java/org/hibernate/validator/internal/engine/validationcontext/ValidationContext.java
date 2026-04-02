@@ -10,7 +10,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintValidatorFactory;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
@@ -51,8 +50,7 @@ public interface ValidationContext<T> {
 
 	void addConstraintFailure(
 			ValueContext<?, ?> valueContext,
-			ConstraintViolationCreationContext constraintViolationCreationContext,
-			ConstraintDescriptor<?> descriptor
+			ConstraintViolationCreationContext constraintViolationCreationContext
 	);
 
 	Set<ConstraintViolation<T>> getFailingConstraints();

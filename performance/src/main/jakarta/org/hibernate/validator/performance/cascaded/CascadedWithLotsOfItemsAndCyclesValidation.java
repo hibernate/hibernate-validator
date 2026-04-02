@@ -18,6 +18,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -85,7 +86,7 @@ public class CascadedWithLotsOfItemsAndCyclesValidation {
 
 		public void addArticle(Article article) {
 			articles.add( article );
-			article.shops.add(  this );
+			article.shops.add( this );
 		}
 	}
 

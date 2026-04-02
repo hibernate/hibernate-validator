@@ -95,6 +95,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	 */
 	private final boolean processedBeanTrackingEnabled;
 
+	protected final ConstraintValidatorContextImpl constraintValidatorReusableContext;
+
 	/**
 	 * Contains all failing constraints so far.
 	 */
@@ -123,6 +125,13 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 		this.rootBeanMetaData = rootBeanMetaData;
 
 		this.processedBeanTrackingEnabled = processedBeanTrackingEnabled;
+
+		this.constraintValidatorReusableContext = new ConstraintValidatorContextImpl(
+				validatorScopedContext.getClockProvider(),
+				validatorScopedContext.getConstraintValidatorPayload(),
+				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
+				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
+		);
 	}
 
 	@Override
@@ -203,8 +212,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 	@Override
 	public void addConstraintFailure(
 			ValueContext<?, ?> valueContext,
-			ConstraintViolationCreationContext constraintViolationCreationContext,
-			ConstraintDescriptor<?> descriptor
+			ConstraintViolationCreationContext constraintViolationCreationContext
 	) {
 		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
@@ -212,7 +220,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				constraintViolationCreationContext.getExpressionLanguageFeatureLevel(),
 				constraintViolationCreationContext.isCustomViolation(),
 				valueContext.getCurrentValidatedValue(),
-				descriptor,
+				constraintViolationCreationContext.getConstraintDescriptor(),
 				constraintViolationCreationContext.getPath(),
 				constraintViolationCreationContext.getMessageParameters(),
 				constraintViolationCreationContext.getExpressionVariables()
@@ -225,7 +233,7 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 						messageTemplate,
 						interpolatedMessage,
 						path,
-						descriptor,
+						constraintViolationCreationContext.getConstraintDescriptor(),
 						valueContext,
 						constraintViolationCreationContext
 				)
@@ -264,14 +272,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 
 	@Override
 	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, MutablePath path) {
-		return new ConstraintValidatorContextImpl(
-				validatorScopedContext.getClockProvider(),
-				path,
-				constraintDescriptor,
-				validatorScopedContext.getConstraintValidatorPayload(),
-				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
-				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
-		);
+		constraintValidatorReusableContext.resetAsRegularContext( path, constraintDescriptor );
+		return constraintValidatorReusableContext;
 	}
 
 	@Override
