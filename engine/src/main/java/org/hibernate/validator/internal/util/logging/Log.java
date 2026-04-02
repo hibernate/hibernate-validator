@@ -962,4 +962,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 273, value = "Index %1$d is out of bounds for the path of length %2$d.")
 	IndexOutOfBoundsException pathIndexOutOfBounds(int index, int length);
+
+	@Message(id = 274, value = "Unsupported operation for the current constraint validator kind.")
+	AssertionError getUnexpectedConstraintValidatorContextCall();
 }

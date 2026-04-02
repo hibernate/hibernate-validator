@@ -20,7 +20,6 @@ import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
-import org.hibernate.validator.internal.engine.constraintvalidation.CrossParameterConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -95,25 +94,20 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 	@Override
 	public ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, MutablePath path) {
 		if ( ConstraintType.CROSS_PARAMETER.equals( constraintDescriptor.getConstraintType() ) ) {
-			return new CrossParameterConstraintValidatorContextImpl(
-					getParameterNames(),
-					validatorScopedContext.getClockProvider(),
+			constraintValidatorReusableContext.resetAsCrossParameterContext(
 					path,
 					constraintDescriptor,
-					validatorScopedContext.getConstraintValidatorPayload(),
-					validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
-					validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
+					getParameterNames()
+			);
+		}
+		else {
+			constraintValidatorReusableContext.resetAsRegularContext(
+					path,
+					constraintDescriptor
 			);
 		}
 
-		return new ConstraintValidatorContextImpl(
-				validatorScopedContext.getClockProvider(),
-				path,
-				constraintDescriptor,
-				validatorScopedContext.getConstraintValidatorPayload(),
-				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
-				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
-		);
+		return constraintValidatorReusableContext;
 	}
 
 	@Override

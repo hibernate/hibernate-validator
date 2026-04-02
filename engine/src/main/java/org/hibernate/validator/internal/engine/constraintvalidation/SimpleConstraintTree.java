@@ -42,9 +42,7 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 		ConstraintValidatorContextImpl constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
 		if ( constraintValidatorContext != null ) {
 			for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
-				validationContext.addConstraintFailure(
-						valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
-				);
+				validationContext.addConstraintFailure( valueContext, constraintViolationCreationContext );
 			}
 			return false;
 		}
@@ -55,12 +53,12 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 	protected void validateConstraints(
 			ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
-			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts
+			Collection<ConstraintViolationCreationContext> violatedConstraintValidatorContexts
 	) {
 		ConstraintValidatorContextImpl constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
 
 		if ( constraintValidatorContext != null ) {
-			violatedConstraintValidatorContexts.add( constraintValidatorContext );
+			constraintValidatorContext.contributeConstraintViolationCreationContexts( violatedConstraintValidatorContexts );
 		}
 	}
 
@@ -90,6 +88,9 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 		);
 
 		// validate
-		return validateSingleConstraint( valueContext, constraintValidatorContext, validator );
+		if ( validateSingleConstraint( valueContext, constraintValidatorContext, validator ) ) {
+			return null;
+		}
+		return constraintValidatorContext;
 	}
 }
