@@ -8,7 +8,6 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Optional;
 
 import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.ConstraintValidator;
@@ -69,7 +68,7 @@ public abstract sealed class ConstraintTree<A extends Annotation> permits Simple
 	public abstract boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext);
 
 	protected abstract void validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext,
-			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts);
+			Collection<ConstraintViolationCreationContext> violatedConstraintValidatorContexts);
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
 		return descriptor;
@@ -148,19 +147,14 @@ public abstract sealed class ConstraintTree<A extends Annotation> permits Simple
 		return validator;
 	}
 
-	/**
-	 * @return an {@link Optional#empty()} if there is no violation or a corresponding {@link ConstraintValidatorContextImpl}
-	 * 		otherwise.
-	 */
-	protected final <V> ConstraintValidatorContextImpl validateSingleConstraint(
+	protected final <V> boolean validateSingleConstraint(
 			ValueContext<?, ?> valueContext,
-			ConstraintValidatorContextImpl constraintValidatorContext,
+			HibernateConstraintValidatorReusableContext constraintValidatorContext,
 			ConstraintValidator<A, V> validator) {
-		boolean isValid;
 		try {
 			@SuppressWarnings("unchecked")
 			V validatedValue = (V) valueContext.getCurrentValidatedValue();
-			isValid = validator.isValid( validatedValue, constraintValidatorContext );
+			return validator.isValid( validatedValue, constraintValidatorContext );
 		}
 		catch (RuntimeException e) {
 			if ( e instanceof ConstraintDeclarationException ) {
@@ -168,12 +162,6 @@ public abstract sealed class ConstraintTree<A extends Annotation> permits Simple
 			}
 			throw LOG.getExceptionDuringIsValidCallException( e );
 		}
-		if ( !isValid ) {
-			//We do not add these violations yet, since we don't know how they are
-			//going to influence the final boolean evaluation
-			return constraintValidatorContext;
-		}
-		return null;
 	}
 
 	@Override

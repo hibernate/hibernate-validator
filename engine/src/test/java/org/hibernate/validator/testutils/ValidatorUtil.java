@@ -27,7 +27,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorReusableContext;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
@@ -256,8 +256,8 @@ public final class ValidatorUtil {
 	}
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext(MutablePath propertyPath) {
-		return new ConstraintValidatorContextImpl( DefaultClockProvider.INSTANCE, propertyPath, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
+		return new HibernateConstraintValidatorReusableContext( DefaultClockProvider.INSTANCE, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
 				ExpressionLanguageFeatureLevel.NONE
-		);
+		).asRegularContext( propertyPath, null );
 	}
 }

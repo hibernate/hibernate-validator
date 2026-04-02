@@ -39,12 +39,10 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 
 	@Override
 	public boolean validateConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
-		ConstraintValidatorContextImpl constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
+		HibernateConstraintValidatorReusableContext constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
 		if ( constraintValidatorContext != null ) {
 			for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
-				validationContext.addConstraintFailure(
-						valueContext, constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
-				);
+				validationContext.addConstraintFailure( valueContext, constraintViolationCreationContext );
 			}
 			return false;
 		}
@@ -55,16 +53,16 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 	protected void validateConstraints(
 			ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext,
-			Collection<ConstraintValidatorContextImpl> violatedConstraintValidatorContexts
+			Collection<ConstraintViolationCreationContext> violatedConstraintValidatorContexts
 	) {
-		ConstraintValidatorContextImpl constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
+		HibernateConstraintValidatorReusableContext constraintValidatorContext = doValidateConstraints( validationContext, valueContext );
 
 		if ( constraintValidatorContext != null ) {
-			violatedConstraintValidatorContexts.add( constraintValidatorContext );
+			constraintValidatorContext.supplyConstraintViolationCreationContexts( violatedConstraintValidatorContexts );
 		}
 	}
 
-	private ConstraintValidatorContextImpl doValidateConstraints(
+	private HibernateConstraintValidatorReusableContext doValidateConstraints(
 			ValidationContext<?> validationContext,
 			ValueContext<?, ?> valueContext
 	) {
@@ -85,11 +83,14 @@ final class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B>
 		ConstraintValidator<B, ?> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 		// create a constraint validator context
-		ConstraintValidatorContextImpl constraintValidatorContext = validationContext.createConstraintValidatorContextFor(
+		HibernateConstraintValidatorReusableContext constraintValidatorContext = validationContext.createConstraintValidatorContextFor(
 				descriptor, valueContext.getPropertyPath()
 		);
 
 		// validate
-		return validateSingleConstraint( valueContext, constraintValidatorContext, validator );
+		if ( validateSingleConstraint( valueContext, constraintValidatorContext, validator ) ) {
+			return null;
+		}
+		return constraintValidatorContext;
 	}
 }
