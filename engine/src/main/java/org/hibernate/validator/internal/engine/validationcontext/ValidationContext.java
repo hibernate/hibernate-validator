@@ -10,13 +10,12 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintValidatorFactory;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorReusableContext;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valuecontext.ValueContext;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -51,13 +50,12 @@ public interface ValidationContext<T> {
 
 	void addConstraintFailure(
 			ValueContext<?, ?> valueContext,
-			ConstraintViolationCreationContext constraintViolationCreationContext,
-			ConstraintDescriptor<?> descriptor
+			ConstraintViolationCreationContext constraintViolationCreationContext
 	);
 
 	Set<ConstraintViolation<T>> getFailingConstraints();
 
-	ConstraintValidatorContextImpl createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, MutablePath path);
+	HibernateConstraintValidatorReusableContext createConstraintValidatorContextFor(ConstraintDescriptorImpl<?> constraintDescriptor, MutablePath path);
 
 	void markConstraintProcessed(ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint);
 }

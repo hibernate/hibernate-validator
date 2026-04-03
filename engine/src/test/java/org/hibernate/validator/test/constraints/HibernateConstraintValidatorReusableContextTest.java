@@ -16,8 +16,8 @@ import java.util.Map;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ValidationException;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorReusableContext;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
@@ -25,18 +25,18 @@ import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectatio
 import org.testng.annotations.Test;
 
 /**
- * Tests for the {@link ConstraintValidatorContextImpl}.
+ * Tests for the {@link HibernateConstraintValidatorReusableContext}.
  *
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
-public class ConstraintValidatorContextImplTest {
+public class HibernateConstraintValidatorReusableContextTest {
 
 	private static String message = "message";
 
 	@Test
 	public void testIterableIndexed() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inIterable().atIndex( 3 )
@@ -50,7 +50,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testIterableKeyed() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( null ).inIterable().atKey( "test" )
@@ -64,7 +64,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testIterableWithKeyFollowedBySimpleNodes() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
@@ -81,7 +81,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testIterableKeyedAndIndexed() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inIterable().atKey( "test" )
@@ -97,7 +97,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testMultipleInIterable() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inIterable().atKey( "test" )
@@ -113,7 +113,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testMultipleSimpleNodes() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" )
@@ -129,7 +129,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testLongPath() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "a" )
 				.addPropertyNode( "b" ).inIterable().atKey( "key1" )
@@ -153,7 +153,7 @@ public class ConstraintValidatorContextImplTest {
 	public void testMultipleMessages() {
 		String message1 = "message1";
 		String message2 = "message2";
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message1 )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inIterable().atKey( "key" )
@@ -171,13 +171,13 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testUnwrapToImplementationCausesValidationException() {
-		ConstraintValidatorContext context = createEmptyConstraintValidatorContextImpl();
-		context.unwrap( ConstraintValidatorContextImpl.class );
+		ConstraintValidatorContext context = createEmptyHibernateConstraintValidatorReusableContext();
+		context.unwrap( HibernateConstraintValidatorReusableContext.class );
 	}
 
 	@Test
 	public void testUnwrapToPublicTypesSucceeds() {
-		ConstraintValidatorContext context = createEmptyConstraintValidatorContextImpl();
+		ConstraintValidatorContext context = createEmptyHibernateConstraintValidatorReusableContext();
 
 		ConstraintValidatorContext asConstraintValidatorContext = context.unwrap( ConstraintValidatorContext.class );
 		assertSame( asConstraintValidatorContext, context );
@@ -188,7 +188,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testInContainer() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inContainer( Map.class, 1 ).inIterable().atKey( "test" )
@@ -204,7 +204,7 @@ public class ConstraintValidatorContextImplTest {
 
 	@Test
 	public void testContainerElementNode() {
-		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
+		HibernateConstraintValidatorReusableContext context = createEmptyHibernateConstraintValidatorReusableContext();
 		context.buildConstraintViolationWithTemplate( message )
 				.addPropertyNode( "foo" )
 				.addPropertyNode( "bar" ).inContainer( Map.class, 0 ).inIterable().atKey( "test" )
@@ -222,12 +222,13 @@ public class ConstraintValidatorContextImplTest {
 				.containerElement( "<list element>", true, null, 3, List.class, 0 ) );
 	}
 
-	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
+	private HibernateConstraintValidatorReusableContext createEmptyHibernateConstraintValidatorReusableContext() {
 		MutablePath path = MutablePath.createRootPath();
 		path.addBeanNode();
 
-		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, path, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
+		HibernateConstraintValidatorReusableContext context = new HibernateConstraintValidatorReusableContext( null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
 				ExpressionLanguageFeatureLevel.NONE );
+		context.asRegularContext( path, null );
 		context.disableDefaultConstraintViolation();
 		return context;
 	}

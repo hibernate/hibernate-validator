@@ -30,7 +30,7 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorReusableContext;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
@@ -64,7 +64,7 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 	@BeforeTest
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
-		Logger logger = context.getLogger( ConstraintValidatorContextImpl.class.getName() );
+		Logger logger = context.getLogger( HibernateConstraintValidatorReusableContext.class.getName() );
 		constraintValidatorContextImplLoglistAppender = new ListAppender( "list" );
 		logger.addAppender( constraintValidatorContextImplLoglistAppender );
 		constraintValidatorContextImplLoglistAppender.clear();

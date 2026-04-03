@@ -11,7 +11,8 @@ To allow performance testing of different Hibernate Validator versions there are
 Choosing a profile executes the tests against the specified Hibernate Validator or BVal version, respectively. The
 defined profiles are:
 
-* hv-current (Hibernate Validator 9.0.0-SNAPSHOT)
+* hv-current (Hibernate Validator 9.2.0-SNAPSHOT)
+* hv-9.1 (Hibernate Validator 9.1.1.Final)
 * hv-9.0 (Hibernate Validator 9.0.0.Final)
 * hv-8.0 (Hibernate Validator 8.0.3.Final)
 * hv-6.2 (Hibernate Validator 6.2.5.Final)

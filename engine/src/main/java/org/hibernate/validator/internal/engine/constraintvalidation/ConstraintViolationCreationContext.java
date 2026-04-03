@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.util.Map;
 
 import jakarta.validation.Path;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
@@ -20,6 +21,7 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
  */
 public class ConstraintViolationCreationContext {
 
+	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final String message;
 	private final ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
 	private final boolean customViolation;
@@ -30,13 +32,16 @@ public class ConstraintViolationCreationContext {
 	private final Map<String, Object> expressionVariables;
 	private final Object dynamicPayload;
 
-	public ConstraintViolationCreationContext(String message,
+	public ConstraintViolationCreationContext(
+			ConstraintDescriptor<?> constraintDescriptor,
+			String message,
 			ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel,
 			boolean customViolation,
 			MutablePath property,
 			Map<String, Object> messageParameters,
 			Map<String, Object> expressionVariables,
 			Object dynamicPayload) {
+		this.constraintDescriptor = constraintDescriptor;
 		this.message = message;
 		this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
 		this.customViolation = customViolation;
@@ -45,6 +50,10 @@ public class ConstraintViolationCreationContext {
 		this.messageParameters = messageParameters;
 		this.expressionVariables = expressionVariables;
 		this.dynamicPayload = dynamicPayload;
+	}
+
+	public ConstraintDescriptor<?> getConstraintDescriptor() {
+		return constraintDescriptor;
 	}
 
 	public final String getMessage() {

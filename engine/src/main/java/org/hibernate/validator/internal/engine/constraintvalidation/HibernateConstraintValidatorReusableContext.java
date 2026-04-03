@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,20 +15,12 @@ import java.util.Map;
 
 import jakarta.validation.ClockProvider;
 import jakarta.validation.ConstraintValidatorContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeBuilderDefinedContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.ContainerElementNodeContextBuilder;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeContextBuilder;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderDefinedContext;
-import jakarta.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeContextBuilder;
 import jakarta.validation.ElementKind;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
+import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
@@ -39,35 +32,37 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
-public class ConstraintValidatorContextImpl implements HibernateConstraintValidatorContext {
+public class HibernateConstraintValidatorReusableContext implements HibernateCrossParameterConstraintValidatorContext {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private Map<String, Object> messageParameters;
-	private Map<String, Object> expressionVariables;
 	private final ClockProvider clockProvider;
 	private final ExpressionLanguageFeatureLevel defaultConstraintExpressionLanguageFeatureLevel;
 	private final ExpressionLanguageFeatureLevel defaultCustomViolationExpressionLanguageFeatureLevel;
-	private final MutablePath basePath;
-	private final ConstraintDescriptor<?> constraintDescriptor;
-	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
-	private boolean defaultDisabled;
-	private Object dynamicPayload;
 	private final Object constraintValidatorPayload;
 
-	public ConstraintValidatorContextImpl(
+	private Map<String, Object> messageParameters;
+	private Map<String, Object> expressionVariables;
+	private boolean defaultDisabled;
+	private Object dynamicPayload;
+	private List<String> parameterNames;
+
+	private MutablePath basePath;
+	private ConstraintDescriptor<?> constraintDescriptor;
+	private ContextKind contextKind;
+
+	private List<ConstraintViolationCreationContext> constraintViolationCreationContexts;
+
+	public HibernateConstraintValidatorReusableContext(
 			ClockProvider clockProvider,
-			MutablePath propertyPath,
-			ConstraintDescriptor<?> constraintDescriptor,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel defaultConstraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel defaultCustomViolationExpressionLanguageFeatureLevel) {
 		this.clockProvider = clockProvider;
 		this.defaultConstraintExpressionLanguageFeatureLevel = defaultConstraintExpressionLanguageFeatureLevel;
 		this.defaultCustomViolationExpressionLanguageFeatureLevel = defaultCustomViolationExpressionLanguageFeatureLevel;
-		this.basePath = propertyPath;
-		this.constraintDescriptor = constraintDescriptor;
 		this.constraintValidatorPayload = constraintValidatorPayload;
 	}
 
@@ -83,7 +78,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	@Override
 	public HibernateConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
-		return new ConstraintViolationBuilderImpl(
+		return new HibernateConstraintValidatorReusableContext.ConstraintViolationBuilderImpl(
 				messageTemplate,
 				getCopyOfBasePath()
 		);
@@ -93,6 +88,10 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	public <T> T unwrap(Class<T> type) {
 		//allow unwrapping into public super types
 		if ( type.isAssignableFrom( HibernateConstraintValidatorContext.class ) ) {
+			return type.cast( this );
+		}
+		if ( ContextKind.CROSS_PARAMETER.equals( contextKind )
+				&& type.isAssignableFrom( HibernateCrossParameterConstraintValidatorContext.class ) ) {
 			return type.cast( this );
 		}
 		throw LOG.getTypeNotSupportedForUnwrappingException( type );
@@ -149,14 +148,14 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	public final List<ConstraintViolationCreationContext> getConstraintViolationCreationContexts() {
 		if ( defaultDisabled ) {
-			if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.size() == 0 ) {
+			if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.isEmpty() ) {
 				throw LOG.getAtLeastOneCustomMessageMustBeCreatedException();
 			}
 
 			return constraintViolationCreationContexts;
 		}
 
-		if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.size() == 0 ) {
+		if ( constraintViolationCreationContexts == null || constraintViolationCreationContexts.isEmpty() ) {
 			return Collections.singletonList( getDefaultConstraintViolationCreationContext() );
 		}
 
@@ -174,6 +173,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private ConstraintViolationCreationContext getDefaultConstraintViolationCreationContext() {
 		return new ConstraintViolationCreationContext(
+				constraintDescriptor,
 				getDefaultConstraintMessageTemplate(),
 				defaultConstraintExpressionLanguageFeatureLevel,
 				false,
@@ -182,6 +182,29 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				expressionVariables != null ? Map.copyOf( expressionVariables ) : Collections.emptyMap(),
 				dynamicPayload
 		);
+	}
+
+	@Override
+	public List<String> getMethodParameterNames() {
+		if ( ContextKind.CROSS_PARAMETER.equals( contextKind ) ) {
+			return parameterNames;
+		}
+		throw LOG.getUnexpectedConstraintValidatorContextCall();
+	}
+
+	public void supplyConstraintViolationCreationContexts(Collection<ConstraintViolationCreationContext> contexts) {
+		if ( defaultDisabled ) {
+			if ( this.constraintViolationCreationContexts == null || this.constraintViolationCreationContexts.isEmpty() ) {
+				throw LOG.getAtLeastOneCustomMessageMustBeCreatedException();
+			}
+		}
+		else {
+			contexts.add( getDefaultConstraintViolationCreationContext() );
+		}
+
+		if ( this.constraintViolationCreationContexts != null && !this.constraintViolationCreationContexts.isEmpty() ) {
+			contexts.addAll( this.constraintViolationCreationContexts );
+		}
 	}
 
 	private abstract class NodeBuilderBase {
@@ -210,6 +233,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			}
 			constraintViolationCreationContexts.add(
 					new ConstraintViolationCreationContext(
+							constraintDescriptor,
 							messageTemplate,
 							expressionLanguageFeatureLevel,
 							true,
@@ -219,11 +243,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 							dynamicPayload
 					)
 			);
-			return ConstraintValidatorContextImpl.this;
+			return HibernateConstraintValidatorReusableContext.this;
 		}
 	}
 
-	protected class ConstraintViolationBuilderImpl extends NodeBuilderBase implements HibernateConstraintViolationBuilder {
+	protected class ConstraintViolationBuilderImpl extends HibernateConstraintValidatorReusableContext.NodeBuilderBase implements HibernateConstraintViolationBuilder {
 
 		protected ConstraintViolationBuilderImpl(String template, MutablePath path) {
 			super( template, path );
@@ -241,23 +265,29 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );
 
-			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
+			return new HibernateConstraintValidatorReusableContext.NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
 			dropLeafNodeIfRequired();
 
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, ElementKind.PROPERTY );
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, null, ElementKind.BEAN );
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
 		public NodeBuilderDefinedContext addParameterNode(int index) {
+			if ( ContextKind.CROSS_PARAMETER.equals( contextKind ) ) {
+				dropLeafNode();
+				propertyPath.addParameterNode( parameterNames.get( index ), index );
+
+				return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
+			}
 			throw LOG.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
 		}
 
@@ -265,7 +295,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
 			dropLeafNodeIfRequired();
 
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, containerType, typeArgumentIndex );
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, containerType, typeArgumentIndex );
 		}
 
 		/**
@@ -281,10 +311,15 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				propertyPath.getLeafNode().reset();
 			}
 		}
+
+		private void dropLeafNode() {
+			propertyPath = MutablePath.createCopyWithoutLeafNode( propertyPath );
+		}
 	}
 
-	protected class NodeBuilder extends NodeBuilderBase
-			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext, ContainerElementNodeBuilderDefinedContext {
+	protected class NodeBuilder extends HibernateConstraintValidatorReusableContext.NodeBuilderBase
+			implements ConstraintViolationBuilder.NodeBuilderDefinedContext, ConstraintViolationBuilder.LeafNodeBuilderDefinedContext,
+			ConstraintViolationBuilder.ContainerElementNodeBuilderDefinedContext {
 
 		protected NodeBuilder(String template, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, MutablePath path) {
 			super( template, expressionLanguageFeatureLevel, path );
@@ -297,24 +332,25 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		}
 
 		@Override
-		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, ElementKind.PROPERTY );
+		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addPropertyNode(String name) {
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
-		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, null, ElementKind.BEAN );
+		public ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext addBeanNode() {
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
-		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, containerType, typeArgumentIndex );
+		public ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, containerType, typeArgumentIndex );
 		}
 	}
 
-	private class DeferredNodeBuilder extends NodeBuilderBase
-			implements NodeBuilderCustomizableContext, LeafNodeBuilderCustomizableContext, NodeContextBuilder, LeafNodeContextBuilder,
-			ContainerElementNodeBuilderCustomizableContext, ContainerElementNodeContextBuilder {
+	private class DeferredNodeBuilder extends HibernateConstraintValidatorReusableContext.NodeBuilderBase
+			implements ConstraintViolationBuilder.NodeBuilderCustomizableContext, ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext, ConstraintViolationBuilder.NodeContextBuilder,
+			ConstraintViolationBuilder.LeafNodeContextBuilder,
+			ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext, ConstraintViolationBuilder.ContainerElementNodeContextBuilder {
 
 		private final String leafNodeName;
 
@@ -350,53 +386,53 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		}
 
 		@Override
-		public DeferredNodeBuilder inIterable() {
+		public HibernateConstraintValidatorReusableContext.DeferredNodeBuilder inIterable() {
 			propertyPath.makeLeafNodeIterable();
 			return this;
 		}
 
 		@Override
-		public DeferredNodeBuilder inContainer(Class<?> containerClass, Integer typeArgumentIndex) {
+		public HibernateConstraintValidatorReusableContext.DeferredNodeBuilder inContainer(Class<?> containerClass, Integer typeArgumentIndex) {
 			propertyPath.setLeafNodeTypeParameter( containerClass, typeArgumentIndex );
 			return this;
 		}
 
 		@Override
-		public NodeBuilder atKey(Object key) {
+		public HibernateConstraintValidatorReusableContext.NodeBuilder atKey(Object key) {
 			propertyPath.makeLeafNodeIterableAndSetMapKey( key );
 			addLeafNode();
-			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
+			return new HibernateConstraintValidatorReusableContext.NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		@Override
-		public NodeBuilder atIndex(Integer index) {
+		public HibernateConstraintValidatorReusableContext.NodeBuilder atIndex(Integer index) {
 			propertyPath.makeLeafNodeIterableAndSetIndex( index );
 			addLeafNode();
-			return new NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
+			return new HibernateConstraintValidatorReusableContext.NodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath );
 		}
 
 		@Override
 		@Deprecated
-		public NodeBuilderCustomizableContext addNode(String name) {
+		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
 			return addPropertyNode( name );
 		}
 
 		@Override
-		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addPropertyNode(String name) {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, ElementKind.PROPERTY );
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, ElementKind.PROPERTY );
 		}
 
 		@Override
-		public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
+		public ConstraintViolationBuilder.ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name, Class<?> containerType, Integer typeArgumentIndex) {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, containerType, typeArgumentIndex );
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, name, containerType, typeArgumentIndex );
 		}
 
 		@Override
-		public LeafNodeBuilderCustomizableContext addBeanNode() {
+		public ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext addBeanNode() {
 			addLeafNode();
-			return new DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, null, ElementKind.BEAN );
+			return new HibernateConstraintValidatorReusableContext.DeferredNodeBuilder( messageTemplate, expressionLanguageFeatureLevel, propertyPath, null, ElementKind.BEAN );
 		}
 
 		@Override
@@ -425,5 +461,50 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 					throw new IllegalStateException( "Unsupported node kind: " + leafNodeKind );
 			}
 		}
+	}
+
+	public HibernateConstraintValidatorReusableContext asRegularContext(
+			MutablePath propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor
+	) {
+		this.contextKind = ContextKind.REGULAR;
+		this.basePath = propertyPath;
+		this.constraintDescriptor = constraintDescriptor;
+
+		this.parameterNames = null;
+		this.messageParameters = null;
+		this.expressionVariables = null;
+		this.defaultDisabled = false;
+		this.dynamicPayload = null;
+
+		this.constraintViolationCreationContexts = null;
+
+		return this;
+	}
+
+	public HibernateConstraintValidatorReusableContext asCrossParameterContext(
+			MutablePath propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			List<String> parameterNames
+	) {
+		Contracts.assertTrue( propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER, "Context can only be used for cross parameter validation" );
+
+		this.contextKind = ContextKind.CROSS_PARAMETER;
+		this.basePath = propertyPath;
+		this.constraintDescriptor = constraintDescriptor;
+		this.parameterNames = parameterNames;
+
+		this.messageParameters = null;
+		this.expressionVariables = null;
+		this.defaultDisabled = false;
+		this.dynamicPayload = null;
+
+		this.constraintViolationCreationContexts = null;
+
+		return this;
+	}
+
+	private enum ContextKind {
+		REGULAR, CROSS_PARAMETER;
 	}
 }
