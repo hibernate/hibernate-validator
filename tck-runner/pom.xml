@@ -333,8 +333,8 @@
             <id>sigtest</id>
             <properties>
                 <sigtest.java-version>${java-version.main.release}</sigtest.java-version>
-                <sigtest.signature-file>${project.build.directory}/validation-tck/validation-tck-dist-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk${sigtest.java-version}.sig</sigtest.signature-file>
-                <sigtest.signature-file-21>${project.build.directory}/validation-tck/validation-tck-dist-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk21.sig</sigtest.signature-file-21>
+                <sigtest.signature-file>${project.build.directory}/validation-tck/validation-tck-distribution-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk${sigtest.java-version}.sig</sigtest.signature-file>
+                <sigtest.signature-file-21>${project.build.directory}/validation-tck/validation-tck-distribution-${version.jakarta.validation-api}/artifacts/validation-tck-tests-${version.jakarta.validation-api}-sigtest-jdk21.sig</sigtest.signature-file-21>
             </properties>
             <build>
                 <plugins>
