@@ -202,7 +202,7 @@
         <version.org.springframework.spring-expression>7.0.6</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.tools.jackson.core.jackson-bom>3.1.0</version.tools.jackson.core.jackson-bom>
-        <version.net.bytebuddy.byte-buddy>1.18.7</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.18.8</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
