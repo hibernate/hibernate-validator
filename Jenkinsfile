@@ -329,6 +329,7 @@ stage('Sonar analysis') {
 
 				// we don't clean to keep the unstashed jacoco reports:
 				sh "mvn package -Pskip-checks -Pci-build -DskipTests -Pcoverage-report ${toTestJdkArg(environments.content.jdk.default)}"
+				def currentJavaVersion = sh(script: 'mvn help:evaluate -Dexpression=java-version.main.release -q -DforceStdout', returnStdout: true).trim()
 
                 dir('.sonar') {
                     sh "curl --create-dirs -sSLo \"\$(pwd)\"/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${sonarCliVersion}.zip"
@@ -353,7 +354,7 @@ stage('Sonar analysis') {
 						passwordVariable: 'SONAR_TOKEN'
 				)]) {
 					// We don't want to use the build cache or build scans for this execution
-					def sonarCliArgs = ''
+                    def sonarCliArgs = "-Dsonar.java.source=${currentJavaVersion}"
 
                     if (helper.scmSource.pullRequest) {
                         sonarCliArgs+=" -Dsonar.pullrequest.branch=${helper.scmSource.branch.name}"
