@@ -1738,15 +1738,15 @@
             </build>
         </profile>
         <profile>
-            <id>testWithJdk26</id>
+            <id>testWithJdk27</id>
             <activation>
                 <property>
                     <name>java-version.test.release</name>
-                    <value>26</value>
+                    <value>27</value>
                 </property>
             </activation>
             <properties>
-                <!-- ForbiddenAPIs doesn't work with JDK25+ yet -->
+                <!-- ForbiddenAPIs doesn't work with JDK27+ yet -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
                 <!-- We need net.bytebuddy.experimental=true to make Bytebuddy work with JDK25+ -->
                 <surefire.jvm.args.java-version>-Dnet.bytebuddy.experimental=true</surefire.jvm.args.java-version>
