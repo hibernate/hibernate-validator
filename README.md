@@ -3,7 +3,7 @@
 *Version: 9.1.0.Final - 2025-11-07*
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.validator/hibernate-validator.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.validator&sort=name)
-[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
+[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-validator%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
 [![Sonar Coverage](https://img.shields.io/sonar/coverage/hibernate_hibernate-validator?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/project/activity?id=hibernate_hibernate-validator&graph=coverage)
 [![Quality gate](https://img.shields.io/sonar/alert_status/hibernate_hibernate-validator?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=hibernate_hibernate-validator)
 [![Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle)](https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Validator)
