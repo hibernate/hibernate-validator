@@ -203,6 +203,41 @@
             </dependencies>
         </profile>
         <profile>
+            <id>hv-9.1</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-9.1</value>
+                </property>
+            </activation>
+            <properties>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <validation-api.version>3.1.1.Final</validation-api.version>
+                <beanvalidation-impl.version>9.1.0.Final</beanvalidation-impl.version>
+                <sources.to.add.main>${project.basedir}/src/main/jakarta</sources.to.add.main>
+                <sources.to.add.additional.predefined>${project.basedir}/src/main/jakarta-predefined-scope</sources.to.add.additional.predefined>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${beanvalidation-impl.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.expressly</groupId>
+                    <artifactId>expressly</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>hv-9.0</id>
             <activation>
                 <property>

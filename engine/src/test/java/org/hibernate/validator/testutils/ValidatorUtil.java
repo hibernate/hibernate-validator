@@ -256,8 +256,10 @@ public final class ValidatorUtil {
 	}
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext(MutablePath propertyPath) {
-		return new ConstraintValidatorContextImpl( DefaultClockProvider.INSTANCE, propertyPath, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
+		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl( DefaultClockProvider.INSTANCE, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
 				ExpressionLanguageFeatureLevel.NONE
 		);
+		constraintValidatorContext.resetAsRegularContext( propertyPath, null );
+		return constraintValidatorContext;
 	}
 }

@@ -17,7 +17,7 @@ import jakarta.validation.ConstraintValidator;
 /**
  * @author Marko Bekhta
  */
-public class BaseMinMaxValidatorForNumberTest {
+public abstract class BaseMinMaxValidatorForNumberTest {
 
 	protected <A extends Annotation> void testNumberValidator(ConstraintValidator<A, Number> constraint, boolean inclusive, boolean isMax) {
 		byte b = 1;
