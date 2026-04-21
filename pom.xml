@@ -199,7 +199,7 @@
         <version.io.rest-assured>5.5.7</version.io.rest-assured>
         <version.org.apache.groovy>5.0.5</version.org.apache.groovy>
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>6.2.17</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>6.2.18</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.20.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.20</version.com.fasterxml.jackson.core.jackson-annotations>
@@ -411,7 +411,7 @@
                 - update README
                 - run mvn wrapper:wrapper to re-generate the maven wrapper
             -->
-        <maven.min.version>3.9.14</maven.min.version>
+        <maven.min.version>3.9.15</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
