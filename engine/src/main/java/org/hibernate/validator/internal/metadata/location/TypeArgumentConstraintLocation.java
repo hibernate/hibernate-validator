@@ -50,6 +50,11 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public boolean isDeclaredOnInterface() {
+		return delegate.isDeclaredOnInterface();
+	}
+
+	@Override
 	public Constrainable getConstrainable() {
 		return delegate.getConstrainable();
 	}

@@ -25,6 +25,8 @@ class BeanConstraintLocation implements ConstraintLocation {
 	 */
 	private final Class<?> declaringClass;
 
+	private final boolean isDeclaredOnInterface;
+
 	/**
 	 * The type to be used for validator resolution for constraints at this location.
 	 */
@@ -32,6 +34,7 @@ class BeanConstraintLocation implements ConstraintLocation {
 
 	BeanConstraintLocation(Class<?> declaringClass) {
 		this.declaringClass = declaringClass;
+		this.isDeclaredOnInterface = declaringClass.isInterface();
 
 		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
 		// resolution (HF)
@@ -41,6 +44,11 @@ class BeanConstraintLocation implements ConstraintLocation {
 	@Override
 	public Class<?> getDeclaringClass() {
 		return declaringClass;
+	}
+
+	@Override
+	public boolean isDeclaredOnInterface() {
+		return isDeclaredOnInterface;
 	}
 
 	@Override
