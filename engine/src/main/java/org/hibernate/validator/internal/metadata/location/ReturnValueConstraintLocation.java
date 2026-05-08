@@ -23,16 +23,24 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 
 	private final Callable callable;
 
+	private final boolean isDeclaredOnInterface;
+
 	private final ConstraintLocationKind kind;
 
 	ReturnValueConstraintLocation(Callable callable) {
 		this.callable = callable;
+		this.isDeclaredOnInterface = callable.getDeclaringClass().isInterface();
 		this.kind = ConstraintLocationKind.of( callable.getConstrainedElementKind() );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
 		return callable.getDeclaringClass();
+	}
+
+	@Override
+	public boolean isDeclaredOnInterface() {
+		return isDeclaredOnInterface;
 	}
 
 	@Override

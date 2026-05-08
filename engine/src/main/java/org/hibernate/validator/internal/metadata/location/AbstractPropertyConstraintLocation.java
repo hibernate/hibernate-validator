@@ -24,16 +24,24 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 	 */
 	private final T property;
 
+	private final boolean isDeclaredOnInterface;
+
 	private final PropertyAccessor propertyAccessor;
 
 	AbstractPropertyConstraintLocation(T property) {
 		this.property = property;
+		this.isDeclaredOnInterface = property.getDeclaringClass().isInterface();
 		this.propertyAccessor = property.createAccessor();
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
 		return property.getDeclaringClass();
+	}
+
+	@Override
+	public boolean isDeclaredOnInterface() {
+		return isDeclaredOnInterface;
 	}
 
 	@Override
