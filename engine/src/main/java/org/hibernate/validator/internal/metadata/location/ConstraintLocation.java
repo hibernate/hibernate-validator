@@ -70,6 +70,11 @@ public interface ConstraintLocation {
 	Class<?> getDeclaringClass();
 
 	/**
+	 * Returns whether this location's declaring class is an interface.
+	 */
+	boolean isDeclaredOnInterface();
+
+	/**
 	 * Returns the member represented by this location.
 	 *
 	 * @return the member represented by this location. Will be {@code null} when this location represents a type.
