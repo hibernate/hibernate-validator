@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 /**
  * @author Marko Bekhta
  */
+@SuppressWarnings("removal")
 @TestForIssue(jiraKey = "HV-1680")
 public class EnhancedBeanAccessorTest {
 	@Test

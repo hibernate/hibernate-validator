@@ -78,6 +78,7 @@ public final class TypeHelper {
 		throw new AssertionError();
 	}
 
+	@SuppressWarnings("removal")
 	public static boolean isHibernateValidatorEnhancedBean(Class<?> clazz) {
 		return HibernateValidatorEnhancedBean.class.isAssignableFrom( clazz );
 	}

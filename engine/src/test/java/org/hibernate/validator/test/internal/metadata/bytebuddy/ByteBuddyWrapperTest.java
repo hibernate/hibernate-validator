@@ -40,6 +40,7 @@ import org.testng.annotations.Test;
  *
  * @author Marko Bekhta
  */
+@SuppressWarnings("removal")
 public class ByteBuddyWrapperTest {
 
 	@Test
