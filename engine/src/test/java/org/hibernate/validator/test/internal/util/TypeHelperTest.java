@@ -877,6 +877,7 @@ public class TypeHelperTest {
 		assertTrue( TypeHelper.isAssignable( parentEntityType, childEntityType ) );
 	}
 
+	@SuppressWarnings("removal")
 	@Test
 	public void testIsHibernateValidatorEnhancedBean() {
 		class Foo {

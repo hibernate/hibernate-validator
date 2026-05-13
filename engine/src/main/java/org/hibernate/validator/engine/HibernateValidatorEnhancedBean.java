@@ -17,9 +17,13 @@ import org.hibernate.validator.Incubating;
  * the interface and all its super classes as well. Otherwise unexpected {@link IllegalArgumentException}
  * could be thrown by the Hibernate Validator engine.
  *
+ * @deprecated This interface will be removed in a future version of Hibernate Validator.
+ * It will be replaced by a pluggable mechanism for controlling state access. No direct
+ * migration path or alternative currently exists.
  * @author Marko Bekhta
  * @since 6.1
  */
+@Deprecated(since = "9.2", forRemoval = true)
 @Incubating
 public interface HibernateValidatorEnhancedBean {
 

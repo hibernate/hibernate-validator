@@ -121,6 +121,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 			this.getterFullName = getterFullName;
 		}
 
+		@SuppressWarnings("removal")
 		@Override
 		public Object getValueFrom(Object bean) {
 			// we don't do an instanceof check here as it should already be applied when the accessor was created.
