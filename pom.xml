@@ -157,7 +157,7 @@
         -->
         <version.com.fasterxml.classmate>1.7.3</version.com.fasterxml.classmate>
         <version.joda-time>2.14.2</version.joda-time>
-        <version.org.slf4j>2.0.17</version.org.slf4j>
+        <version.org.slf4j>2.0.18</version.org.slf4j>
         <version.org.apache.logging.log4j>2.26.0</version.org.apache.logging.log4j>
 
         <!--
