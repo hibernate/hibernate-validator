@@ -43,6 +43,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NORMALIZED;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_BLANK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_EMPTY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL;
@@ -116,6 +117,7 @@ import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NullOrNotBlank;
+import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -338,6 +340,18 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValida
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotBlankValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArray;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfBoolean;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfByte;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfChar;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfDouble;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfFloat;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfInt;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfLong;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForArraysOfShort;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForCollection;
+import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
@@ -786,6 +800,22 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_BLANK ) ) {
 			putBuiltinConstraint( tmpConstraints, NullOrNotBlank.class, NullOrNotBlankValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_EMPTY ) ) {
+			List<Class<? extends ConstraintValidator<NullOrNotEmpty, ?>>> nullOrNotEmptyValidators = new ArrayList<>( 12 );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForCharSequence.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForCollection.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArray.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForMap.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfBoolean.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfByte.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfChar.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfDouble.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfFloat.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfInt.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfLong.class );
+			nullOrNotEmptyValidators.add( NullOrNotEmptyValidatorForArraysOfShort.class );
+			putBuiltinConstraints( tmpConstraints, NullOrNotEmpty.class, nullOrNotEmptyValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP ) ) {
 			putBuiltinConstraint( tmpConstraints, NIP.class, NIPValidator.class );

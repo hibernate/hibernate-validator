@@ -722,6 +722,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@NullOrNotEmpty`:: Validates that the annotated element is either `null` or not empty. This is useful for nullable fields and for use with `Optional`, where an empty `Optional` (extracted as `null`) should be considered valid, but a present value must not be empty.
+	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
+	Hibernate metadata impact::: None
+
 `@Range(min=, max=)`:: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
 	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
 	Hibernate metadata impact::: None

@@ -63,6 +63,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK( "org.hibernate.validator.constraints.Mod11Check" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NORMALIZED( "org.hibernate.validator.constraints.Normalized" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_BLANK( "org.hibernate.validator.constraints.NullOrNotBlank" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_EMPTY( "org.hibernate.validator.constraints.NullOrNotEmpty" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN( "org.hibernate.validator.constraints.EAN", Arrays.asList( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK ) ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT( "org.hibernate.validator.constraints.ParameterScriptAssert" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE( "org.hibernate.validator.constraints.Range",
