@@ -13,7 +13,7 @@ module org.hibernate.validator.integrationtest.java.module.cdi {
 	exports org.hibernate.validator.integrationtest.java.module.cdi.constraint to org.hibernate.validator;
 
 	// HV needs reflection access to constrained beans. e.g. to make fields accessible
-	opens org.hibernate.validator.integrationtest.java.module.cdi.model to org.hibernate.validator;
+	opens org.hibernate.validator.integrationtest.java.module.cdi.model to org.hibernate.validator, org.hibernate.accessor.core;
 
 	// we let all know that there's a `ConstraintValidator` "service" to be "loaded"
 	provides jakarta.validation.ConstraintValidator with org.hibernate.validator.integrationtest.java.module.cdi.constraint.CarServiceConstraint.Validator;

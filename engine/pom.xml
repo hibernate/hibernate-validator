@@ -64,6 +64,11 @@
             <groupId>com.fasterxml</groupId>
             <artifactId>classmate</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.accessor</groupId>
+            <artifactId>hibernate-accessor-core</artifactId>
+            <version>${version.org.hibernate.accessor}</version>
+        </dependency>
 
         <!--
         Provided dependencies

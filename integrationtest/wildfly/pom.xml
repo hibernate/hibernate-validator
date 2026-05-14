@@ -216,6 +216,24 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-hibernate-accessor-current</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <!-- WildFly current -->
+                                <artifactItem>
+                                    <groupId>org.hibernate.accessor</groupId>
+                                    <artifactId>hibernate-accessor-core</artifactId>
+                                    <version>${version.org.hibernate.accessor}</version>
+                                    <outputDirectory>${wildfly.modules-dir}/org/hibernate/accessor/main/</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

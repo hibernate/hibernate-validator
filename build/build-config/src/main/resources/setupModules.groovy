@@ -40,6 +40,7 @@ processFileInplace( hvModuleXml ) { text ->
 }
 
 removeDependency( hvModuleXml, "org.apache.xerces" )
+appendDependency( hvModuleXml, "org.hibernate.accessor", false )
 appendDependency( hvModuleXml, "javax.xml.stream.api", false )
 appendDependency( hvModuleXml, "javax.api", false )
 
@@ -47,6 +48,26 @@ appendDependency( hvModuleXml, "javax.money.api", true )
 appendDependency( hvModuleXml, "javafx.api", true )
 
 deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/main', 'hibernate-validator-.*\\.jar' ) )
+
+// Hibernate Accessor
+def haModuleDir = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/accessor/main' )
+haModuleDir.mkdirs()
+
+def haArtifactName = 'hibernate-accessor-core-' + hibernateAccessorVersion + '.jar';
+println "[INFO] Using Hibernate Accessor version " + haArtifactName;
+
+new File( haModuleDir, 'module.xml' ).text =
+        """<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ Copyright Red Hat Inc. and Hibernate Authors
+  -->
+<module name="org.hibernate.accessor" xmlns="urn:jboss:module:1.9">
+  <resources>                                                                                                                                                                                                   
+      <resource-root path="${haArtifactName}" />
+  </resources>                                                                                                                                                                                                  
+</module>                                                       
+"""
 
 // HV CDI
 hvCdiModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/cdi/main/module.xml' )

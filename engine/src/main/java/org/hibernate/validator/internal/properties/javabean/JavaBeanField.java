@@ -10,9 +10,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import org.hibernate.validator.internal.properties.PropertyAccessor;
+import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.actions.GetDeclaredField;
 
 /**
  * @author Marko Bekhta
@@ -23,12 +23,14 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	private final String resolvedPropertyName;
 	private final Type typeForValidatorResolution;
 	private final Type type;
+	private final HibernateAccessorFactory accessorFactory;
 
-	public JavaBeanField(Field field, String resolvedPropertyName) {
+	public JavaBeanField(Field field, String resolvedPropertyName, HibernateAccessorFactory accessorFactory) {
 		this.field = field;
 		this.type = ReflectionHelper.typeOf( field );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( this.type );
 		this.resolvedPropertyName = resolvedPropertyName;
+		this.accessorFactory = accessorFactory;
 	}
 
 	@Override
@@ -87,8 +89,8 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	}
 
 	@Override
-	public PropertyAccessor createAccessor() {
-		return new FieldAccessor( field );
+	public HibernateAccessorValueReader<?> createAccessor() {
+		return accessorFactory.valueReader( field );
 	}
 
 	@Override
@@ -122,28 +124,5 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	@Override
 	public String toString() {
 		return getName();
-	}
-
-	private static class FieldAccessor implements PropertyAccessor {
-
-		private Field accessibleField;
-
-		private FieldAccessor(Field field) {
-			this.accessibleField = getAccessible( field );
-		}
-
-		@Override
-		public Object getValueFrom(Object bean) {
-			return ReflectionHelper.getValue( accessibleField, bean );
-		}
-	}
-
-	/**
-	 * Returns an accessible copy of the given member.
-	 */
-	private static Field getAccessible(Field original) {
-		Class<?> clazz = original.getDeclaringClass();
-
-		return GetDeclaredField.andMakeAccessible( clazz, original.getName() );
 	}
 }
