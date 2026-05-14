@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAccessorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
@@ -43,6 +44,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.spi.ConfigurationState;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
@@ -189,7 +191,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ),
-				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ) );
+				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ),
+				determineAccessorFactory( hibernateSpecificConfig, properties, externalClassLoader ) );
 		this.beanMetadataClassNormalizer = determineBeanMetaDataClassNormalizer( hibernateSpecificConfig );
 
 		// first we want to register any validators coming from a service loader. Since they are just loaded and there's
@@ -293,6 +296,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
 		return javaBeanHelper.getGetterPropertySelectionStrategy();
+	}
+
+	@Override
+	public HibernateAccessorFactory getAccessorFactory() {
+		return javaBeanHelper.getAccessorFactory();
 	}
 
 	@Override

@@ -4,18 +4,14 @@
  */
 package org.hibernate.validator.internal.properties.javabean;
 
-import static org.hibernate.validator.internal.util.TypeHelper.isHibernateValidatorEnhancedBean;
-
 import java.lang.reflect.Method;
 
-import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
+import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
-import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.actions.GetDeclaredMethod;
 
 /**
  * @author Marko Bekhta
@@ -33,13 +29,17 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	 */
 	private final Class<?> declaringClass;
 
-	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName, String resolvedPropertyName) {
+	private final HibernateAccessorFactory accessorFactory;
+
+	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName, String resolvedPropertyName,
+			HibernateAccessorFactory accessorFactory) {
 		super( method );
 		Contracts.assertNotNull( propertyName, "Property name cannot be null." );
 
 		this.declaringClass = declaringClass;
 		this.propertyName = propertyName;
 		this.resolvedPropertyName = resolvedPropertyName;
+		this.accessorFactory = accessorFactory;
 	}
 
 	@Override
@@ -80,14 +80,8 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	}
 
 	@Override
-	public PropertyAccessor createAccessor() {
-		if ( isHibernateValidatorEnhancedBean( executable.getDeclaringClass() ) ) {
-			return new EnhancedBeanGetterAccessor( executable.getName() );
-		}
-		else {
-			return new GetterAccessor( executable );
-		}
-
+	public HibernateAccessorValueReader<?> createAccessor() {
+		return accessorFactory.valueReader( executable );
 	}
 
 	@Override
@@ -112,44 +106,6 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 		int result = super.hashCode();
 		result = 31 * result + this.propertyName.hashCode();
 		return result;
-	}
-
-	private static class EnhancedBeanGetterAccessor implements PropertyAccessor {
-		private final String getterFullName;
-
-		private EnhancedBeanGetterAccessor(final String getterFullName) {
-			this.getterFullName = getterFullName;
-		}
-
-		@SuppressWarnings("removal")
-		@Override
-		public Object getValueFrom(Object bean) {
-			// we don't do an instanceof check here as it should already be applied when the accessor was created.
-			return ( (HibernateValidatorEnhancedBean) bean ).$$_hibernateValidator_getGetterValue( getterFullName );
-		}
-	}
-
-	private static class GetterAccessor implements PropertyAccessor {
-
-		private Method accessibleGetter;
-
-		private GetterAccessor(Method getter) {
-			this.accessibleGetter = getAccessible( getter );
-		}
-
-		@Override
-		public Object getValueFrom(Object bean) {
-			return ReflectionHelper.getValue( accessibleGetter, bean );
-		}
-	}
-
-	/**
-	 * Returns an accessible copy of the given method.
-	 */
-	private static Method getAccessible(Method original) {
-		Class<?> clazz = original.getDeclaringClass();
-
-		return GetDeclaredMethod.andMakeAccessible( clazz, original.getName() );
 	}
 
 }
