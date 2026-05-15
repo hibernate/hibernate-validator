@@ -23,12 +23,14 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 
 	private final Callable callable;
 	private final int index;
+	private final boolean isDeclaredOnInterface;
 	private final Type typeForValidatorResolution;
 	private final ConstraintLocationKind kind;
 
 	public ParameterConstraintLocation(Callable callable, int index) {
 		this.callable = callable;
 		this.index = index;
+		this.isDeclaredOnInterface = callable.getDeclaringClass().isInterface();
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( callable.getParameterGenericType( index ) );
 		this.kind = ConstraintLocationKind.of( callable.getConstrainedElementKind() );
 	}
@@ -36,6 +38,11 @@ public class ParameterConstraintLocation implements ConstraintLocation {
 	@Override
 	public Class<?> getDeclaringClass() {
 		return callable.getDeclaringClass();
+	}
+
+	@Override
+	public boolean isDeclaredOnInterface() {
+		return isDeclaredOnInterface;
 	}
 
 	@Override
