@@ -242,7 +242,7 @@
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <version.depends.plugin>1.5.0</version.depends.plugin>
         <version.deploy.plugin>3.1.4</version.deploy.plugin>
-        <version.enforcer.plugin>3.6.2</version.enforcer.plugin>
+        <version.enforcer.plugin>3.6.3</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
         <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>4.2.1</version.gmavenplus.plugin>
