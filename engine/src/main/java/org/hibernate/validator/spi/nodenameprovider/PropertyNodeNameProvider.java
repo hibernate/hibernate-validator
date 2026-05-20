@@ -14,16 +14,16 @@ import org.hibernate.validator.Incubating;
 public interface PropertyNodeNameProvider {
 	/// Returns the resolved name of a property.
 	///
-	/// Depending on the subtype of the [Property],
-	/// a different strategy for name resolution could be applied, defaulting to [Property#getName()]. For example:
+	/// Depending on the subtype of the [Property], a different strategy for name resolution could be applied, defaulting
+	/// to [Property#getName()]. For example:
 	///
 	/// ```
 	/// if (property instanceof [JavaBeanProperty]){
-	///// for instance, generate a property name based on the annotations of the property
-	///} else {
+	///    // for instance, generate a property name based on the annotations of the property
+	/// } else {
 	///     return property.getName();
-	///}
-	///```
+	/// }
+	/// ```
 	///
 	/// @param property whose name needs to be resolved
 	/// @return String representing the resolved name
@@ -35,19 +35,19 @@ public interface PropertyNodeNameProvider {
 
 	/// Returns the resolved name of a property.
 	///
-	/// Depending on the subtype of the [Property],
-	/// a different strategy for name resolution could be applied, defaulting to [Property#getName()]. For example:
+	/// Depending on the subtype of the [Property], a different strategy for name resolution could be applied, defaulting
+	/// to [Property#getName()]. For example:
 	///
 	/// ```
 	/// if (property instanceof [JavaBeanProperty]){
-	///// for instance, generate a property name based on the annotations of the property
-	///} else {
+	///     // for instance, generate a property name based on the annotations of the property
+	/// } else {
 	///     return property.getName();
-	///}
-	///```
+	/// }
+	/// ```
 	///
 	/// @param property whose name needs to be resolved
-	/// @param context  additional context available during the property name resolution
+	/// @param context additional context available during the property name resolution
 	/// @return String representing the resolved name
 	/// @since 9.2
 	@Incubating
