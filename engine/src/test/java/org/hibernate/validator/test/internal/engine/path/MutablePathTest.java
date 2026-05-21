@@ -27,6 +27,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
@@ -241,7 +242,7 @@ public class MutablePathTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), HibernateAccessorFactory.reflection() ),
 				new DefaultBeanMetaDataClassNormalizer(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),

@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -121,6 +122,15 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME = "hibernate.validator.getter_property_selection_strategy";
+
+	/**
+	 * Property for configuring the accessor factory, allowing to set which {@link HibernateAccessorFactory}
+	 * implementation will be used for accessing bean property values.
+	 *
+	 * @since 10.0.0
+	 */
+	@Incubating
+	String ACCESSOR_FACTORY_CLASSNAME = "hibernate.validator.accessor_factory";
 
 	/**
 	 * Property for configuring the property node name provider, allowing to select an implementation of {@link PropertyNodeNameProvider}
@@ -398,6 +408,16 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy);
+
+	/**
+	 * Allows to set an accessor factory defining the strategy for accessing bean property values.
+	 *
+	 * @param accessorFactory the {@link HibernateAccessorFactory} to be used
+	 * @return {@code this} following the chaining method pattern
+	 * @since 10.0.0
+	 */
+	@Incubating
+	S accessorFactory(HibernateAccessorFactory accessorFactory);
 
 	/**
 	 * Allows to set a property node name provider, defining how the name of a property node will be resolved

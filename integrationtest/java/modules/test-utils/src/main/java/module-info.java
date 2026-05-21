@@ -10,6 +10,6 @@ module org.hibernate.validator.integrationtest.java.module.test.utils {
 	requires org.assertj.core;
 	requires org.glassfish.expressly;
 
-	opens org.hibernate.validator.integrationtest.java.module.test.utils to org.hibernate.validator;
+	opens org.hibernate.validator.integrationtest.java.module.test.utils to org.hibernate.validator, org.hibernate.accessor.core;
 
 }

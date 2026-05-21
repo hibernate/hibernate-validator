@@ -4,15 +4,19 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 
+import org.hibernate.accessor.HibernateAccessorException;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.PropertyAccessor;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * A {@link Cascadable} backed by a property of a Java bean.
@@ -21,9 +25,10 @@ import org.hibernate.validator.internal.properties.PropertyAccessor;
  * @author Marko Bekhta
  */
 public abstract class AbstractPropertyCascadable<T extends Property> implements Cascadable {
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private final T property;
-	private final PropertyAccessor propertyAccessor;
+	private final HibernateAccessorValueReader<?> propertyAccessor;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
@@ -41,7 +46,12 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 
 	@Override
 	public Object getValue(Object parent) {
-		return propertyAccessor.getValueFrom( parent );
+		try {
+			return propertyAccessor.get( parent );
+		}
+		catch (HibernateAccessorException e) {
+			throw LOG.getUnexpectedExceptionAccessingBean( e );
+		}
 	}
 
 	@Override

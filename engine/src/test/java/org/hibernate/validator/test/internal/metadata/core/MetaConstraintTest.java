@@ -12,6 +12,7 @@ import java.util.Collections;
 
 import jakarta.validation.constraints.NotNull;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
@@ -54,7 +55,7 @@ public class MetaConstraintTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-930")
 	public void two_meta_constraints_for_the_same_constraint_should_be_equal() throws Exception {
-		JavaBeanGetter javaBeanGetter = new JavaBeanGetter( Foo.class, Foo.class.getDeclaredMethod( "getBar" ), "bar", "bar" );
+		JavaBeanGetter javaBeanGetter = new JavaBeanGetter( Foo.class, Foo.class.getDeclaredMethod( "getBar" ), "bar", "bar", HibernateAccessorFactory.reflection() );
 		ConstraintDescriptorImpl<NotNull> constraintDescriptor1 = new ConstraintDescriptorImpl<>(
 				constraintHelper, javaBeanGetter, constraintAnnotationDescriptor, ConstraintLocationKind.METHOD
 		);

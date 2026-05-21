@@ -4,12 +4,16 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 
+import org.hibernate.accessor.HibernateAccessorException;
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * An abstract property constraint location.
@@ -18,13 +22,14 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  * @author Guillaume Smet
  */
 public abstract class AbstractPropertyConstraintLocation<T extends Property> implements ConstraintLocation {
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	/**
 	 * The property the constraint was defined on.
 	 */
 	private final T property;
 
-	private final PropertyAccessor propertyAccessor;
+	private final HibernateAccessorValueReader<?> propertyAccessor;
 
 	AbstractPropertyConstraintLocation(T property) {
 		this.property = property;
@@ -62,7 +67,12 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	@Override
 	public Object getValue(Object parent) {
-		return propertyAccessor.getValueFrom( parent );
+		try {
+			return propertyAccessor.get( parent );
+		}
+		catch (HibernateAccessorException e) {
+			throw LOG.getUnexpectedExceptionAccessingBean( e );
+		}
 	}
 
 	@Override

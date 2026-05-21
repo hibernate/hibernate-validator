@@ -12,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.actions.GetDeclaredConstructor;
@@ -34,10 +35,13 @@ public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
+	private final HibernateAccessorFactory accessorFactory;
 
-	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy, PropertyNodeNameProvider propertyNodeNameProvider) {
+	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy, PropertyNodeNameProvider propertyNodeNameProvider,
+			HibernateAccessorFactory accessorFactory) {
 		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
 		this.propertyNodeNameProvider = propertyNodeNameProvider;
+		this.accessorFactory = accessorFactory;
 	}
 
 	@Override
@@ -47,6 +51,10 @@ public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 
 	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
 		return propertyNodeNameProvider;
+	}
+
+	public HibernateAccessorFactory getAccessorFactory() {
+		return accessorFactory;
 	}
 
 	public Optional<JavaBeanField> findDeclaredField(Class<?> declaringClass, String property) {
@@ -79,7 +87,7 @@ public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 		}
 		else {
 			return Optional.of( new JavaBeanGetter( declaringClass, getter, property, propertyNodeNameProvider.getName(
-					new JavaBeanPropertyImpl( declaringClass, property, getter.getName() ), this ) ) );
+					new JavaBeanPropertyImpl( declaringClass, property, getter.getName() ), this ), accessorFactory ) );
 		}
 	}
 
@@ -121,14 +129,14 @@ public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 		Optional<String> correspondingProperty = getterPropertySelectionStrategy.getProperty( executable );
 		if ( correspondingProperty.isPresent() ) {
 			return new JavaBeanGetter( declaringClass, method, correspondingProperty.get(), propertyNodeNameProvider.getName(
-					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get(), method.getName() ), this ) );
+					new JavaBeanPropertyImpl( declaringClass, correspondingProperty.get(), method.getName() ), this ), accessorFactory );
 		}
 
 		return new JavaBeanMethod( method );
 	}
 
 	public JavaBeanField field(Field field) {
-		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName(), field.getName() ), this ) );
+		return new JavaBeanField( field, propertyNodeNameProvider.getName( new JavaBeanPropertyImpl( field.getDeclaringClass(), field.getName(), field.getName() ), this ), accessorFactory );
 	}
 
 	private static class JavaBeanConstrainableExecutable implements ConstrainableExecutable {

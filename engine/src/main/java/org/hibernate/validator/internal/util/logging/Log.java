@@ -965,4 +965,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 274, value = "Unsupported operation for the current constraint validator kind.")
 	AssertionError getUnexpectedConstraintValidatorContextCall();
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 275, value = "Using %s as accessor factory.")
+	void usingAccessorFactory(@FormatWith(ClassObjectFormatter.class) Class<?> accessorFactoryClass);
+
+	@Message(id = 276, value = "Unable to instantiate accessor factory class %s.")
+	ValidationException getUnableToInstantiateAccessorFactoryClassException(String accessorFactoryClassName, @Cause Exception e);
+
+	@Message(id = 277, value = "An unexpected exception occurred when accessing bean state.")
+	ValidationException getUnexpectedExceptionAccessingBean(@Cause Exception e);
 }

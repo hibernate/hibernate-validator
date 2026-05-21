@@ -17,6 +17,7 @@ import java.util.Set;
 
 import jakarta.validation.spi.ConfigurationState;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
@@ -345,6 +346,32 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return new DefaultGetterPropertySelectionStrategy();
+	}
+
+	static HibernateAccessorFactory determineAccessorFactory(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
+			ClassLoader externalClassLoader) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getAccessorFactory() != null ) {
+			LOG.usingAccessorFactory( hibernateSpecificConfig.getAccessorFactory().getClass() );
+			return hibernateSpecificConfig.getAccessorFactory();
+		}
+
+		String accessorFactoryFqcn = properties.get( HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME );
+		if ( accessorFactoryFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends HibernateAccessorFactory> clazz =
+						(Class<? extends HibernateAccessorFactory>) LoadClass.action( accessorFactoryFqcn, externalClassLoader );
+				HibernateAccessorFactory accessorFactory = NewInstance.action( clazz, "accessor factory class" );
+				LOG.usingAccessorFactory( clazz );
+
+				return accessorFactory;
+			}
+			catch (Exception e) {
+				throw LOG.getUnableToInstantiateAccessorFactoryClassException( accessorFactoryFqcn, e );
+			}
+		}
+
+		return HibernateAccessorFactory.reflection();
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig) {
