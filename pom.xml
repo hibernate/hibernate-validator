@@ -188,7 +188,7 @@
         <version.org.openjfx>17.0.19</version.org.openjfx>
 
         <!-- Test dependencies -->
-        <version.org.jboss.arquillian>1.10.1.Final</version.org.jboss.arquillian>
+        <version.org.jboss.arquillian>1.10.2.Final</version.org.jboss.arquillian>
         <version.shrinkwrap.core>1.2.6</version.shrinkwrap.core>
         <version.shrinkwrap.resolvers>3.3.6</version.shrinkwrap.resolvers>
         <version.shrinkwrap.descriptors>2.0.0</version.shrinkwrap.descriptors>
