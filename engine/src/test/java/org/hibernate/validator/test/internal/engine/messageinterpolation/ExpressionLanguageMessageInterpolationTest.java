@@ -70,7 +70,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_METHODS,
-				false );
+				false,
+				null );
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
@@ -89,7 +90,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
-				false );
+				false,
+				null );
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
@@ -108,7 +110,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.VARIABLES,
-				false );
+				false,
+				null );
 
 		String expected = "${validatedValue.age}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
@@ -125,7 +128,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_METHODS,
-				false );
+				false,
+				null );
 
 		String expected = "${validatedValue.foo}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.foo}", context );
@@ -217,7 +221,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.VARIABLES,
-				false );
+				false,
+				null );
 
 		// german locale
 		String expected = "42,00";
@@ -297,7 +302,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_METHODS,
-				false );
+				false,
+				null );
 
 		String expected = "${formatter.foo('%1$.2f', validatedValue)}";
 		String actual = interpolatorUnderTest.interpolate(
@@ -380,6 +386,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				expressionLanguageFeatureLevel,
-				false );
+				false,
+				null );
 	}
 }

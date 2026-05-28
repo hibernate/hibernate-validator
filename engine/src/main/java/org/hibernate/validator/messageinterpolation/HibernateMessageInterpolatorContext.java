@@ -9,6 +9,9 @@ import java.util.Map;
 import jakarta.validation.MessageInterpolator;
 import jakarta.validation.Path;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.HibernateValidatorContext;
+
 /**
  * Extension to {@code MessageInterpolator.Context} which provides functionality
  * specific to Hibernate Validator.
@@ -53,4 +56,19 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	 * @since 6.2
 	 */
 	ExpressionLanguageFeatureLevel getExpressionLanguageFeatureLevel();
+
+	/**
+	 * Returns an instance of the specified type or {@code null} if the constraint validator payload assigned to
+	 * the validator isn't of the given type.
+	 * <p>
+	 * This is the payload configured through {@link HibernateValidatorConfiguration#constraintValidatorPayload(Object)}
+	 * or {@link HibernateValidatorContext#constraintValidatorPayload(Object)}.
+	 *
+	 * @param type the type of payload to retrieve
+	 * @return an instance of the specified type or {@code null} if the constraint validator payload isn't of the
+	 * given type
+	 *
+	 * @since 9.2
+	 */
+	<C> C getConstraintValidatorPayload(Class<C> type);
 }

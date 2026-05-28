@@ -282,7 +282,8 @@ public class ResourceBundleMessageInterpolatorTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_METHODS,
-				false );
+				false,
+				null );
 	}
 
 	private void runInterpolation(boolean cachingEnabled) {

@@ -38,9 +38,10 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final Map<String, Object> expressionVariables;
 	private final ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel;
 	private final boolean customViolation;
+	private final Object constraintValidatorPayload;
 
 	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor, Object validatedValue, Class<?> rootBeanType, Path propertyPath, Map<String, Object> messageParameters,
-			Map<String, Object> expressionVariables, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, boolean customViolation) {
+			Map<String, Object> expressionVariables, ExpressionLanguageFeatureLevel expressionLanguageFeatureLevel, boolean customViolation, Object constraintValidatorPayload) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
@@ -49,6 +50,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		this.expressionVariables = expressionVariables;
 		this.expressionLanguageFeatureLevel = expressionLanguageFeatureLevel;
 		this.customViolation = customViolation;
+		this.constraintValidatorPayload = constraintValidatorPayload;
 	}
 
 	@Override
@@ -88,6 +90,16 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	@Override
 	public Path getPropertyPath() {
 		return propertyPath;
+	}
+
+	@Override
+	public <C> C getConstraintValidatorPayload(Class<C> type) {
+		if ( constraintValidatorPayload != null && type.isAssignableFrom( constraintValidatorPayload.getClass() ) ) {
+			return type.cast( constraintValidatorPayload );
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override

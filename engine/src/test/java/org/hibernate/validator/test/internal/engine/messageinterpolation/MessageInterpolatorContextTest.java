@@ -12,6 +12,7 @@ import static org.easymock.EasyMock.verify;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
@@ -38,6 +39,7 @@ import jakarta.validation.metadata.BeanDescriptor;
 import jakarta.validation.metadata.ConstraintDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
@@ -95,7 +97,8 @@ public class MessageInterpolatorContextTest {
 								Collections.<String, Object>emptyMap(),
 								Collections.<String, Object>emptyMap(),
 								ExpressionLanguageFeatureLevel.BEAN_METHODS,
-								false )
+								false,
+								null )
 				)
 		)
 				.andReturn( "invalid" );
@@ -113,14 +116,14 @@ public class MessageInterpolatorContextTest {
 	@Test(expectedExceptions = ValidationException.class)
 	public void testUnwrapToImplementationCausesValidationException() {
 		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false );
+				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false, null );
 		context.unwrap( MessageInterpolatorContext.class );
 	}
 
 	@Test
 	public void testUnwrapToInterfaceTypesSucceeds() {
 		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(),
-				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false );
+				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false, null );
 
 		MessageInterpolator.Context asMessageInterpolatorContext = context.unwrap( MessageInterpolator.Context.class );
 		assertSame( asMessageInterpolatorContext, context );
@@ -145,7 +148,8 @@ public class MessageInterpolatorContextTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_METHODS,
-				false );
+				false,
+				null );
 
 		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getRootBeanType(), rootBeanType );
 	}
@@ -162,9 +166,64 @@ public class MessageInterpolatorContextTest {
 				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(),
 				ExpressionLanguageFeatureLevel.BEAN_METHODS,
-				false );
+				false,
+				null );
 
 		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getPropertyPath(), pathMock );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2219")
+	public void testGetConstraintValidatorPayload() {
+		String constraintValidatorPayload = "payload";
+		MessageInterpolator.Context context = new MessageInterpolatorContext(
+				null,
+				null,
+				null,
+				null,
+				Collections.<String, Object>emptyMap(),
+				Collections.<String, Object>emptyMap(),
+				ExpressionLanguageFeatureLevel.BEAN_METHODS,
+				false,
+				constraintValidatorPayload );
+
+		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( String.class ), constraintValidatorPayload );
+		assertNull( context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( Integer.class ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2219")
+	public void testGetConstraintValidatorPayloadReturnsNullWhenUnset() {
+		MessageInterpolator.Context context = new MessageInterpolatorContext(
+				null,
+				null,
+				null,
+				null,
+				Collections.<String, Object>emptyMap(),
+				Collections.<String, Object>emptyMap(),
+				ExpressionLanguageFeatureLevel.BEAN_METHODS,
+				false,
+				null );
+
+		assertNull( context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( Object.class ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2219")
+	public void testConstraintValidatorPayloadIsPassedToMessageInterpolator() {
+		HibernateValidatorFactory validatorFactory = ValidatorUtil.getConfiguration()
+				.messageInterpolator( new ConstraintValidatorPayloadMessageInterpolator() )
+				.buildValidatorFactory()
+				.unwrap( HibernateValidatorFactory.class );
+		Validator validator = validatorFactory.usingContext()
+				.constraintValidatorPayload( "payload" )
+				.getValidator();
+
+		Set<ConstraintViolation<TestBean>> violations = validator.validate( new TestBean( "value" ) );
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Size.class ).withMessage( "payload" )
+		);
 	}
 
 	@Test
@@ -221,6 +280,19 @@ public class MessageInterpolatorContextTest {
 			return baseNodeBuilder.toString();
 		}
 
+	}
+
+	private static class ConstraintValidatorPayloadMessageInterpolator implements MessageInterpolator {
+
+		@Override
+		public String interpolate(String messageTemplate, Context context) {
+			return context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( String.class );
+		}
+
+		@Override
+		public String interpolate(String messageTemplate, Context context, Locale locale) {
+			return interpolate( messageTemplate, context );
+		}
 	}
 
 	/**
