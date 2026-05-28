@@ -296,7 +296,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				messageParameters,
 				expressionVariables,
 				expressionLanguageFeatureLevel,
-				customViolation
+				customViolation,
+				validatorScopedContext.getConstraintValidatorPayload()
 		);
 
 		try {
