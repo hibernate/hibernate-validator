@@ -16,6 +16,7 @@
                 <updated name="jakarta.validation.api" />
                 <updated name="org.hibernate.validator" />
                 <updated name="org.hibernate.validator.cdi" />
+                <updated name="org.jboss.logging" />
             </modules>
         </specified-content>
     </element>
