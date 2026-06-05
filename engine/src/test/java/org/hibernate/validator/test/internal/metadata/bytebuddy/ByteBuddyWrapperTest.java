@@ -49,7 +49,7 @@ public class ByteBuddyWrapperTest {
 
 		ClassLoader classLoader = new ByteArrayClassLoader(
 				ClassLoadingStrategy.BOOTSTRAP_LOADER,
-				ClassFileLocator.ForClassLoader.readToNames( Foo.class, HibernateValidatorEnhancedBean.class,
+				ClassFileLocator.ForClassLoader.readToNames( HibernateValidatorEnhancedBean.class,
 						MyContracts.class, StringHelper.class ) );
 
 		Class<?> aClass = new ByteBuddy().rebase( clazz )
@@ -67,7 +67,7 @@ public class ByteBuddyWrapperTest {
 				)
 				.intercept( new Implementation.Simple( new GetGetterValue( clazz ) ) )
 				.make()
-				.load( classLoader, ClassLoadingStrategy.Default.INJECTION )
+				.load( classLoader, ClassLoadingStrategy.Default.WRAPPER )
 				.getLoaded();
 
 		Object object = aClass.getConstructor().newInstance();
