@@ -49,7 +49,6 @@ defaults:
 
 env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress"
-  TESTCONTAINERS_REUSE_ENABLE: true
 
 permissions:
   contents: read
@@ -108,11 +107,14 @@ jobs:
 
       - name: Build code and run tests and basic checks (Standalone)
         run: |
-          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean install \
-          -Pjqassistant -Pdist
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
+          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean install \
+              -Pjqassistant -Pdist
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
+          MAVEN_MATRIX_ARGS: ${{ matrix.os.maven.args }}
       # For jobs running on 'pull_request', upload build scan data.
       # The actual publishing must be done in a separate job (see ci-report.yml).
       # We don't write to the remote cache as that would be unsafe.
@@ -125,13 +127,16 @@ jobs:
 
       - name: Run TCK tests in container mode
         run: |
-          ./mvnw $MAVEN_ARGS ${{ matrix.os.maven.args }} clean verify \
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_matrix_args <<< "$MAVEN_MATRIX_ARGS"
+          ./mvnw "${mvn_args[@]}" "${mvn_matrix_args[@]}" clean verify \
           -Pjqassistant -Pskip-checks \
           -am -pl :hibernate-validator-tck-runner \
           -Dincontainer -Dincontainer-prepared
         env:
           DEVELOCITY_ACCESS_KEY: "${{ secrets.DEVELOCITY_ACCESS_KEY || '' }}"
           DEVELOCITY_BASE_URL: "${{ env.DEVELOCITY_BASE_URL || 'https://develocity.commonhaus.dev' }}"
+          MAVEN_MATRIX_ARGS: ${{ matrix.os.maven.args }}
 
       - name: Upload GitHub Actions artifact for the Develocity build scan
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
