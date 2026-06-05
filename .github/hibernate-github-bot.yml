@@ -50,9 +50,13 @@ develocity:
 licenseAgreement:
   enabled: true
   ignore:
-    # We ignore all dependabot PRs for a license check:
     - user: dependabot[bot]
-      titlePattern: ".*Bump.*"
+      titlePattern: "Bump.*"
+    # Members of this team already agreed to both LGPL and ASL2 for all their contributions.
+    - team:
+        name: license-agreement
+        organization: hibernate
+      titlePattern: ".*"
 branches:
   enabled: true
   titlePrefix: "[%s]"
