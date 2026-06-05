@@ -58,6 +58,7 @@ import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
@@ -160,6 +161,7 @@ public class MessagePropertiesTest {
 							violationOf( Normalized.class ),
 							violationOf( NullOrNotBlank.class ),
 							violationOf( NullOrNotEmpty.class ),
+							violationOf( Port.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( URL.class ),
@@ -312,6 +314,9 @@ public class MessagePropertiesTest {
 
 		@NullOrNotEmpty
 		private String nullOrNotEmpty = "";
+
+		@Port
+		private int port = 70000;
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
