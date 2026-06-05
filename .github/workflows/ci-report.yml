@@ -15,14 +15,19 @@ defaults:
 env:
   MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress"
 
-permissions:
-  contents: read
+permissions: { } # none, jobs are defining their own if they need any
 
 jobs:
   publish-build-scans:
     name: Publish Develocity build scans
     if: github.repository == 'hibernate/hibernate-validator' && github.event.workflow_run.conclusion != 'cancelled'
     runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+
     steps:
       # Different branches might have different versions of Develocity, and we want to make sure
       #  that we publish with the one that we built the scan with in the first place:
@@ -30,22 +35,34 @@ jobs:
         id: determine_branch_ref
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_EVENT: ${{ github.event.workflow_run.event }}
+          FORK_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+          REPO_OWNER: ${{ github.event.workflow_run.repository.owner.login }}
+          REPO_FULL_NAME: ${{ github.event.workflow_run.repository.full_name }}
+          HEAD_BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
         run: |
-          if [ "${{ github.event.workflow_run.event }}" == "pull_request" ]; then
+          BRANCH_NAME="$HEAD_BRANCH_NAME"
+          if [ "$GH_EVENT" == "pull_request" ]; then
             echo "::notice::Triggering workflow was executed for a pull request"
 
-            FORK_OWNER="${{ github.event.workflow_run.head_repository.owner.login }}"
-            BRANCH_NAME="${{ github.event.workflow_run.head_branch }}"
-            if [ "${{ github.event.workflow_run.head_repository.owner.login }}" != "${{ github.event.workflow_run.repository.owner.login }}" ]; then
+            if [ "$FORK_OWNER" != "$REPO_OWNER" ]; then
               BRANCH_NAME="$FORK_OWNER:$BRANCH_NAME"
             fi
-            TARGET_BRANCH=$(gh pr view "$BRANCH_NAME" --repo ${{ github.event.workflow_run.repository.full_name }} --json baseRefName -q .baseRefName)
+            GH_RESPONSE=$(gh pr view "$BRANCH_NAME" --repo "$REPO_FULL_NAME" --json number,baseRefName)
+            TARGET_BRANCH=$(echo "$GH_RESPONSE" | jq -r '.baseRefName')
+            PR_ID=$(echo "$GH_RESPONSE" | jq -r '.number')
 
             echo "::notice::PR found. Target branch is: $TARGET_BRANCH"
-            echo "original_branch_ref=$TARGET_BRANCH" >> "$GITHUB_OUTPUT"
+            echo "::notice::          Pull Request number is: $PR_ID"
+            echo "::notice::          Branch to merge is: $BRANCH_NAME"
+            {
+              echo "original_branch_ref=$TARGET_BRANCH"
+              echo "pr_id=$PR_ID"
+              echo "branch_to_merge=$BRANCH_NAME"
+            } >> "$GITHUB_OUTPUT"
           else
             echo "::notice::Triggering workflow was executed for a push event? Using the head_branch value."
-            echo "original_branch_ref=${{ github.event.workflow_run.head_branch }}" >> "$GITHUB_OUTPUT"
+            echo "original_branch_ref=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
           fi
       # Checkout target branch which has trusted code
       - name: Check out target branch
@@ -86,6 +103,7 @@ jobs:
       - name: Publish Develocity build scans for previous builds
         if: ${{ steps.downloadBuildScan.outcome != 'failure'}}
         run: |
+          read -ra mvn_args <<< "$MAVEN_ARGS"
           shopt -s nullglob # Don't run the loop below if there are no artifacts
           status=0
           mkdir -p ~/.m2/.develocity/
@@ -93,8 +111,8 @@ jobs:
           do
             rm -rf ~/.m2/.develocity/build-scan-data
             mv "$build_scan_data_directory" ~/.m2/.develocity/build-scan-data \
-            && ./mvnw $MAVEN_ARGS develocity:build-scan-publish-previous || status=1
+            && ./mvnw "${mvn_args[@]}" develocity:build-scan-publish-previous || status=1
           done
-          exit $status
+          exit "$status"
         env:
           DEVELOCITY_ACCESS_KEY: ${{ secrets.DEVELOCITY_ACCESS_KEY_PR }}

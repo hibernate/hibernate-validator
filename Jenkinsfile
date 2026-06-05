@@ -372,6 +372,9 @@ stage('Sonar analysis') {
                     }
 
                     sh """.sonar/bin/sonar-scanner $sonarCliArgs \\
+                        -Dsonar.host.url="https://sonarcloud.io" \\
+                        -Dsonar.organization="hibernate" \\
+                        -Dsonar.projectKey="hibernate_hibernate-validator" \\
                         -Dsonar.java.libraries="\$(pwd)/build/reports/target/sonar-dependencies/*.jar" \\
                         -Dsonar.coverage.jacoco.xmlReportPaths="\$(pwd)/build/reports/target/site/jacoco-aggregate/jacoco.xml"
                     """
