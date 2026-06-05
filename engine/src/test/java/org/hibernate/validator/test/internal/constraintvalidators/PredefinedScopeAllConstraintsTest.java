@@ -57,6 +57,7 @@ import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
@@ -119,6 +120,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Normalized.class, new NormalizedBean() );
 		testConstraint( NullOrNotBlank.class, new NullOrNotBlankBean() );
 		testConstraint( NullOrNotEmpty.class, new NullOrNotEmptyBean() );
+		testConstraint( Port.class, new PortBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( URL.class, new URLBean() );
@@ -365,6 +367,12 @@ public class PredefinedScopeAllConstraintsTest {
 		@NullOrNotEmpty
 		private String nullOrNotEmpty = "";
 
+	}
+
+	private static class PortBean {
+
+		@Port
+		private int port = 70000;
 	}
 
 	private static class RangeBean {
