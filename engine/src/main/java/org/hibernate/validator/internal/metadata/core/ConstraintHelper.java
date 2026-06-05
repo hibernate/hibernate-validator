@@ -48,6 +48,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_REGON;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PORT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RU_INN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT;
@@ -119,6 +120,7 @@ import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
@@ -825,6 +827,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL ) ) {
 			putBuiltinConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PORT ) ) {
+			putBuiltinConstraint( tmpConstraints, Port.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE ) ) {
 			putBuiltinConstraint( tmpConstraints, Range.class );
