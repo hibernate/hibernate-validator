@@ -267,15 +267,26 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 
 		assertFalse( compilationResult );
 
-		assertThatDiagnosticsMatch(
-				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 9 ),
-				new DiagnosticExpectation( Kind.ERROR, 10 ),
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 ),
-				new DiagnosticExpectation( Kind.ERROR, 22 )
-		);
+		// JDK 27+ javac no longer reports redundant errors for usages of types
+		// from a package that already failed to import
+		if ( Runtime.version().feature() >= 27 ) {
+			assertThatDiagnosticsMatch(
+					diagnostics,
+					new DiagnosticExpectation( Kind.ERROR, 9 ),
+					new DiagnosticExpectation( Kind.ERROR, 10 )
+			);
+		}
+		else {
+			assertThatDiagnosticsMatch(
+					diagnostics,
+					new DiagnosticExpectation( Kind.ERROR, 9 ),
+					new DiagnosticExpectation( Kind.ERROR, 10 ),
+					new DiagnosticExpectation( Kind.ERROR, 17 ),
+					new DiagnosticExpectation( Kind.ERROR, 18 ),
+					new DiagnosticExpectation( Kind.ERROR, 21 ),
+					new DiagnosticExpectation( Kind.ERROR, 22 )
+			);
+		}
 	}
 
 	@Test
