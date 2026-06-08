@@ -726,6 +726,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
 	Hibernate metadata impact::: None
 
+`@Port`:: Validates that the annotated element is a valid port number (between 0 and 65535 inclusive).
+	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
+	Hibernate metadata impact::: None
+
 `@Range(min=, max=)`:: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
 	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
 	Hibernate metadata impact::: None
