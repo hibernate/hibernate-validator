@@ -178,8 +178,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 				defaultConstraintExpressionLanguageFeatureLevel,
 				false,
 				basePath,
-				messageParameters != null ? Map.copyOf( messageParameters ) : Collections.emptyMap(),
-				expressionVariables != null ? Map.copyOf( expressionVariables ) : Collections.emptyMap(),
+				messageParameters,
+				expressionVariables,
 				dynamicPayload
 		);
 	}
@@ -214,8 +214,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 							expressionLanguageFeatureLevel,
 							true,
 							propertyPath,
-							messageParameters != null ? Map.copyOf( messageParameters ) : Collections.emptyMap(),
-							expressionVariables != null ? Map.copyOf( expressionVariables ) : Collections.emptyMap(),
+							messageParameters,
+							expressionVariables,
 							dynamicPayload
 					)
 			);
