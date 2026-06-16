@@ -177,6 +177,10 @@ Jakarta Validation XML descriptor _META-INF/validation.xml_ (see
 `Validator` (see <<section-validator-factory-message-interpolator>> and
 <<section-configuring-validator>>, respectively).
 
+When using the Hibernate Validator-specific `HibernateMessageInterpolatorContext`, custom message interpolators can
+access the <<constraint-validator-payload,constraint validator payload>>, if one was configured for the
+`ValidatorFactory` or `Validator`.
+
 [[section-resource-bundle-locator]]
 ==== `ResourceBundleLocator`
 

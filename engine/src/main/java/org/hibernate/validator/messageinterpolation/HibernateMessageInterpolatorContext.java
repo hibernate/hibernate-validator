@@ -11,6 +11,7 @@ import jakarta.validation.Path;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.Incubating;
 
 /**
  * Extension to {@code MessageInterpolator.Context} which provides functionality
@@ -70,5 +71,6 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	 *
 	 * @since 9.2
 	 */
+	@Incubating
 	<C> C getConstraintValidatorPayload(Class<C> type);
 }
