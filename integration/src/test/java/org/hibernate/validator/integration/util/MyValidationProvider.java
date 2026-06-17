@@ -63,7 +63,8 @@ public class MyValidationProvider implements ValidationProvider<MyValidatorConfi
 
 		@Override
 		public ConstraintValidatorFactory getConstraintValidatorFactory() {
-			throw new UnsupportedOperationException();
+			return jakarta.validation.Validation.byDefaultProvider().configure()
+					.getDefaultConstraintValidatorFactory();
 		}
 
 		@Override

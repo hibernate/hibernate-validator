@@ -7,12 +7,6 @@ def processFileInplace(File file, Closure processText) {
     file.write( processText( text ) )
 }
 
-def deleteFiles(List<String> filePaths) {
-    for ( String filePath : filePaths ) {
-        new File( filePath ).delete();
-    }
-}
-
 def appendDependency(File file, String dependencyToAppend, boolean optional) {
     file.write( file.text.replaceAll( /<\/dependencies>/, '  <module name="' + dependencyToAppend + '"' + ( optional ? ' optional="true"' : '' ) + '/>\n  </dependencies>' ) )
 }
@@ -29,8 +23,6 @@ processFileInplace( bvModuleXml ) { text ->
     text.replaceAll( /<resource-root path=".*validation-api.*jar/, '<resource-root path="' + bvArtifactName )
 }
 
-deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/jakarta/validation/api/main', '.*\\.jar' ) )
-
 // HV
 hvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/main/module.xml' )
 def hvArtifactName = 'hibernate-validator-' + project.version + '.jar';
@@ -46,8 +38,6 @@ appendDependency( hvModuleXml, "javax.api", false )
 appendDependency( hvModuleXml, "javax.money.api", true )
 appendDependency( hvModuleXml, "javafx.api", true )
 
-deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/main', 'hibernate-validator-.*\\.jar' ) )
-
 // HV CDI
 hvCdiModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/cdi/main/module.xml' )
 def hvCdiArtifactName = 'hibernate-validator-cdi-' + project.version + '.jar';
@@ -55,7 +45,5 @@ println "[INFO] Using HV CDI Portable Extension version " + hvCdiArtifactName;
 processFileInplace( hvCdiModuleXml ) { text ->
     text.replaceAll( /hibernate-validator-cdi.*jar/, hvCdiArtifactName )
 }
-
-deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/cdi/main', 'hibernate-validator-cdi-.*\\.jar' ) )
 
 println "[INFO] ------------------------------------------------------------------------";

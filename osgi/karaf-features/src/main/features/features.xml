@@ -30,7 +30,7 @@
     </feature>
     <feature name="hibernate-validator-groovy" version="${project.version}">
         <feature>hibernate-validator</feature>
-        <bundle>mvn:org.codehaus.groovy/groovy-all/${version.org.codehaus.groovy}</bundle>
+        <bundle>mvn:org.apache.groovy/groovy/${version.org.apache.groovy}</bundle>
     </feature>
     <feature name="hibernate-validator-paranamer" version="${project.version}">
         <feature prerequisite="true">wrap</feature>
