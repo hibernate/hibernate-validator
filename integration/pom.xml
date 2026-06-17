@@ -89,6 +89,17 @@
             <artifactId>jakarta.annotation-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--
+            wildfly-arquillian 5.1.0.Beta9 requires jboss-logging 3.6.x
+            this is fine though as we've already compiled validator classes
+            and generated the loggers at this point with the default version (3.4)
+         -->
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.6.3.Final</version>
+            <scope>test</scope>
+        </dependency>
         <!-- For RestEasy -->
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
@@ -352,8 +363,111 @@
                 </property>
             </activation>
             <properties>
-                <skip.failsafe.execution>true</skip.failsafe.execution>
+                <wildfly.target-dir>${project.build.directory}/wildfly-${version.wildfly.jdk25}</wildfly.target-dir>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <!-- Override: unpack WF 36 instead of WF 27 -->
+                            <execution>
+                                <id>unpack-wildfly-current</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${version.wildfly.jdk25}</version>
+                                            <type>tar.gz</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <!-- Skip: no patch zip needed with groovy approach -->
+                            <execution>
+                                <id>copy-patch-current</id>
+                                <phase>none</phase>
+                            </execution>
+                            <!-- Copy HV artifacts directly into WF modules -->
+                            <execution>
+                                <id>copy-hv-artifacts-jdk25</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>jakarta.validation</groupId>
+                                            <artifactId>jakarta.validation-api</artifactId>
+                                            <version>${version.jakarta.validation-api}</version>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${wildfly.modules-dir}/jakarta/validation/api/main</outputDirectory>
+                                            <destFileName>jakarta.validation-api-${version.jakarta.validation-api}.jar</destFileName>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>hibernate-validator</artifactId>
+                                            <version>${project.version}</version>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${wildfly.modules-dir}/org/hibernate/validator/main</outputDirectory>
+                                            <destFileName>hibernate-validator-${project.version}.jar</destFileName>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>hibernate-validator-cdi</artifactId>
+                                            <version>${project.version}</version>
+                                            <overWrite>true</overWrite>
+                                            <outputDirectory>${wildfly.modules-dir}/org/hibernate/validator/cdi/main</outputDirectory>
+                                            <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Skip: no wildfly-maven-plugin patch application needed, we've applied the patch with groovy -->
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>apply-wildfly-current-patch-file</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Run groovy script to update WF module.xml descriptors -->
+                    <plugin>
+                        <groupId>org.codehaus.gmavenplus</groupId>
+                        <artifactId>gmavenplus-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>update-wildfly-jdk25-modules</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <scripts>
+                                        <script>file:///${pom.basedir}/src/script/setupModulesJdk25.groovy</script>
+                                    </scripts>
+                                    <properties>
+                                        <wildflyPatchedTargetDir>${wildfly.target-dir}</wildflyPatchedTargetDir>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
