@@ -515,10 +515,12 @@ run_benchmarks() {
         lib_name="$(get_profiler_lib_name)"
         local agent_path="${RESOLVED_ASYNC_PROFILER_HOME}/lib/${lib_name}"
         # When both formats are requested, record as JFR and convert to flamegraph after
+        # %p is replaced by async-profiler with the JVM PID, producing a
+        # distinct file per JMH fork so results are not overwritten.
         if [[ "${ASYNC_PROFILER_FORMAT}" == *"jfr"* ]]; then
-            local ap_out="${RESULTS_DIR}/profile.jfr"
+            local ap_out="${RESULTS_DIR}/profile-%p.jfr"
         else
-            local ap_out="${RESULTS_DIR}/profile.html"
+            local ap_out="${RESULTS_DIR}/profile-%p.html"
         fi
         jvm_args_parts+=("-agentpath:${agent_path}=start,event=cpu,file=${ap_out},ann")
     fi
@@ -559,25 +561,29 @@ run_benchmarks() {
     echo "" >&2
 
     if [[ "${ASYNC_PROFILER_ENABLED}" == true ]]; then
-        # When both formats requested, convert JFR → flamegraph HTML
+        # When both formats requested, convert each JFR → flamegraph HTML
         if [[ "${ASYNC_PROFILER_FORMAT}" == *"flamegraph"* ]] && [[ "${ASYNC_PROFILER_FORMAT}" == *"jfr"* ]]; then
-            log "Converting JFR recording to flamegraph..."
             local jfrconv="${RESOLVED_ASYNC_PROFILER_HOME}/bin/jfrconv"
             if [[ -x "${jfrconv}" ]]; then
-                "${jfrconv}" --cpu --lines "${RESULTS_DIR}/profile.jfr" "${RESULTS_DIR}/profile.html" \
-                    || warn "Failed to convert JFR to flamegraph. JFR recording is still available."
+                for jfr_file in "${RESULTS_DIR}"/profile-*.jfr; do
+                    [[ -f "${jfr_file}" ]] || continue
+                    local html_file="${jfr_file%.jfr}.html"
+                    log "Converting $(basename "${jfr_file}") to flamegraph..."
+                    "${jfrconv}" --cpu --lines "${jfr_file}" "${html_file}" \
+                        || warn "Failed to convert ${jfr_file} to flamegraph. JFR recording is still available."
+                done
             else
                 warn "jfrconv not found at ${jfrconv}. Skipping flamegraph conversion."
             fi
         fi
 
-        IFS=',' read -ra ap_fmts <<< "${ASYNC_PROFILER_FORMAT}"
-        for fmt in "${ap_fmts[@]}"; do
-            case "${fmt}" in
-                flamegraph) log "Flamegraph: ${RESULTS_DIR}/profile.html" ;;
-                jfr)        log "JFR recording: ${RESULTS_DIR}/profile.jfr" ;;
-            esac
-        done
+        local file_count
+        if [[ "${ASYNC_PROFILER_FORMAT}" == *"jfr"* ]]; then
+            file_count=$(find "${RESULTS_DIR}" -name 'profile-*.jfr' | wc -l)
+        else
+            file_count=$(find "${RESULTS_DIR}" -name 'profile-*.html' | wc -l)
+        fi
+        log "Async-profiler: ${file_count} recording(s) in ${RESULTS_DIR}/"
     fi
 
     log "Results written to ${RESULTS_DIR}/"
