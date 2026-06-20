@@ -10,9 +10,17 @@ import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+
 import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ListAppender;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.testng.annotations.Test;
 
 public class JavaBeanExecutableTest {
@@ -59,6 +67,41 @@ public class JavaBeanExecutableTest {
 		assertThat( parameterizedType2.getRawType() ).isEqualTo( List.class );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1852")
+	public void validatingEnumConstantDoesNotLogMissingParameterMetadataWarning() {
+		LoggerContext context = LoggerContext.getContext( false );
+		Logger logger = context.getLogger( "org.hibernate.validator" );
+		Level originalLogLevel = logger.getLevel();
+		ListAppender logAppender = new ListAppender( "hv-1852" );
+		logAppender.start();
+		logger.addAppender( logAppender );
+
+		try {
+			if ( logger.getLevel().isMoreSpecificThan( Level.WARN ) ) {
+				Configurator.setLevel( "org.hibernate.validator", Level.WARN );
+				context.updateLoggers();
+			}
+
+			try ( ValidatorFactory factory = Validation.buildDefaultValidatorFactory() ) {
+				factory.getValidator().validate( SecurityProtocol.VALUE1 );
+			}
+
+			assertThat( logAppender.getMessages( Level.WARN ) )
+					.noneMatch( message -> message.contains( "HV000254" )
+							|| message.contains( "Missing parameter metadata" ) );
+		}
+		finally {
+			logger.removeAppender( logAppender );
+			logAppender.stop();
+
+			if ( originalLogLevel != null ) {
+				Configurator.setLevel( "org.hibernate.validator", originalLogLevel );
+				context.updateLoggers();
+			}
+		}
+	}
+
 	private class Bean {
 
 		private Bean(Map<String, String> map, List<Integer> list) {
@@ -76,6 +119,17 @@ public class JavaBeanExecutableTest {
 		;
 
 		private MyEnum(Map<String, String> map, List<Integer> list) {
+		}
+	}
+
+	private enum SecurityProtocol {
+		VALUE1( false );
+
+		@SuppressWarnings("unused")
+		private final boolean param1;
+
+		SecurityProtocol(boolean param1) {
+			this.param1 = param1;
 		}
 	}
 }
