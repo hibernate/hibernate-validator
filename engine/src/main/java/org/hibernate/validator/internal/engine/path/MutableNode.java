@@ -419,16 +419,16 @@ public class MutableNode
 	public final int buildHashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( index == null ) ? 0 : index.hashCode() );
+		result = prime * result + ( ( index == null ) ? 0 : index );
 		result = prime * result + ( isIterable ? 1231 : 1237 );
 		result = prime * result + ( ( key == null ) ? 0 : key.hashCode() );
-		result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
+		result = prime * result + ( ( kind == null ) ? 0 : kind.ordinal() );
 		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
-		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex );
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : Arrays.hashCode( parameterTypes ) );
 		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
-		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
-		return result;
+		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex );
+		return result & 0x7FFFFFFF;
 	}
 
 	@Override
