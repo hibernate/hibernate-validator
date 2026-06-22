@@ -1,6 +1,30 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.4.Final (2026-06-22)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/35288
+
+
+** Bug
+    * HV-2164 NIP constraint javadoc incorrectly states that it is a 9 digit sequence
+
+** Improvement
+    * HV-2214 Enable automatic releases
+    * HV-2181 Update hibernate-asciidoctor-extensions to 2.0.1
+    * HV-2180 Update paranamer to 2.8.3
+    * HV-2179 Update Java Money API to 1.0.3
+    * HV-2178 Update jboss-logging-tools to 2.2.2
+    * HV-2177 Update Groovy to 2.4.21
+    * HV-2176 Update joda-time to 2.9.9
+    * HV-2157 Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+    * HV-2138 Include license file in the META-INF of published artifacts
+
+** Task
+    * HV-2192 Use Maven 3.9.13 as a required minimum version for the build
+    * HV-2142 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+
 8.0.3.Final (2025-08-06)
 -------------------------
 
