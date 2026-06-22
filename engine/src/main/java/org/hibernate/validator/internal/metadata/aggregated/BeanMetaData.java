@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.reflect.Executable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,6 +37,12 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @return {@code true} if the bean class for this bean meta data has any constraints at all, {@code false} otherwise.
 	 */
 	boolean hasConstraints();
+
+	/**
+	 * @return a correctly pre-sized map for tracking validated interfaces during default group validation,
+	 *         or {@code null} if no constraints are declared on interfaces.
+	 */
+	Map<Class<?>, Class<?>> maybeCreateValidatedInterfacesTrackingMap();
 
 	/**
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
