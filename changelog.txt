@@ -1,6 +1,39 @@
 Hibernate Validator Changelog
 =============================
 
+9.1.1.Final (2026-06-22)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/36015
+
+
+** Bug
+    * HV-2217 HibernateConstraintValidatorContext::addExpressionVariable throws NPE when given null value
+    * HV-2164 NIP constraint javadoc incorrectly states that it is a 9 digit sequence
+    * HV-1923 CPF constraint accepting incorrect format
+
+** Improvement
+    * HV-2216 Use Maven 3.9.16 as a required minimum version for the build
+    * HV-2214 Enable automatic releases
+    * HV-2212 Bump joda-time to 2.14.2
+    * HV-2208 Update to OpenJFX to 17.0.19
+    * HV-2207 Use Maven 3.9.15 as a required minimum version for the build
+    * HV-2197 Update to JBoss logging 3.6.3.Final
+    * HV-2194 Bump joda-time to 2.14.1
+    * HV-2191 Simplify PlatformResourceBundleLocator#determineAvailabilityOfResourceBundleControl() to drop reflection
+    * HV-2173 Upgrade to JBoss logging 3.6.2.Final
+    * HV-2172 Update to OpenJFX to 17.0.18
+    * HV-2171 Bump Apache Groovy to 5.0.4
+    * HV-2170 Pass a ROOT locale to loggers to avoid unnecessary class lookups
+    * HV-2162 Provide the member name in the JavaBeanProperty
+    * HV-2158 Update documentation theme to the current latest 6.1.2.Final
+    * HV-2157 Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+    * HV-2156 Test against wildfly-preview 38.0.1.Final
+
+** Task
+    * HV-2192 Use Maven 3.9.13 as a required minimum version for the build
+    * HV-2163 Use Maven 3.9.12 as a required minimum version for the build
+
 9.1.0.Final (2025-11-07)
 -------------------------
 
