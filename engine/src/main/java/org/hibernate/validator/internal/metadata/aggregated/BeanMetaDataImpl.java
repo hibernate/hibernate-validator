@@ -187,6 +187,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private volatile BeanDescriptor beanDescriptor;
 
 	/**
+	 * The number of distinct interfaces declaring constraints, or 0 if none.
+	 */
+	private final int constraintDeclaringInterfaceCount;
+
+	/**
 	 * Whether tracking of processed beans should be enabled for objects of this type.
 	 */
 	private final boolean trackingEnabled;
@@ -272,6 +277,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.directClassMetaConstraints = getDirectConstraints( classMetaConstraints );
 		this.directPropertyMetaConstraints = getDirectConstraints( propertyMetaConstraints );
 		this.allDirectMetaConstraints = getDirectConstraints( allMetaConstraints );
+		this.constraintDeclaringInterfaceCount = countConstraintDeclaringInterfaces( allMetaConstraints );
 
 		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
 		this.unconstrainedExecutables = CollectionHelper.toImmutableSet( tmpUnconstrainedExecutables );
@@ -297,6 +303,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.propertyMetaConstraints = originalBeanMetaData.propertyMetaConstraints;
 		this.directClassMetaConstraints = originalBeanMetaData.directClassMetaConstraints;
 		this.directPropertyMetaConstraints = originalBeanMetaData.directPropertyMetaConstraints;
+		this.constraintDeclaringInterfaceCount = originalBeanMetaData.constraintDeclaringInterfaceCount;
 		this.classHierarchyWithoutInterfaces = originalBeanMetaData.classHierarchyWithoutInterfaces;
 		this.defaultGroupSequenceProvider = originalBeanMetaData.defaultGroupSequenceProvider;
 		this.defaultGroupSequence = originalBeanMetaData.defaultGroupSequence;
@@ -323,6 +330,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public boolean hasConstraints() {
 		return hasConstraints;
+	}
+
+	@Override
+	public Map<Class<?>, Class<?>> maybeCreateValidatedInterfacesTrackingMap() {
+		if ( constraintDeclaringInterfaceCount == 0 ) {
+			return null;
+		}
+		return CollectionHelper.newHashMap( constraintDeclaringInterfaceCount );
 	}
 
 	@Override
@@ -598,6 +613,19 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		return CollectionHelper.toImmutableSet( constraints );
+	}
+
+	private static int countConstraintDeclaringInterfaces(Set<MetaConstraint<?>> metaConstraints) {
+		Set<Class<?>> interfaces = null;
+		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
+			if ( metaConstraint.getLocation().isDeclaredOnInterface() ) {
+				if ( interfaces == null ) {
+					interfaces = newHashSet();
+				}
+				interfaces.add( metaConstraint.getLocation().getDeclaringClass() );
+			}
+		}
+		return interfaces != null ? interfaces.size() : 0;
 	}
 
 	/**

@@ -273,6 +273,11 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		}
 
 		@Override
+		public Map<Class<?>, Class<?>> maybeCreateValidatedInterfacesTrackingMap() {
+			return null;
+		}
+
+		@Override
 		public BeanDescriptor getBeanDescriptor() {
 			return beanDescriptor;
 		}
@@ -368,7 +373,7 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 
 		@Override
 		public ConstraintFinder findConstraints() {
-			return UninitializedConstaintFinder.INSTANCE;
+			return UninitializedConstraintFinder.INSTANCE;
 		}
 
 		@Override
@@ -407,9 +412,9 @@ public class PredefinedScopeBeanMetaDataManager implements BeanMetaDataManager {
 		}
 	}
 
-	private static class UninitializedConstaintFinder implements ConstraintFinder {
+	private static class UninitializedConstraintFinder implements ConstraintFinder {
 
-		private static final UninitializedConstaintFinder INSTANCE = new UninitializedConstaintFinder();
+		private static final UninitializedConstraintFinder INSTANCE = new UninitializedConstraintFinder();
 
 		@Override
 		public ConstraintFinder unorderedAndMatchingGroups(Class<?>... groups) {

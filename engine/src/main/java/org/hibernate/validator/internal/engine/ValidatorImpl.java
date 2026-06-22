@@ -13,7 +13,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -451,7 +450,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private <U> void validateConstraintsForDefaultGroup(BaseBeanValidationContext<?> validationContext, BeanValueContext<U, Object> valueContext) {
 		final BeanMetaData<U> beanMetaData = valueContext.getCurrentBeanMetaData();
-		final Map<Class<?>, Class<?>> validatedInterfaces = new HashMap<>();
+		final Map<Class<?>, Class<?>> validatedInterfaces = beanMetaData.maybeCreateValidatedInterfacesTrackingMap();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
 		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
@@ -534,7 +533,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 			// time. An interface can define more than one constraint, we have to check the class we are validating.
-			if ( metaConstraint.getLocation().isDeclaredOnInterface() ) {
+			if ( validatedInterfaces != null && metaConstraint.getLocation().isDeclaredOnInterface() ) {
 				final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
 				Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
 				if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
