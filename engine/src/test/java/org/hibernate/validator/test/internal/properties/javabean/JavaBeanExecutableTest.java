@@ -6,9 +6,21 @@ package org.hibernate.validator.test.internal.properties.javabean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
@@ -69,7 +81,61 @@ public class JavaBeanExecutableTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1852")
-	public void validatingEnumConstantDoesNotLogMissingParameterMetadataWarning() {
+	public void validatingEnumConstantDoesNotLogMissingParameterMetadataWarning() throws Exception {
+		assertValidatingDoesNotLogMissingParameterMetadataWarning( SecurityProtocol.VALUE1 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1852")
+	public void validatingEnumConstantWithoutParameterMetadataDoesNotLogMissingParameterMetadataWarning() throws Exception {
+		Path outputDirectory = Files.createTempDirectory( "hv-1852" );
+		try {
+			Class<?> enumClass = compileSecurityProtocolWithoutParameterMetadata( outputDirectory );
+			Object enumConstant = enumClass.getEnumConstants()[0];
+
+			assertValidatingDoesNotLogMissingParameterMetadataWarning( enumConstant );
+		}
+		finally {
+			deleteRecursively( outputDirectory );
+		}
+	}
+
+	private static Class<?> compileSecurityProtocolWithoutParameterMetadata(Path outputDirectory) throws Exception {
+		Path sourceDirectory = outputDirectory.resolve( "hv1852" );
+		Path source = sourceDirectory.resolve( "SecurityProtocol.java" );
+		Files.createDirectories( sourceDirectory );
+		Files.writeString( source, """
+				package hv1852;
+
+				public enum SecurityProtocol {
+					VALUE1( false );
+
+					@SuppressWarnings(\"unused\")
+					private final boolean param1;
+
+					SecurityProtocol(boolean param1) {
+						this.param1 = param1;
+					}
+				}
+				""" );
+
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		assertThat( compiler ).isNotNull();
+		try ( StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null ) ) {
+			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( source.toFile() );
+			Boolean compiled = compiler.getTask( null, fileManager, null, List.of( "-d", outputDirectory.toString() ),
+					null, compilationUnits )
+					.call();
+			assertThat( compiled ).isTrue();
+		}
+
+		try ( URLClassLoader classLoader = new URLClassLoader( new URL[] { outputDirectory.toUri().toURL() },
+				JavaBeanExecutableTest.class.getClassLoader() ) ) {
+			return classLoader.loadClass( "hv1852.SecurityProtocol" );
+		}
+	}
+
+	private static void assertValidatingDoesNotLogMissingParameterMetadataWarning(Object value) throws Exception {
 		LoggerContext context = LoggerContext.getContext( false );
 		Logger logger = context.getLogger( "org.hibernate.validator" );
 		Level originalLogLevel = logger.getLevel();
@@ -84,7 +150,7 @@ public class JavaBeanExecutableTest {
 			}
 
 			try ( ValidatorFactory factory = Validation.buildDefaultValidatorFactory() ) {
-				factory.getValidator().validate( SecurityProtocol.VALUE1 );
+				factory.getValidator().validate( value );
 			}
 
 			assertThat( logAppender.getMessages( Level.WARN ) )
@@ -99,6 +165,13 @@ public class JavaBeanExecutableTest {
 				Configurator.setLevel( "org.hibernate.validator", originalLogLevel );
 				context.updateLoggers();
 			}
+		}
+	}
+
+	private static void deleteRecursively(Path path) throws IOException {
+		try ( Stream<Path> paths = Files.walk( path ) ) {
+			paths.sorted( Comparator.reverseOrder() )
+					.forEach( file -> file.toFile().delete() );
 		}
 	}
 
