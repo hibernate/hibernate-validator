@@ -253,7 +253,6 @@ public class MutableNode
 	public void reset() {
 		isIterable = false;
 		index = null;
-		parameterIndex = null;
 		key = null;
 		typeArgumentIndex = null;
 		containerClass = null;
@@ -642,12 +641,14 @@ public class MutableNode
 		reset();
 		this.name = resolvedPropertyName;
 		this.kind = ElementKind.PROPERTY;
+		this.parameterIndex = null;
 	}
 
 	public void resetAsBeanNode() {
 		reset();
 		this.kind = ElementKind.BEAN;
 		this.name = null;
+		this.parameterIndex = null;
 	}
 
 	public void resetAsParameter(String parameterName, int index) {
@@ -661,12 +662,14 @@ public class MutableNode
 		reset();
 		this.name = RETURN_VALUE_NODE_NAME;
 		this.kind = ElementKind.RETURN_VALUE;
+		this.parameterIndex = null;
 	}
 
 	public void resetAsCrossParameter() {
 		reset();
 		this.name = CROSS_PARAMETER_NODE_NAME;
 		this.kind = ElementKind.CROSS_PARAMETER;
+		this.parameterIndex = null;
 	}
 
 	protected static class NodeIterator implements Iterator<Path.Node> {
