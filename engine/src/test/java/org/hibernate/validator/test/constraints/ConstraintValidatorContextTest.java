@@ -10,10 +10,16 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertEquals;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +28,9 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
+import jakarta.validation.Path.ParameterNode;
 import jakarta.validation.Payload;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
@@ -503,6 +512,72 @@ public class ConstraintValidatorContextTest {
 
 				return false;
 			}
+		}
+	}
+
+	@Test
+	public void shouldProvideParameterIndexForParameterNodes() throws NoSuchMethodException {
+		RequestService service = new RequestService();
+
+		Set<ConstraintViolation<RequestService>> violations = executableValidator.validateParameters(
+				service,
+				RequestService.class.getMethod( "call", ValidatedRequest.class ),
+				new java.lang.Object[] { new ValidatedRequest( "value" ) }
+		);
+
+		assertEquals( violations.size(), 1 );
+		ConstraintViolation<RequestService> violation = violations.iterator().next();
+		List<Path.Node> nodes = asList( violation.getPropertyPath().iterator() );
+		Path.Node paramNode = nodes.get( 1 );
+		assertEquals( paramNode.getKind(), ElementKind.PARAMETER );
+		assertEquals( ( (ParameterNode) paramNode ).getParameterIndex(), 0 );
+	}
+
+	private static <T> List<T> asList(Iterator<T> i) {
+		List<T> r = new ArrayList<>();
+		while ( i.hasNext() ) {
+			r.add( i.next() );
+		}
+		return r;
+	}
+
+	@Target({ ElementType.TYPE, ElementType.PARAMETER })
+	@Retention(RetentionPolicy.RUNTIME)
+	@Constraint(validatedBy = ValidRequest.ValidRequestValidator.class)
+	public @interface ValidRequest {
+		String message() default "invalid";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
+
+		class ValidRequestValidator implements ConstraintValidator<ValidRequest, ValidatedRequest> {
+
+			@Override
+			public boolean isValid(ValidatedRequest value, ConstraintValidatorContext context) {
+				context.disableDefaultConstraintViolation();
+				context.buildConstraintViolationWithTemplate( context.getDefaultConstraintMessageTemplate() )
+						.addPropertyNode( "v" )
+						.addConstraintViolation();
+				return false;
+			}
+		}
+	}
+
+	public static class ValidatedRequest {
+		private final String v;
+
+		public ValidatedRequest(String v) {
+			this.v = v;
+		}
+
+		public String getV() {
+			return v;
+		}
+	}
+
+	public static class RequestService {
+		public void call(@ValidRequest ValidatedRequest r) {
 		}
 	}
 
