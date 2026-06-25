@@ -22,7 +22,7 @@ The documentation for this release is included in the _docs_ directory of the di
 
 ## Release Notes
 
-The full list of changes for this release can be found in [changelog.txt](changelog.txt).
+The full list of changes for this release can be found in [changelog.md](changelog.md).
 
 ## System Requirements
 
