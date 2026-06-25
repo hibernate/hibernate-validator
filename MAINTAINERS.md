@@ -62,7 +62,7 @@ Once you trigger the CI job, it automatically pushes artifacts to the
 * Release the version on JIRA:
   * Go to [the list of releases](https://hibernate.atlassian.net/projects/HV?selectedItem=com.atlassian.jira.jira-projects-plugin%3Arelease-page)
   * Click "Release" next to the version to release.
-* Do *not* update the repository (in particular changelog.txt and README.md), 
+* Do *not* update the repository (in particular changelog.md and README.md), 
   the release job does it for you.
 * Trigger the release on CI:
   * Go to CI, to [the "hibernate-validator-release" CI job](https://ci.hibernate.org/job/hibernate-validator-release/).
