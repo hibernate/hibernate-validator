@@ -59,7 +59,7 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
-			<source>../changelog.txt</source>
+			<source>../changelog.md</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
@@ -82,7 +82,7 @@
 				<!-- we already have these files at the top level of the distribution -->
 				<exclude>README.md</exclude>
 				<exclude>CONTRIBUTING.md</exclude>
-				<exclude>changelog.txt</exclude>
+				<exclude>changelog.md</exclude>
 				<exclude>AUTHORS.txt</exclude>
 				<exclude>license.txt</exclude>
 
