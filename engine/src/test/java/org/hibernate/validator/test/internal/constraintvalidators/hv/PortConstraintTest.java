@@ -8,6 +8,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -63,6 +64,26 @@ public class PortConstraintTest {
 	}
 
 	@Test
+	public void fractionalValuesAreInvalid() {
+		assertThat( validator.validate( new DoublePort( 80.5 ) ) ).containsOnlyViolations(
+				violationOf( Port.class )
+		);
+		assertThat( validator.validate( new FloatPort( 443.1f ) ) ).containsOnlyViolations(
+				violationOf( Port.class )
+		);
+		assertThat( validator.validate( new BigDecimalPort( new BigDecimal( "8080.5" ) ) ) ).containsOnlyViolations(
+				violationOf( Port.class )
+		);
+	}
+
+	@Test
+	public void wholeDoubleAndFloatValuesAreValid() {
+		assertNoViolations( validator.validate( new DoublePort( 80.0 ) ) );
+		assertNoViolations( validator.validate( new FloatPort( 443.0f ) ) );
+		assertNoViolations( validator.validate( new BigDecimalPort( new BigDecimal( "8080.0" ) ) ) );
+	}
+
+	@Test
 	public void testProgrammaticDefinition() throws Exception {
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -99,6 +120,36 @@ public class PortConstraintTest {
 		private final Integer port;
 
 		public Bar(Integer port) {
+			this.port = port;
+		}
+	}
+
+	private static class DoublePort {
+
+		@Port
+		private final Double port;
+
+		public DoublePort(Double port) {
+			this.port = port;
+		}
+	}
+
+	private static class FloatPort {
+
+		@Port
+		private final Float port;
+
+		public FloatPort(Float port) {
+			this.port = port;
+		}
+	}
+
+	private static class BigDecimalPort {
+
+		@Port
+		private final BigDecimal port;
+
+		public BigDecimalPort(BigDecimal port) {
 			this.port = port;
 		}
 	}

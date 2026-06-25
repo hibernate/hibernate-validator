@@ -355,6 +355,16 @@ import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyVa
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
@@ -829,7 +839,18 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PORT ) ) {
-			putBuiltinConstraint( tmpConstraints, Port.class );
+			List<Class<? extends ConstraintValidator<Port, ?>>> portValidators = new ArrayList<>();
+			portValidators.add( PortValidatorForBigDecimal.class );
+			portValidators.add( PortValidatorForBigInteger.class );
+			portValidators.add( PortValidatorForByte.class );
+			portValidators.add( PortValidatorForDouble.class );
+			portValidators.add( PortValidatorForFloat.class );
+			portValidators.add( PortValidatorForInteger.class );
+			portValidators.add( PortValidatorForLong.class );
+			portValidators.add( PortValidatorForNumber.class );
+			portValidators.add( PortValidatorForShort.class );
+			portValidators.add( PortValidatorForCharSequence.class );
+			putBuiltinConstraints( tmpConstraints, Port.class, portValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE ) ) {
 			putBuiltinConstraint( tmpConstraints, Range.class );
