@@ -1,0 +1,2570 @@
+# Hibernate Validator Changelog
+
+## 9.1.1.Final (2026-06-22)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/36015)
+
+
+### Bug
+* [HV-2217](https://hibernate.atlassian.net/browse/HV-2217) HibernateConstraintValidatorContext::addExpressionVariable throws NPE when given null value
+* [HV-2164](https://hibernate.atlassian.net/browse/HV-2164) NIP constraint javadoc incorrectly states that it is a 9 digit sequence
+* [HV-1923](https://hibernate.atlassian.net/browse/HV-1923) CPF constraint accepting incorrect format
+
+### Improvement
+* [HV-2216](https://hibernate.atlassian.net/browse/HV-2216) Use Maven 3.9.16 as a required minimum version for the build
+* [HV-2214](https://hibernate.atlassian.net/browse/HV-2214) Enable automatic releases
+* [HV-2212](https://hibernate.atlassian.net/browse/HV-2212) Bump joda-time to 2.14.2
+* [HV-2208](https://hibernate.atlassian.net/browse/HV-2208) Update to OpenJFX to 17.0.19
+* [HV-2207](https://hibernate.atlassian.net/browse/HV-2207) Use Maven 3.9.15 as a required minimum version for the build
+* [HV-2197](https://hibernate.atlassian.net/browse/HV-2197) Update to JBoss logging 3.6.3.Final
+* [HV-2194](https://hibernate.atlassian.net/browse/HV-2194) Bump joda-time to 2.14.1
+* [HV-2191](https://hibernate.atlassian.net/browse/HV-2191) Simplify PlatformResourceBundleLocator#determineAvailabilityOfResourceBundleControl() to drop reflection
+* [HV-2173](https://hibernate.atlassian.net/browse/HV-2173) Upgrade to JBoss logging 3.6.2.Final
+* [HV-2172](https://hibernate.atlassian.net/browse/HV-2172) Update to OpenJFX to 17.0.18
+* [HV-2171](https://hibernate.atlassian.net/browse/HV-2171) Bump Apache Groovy to 5.0.4
+* [HV-2170](https://hibernate.atlassian.net/browse/HV-2170) Pass a ROOT locale to loggers to avoid unnecessary class lookups
+* [HV-2162](https://hibernate.atlassian.net/browse/HV-2162) Provide the member name in the JavaBeanProperty
+* [HV-2158](https://hibernate.atlassian.net/browse/HV-2158) Update documentation theme to the current latest 6.1.2.Final
+* [HV-2157](https://hibernate.atlassian.net/browse/HV-2157) Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+* [HV-2156](https://hibernate.atlassian.net/browse/HV-2156) Test against wildfly-preview 38.0.1.Final
+
+### Task
+* [HV-2192](https://hibernate.atlassian.net/browse/HV-2192) Use Maven 3.9.13 as a required minimum version for the build
+* [HV-2163](https://hibernate.atlassian.net/browse/HV-2163) Use Maven 3.9.12 as a required minimum version for the build
+
+
+## 9.1.0.Final (2025-11-07)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/35947)
+
+
+### Improvement
+* [HV-2154](https://hibernate.atlassian.net/browse/HV-2154) - Include hibernate-validator-test-utils in the dist bundle
+* [HV-2153](https://hibernate.atlassian.net/browse/HV-2153) - Create migration guide as part of the project sources
+* [HV-2152](https://hibernate.atlassian.net/browse/HV-2152) - Add a "What's New" document for series
+
+## 9.1.0.CR1 (2025-10-29)
+
+### Bug
+* [HV-2151](https://hibernate.atlassian.net/browse/HV-2151) - CachingTraversableResolverForSingleValidation won't work
+
+### Improvement
+* [HV-2148](https://hibernate.atlassian.net/browse/HV-2148) - Update Hibernate asciidoc theme to 6.1.1.Final
+
+### Task
+* [HV-2150](https://hibernate.atlassian.net/browse/HV-2150) - Test against wildfly-preview 38.0.0.Final
+* [HV-2149](https://hibernate.atlassian.net/browse/HV-2149) - Lower the log level for some resource bundle messages
+
+## 9.1.0.Beta1 (2025-10-22)
+
+### Improvement
+* [HV-2147](https://hibernate.atlassian.net/browse/HV-2147) - Bump Apache Groovy to 5.0.2
+* [HV-2145](https://hibernate.atlassian.net/browse/HV-2145) - Require JDK 25 for the build
+* [HV-2144](https://hibernate.atlassian.net/browse/HV-2144) - Update to com.fasterxml:classmate 1.7.1
+* [HV-2143](https://hibernate.atlassian.net/browse/HV-2143) - Apply the unified Hibernate Documentation theme
+
+### New Feature
+* [HV-2137](https://hibernate.atlassian.net/browse/HV-2137) - Add IpAddress constraint
+
+### Task
+* [HV-2142](https://hibernate.atlassian.net/browse/HV-2142) - Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+
+## 9.1.0.Alpha2 (2025-09-19)
+
+### Improvement
+* [HV-2140](https://hibernate.atlassian.net/browse/HV-2140) - Bump Apache Groovy to 5.0.1
+* [HV-2139](https://hibernate.atlassian.net/browse/HV-2139) - Introduce a RandomAccessPath as an extension of the org.hibernate.validator.path.Path
+* [HV-2138](https://hibernate.atlassian.net/browse/HV-2138) - Include license file in the META-INF of published artifacts
+* [HV-2135](https://hibernate.atlassian.net/browse/HV-2135) - Do not initialize the alreadyProcessedGroups unless necessary in BeanValueContext
+* [HV-2004](https://hibernate.atlassian.net/browse/HV-2004) - add constant pool for @Pattern
+
+### Task
+* [HV-2136](https://hibernate.atlassian.net/browse/HV-2136) - Test against wildfly-preview 37.0.1.Final
+* [HV-2134](https://hibernate.atlassian.net/browse/HV-2134) - Update beanvalidation-benchmark to run with jakarta versions
+* [HV-2130](https://hibernate.atlassian.net/browse/HV-2130) - Add a GitHub workflow to publish TCK results (for certification)
+
+## 9.1.0.Alpha1 (2025-08-28)
+
+### Bug
+* [HV-2117](https://hibernate.atlassian.net/browse/HV-2117) - NIP validation incorrectly accepts values ending in 0
+* [HV-1987](https://hibernate.atlassian.net/browse/HV-1987) - When complex objects are verified, processedPathsPerBean always occupies a large amount of memory, causing OOM.
+
+### Improvement
+* [HV-2133](https://hibernate.atlassian.net/browse/HV-2133) - Bump Apache Groovy to 5.0.0
+* [HV-2128](https://hibernate.atlassian.net/browse/HV-2128) - Consider creating Hibernate Validator extension to the Path with more convinience methods
+* [HV-2127](https://hibernate.atlassian.net/browse/HV-2127) - Make Path implementaion not relying on Lists (or other collections)
+* [HV-2125](https://hibernate.atlassian.net/browse/HV-2125) - Update Hibernate asciidoc theme to 5.1.2.Final
+* [HV-2124](https://hibernate.atlassian.net/browse/HV-2124) - Bump Apache Groovy to 4.0.28
+* [HV-2122](https://hibernate.atlassian.net/browse/HV-2122) - Update to OpenJFX to 17.0.16
+* [HV-2116](https://hibernate.atlassian.net/browse/HV-2116) - Do not recreate PersistenceUtil in the built-in JPATraversableResolver
+* [HV-2114](https://hibernate.atlassian.net/browse/HV-2114) - Add support for Korean foreigner resident registration number (RRN) validation
+* [HV-2113](https://hibernate.atlassian.net/browse/HV-2113) - Adding Date Validation Condition in KorRRNValidator
+* [HV-2112](https://hibernate.atlassian.net/browse/HV-2112) - Use the Hibernate theme for rendered javadocs
+* [HV-2111](https://hibernate.atlassian.net/browse/HV-2111) - Bump Apache Groovy to 4.0.27
+* [HV-2110](https://hibernate.atlassian.net/browse/HV-2110) - Update to OpenJFX to 17.0.15
+* [HV-2109](https://hibernate.atlassian.net/browse/HV-2109) - Bump Expressly version to 6.0.0
+* [HV-1831](https://hibernate.atlassian.net/browse/HV-1831) - Optimize cascading validation for large lists
+* [HV-1591](https://hibernate.atlassian.net/browse/HV-1591) - Log a warning when @Valid is defined both globally and on a type parameter of a container
+
+### Task
+* [HV-2131](https://hibernate.atlassian.net/browse/HV-2131) - Use a sig file from the TCK dist zip (instead of generating one on-the-fly)
+* [HV-2129](https://hibernate.atlassian.net/browse/HV-2129) - Test against wildfly-preview 37.0.0.Final
+* [HV-2123](https://hibernate.atlassian.net/browse/HV-2123) - Use Maven 3.9.11 as a required minimum version for the build
+* [HV-2120](https://hibernate.atlassian.net/browse/HV-2120) - Stop exporting logging/reporting.impl packages to org.jboss.logging
+* [HV-2119](https://hibernate.atlassian.net/browse/HV-2119) - Test against JDK 26
+* [HV-2118](https://hibernate.atlassian.net/browse/HV-2118) - Switch to Maven Central publishing
+* [HV-2115](https://hibernate.atlassian.net/browse/HV-2115) - Use Maven 3.9.10 as a required minimum version for the build
+* [HV-1271](https://hibernate.atlassian.net/browse/HV-1271) - Move JavaDoc stylesheet.css to separate repo and fetch it from there
+
+## 9.0.0.Final (2025-05-20)
+
+### Bug
+* [HV-2074](https://hibernate.atlassian.net/browse/HV-2074) - Customizing PropertyNodeNameProvider Not Working in Programmatic Constraint Definition
+* [HV-1917](https://hibernate.atlassian.net/browse/HV-1917) - MinDuration/MaxDuration validation message (english) broken for zero duration.
+
+### Improvement
+* [HV-2103](https://hibernate.atlassian.net/browse/HV-2103) - Include Jakarta Validation 3.1 XSDs
+* [HV-2102](https://hibernate.atlassian.net/browse/HV-2102) - Disable external schema loading
+* [HV-2094](https://hibernate.atlassian.net/browse/HV-2094) - Bump Jakarta EE BOM to 11.0.0
+* [HV-2093](https://hibernate.atlassian.net/browse/HV-2093) - Bump joda-time to 2.14.0
+* [HV-2091](https://hibernate.atlassian.net/browse/HV-2091) - Upgrade paranamer to 2.8.3
+* [HV-2090](https://hibernate.atlassian.net/browse/HV-2090) - Update to OpenJFX to 17.0.14
+* [HV-2089](https://hibernate.atlassian.net/browse/HV-2089) - Upgrade paranamer to 2.8.2
+* [HV-2088](https://hibernate.atlassian.net/browse/HV-2088) - Bump Jakarta EE BOM to 11.0.0-RC1
+* [HV-2087](https://hibernate.atlassian.net/browse/HV-2087) - Upgrade jboss-logging-tools to 3.0.4.Final
+* [HV-2086](https://hibernate.atlassian.net/browse/HV-2086) - Bump Apache Groovy to 4.0.26
+* [HV-2085](https://hibernate.atlassian.net/browse/HV-2085) - Upgrade paranamer to 2.8.1
+* [HV-2084](https://hibernate.atlassian.net/browse/HV-2084) - Bump Jakarta EE BOM to 11.0.0-M5
+* [HV-2079](https://hibernate.atlassian.net/browse/HV-2079) - Bump joda-time to 2.13.1
+* [HV-2078](https://hibernate.atlassian.net/browse/HV-2078) - Bump Apache Groovy to 4.0.25
+
+### Task
+* [HV-2108](https://hibernate.atlassian.net/browse/HV-2108) - Test against wildfly-preview 36.0.1.Final
+* [HV-2107](https://hibernate.atlassian.net/browse/HV-2107) - Enable copytocliboard extension from hibernate-asciidoctor-extensions
+* [HV-2104](https://hibernate.atlassian.net/browse/HV-2104) - Remove Google Analytics
+* [HV-2101](https://hibernate.atlassian.net/browse/HV-2101) - Test against wildfly-preview 36.0.0.Final
+* [HV-2096](https://hibernate.atlassian.net/browse/HV-2096) - Use JReleaser to publish hibernate artifacts
+* [HV-2095](https://hibernate.atlassian.net/browse/HV-2095) - Upgrade hibernate-asciidoctor-theme to 5.0.6.Final
+* [HV-2081](https://hibernate.atlassian.net/browse/HV-2081) - Test against wildfly-preview 35.0.1.Final
+* [HV-2077](https://hibernate.atlassian.net/browse/HV-2077) - Align content of CONTRIBUTING.md with what's in other projects
+* [HV-2076](https://hibernate.atlassian.net/browse/HV-2076) - Test against wildfly-preview 35.0.0.Final
+* [HV-2075](https://hibernate.atlassian.net/browse/HV-2075) - Upgrade to wildfly-arquillian-container-managed 5.1.0.Beta9 for testing
+* [HV-2072](https://hibernate.atlassian.net/browse/HV-2072) - Make Hibernate Validator integration tests running on JDK 24+
+* [HV-2071](https://hibernate.atlassian.net/browse/HV-2071) - Build with JDK 21
+* [HV-2070](https://hibernate.atlassian.net/browse/HV-2070) - Use `maven-assembly-plugin` instead of `copy-maven-plugin` to rename the pdf documents
+* [HV-2023](https://hibernate.atlassian.net/browse/HV-2023) - Add a step to build pdf documentation to the nightly CI job
+
+## 9.0.0.CR1 (2024-12-13)
+
+### Bug
+* [HV-2067](https://hibernate.atlassian.net/browse/HV-2067) - UUID version not correctly validated
+* [HV-2061](https://hibernate.atlassian.net/browse/HV-2061) - OSGi: HV 9.0.0.Beta1/2/3 imports wrong OSGi package version of Jakarta EL
+* [HV-2044](https://hibernate.atlassian.net/browse/HV-2044) - The distribution package is missing the javadocs sub directory  
+* [HV-1955](https://hibernate.atlassian.net/browse/HV-1955) - NotBlankValidator is not consistent with Jakarta @NotBlank specs
+* [HV-1829](https://hibernate.atlassian.net/browse/HV-1829) - Hibernate docs still reference ConstraintDefinitionContributor which was removed in 5.3
+
+### Improvement
+* [HV-2066](https://hibernate.atlassian.net/browse/HV-2066) - update document section 3.1.1
+* [HV-2064](https://hibernate.atlassian.net/browse/HV-2064) - Upgrade jboss-logging-tools to 3.0.3.Final
+* [HV-2062](https://hibernate.atlassian.net/browse/HV-2062) - Version is lost when using JLink
+* [HV-2056](https://hibernate.atlassian.net/browse/HV-2056) - Update to OpenJFX from 17.0.12 to 17.0.13
+* [HV-2055](https://hibernate.atlassian.net/browse/HV-2055) - Update version.org.jboss.logging.jboss-logging-tools from 3.0.1.Final to 3.0.2.Final
+* [HV-2053](https://hibernate.atlassian.net/browse/HV-2053) - Add translation of Validation Messages for Azerbaijani language
+* [HV-2049](https://hibernate.atlassian.net/browse/HV-2049) - Bump Apache Groovy to 4.0.23 
+* [HV-2048](https://hibernate.atlassian.net/browse/HV-2048) - Bump joda-time to 2.13.0
+* [HV-2045](https://hibernate.atlassian.net/browse/HV-2045) - Upgrade to JBoss logging 3.6.1.Final
+* [HV-1962](https://hibernate.atlassian.net/browse/HV-1962) - Remove relativePath in pom because it's default
+* [HV-1942](https://hibernate.atlassian.net/browse/HV-1942) - Update DefaultGroupSequenceProvider add default method provide the class of instance
+* [HV-1931](https://hibernate.atlassian.net/browse/HV-1931) - No version info when running from the module path
+
+### Remove Feature
+* [HV-2068](https://hibernate.atlassian.net/browse/HV-2068) - Stop publishing relocation poms
+
+### Task
+* [HV-2069](https://hibernate.atlassian.net/browse/HV-2069) - Test Hibernate Validator against JDK 25
+* [HV-2065](https://hibernate.atlassian.net/browse/HV-2065) - Test against wildfly-preview 34.0.1.Final
+* [HV-2059](https://hibernate.atlassian.net/browse/HV-2059) - Integrate with Develocity build scans/build cache
+* [HV-2058](https://hibernate.atlassian.net/browse/HV-2058) - Test against wildfly-preview 34.0.0.Final
+* [HV-2057](https://hibernate.atlassian.net/browse/HV-2057) - Complete Validator + Sonar integration
+* [HV-2051](https://hibernate.atlassian.net/browse/HV-2051) - Use spotless maven plugin instead of formatter/impsorter/license check plugins
+* [HV-2050](https://hibernate.atlassian.net/browse/HV-2050) - Use SPDX headers format 
+* [HV-2047](https://hibernate.atlassian.net/browse/HV-2047) - Test against wildfly-preview 33.0.2.Final
+* [HV-2046](https://hibernate.atlassian.net/browse/HV-2046) - Enable code coverage with maven build
+* [HV-2020](https://hibernate.atlassian.net/browse/HV-2020) - Investigate if we can remove the dependency on Expressly
+* [HV-1754](https://hibernate.atlassian.net/browse/HV-1754) - Re-enable EjbIT when all tested versions of WildFly have fixed WFL-11566
+
+## 9.0.0.Beta3 (2024-09-04)
+
+### Bug
+* [HV-2029](https://hibernate.atlassian.net/browse/HV-2029) - Exactly the same ConvertGroup defined on both original and overridden methods lead to an exception
+* [HV-2018](https://hibernate.atlassian.net/browse/HV-2018) - Validator.validateValue() prints no violations on an interface
+
+### Improvement
+* [HV-2032](https://hibernate.atlassian.net/browse/HV-2032) - Support strict Jaxp security settings from JDK 23
+* [HV-2031](https://hibernate.atlassian.net/browse/HV-2031) - Make PredefinedScopeHibernateValidatorFactory aware of constraint mappings defined purely in XML
+
+### Remove Feature
+* [HV-2043](https://hibernate.atlassian.net/browse/HV-2043) - Remove deprecated PropertyTarget#property
+* [HV-2042](https://hibernate.atlassian.net/browse/HV-2042) - Remove deprecated org.hibernate.validator.constraints.ModCheck constraint
+* [HV-2040](https://hibernate.atlassian.net/browse/HV-2040) - Remove deprecated `AnnotationProcessingOptions`
+* [HV-2039](https://hibernate.atlassian.net/browse/HV-2039) - Remove deprecated `PredefinedScopeHibernateValidatorConfiguration#initializeLocales`
+* [HV-2038](https://hibernate.atlassian.net/browse/HV-2038) - Remove deprecated ReflectionParameterNameProvider
+* [HV-2037](https://hibernate.atlassian.net/browse/HV-2037) - Remove deprecated org.hibernate.validator.constraints.NotEmpty constraint
+* [HV-2036](https://hibernate.atlassian.net/browse/HV-2036) - Remove deprecated org.hibernate.validator.constraints.NotBlank constraint
+* [HV-2035](https://hibernate.atlassian.net/browse/HV-2035) - Remove deprecated org.hibernate.validator.constraints.Email constraint
+* [HV-2034](https://hibernate.atlassian.net/browse/HV-2034) - Remove deprecated `hibernate.validator.constraint_mapping_contributor`
+* [HV-2025](https://hibernate.atlassian.net/browse/HV-2025) - Remove OSGi testing and support
+
+### Task
+* [HV-2041](https://hibernate.atlassian.net/browse/HV-2041) - Update to new versions of hibernate-infra extensions/theme that depend on AsciidoctorJ 3.0
+* [HV-2033](https://hibernate.atlassian.net/browse/HV-2033) - Test against wildfly-preview 33.0.1.Final
+* [HV-2026](https://hibernate.atlassian.net/browse/HV-2026) - Use Maven 3.9.8 as a required minimum version for the build
+* [HV-2022](https://hibernate.atlassian.net/browse/HV-2022) - Try using offline links for Javadoc generation
+* [HV-2021](https://hibernate.atlassian.net/browse/HV-2021) - Add simple GH actions to build Hibernate Validator
+* [HV-2019](https://hibernate.atlassian.net/browse/HV-2019) - FIx snapshot publishing
+
+## 9.0.0.Beta2 (2024-08-01)
+
+## 9.0.0.Beta1 (2024-08-01)
+
+### Bug
+* [HV-2008](https://hibernate.atlassian.net/browse/HV-2008) - hibernate-validator-test-utils are not compatible to current AssertJ versions
+* [HV-2002](https://hibernate.atlassian.net/browse/HV-2002) - Brazilian Titulo Eleitoral not correctly validating on some scenarios
+* [HV-1978](https://hibernate.atlassian.net/browse/HV-1978) - Expression Language not propagated to iterable node
+* [HV-1971](https://hibernate.atlassian.net/browse/HV-1971) - CNPJ with all digits the same
+* [HV-1965](https://hibernate.atlassian.net/browse/HV-1965) - Typo in CrossParameterConstraintValidatorContextImpl, wrong element kind assertion fail message.
+* [HV-1959](https://hibernate.atlassian.net/browse/HV-1959) - Typo fix for Ukrainian localization
+* [HV-1946](https://hibernate.atlassian.net/browse/HV-1946) - PathImpl.createCopy() only performs a shallow copy
+
+### Improvement
+* [HV-2015](https://hibernate.atlassian.net/browse/HV-2015) - Align Jakarta API versions with the Jakarta EE 11
+* [HV-2014](https://hibernate.atlassian.net/browse/HV-2014) - Update version.org.jboss.logging.jboss-logging-tools from 3.0.0.Final to 3.0.1.Final
+* [HV-2007](https://hibernate.atlassian.net/browse/HV-2007) - Add a nightly job to verify the build reproducibility
+* [HV-2006](https://hibernate.atlassian.net/browse/HV-2006) - Update org.jboss.logging:jboss-logging-processor from 2.2.1.Final to 3.0.0.Final
+* [HV-2001](https://hibernate.atlassian.net/browse/HV-2001) - Generate module-info for published artifacts
+* [HV-2000](https://hibernate.atlassian.net/browse/HV-2000) - Use URI for @URL validation
+* [HV-1999](https://hibernate.atlassian.net/browse/HV-1999) - New Alphanumeric CNPJ
+* [HV-1998](https://hibernate.atlassian.net/browse/HV-1998) - Reproducible builds
+* [HV-1997](https://hibernate.atlassian.net/browse/HV-1997) - Stop publishing test modules
+* [HV-1996](https://hibernate.atlassian.net/browse/HV-1996) - Create and publish Hibernate Validator BOM
+* [HV-1995](https://hibernate.atlassian.net/browse/HV-1995) - Test against latest Wildfly 32.0.1
+* [HV-1993](https://hibernate.atlassian.net/browse/HV-1993) - Simplify the checks whether the path was already validated
+* [HV-1992](https://hibernate.atlassian.net/browse/HV-1992) - Switch to a different sigtest-maven-plugin
+* [HV-1991](https://hibernate.atlassian.net/browse/HV-1991) - Upgrade to JDK 17 as the baseline and drop JDK 11 compatibility
+* [HV-1986](https://hibernate.atlassian.net/browse/HV-1986) - Add impsort and formatter plugins
+* [HV-1985](https://hibernate.atlassian.net/browse/HV-1985) - Bump joda-time to 2.12.7
+* [HV-1984](https://hibernate.atlassian.net/browse/HV-1984) - Bump jboss-logging to 3.5.3.Final
+* [HV-1983](https://hibernate.atlassian.net/browse/HV-1983) - Bump com.fasterxml:classmate to 1.7.0
+* [HV-1982](https://hibernate.atlassian.net/browse/HV-1982) - Bump javax.money:money-api to 1.1
+* [HV-1981](https://hibernate.atlassian.net/browse/HV-1981) - Use Maven 3.9.6 in CI builds and as a required minimum version for the build
+* [HV-1979](https://hibernate.atlassian.net/browse/HV-1979) - Upgrade to jakarta.validation-api 3.1.0
+* [HV-1943](https://hibernate.atlassian.net/browse/HV-1943) - Some french validation messages are not quite accurate
+
+### New Feature
+* [HV-1973](https://hibernate.atlassian.net/browse/HV-1973) - Bitcoint address validation
+* [HV-1970](https://hibernate.atlassian.net/browse/HV-1970) - Add South Korean specific RRN annotation
+* [HV-1328](https://hibernate.atlassian.net/browse/HV-1328) - Add an option to validate class-level constraints only if all property constraints are valid
+
+### Remove Feature
+* [HV-1994](https://hibernate.atlassian.net/browse/HV-1994) - Stop publishing and remove hibernate-validator-modules 
+* [HV-1975](https://hibernate.atlassian.net/browse/HV-1975) - Remove Security Manager usage 
+
+### Task
+* [HV-2017](https://hibernate.atlassian.net/browse/HV-2017) - Use wildfly-preview-dist in integration tests to test against the Jakarta EE 11
+* [HV-2016](https://hibernate.atlassian.net/browse/HV-2016) - Switch to log4j2 in performance tests
+* [HV-2013](https://hibernate.atlassian.net/browse/HV-2013) - Test against latest Wildfly 33.0.0
+* [HV-2012](https://hibernate.atlassian.net/browse/HV-2012) - Update to OpenJFX 17.0.12
+* [HV-2011](https://hibernate.atlassian.net/browse/HV-2011) - Update Arquillian dependency management configuration
+* [HV-2010](https://hibernate.atlassian.net/browse/HV-2010) - Clean up configuration of the performance tests
+* [HV-2009](https://hibernate.atlassian.net/browse/HV-2009) - Update Jakarta specification names where applicable
+* [HV-1990](https://hibernate.atlassian.net/browse/HV-1990) - Test Hibernate Validator against JDK 24
+* [HV-1989](https://hibernate.atlassian.net/browse/HV-1989) - Update documentation examples to use the min required Java version where applicable
+* [HV-1988](https://hibernate.atlassian.net/browse/HV-1988) - Upgrade jboss-logging to latest version (3.6.0)
+* [HV-1980](https://hibernate.atlassian.net/browse/HV-1980) - Update gpg plugin configuration
+* [HV-1977](https://hibernate.atlassian.net/browse/HV-1977) - Enable dependabot updates for more dependencies
+* [HV-1974](https://hibernate.atlassian.net/browse/HV-1974) - Update maven build configuration to address lib/plugin upgrades from Dependabot
+* [HV-1969](https://hibernate.atlassian.net/browse/HV-1969) - Test Hibernate Validator against JDK 23
+* [HV-1968](https://hibernate.atlassian.net/browse/HV-1968) - Force user.country when testing
+
+## 8.0.1.Final (2023-06-20)
+
+### Bug
+* [HV-1949](https://hibernate.atlassian.net/browse/HV-1949) - Nondeterministic behavior of HibernateValidator (in springboot?) when both annotation and xml-based definition are used
+* [HV-1932](https://hibernate.atlassian.net/browse/HV-1932) - Incomplete @Positive annotation's default message in fr
+* [HV-1939](https://hibernate.atlassian.net/browse/HV-1939) - Annotations on constructors of named classes declared in method get ignored
+
+### Improvement
+* [HV-1943](https://hibernate.atlassian.net/browse/HV-1943) - Some french validation messages are not quite accurate
+* [HV-1941](https://hibernate.atlassian.net/browse/HV-1941) - Add support for European Portuguese for ValidationMessages
+* [HV-1927](https://hibernate.atlassian.net/browse/HV-1927) - Use Executable#getAnnotatedParameterTypes() instead of Executable#getGenericParameterTypes()
+
+### Task
+* [HV-1956](https://hibernate.atlassian.net/browse/HV-1956) - Update Weld test dependency to 5.1.1.Final
+* [HV-1954](https://hibernate.atlassian.net/browse/HV-1954) - Test Hibernate Validator against JDK 22
+* [HV-1944](https://hibernate.atlassian.net/browse/HV-1944) - Upgraded JBoss Logging, Maven Enforcer plugin and Guava to latest version
+* [HV-1938](https://hibernate.atlassian.net/browse/HV-1938) - Update ByteBuddy test dependency to 1.13.0
+* [HV-1935](https://hibernate.atlassian.net/browse/HV-1935) - Test Hibernate Validator against JDK 21
+* [HV-1934](https://hibernate.atlassian.net/browse/HV-1934) - Upgrade to hibernate-asciidoctor-theme 1.0.6
+
+## 8.0.0.Final (2022-09-09)
+
+## 8.0.0.CR3 (2022-08-09)
+
+### Task
+* [HV-1925](https://hibernate.atlassian.net/browse/HV-1925) - Switch to WildFly 27 for testing and remove the remaining javax stuff
+* [HV-1924](https://hibernate.atlassian.net/browse/HV-1924) - Bump expressly from 5.0.0-M2 to 5.0.0
+
+## 8.0.0.CR2 (2022-08-04)
+
+### Bug
+* [HV-1922](https://hibernate.atlassian.net/browse/HV-1922) - Switch to use arquillian-protocol-servlet-jakarta artifact instead of arquillian-protocol-servlet for testing with WildFly 27
+
+### Task
+* [HV-1920](https://hibernate.atlassian.net/browse/HV-1920) - Upgrade Spring Expression test dependency to 5.3.22
+* [HV-1919](https://hibernate.atlassian.net/browse/HV-1919) - Upgrade Maven Assembly Plugin to 3.4.2
+* [HV-1914](https://hibernate.atlassian.net/browse/HV-1914) - Test against JDK 20 (early access)
+
+## 8.0.0.CR1 (2022-06-28)
+
+### Bug
+* [HV-1853](https://hibernate.atlassian.net/browse/HV-1853) - Inconsistency of getter method detection in GetterPropertySelectionStrategy
+
+### Improvement
+* [HV-1901](https://hibernate.atlassian.net/browse/HV-1901) - Provide an easy way to run the TCK with a provided WildFly
+
+### Task
+* [HV-1911](https://hibernate.atlassian.net/browse/HV-1911) - Upgrade jakarta.el-api to 5.0.1
+* [HV-1910](https://hibernate.atlassian.net/browse/HV-1910) - Update jakarta.annotation-api to 2.1.1
+* [HV-1909](https://hibernate.atlassian.net/browse/HV-1909) - Update Weld to 5.0.1.Final
+* [HV-1908](https://hibernate.atlassian.net/browse/HV-1908) - Update CDI API to 4.0.1 and Weld to 5.0.0.SP2
+* [HV-1907](https://hibernate.atlassian.net/browse/HV-1907) - Update Jakarta EL API to 5.0.0 and Expressly to 5.0.0-M2
+* [HV-1906](https://hibernate.atlassian.net/browse/HV-1906) - Update Bean Validation API to 3.0.2 and TCK to 3.0.1
+* [HV-1904](https://hibernate.atlassian.net/browse/HV-1904) - Update Jakarta EE 10 dependencies to stable versions
+* [HV-1898](https://hibernate.atlassian.net/browse/HV-1898) - Bump jakarta.persistence-api to 3.1.0
+* [HV-1897](https://hibernate.atlassian.net/browse/HV-1897) - Bump jakarta.annotation-api to 2.1.0
+* [HV-1896](https://hibernate.atlassian.net/browse/HV-1896) - Upgrade Jackson Databind test dependency to 2.13.2.2
+
+## 8.0.0.Alpha3 (2022-04-01)
+
+### Bug
+* [HV-1895](https://hibernate.atlassian.net/browse/HV-1895) - Bundle plugin 3.5.0 produces unusable osgi values in manifest
+
+### Task
+* [HV-1893](https://hibernate.atlassian.net/browse/HV-1893) - Make test suite locale independent
+
+## 8.0.0.Alpha2 (2022-03-10)
+
+### Bug
+* [HV-1889](https://hibernate.atlassian.net/browse/HV-1889) - Fix imagesdir for documentation
+
+### Task
+* [HV-1892](https://hibernate.atlassian.net/browse/HV-1892) - Update Java 9 section in documentation
+* [HV-1891](https://hibernate.atlassian.net/browse/HV-1891) - Update EL dependency to Expressly in documentation
+* [HV-1890](https://hibernate.atlassian.net/browse/HV-1890) - Fix Jakarta Bean Validation versions in documentation
+* [HV-1888](https://hibernate.atlassian.net/browse/HV-1888) - Rename jakarta.annotation.processing.Processor to javax.annotation.processing.Processor
+* [HV-1887](https://hibernate.atlassian.net/browse/HV-1887) - Make Java 11 the base version for Hibernate Validator 8
+
+## 8.0.0.Alpha1 (2022-02-28)
+
+### Bug
+* [HV-1857](https://hibernate.atlassian.net/browse/HV-1857) - Hibernate Validator version for EE 10/EL 5?
+
+### New Feature
+* [HV-1867](https://hibernate.atlassian.net/browse/HV-1867) - Add UUID validation
+
+### Task
+* [HV-1886](https://hibernate.atlassian.net/browse/HV-1886) - Fix incontainer build for main
+* [HV-1882](https://hibernate.atlassian.net/browse/HV-1882) - Use a different JDK for running Maven than for compiling/launching tests in JDK CI jobs
+
+## 7.0.2.Final (2021-12-14)
+
+### Bug
+* [HV-1854](https://hibernate.atlassian.net/browse/HV-1854) - PESELValidator does not valid correct
+* [HV-1833](https://hibernate.atlassian.net/browse/HV-1833) - DomainNameUtil issues java.lang.StackOverflowError on very large error (@Email validation)
+
+### Improvement
+* [HV-1840](https://hibernate.atlassian.net/browse/HV-1840) - Remove deprecated CDI API usage
+
+### Task
+* [HV-1862](https://hibernate.atlassian.net/browse/HV-1862) - Update Log4j 2 test dependency to 2.16.0
+* [HV-1861](https://hibernate.atlassian.net/browse/HV-1861) - Switch to the nexus-staging-maven-plugin
+* [HV-1860](https://hibernate.atlassian.net/browse/HV-1860) - Add GitHub SSH keys to SSH agent during Jenkinsfile release
+* [HV-1859](https://hibernate.atlassian.net/browse/HV-1859) - Update Log4j 2 test dependency to 2.15.0
+* [HV-1858](https://hibernate.atlassian.net/browse/HV-1858) - Switch to OSSRH for deployment to Maven Central
+* [HV-1848](https://hibernate.atlassian.net/browse/HV-1848) - Set up SSH config as part of the Jenkinsfile
+* [HV-1846](https://hibernate.atlassian.net/browse/HV-1846) - Upgrade to Byte Buddy 1.11.6 in tests
+* [HV-1845](https://hibernate.atlassian.net/browse/HV-1845) - Test Hibernate Validator against JDK 18
+* [HV-1844](https://hibernate.atlassian.net/browse/HV-1844) - Upgrade Jakarta EL to 4.0.1
+* [HV-1843](https://hibernate.atlassian.net/browse/HV-1843) - Upgrade Jackson test dependency to 2.12.3
+* [HV-1842](https://hibernate.atlassian.net/browse/HV-1842) - Upgrade Guava test dependency to 30.1.1-jre
+* [HV-1841](https://hibernate.atlassian.net/browse/HV-1841) - Expose a getter for the configured PropertyNodeNameProvider
+* [HV-1838](https://hibernate.atlassian.net/browse/HV-1838) - Skip forbiddenapis on JDK17+
+* [HV-1837](https://hibernate.atlassian.net/browse/HV-1837) - Language rework initiative
+* [HV-1836](https://hibernate.atlassian.net/browse/HV-1836) - Restore CI for JDK 15
+* [HV-1835](https://hibernate.atlassian.net/browse/HV-1835) - Test Hibernate Validator against JDK17
+
+## 7.0.1.Final (06-02-2021)
+
+### Task
+* [HV-1826](https://hibernate.atlassian.net/browse/HV-1826) - tck-runner - Reintroduce TCK Runner in container tests for Jakarta EE 9 using WildFly Preview
+
+## 7.0.0.Final (23-12-2020)
+
+### Bug
+* [HV-1821](https://hibernate.atlassian.net/browse/HV-1821) - engine     - HV-1755 introduces NPE in org.hibernate.validator.internal.engine.ValidatorFactoryImpl constructor
+
+### New Feature
+* [HV-1822](https://hibernate.atlassian.net/browse/HV-1822) - validators - Add Russian specific validator for russian taxpayer identification number
+
+## 7.0.0.CR1 (07-12-2020)
+
+### Bug
+* [HV-1804](https://hibernate.atlassian.net/browse/HV-1804) - translations - Fix Dutch translation for @Size constraint
+* [HV-1797](https://hibernate.atlassian.net/browse/HV-1797) - validators   - Validation on classes with a bidirectional relationship cause stack overflow on 6.1.x
+
+### Improvement
+* [HV-1815](https://hibernate.atlassian.net/browse/HV-1815) - translations - Fix DecimalMax and DecimalMin in zh_CN translation
+* [HV-1814](https://hibernate.atlassian.net/browse/HV-1814) - tests        - Upgrade JUnit to 4.13.1
+* [HV-1812](https://hibernate.atlassian.net/browse/HV-1812) - engine       - Avoid reflection-based metadata extraction for built-in value extractors
+
+### New Feature
+* [HV-1816](https://hibernate.atlassian.net/browse/HV-1816) - engine       - Disable Expression Language by default for custom constraint violations
+
+### Task
+* [HV-1820](https://hibernate.atlassian.net/browse/HV-1820) - engine       - Upgrade JBoss Logging to 3.4.1.Final
+* [HV-1819](https://hibernate.atlassian.net/browse/HV-1819) - engine       - Upgrade Classmate to 1.5.1
+* [HV-1818](https://hibernate.atlassian.net/browse/HV-1818) - build        - Upgrade Jakarta API dependencies
+* [HV-1817](https://hibernate.atlassian.net/browse/HV-1817) - build        - Upgrade to checkstyle 8.38
+* [HV-1809](https://hibernate.atlassian.net/browse/HV-1809) - tests        - Upgrade to TestNG 6.14.3
+* [HV-1808](https://hibernate.atlassian.net/browse/HV-1808) - tests        - Upgrade to Arquillian 1.7.0.Alpha4
+* [HV-1807](https://hibernate.atlassian.net/browse/HV-1807) - build        - Add Maven profile to improve contributor experience on Intellij IDEA
+* [HV-1806](https://hibernate.atlassian.net/browse/HV-1806) - tests        - Use the local repository from the Maven build in OSGi/WildFly integration tests
+* [HV-1805](https://hibernate.atlassian.net/browse/HV-1805) - build        - Add a Jenkinsfile to test multiple JDKs from a single job
+* [HV-1803](https://hibernate.atlassian.net/browse/HV-1803) - tests        - Move the tests to log4j2
+* [HV-1802](https://hibernate.atlassian.net/browse/HV-1802) - tests        - Update ByteBuddy test dependency to 1.10.16
+* [HV-1795](https://hibernate.atlassian.net/browse/HV-1795) - build        - Remove link to JavaMoney javadoc
+
+## 7.0.0.Alpha6 (22-07-2020)
+
+### Task
+* [HV-1792](https://hibernate.atlassian.net/browse/HV-1792) - tck-runner - Upgrade Bean Validation TCK to 3.0.0
+
+## 7.0.0.Alpha5 (20-07-2020)
+
+### Bug
+* [HV-1761](https://hibernate.atlassian.net/browse/HV-1761) - engine             - Interpolation of primitive arrays causes a ClassCastException
+
+### Remove Feature
+* [HV-1790](https://hibernate.atlassian.net/browse/HV-1790) - engine, validators - Remove the SafeHtml constraint
+
+### Task
+* [HV-1789](https://hibernate.atlassian.net/browse/HV-1789) - engine, tests      - Upgrade to Bean Validation 3.0.0 and update the XML namespaces
+
+## 7.0.0.Alpha4 (29-06-2020)
+
+### Improvement
+* [HV-1782](https://hibernate.atlassian.net/browse/HV-1782) - translations - Remove trailing dot from @Max constraint German translation
+
+### New Feature
+* [HV-1780](https://hibernate.atlassian.net/browse/HV-1780) - validators   - Add @Normalized contraint that validates if text is normalized in a given form
+
+### Task
+* [HV-1787](https://hibernate.atlassian.net/browse/HV-1787) - build        - Upgrade Jakarta EE dependencies
+* [HV-1786](https://hibernate.atlassian.net/browse/HV-1786) - tck-runner   - Upgrade Bean Validation TCK to 3.0.0-M2
+* [HV-1783](https://hibernate.atlassian.net/browse/HV-1783) - tests        - Upgrade to Arquillian 1.7.0.Alpha1
+
+## 7.0.0.Alpha3 (26-05-2020)
+
+### Bug
+* [HV-1781](https://hibernate.atlassian.net/browse/HV-1781) - engine - Fix Jakarta Persistence class presence test
+
+## 7.0.0.Alpha2 (13-05-2020)
+
+### Bug
+* [HV-1776](https://hibernate.atlassian.net/browse/HV-1776) - annotation-processor - Rename annotation processor service file for new jakarta package
+* [HV-1775](https://hibernate.atlassian.net/browse/HV-1775) - integration          - Rename CDI extension service file for new jakarta package
+* [HV-1774](https://hibernate.atlassian.net/browse/HV-1774) - engine               - Invalid parsing of EL expression can lead to invalid EL expressions considered valid
+* [HV-1772](https://hibernate.atlassian.net/browse/HV-1772) - engine               - Building multiple ValidatorFactory instances from a single Configuration violates specification for MessageInterpolator
+* [HV-1771](https://hibernate.atlassian.net/browse/HV-1771) - translations         - Fix DecimalMin message German translation
+* [HV-1760](https://hibernate.atlassian.net/browse/HV-1760) - validators           - @Negative*/@Positive* do not support CharSequence as documented
+
+### Improvement
+* [HV-1773](https://hibernate.atlassian.net/browse/HV-1773) - documentation        - Be more explicit about issues with EL injection and how to avoid them
+* [HV-1770](https://hibernate.atlassian.net/browse/HV-1770) - engine               - Relax constraint consistency checking for built-in constraints
+* [HV-1769](https://hibernate.atlassian.net/browse/HV-1769) - engine               - Only create the default TraversableResolver if none has been specified
+* [HV-1767](https://hibernate.atlassian.net/browse/HV-1767) - engine               - Reduce the overhead of ConstraintHelper initialization in the predefined scope case
+* [HV-1763](https://hibernate.atlassian.net/browse/HV-1763) - engine               - Improve performances of ExecutableHelper#getSignature
+* [HV-1762](https://hibernate.atlassian.net/browse/HV-1762) - engine               - Avoid cloning overhead from Method.getParameterTypes()
+
+### Task
+* [HV-1778](https://hibernate.atlassian.net/browse/HV-1778) - extensions           - Reenable CDI extension testing
+* [HV-1777](https://hibernate.atlassian.net/browse/HV-1777) - build                - Upgrade Jakarta dependencies to latest
+* [HV-1765](https://hibernate.atlassian.net/browse/HV-1765) - integration          - Upgrade WildFly versions to 18.0.1.Final and 19.0.0.Final
+* [HV-1764](https://hibernate.atlassian.net/browse/HV-1764) - tests                - Upgrade Jackson test dependencies to 2.10.3
+
+## 7.0.0.Alpha1 (25-03-2020)
+
+### Bug
+* [HV-1758](https://hibernate.atlassian.net/browse/HV-1758) - translations               - Extra dollar sign in validation messages for ModCheck
+
+### New Feature
+* [HV-1759](https://hibernate.atlassian.net/browse/HV-1759) - build, engine, integration - Switch to the new jakarta.* packages
+* [HV-1755](https://hibernate.atlassian.net/browse/HV-1755) - engine                     - Introduce the notion of BeanMetaDataClassNormalizer in the standard ValidatorFactory
+
+## 6.1.2.Final (31-01-2020)
+
+### Bug
+* [HV-1756](https://hibernate.atlassian.net/browse/HV-1756) - translations - Incorrect variables in the newly added translations
+
+### Task
+* [HV-1753](https://hibernate.atlassian.net/browse/HV-1753) - tests        - Force Pax-Exam and Karaf to use Maven Central repository with SSL enabled
+
+## 6.1.1.Final (15-01-2020)
+
+### Improvement
+* [HV-1750](https://hibernate.atlassian.net/browse/HV-1750) - engine        - Add debug log when expression factory has failed to load
+* [HV-1747](https://hibernate.atlassian.net/browse/HV-1747) - engine        - Allow overriding the message interpolator in PredefinedScopeValidatorFactory context
+* [HV-1744](https://hibernate.atlassian.net/browse/HV-1744) - documentation - Use auto-expanding entries in the documentation TOC
+
+### New Feature
+* [HV-1749](https://hibernate.atlassian.net/browse/HV-1749) - engine        - Introduce a LocaleResolver SPI
+* [HV-1748](https://hibernate.atlassian.net/browse/HV-1748) - engine        - Improve localization support via Locale.LanguageRange
+
+### Task
+* [HV-1745](https://hibernate.atlassian.net/browse/HV-1745) - tests         - Bump Jackson test dependency to 2.10.1
+
+## 6.1.0.Final (25-10-2019)
+
+### Bug
+* [HV-1730](https://hibernate.atlassian.net/browse/HV-1730) - engine      - JavaBeanExecutable fails to initialize for enum type
+* [HV-1715](https://hibernate.atlassian.net/browse/HV-1715) - engine      - Validation can sometimes proceed to the next group in sequence even after one of the constraints generated a violation
+
+### Improvement
+* [HV-1729](https://hibernate.atlassian.net/browse/HV-1729) - performance - Skip allocation of an action for each need to access the context classloader
+
+### Task
+* [HV-1743](https://hibernate.atlassian.net/browse/HV-1743) - build       - Upgrade maven-compiler-plugin to 3.8.1
+* [HV-1742](https://hibernate.atlassian.net/browse/HV-1742) - build       - Upgrade to WildFly 18.0.0.Final
+* [HV-1741](https://hibernate.atlassian.net/browse/HV-1741) - build       - Upgrade ByteBuddy test dependency to 1.10.2
+* [HV-1740](https://hibernate.atlassian.net/browse/HV-1740) - engine      - Deprecate @SafeHtml
+* [HV-1739](https://hibernate.atlassian.net/browse/HV-1739) - engine      - CVE-2019-10219 Security issue with @SafeHtml
+* [HV-1738](https://hibernate.atlassian.net/browse/HV-1738) - build       - Update Jackson test dependency to 2.9.10
+* [HV-1733](https://hibernate.atlassian.net/browse/HV-1733) - tests       - Fix locale settings of PredefinedScopeValidatorFactoryTest
+* [HV-1732](https://hibernate.atlassian.net/browse/HV-1732) - build       - Change tarLongFileMode to posix for assembly building
+* [HV-1731](https://hibernate.atlassian.net/browse/HV-1731) - tck-runner  - Move TCK signature check to tck-runner module
+* [HV-1728](https://hibernate.atlassian.net/browse/HV-1728) - build       - Upgrade to WildFly 17.0.1.Final
+* [HV-1727](https://hibernate.atlassian.net/browse/HV-1727) - build       - Update Jackson Databind test dependency to 2.9.9.2
+* [HV-1725](https://hibernate.atlassian.net/browse/HV-1725) - build       - Switch to using Jakarta EE artifacts
+* [HV-1724](https://hibernate.atlassian.net/browse/HV-1724) - build       - Update to OpenJFX 11.0.2
+* [HV-1680](https://hibernate.atlassian.net/browse/HV-1680) - engine      - Avoid reflection by using instrumentation - build the enhancer
+
+## 6.1.0.Alpha6 (19-07-2019)
+
+### Bug
+* [HV-1722](https://hibernate.atlassian.net/browse/HV-1722) - engine     - Remove settings-example.xml reference from .travis.yml
+* [HV-1721](https://hibernate.atlassian.net/browse/HV-1721) - engine     - Take into account Hibernate Validator-specific configuration with PredefinedScopeValidatorFactoryImpl
+* [HV-1720](https://hibernate.atlassian.net/browse/HV-1720) - engine     - Support bounded wildcard types in container value unwrapping
+
+### New Feature
+* [HV-1723](https://hibernate.atlassian.net/browse/HV-1723) - validators - Provide a DigitsValidatorForMonetaryAmount to support @Digits on MonetaryAmounts
+
+### Task
+* [HV-1726](https://hibernate.atlassian.net/browse/HV-1726) - engine     - Make PredefinedScopeHibernateValidatorFactory extend HibernateValidatorFactory
+
+## 6.1.0.Alpha5 (13-06-2019)
+
+### Bug
+* [HV-1713](https://hibernate.atlassian.net/browse/HV-1713) - engine       - Missing violation when a bean is validated with different groups
+* [HV-1709](https://hibernate.atlassian.net/browse/HV-1709) - validators   - Polish Identification numbers are not considering length of the value
+* [HV-1706](https://hibernate.atlassian.net/browse/HV-1706) - validators   - ISBN-13 algorithm does not handle checksum 10
+
+### Improvement
+* [HV-1719](https://hibernate.atlassian.net/browse/HV-1719) - engine       - Accept setting per-validator TraversableResolver with PredefinedScopeValidatorFactoryImpl
+* [HV-1708](https://hibernate.atlassian.net/browse/HV-1708) - translations - Add Danish translations of validation messages
+* [HV-1707](https://hibernate.atlassian.net/browse/HV-1707) - validators   - Add ISBN.Type.ANY
+
+### New Feature
+* [HV-823](https://hibernate.atlassian.net/browse/HV-823) - engine       - Provide contract for customization of property names in constraint violation
+
+### Task
+* [HV-1718](https://hibernate.atlassian.net/browse/HV-1718) - engine       - Predefined scope ValidatorFactory: uninitialized bean class shouldn't throw an exception
+* [HV-1717](https://hibernate.atlassian.net/browse/HV-1717) - build        - Update test dependencies
+* [HV-1716](https://hibernate.atlassian.net/browse/HV-1716) - build        - Update WildFly secondary version to 17.0.0.Beta1
+* [HV-1712](https://hibernate.atlassian.net/browse/HV-1712) - engine       - Add org.hibernate.validator.metadata to OSGi manifest
+* [HV-1711](https://hibernate.atlassian.net/browse/HV-1711) - build        - Fix aggregated javadoc build with recent JDK 11
+* [HV-1710](https://hibernate.atlassian.net/browse/HV-1710) - build        - Remove settings-example.xml
+
+## 6.1.0.Alpha4 (22-03-2019)
+
+### Bug
+* [HV-1704](https://hibernate.atlassian.net/browse/HV-1704) - build      - Build fails on Windows
+* [HV-1699](https://hibernate.atlassian.net/browse/HV-1699) - validators - Rounding error when having a BigDecimal at runtime with @Max/@Min annotation set on a Number field
+
+### Improvement
+* [HV-1701](https://hibernate.atlassian.net/browse/HV-1701) -            - Add Max/MinValidatorForInteger
+* [HV-1700](https://hibernate.atlassian.net/browse/HV-1700) - tests      - Remove reference of absent valueextractor from test resources
+* [HV-1697](https://hibernate.atlassian.net/browse/HV-1697) - engine     - Reduce memory allocation of ValidationContexts
+* [HV-1696](https://hibernate.atlassian.net/browse/HV-1696) - engine     - Avoid using computeIfAbsent for the common case when getting bean metadata
+* [HV-1695](https://hibernate.atlassian.net/browse/HV-1695) - engine     - Avoid creating an empty map for group conversions
+* [HV-1694](https://hibernate.atlassian.net/browse/HV-1694) - engine     - Reduce memory allocation for unconstrained beans
+
+### Task
+* [HV-1705](https://hibernate.atlassian.net/browse/HV-1705) - build      - Upgrade WildFly to 16.0.0.Final
+* [HV-1702](https://hibernate.atlassian.net/browse/HV-1702) - build      - Upgrade to checkstyle 8.18 and maven-checkstyle-plugin 3.0.0
+* [HV-1693](https://hibernate.atlassian.net/browse/HV-1693) - build      - Test compatibility with JDK 12
+
+## 6.1.0.Alpha3 (18-02-2019)
+
+### Bug
+* [HV-1692](https://hibernate.atlassian.net/browse/HV-1692) - engine       - Custom group sequence might cause StackOverflowError on objects with cycles
+* [HV-1684](https://hibernate.atlassian.net/browse/HV-1684) - validators   - StackOverflowError with Hibernate Validator 6.0.13.Final
+
+### Improvement
+* [HV-1691](https://hibernate.atlassian.net/browse/HV-1691) - engine       - IndexOutOfBoundsException in PathImpl
+* [HV-1689](https://hibernate.atlassian.net/browse/HV-1689) - engine       - In GetInstancesFromServiceLoader, do not hide ServiceConfigurationError 
+* [HV-1687](https://hibernate.atlassian.net/browse/HV-1687) - engine       - Reduce bootstrap log verbosity
+* [HV-1686](https://hibernate.atlassian.net/browse/HV-1686) - translations - Fix a few typos in the Dutch translation
+* [HV-1683](https://hibernate.atlassian.net/browse/HV-1683) - build        - Upgrade javadoc plugin
+
+### New Feature
+* [HV-1657](https://hibernate.atlassian.net/browse/HV-1657) - engine       - Make the “propertyPath” available via the “HibernateMessageInterpolatorContext”
+
+### Task
+* [HV-1685](https://hibernate.atlassian.net/browse/HV-1685) - integration  - Upgrade the WildFly versions we generate patches for to 14.0.1.Final and 15.0.0.Final
+
+## 6.1.0.Alpha2 (19-12-2018)
+
+### Bug
+* [HV-1681](https://hibernate.atlassian.net/browse/HV-1681) - engine       - PredefinedScopeValidatorFactory and @Valid on unregistered bean throws a NPE
+
+### Improvement
+* [HV-1651](https://hibernate.atlassian.net/browse/HV-1651) - translations - Contribute additional language translations from OpenLiberty
+
+### New Feature
+* [HV-1682](https://hibernate.atlassian.net/browse/HV-1682) - engine       - Provide a way to normalize the class before getting the bean metadata
+
+## 6.1.0.Alpha1 (11-12-2018)
+
+### Bug
+* [HV-1650](https://hibernate.atlassian.net/browse/HV-1650) - validators                          - French translations are badly encoded
+* [HV-1645](https://hibernate.atlassian.net/browse/HV-1645) - extensions                          - Revert HV-1609 due to increased CDI startup caused by ValidateableBeanFilter
+* [HV-1644](https://hibernate.atlassian.net/browse/HV-1644) - build                               - Using Hibernate Validator with Java 11 brings JavaFX on the classpath
+* [HV-1637](https://hibernate.atlassian.net/browse/HV-1637) - translations                        - PropertyNotFoundException for @DecimalMax when using the German translation
+* [HV-1634](https://hibernate.atlassian.net/browse/HV-1634) - engine                              - Deal with synthetic and implicit parameters properly when getting the generic type of a parameter
+* [HV-1510](https://hibernate.atlassian.net/browse/HV-1510) - validators                          - @NotNull doesn't work in 50% when annotated method is extended from multiple classes
+* [HV-1450](https://hibernate.atlassian.net/browse/HV-1450) - engine                              - BeanMetaDataImpl.BeanMetaDataBuilder#build() can choose ConstraintMetaData w/o constraints
+
+### Improvement
+* [HV-1662](https://hibernate.atlassian.net/browse/HV-1662) - engine                              - Extract BeanMetaDataBuilder to its own class file
+* [HV-1661](https://hibernate.atlassian.net/browse/HV-1661) - engine                              - Remove impossible case from ValidatorImpl#buildNewLocalExecutionContext()
+* [HV-1656](https://hibernate.atlassian.net/browse/HV-1656) - translations                        - Add translation of Validation Messages for Japanese language
+* [HV-1653](https://hibernate.atlassian.net/browse/HV-1653) - engine                              - Improve the javadoc of ParameterScriptAssert
+* [HV-1643](https://hibernate.atlassian.net/browse/HV-1643) - translations                        - Fix Russian translation for @Null constraint
+* [HV-1636](https://hibernate.atlassian.net/browse/HV-1636) - engine                              - Avoid instantiating unnecessary objects during constraint metadata creation
+* [HV-1631](https://hibernate.atlassian.net/browse/HV-1631) - engine                              - Avoid doing two lookups in the read methods of AnnotationProcessingOptionsImpl
+* [HV-1630](https://hibernate.atlassian.net/browse/HV-1630) - engine                              - Introduce StringHelper.format()
+* [HV-1629](https://hibernate.atlassian.net/browse/HV-1629) - engine                              - Fix compiler warnings
+* [HV-1628](https://hibernate.atlassian.net/browse/HV-1628) - annotation-processor, engine, tests - Configure a stricter forbidden-apis policy and remove calls deprecated in Java 10
+* [HV-1626](https://hibernate.atlassian.net/browse/HV-1626) - build                               - Remove useless Maven plugins and extensions
+* [HV-1623](https://hibernate.atlassian.net/browse/HV-1623) - engine                              - Build an abstraction over reflection in engine
+* [HV-1622](https://hibernate.atlassian.net/browse/HV-1622) - integration                         - Update the WildFly integration tests to use WildFly 13
+* [HV-1617](https://hibernate.atlassian.net/browse/HV-1617) - build                               - Make our pom files more consistent with WildFly and JBoss parent pom files
+* [HV-1599](https://hibernate.atlassian.net/browse/HV-1599) - engine                              - Avoid creating later discarded violations when reportAsSingleViolation is true
+* [HV-1526](https://hibernate.atlassian.net/browse/HV-1526) - engine                              - Create separate validation context for different validation kinds
+* [HV-1484](https://hibernate.atlassian.net/browse/HV-1484) - build                               - Unify JPMS module names and OSGi bundle names
+* [HV-667](https://hibernate.atlassian.net/browse/HV-667)   - engine                              - Consider to create descriptor model lazily
+
+### New Feature
+* [HV-1671](https://hibernate.atlassian.net/browse/HV-1671) - engine                              - Allow to retrieve all the built-in constraint annotations from ConstraintHelper
+* [HV-1670](https://hibernate.atlassian.net/browse/HV-1670) - engine                              - Add the ability to preload a set of locales
+* [HV-1667](https://hibernate.atlassian.net/browse/HV-1667) - engine                              - Create a predefined scope ValidatorFactory which initializes things eagerly
+* [HV-1363](https://hibernate.atlassian.net/browse/HV-1363) - engine                              - Support for non-standard Java beans
+
+### Remove Feature
+* [HV-1624](https://hibernate.atlassian.net/browse/HV-1624) - engine                              - Remove the StaticFieldELResolver
+
+### Task
+* [HV-1677](https://hibernate.atlassian.net/browse/HV-1677) - engine                              - Allow for an explicit environment variable to disable the JavaFX extensions
+* [HV-1674](https://hibernate.atlassian.net/browse/HV-1674) - engine                              - Make the name of the default bundle public in AbstractMessageInterpolator
+* [HV-1673](https://hibernate.atlassian.net/browse/HV-1673) - engine                              - Audit new privileged calls in the reflection abstraction
+* [HV-1669](https://hibernate.atlassian.net/browse/HV-1669) - engine                              - Only enable the SafeHtml constraint if jsoup in in the classpath
+* [HV-1668](https://hibernate.atlassian.net/browse/HV-1668) - engine                              - Properly register all built-in constraints
+* [HV-1659](https://hibernate.atlassian.net/browse/HV-1659) - integration                         - Upgrade WildFly to 14.0.1
+* [HV-1658](https://hibernate.atlassian.net/browse/HV-1658) - engine                              - Remove a couple of stream usages in ConstraintHelper that cause a problem for another project
+* [HV-1649](https://hibernate.atlassian.net/browse/HV-1649) - tck-runner                          - Upgrade to Bean Validation TCK 2.0.4.Final
+* [HV-1648](https://hibernate.atlassian.net/browse/HV-1648) - build, integration                  - Reenable WildFly integration tests for JDK 11
+* [HV-1647](https://hibernate.atlassian.net/browse/HV-1647) - tck-runner                          - Allow running TCK tests in container mode with JDK 11
+* [HV-1646](https://hibernate.atlassian.net/browse/HV-1646) - build, integration, tck-runner      - Upgrade WildFly to 14.0.0.Beta1
+* [HV-1641](https://hibernate.atlassian.net/browse/HV-1641) - build                               - Use the OSS snapshot repository to download the JavaFX dependencies when building with JDK 11
+* [HV-1640](https://hibernate.atlassian.net/browse/HV-1640) - build                               - Add compatibility with the latest JDK 11 build 22
+* [HV-1635](https://hibernate.atlassian.net/browse/HV-1635) - documentation                       - Remove specific instructions for building with JDK 9 from the README
+* [HV-1627](https://hibernate.atlassian.net/browse/HV-1627) - build                               - Upgrade our JPA test dependency to 2.2
+* [HV-1610](https://hibernate.atlassian.net/browse/HV-1610) - integration                         - Reenable OSGi tests for JDK 10
+* [HV-1608](https://hibernate.atlassian.net/browse/HV-1608) - build                               - Have the build work with JDK 11
+* [HV-1577](https://hibernate.atlassian.net/browse/HV-1577) - engine                              - Use Stax instead of JAXB to parse the XML descriptors
+
+## 6.0.13.Final (22-08-2018)
+
+### Bug
+* [HV-1652](https://hibernate.atlassian.net/browse/HV-1652) - engine     - Fix a few theoretical null pointer dereference issues
+* [HV-1650](https://hibernate.atlassian.net/browse/HV-1650) - validators - French translations are badly encoded
+
+## 6.0.12.Final (10-08-2018)
+
+### Bug
+* [HV-1645](https://hibernate.atlassian.net/browse/HV-1645) - extensions                     - Revert HV-1609 due to increased CDI startup caused by ValidateableBeanFilter
+* [HV-1644](https://hibernate.atlassian.net/browse/HV-1644) - build                          - Using Hibernate Validator with Java 11 brings JavaFX on the classpath
+
+### Improvement
+* [HV-1643](https://hibernate.atlassian.net/browse/HV-1643) - translations                   - Fix Russian translation for @Null constraint
+
+### Task
+* [HV-1649](https://hibernate.atlassian.net/browse/HV-1649) - tck-runner                     - Upgrade to Bean Validation TCK 2.0.4.Final
+* [HV-1648](https://hibernate.atlassian.net/browse/HV-1648) - build, integration             - Reenable WildFly integration tests for JDK 11
+* [HV-1647](https://hibernate.atlassian.net/browse/HV-1647) - tck-runner                     - Allow running TCK tests in container mode with JDK 11
+* [HV-1646](https://hibernate.atlassian.net/browse/HV-1646) - build, integration, tck-runner - Upgrade WildFly to 14.0.0.Beta1
+* [HV-1627](https://hibernate.atlassian.net/browse/HV-1627) - build                          - Upgrade our JPA test dependency to 2.2
+
+## 6.0.11.Final (18-07-2018)
+
+### Bug
+* [HV-1637](https://hibernate.atlassian.net/browse/HV-1637) - translations                        - PropertNotFoundException for @DecimalMax when using the German translation
+
+### Improvement
+* [HV-1628](https://hibernate.atlassian.net/browse/HV-1628) - annotation-processor, engine, tests - Configure a stricter forbidden-apis policy and remove calls deprecated in Java 10
+* [HV-1615](https://hibernate.atlassian.net/browse/HV-1615) - translations                        - Improvements on the dutch translations
+
+### Remove Feature
+* [HV-1624](https://hibernate.atlassian.net/browse/HV-1624) - engine                              - Remove the StaticFieldELResolver
+
+### Task
+* [HV-1641](https://hibernate.atlassian.net/browse/HV-1641) - build                               - Use the OSS snapshot repository to download the JavaFX dependencies when building with JDK 11
+* [HV-1640](https://hibernate.atlassian.net/browse/HV-1640) - build                               - Add compatibility with the latest JDK 11 build 22
+* [HV-1610](https://hibernate.atlassian.net/browse/HV-1610) - integration                         - Reenable OSGi tests for JDK 10
+* [HV-1608](https://hibernate.atlassian.net/browse/HV-1608) - build                               - Have the build work with JDK 11
+* [HV-1577](https://hibernate.atlassian.net/browse/HV-1577) - engine                              - Use Stax instead of JAXB to parse the XML descriptors
+
+## 6.0.10.Final (15-05-2018)
+
+### Bug
+* [HV-1614](https://hibernate.atlassian.net/browse/HV-1614) - engine       - Unable to specify constraints at more than 1 nested parameter of a typed container
+* [HV-1609](https://hibernate.atlassian.net/browse/HV-1609) - integration  - CDI extension should not rely on @WithAnnotations filtering
+* [HV-1604](https://hibernate.atlassian.net/browse/HV-1604) - engine       - Initializing JPATraversableResolver fails with IllegalAccessException
+* [HV-1598](https://hibernate.atlassian.net/browse/HV-1598) - engine       - Fix the behavior of XML default-validated-executable-types
+
+### Improvement
+* [HV-1612](https://hibernate.atlassian.net/browse/HV-1612) - translations - Add Dutch translation of the validation messages
+* [HV-1611](https://hibernate.atlassian.net/browse/HV-1611) - translations - Be consistent in the case of the validation messages
+* [HV-1592](https://hibernate.atlassian.net/browse/HV-1592) - engine       - Make ConstraintValidator declaration stricter
+* [HV-1534](https://hibernate.atlassian.net/browse/HV-1534) - engine       - Allow getter constraints to be specified for subclasses in XML configuration
+
+### Task
+* [HV-1607](https://hibernate.atlassian.net/browse/HV-1607) - build        - Have the build work with JDK 10
+* [HV-1606](https://hibernate.atlassian.net/browse/HV-1606) - tck-runner   - Update TCK to 2.0.3.Final
+* [HV-1605](https://hibernate.atlassian.net/browse/HV-1605) - build        - Update Surefire to 2.21.0 for JDK 10 support
+
+## 6.0.9.Final (27-03-2018)
+
+### Bug
+* [HV-1596](https://hibernate.atlassian.net/browse/HV-1596) - engine      - NPE upon upgrade from HV 5.x to 6.0.8
+* [HV-1594](https://hibernate.atlassian.net/browse/HV-1594) - integration - Add javax.annotation:javax.annotation-api to the hibernate-validator-javax-money Karaf feature
+* [HV-1589](https://hibernate.atlassian.net/browse/HV-1589) - engine      - HibernateConstraintValidators are not correctly cached
+
+### Improvement
+* [HV-1597](https://hibernate.atlassian.net/browse/HV-1597) - engine      - Allow overriding the constraint validator payload at the Validator level with null
+* [HV-1595](https://hibernate.atlassian.net/browse/HV-1595) - engine      - Move ConstraintValidatorPayload to ConstraintValidatorContext
+* [HV-1593](https://hibernate.atlassian.net/browse/HV-1593) - integration - Split the hibernate-validator Karaf feature in several smaller features
+* [HV-1587](https://hibernate.atlassian.net/browse/HV-1587) - engine      - Reduce the already processed work units tracking impact
+* [HV-1586](https://hibernate.atlassian.net/browse/HV-1586) - performance - Various improvements to performance tests
+* [HV-1585](https://hibernate.atlassian.net/browse/HV-1585) - engine      - Omit the cache lookup in AbstractMessageInterpolator for the simple text messages
+
+### Task
+* [HV-1578](https://hibernate.atlassian.net/browse/HV-1578) - build       - Disable the generation of @Generated annotation for JBoss Logging
+
+## 6.0.8.Final (07-03-2018)
+
+### Bug
+* [HV-1554](https://hibernate.atlassian.net/browse/HV-1554) - integration        - OSGi tests running on Payara fail randomly
+* [HV-1551](https://hibernate.atlassian.net/browse/HV-1551) - engine             - Validator not found for @Size on non-parameterized Map/Collection properties
+* [HV-1461](https://hibernate.atlassian.net/browse/HV-1461) - engine             - ExecutableHelper#overrides does not work correctly with the method containing generic and non generic parameters
+
+### Improvement
+* [HV-1582](https://hibernate.atlassian.net/browse/HV-1582) - build, integration - Make the classmate OSGi version range less strict
+* [HV-1581](https://hibernate.atlassian.net/browse/HV-1581) - build              - Make the Felix integration tests fail when a test fails
+* [HV-1580](https://hibernate.atlassian.net/browse/HV-1580) - build              - Fix the path of the setupModules.groovy script
+* [HV-1576](https://hibernate.atlassian.net/browse/HV-1576) - build, integration - Upgrade the integration tests and the base WildFly version to WildFly 12
+* [HV-1573](https://hibernate.atlassian.net/browse/HV-1573) - build              - Ignore the Maven wrapper files in the license check
+* [HV-1572](https://hibernate.atlassian.net/browse/HV-1572) - documentation      - Make the custom container type value extractor example more clear in the documentation
+* [HV-1569](https://hibernate.atlassian.net/browse/HV-1569) - tck-runner         - updateStandaloneXml.groovy shoud take into account the property overridden with the command line
+* [HV-1568](https://hibernate.atlassian.net/browse/HV-1568) - engine             - Prevent possible NullPointerException in ValidatorFactoryScopedContext.Builder
+* [HV-1567](https://hibernate.atlassian.net/browse/HV-1567) - engine             - Make ValidationOrderGenerator global to the ValidatorFactory
+* [HV-1566](https://hibernate.atlassian.net/browse/HV-1566) - engine             - Cache type variable index for performance reasons
+* [HV-1565](https://hibernate.atlassian.net/browse/HV-1565) - documentation      - Add missing security manager permissions for JBoss Logging and Classmate in the documentation
+* [HV-1564](https://hibernate.atlassian.net/browse/HV-1564) - build              - Upgrade the Maven plugins
+* [HV-1563](https://hibernate.atlassian.net/browse/HV-1563) - build              - Update the TCK to 2.0.2.Final and reenable all the TCK tests with JDK 9
+* [HV-1562](https://hibernate.atlassian.net/browse/HV-1562) - build              - JDK9+ build improvements
+* [HV-1560](https://hibernate.atlassian.net/browse/HV-1560) - engine             - Remove Guava as dependency from engine
+* [HV-1559](https://hibernate.atlassian.net/browse/HV-1559) - build              - Align dependency versions with what's in WildFly 11
+* [HV-1553](https://hibernate.atlassian.net/browse/HV-1553) - translations       - Update Spanish translation of constraint messages
+* [HV-1543](https://hibernate.atlassian.net/browse/HV-1543) - engine             - Simplify ConstraintTree in the case of non composing constraints
+* [HV-1444](https://hibernate.atlassian.net/browse/HV-1444) - engine             - Support container only detectable at runtime for global cascaded validation and introduce a cache for the value extractors
+
+### New Feature
+* [HV-1529](https://hibernate.atlassian.net/browse/HV-1529) - engine             - Allow to pass a payload to the constraint validators
+
+### Sub-task
+* [HV-1556](https://hibernate.atlassian.net/browse/HV-1556) - integration        - Felix tests are referencing an outdated snapshot version
+* [HV-1555](https://hibernate.atlassian.net/browse/HV-1555) - integration        - Upgrade Payara (used for the Felix tests) to 5.Beta1
+
+### Task
+* [HV-1584](https://hibernate.atlassian.net/browse/HV-1584) - tck-runner         - Include JavaFX tests in TCK runs (local and incontainer)
+* [HV-1583](https://hibernate.atlassian.net/browse/HV-1583) - build              - Update javax.el dependency to 3.0.1-b09
+* [HV-1570](https://hibernate.atlassian.net/browse/HV-1570) - build              - Update JBoss Logging to version 3.3.2.Final
+* [HV-1558](https://hibernate.atlassian.net/browse/HV-1558) - build              - Put the distribution files to upload into distribution/target/dir so that release scripts find them
+* [HV-1557](https://hibernate.atlassian.net/browse/HV-1557) - build              - Remove old release scripts from the repository
+* [HV-1550](https://hibernate.atlassian.net/browse/HV-1550) - build              - Clarify the build output in the Travis build
+* [HV-1549](https://hibernate.atlassian.net/browse/HV-1549) - build              - Use mvn install instead of mvn verify in the Travis build
+
+## 6.0.7.Final (20-12-2017)
+
+### Task
+* [HV-1548](https://hibernate.atlassian.net/browse/HV-1548) - build - Upgrade the Bean Validation API and TCK to 2.0.1.Final
+
+## 6.0.6.Final (14-12-2017)
+
+### Improvement
+* [HV-1533](https://hibernate.atlassian.net/browse/HV-1533) - engine               - Small performance improvements
+* [HV-1531](https://hibernate.atlassian.net/browse/HV-1531) - engine               - Regroup the ValidatorFactory scoped properties in ValidatorFactoryContext
+* [HV-1530](https://hibernate.atlassian.net/browse/HV-1530) - annotation-processor - Add CodePointLength to supported AP types
+* [HV-1527](https://hibernate.atlassian.net/browse/HV-1527) - engine               - Separate Group and MetaConstraint - Path processed units in ValidationContext
+* [HV-1525](https://hibernate.atlassian.net/browse/HV-1525) - engine               - Various AbstractMessageInterpolator performance improvements
+* [HV-1524](https://hibernate.atlassian.net/browse/HV-1524) - engine               - Log temporal validation tolerance only if it has been explicitly set
+* [HV-1522](https://hibernate.atlassian.net/browse/HV-1522) - engine               - Improve performance of ConstraintViolationImpl hashCode() method
+* [HV-1506](https://hibernate.atlassian.net/browse/HV-1506) - engine               - Regroup the Validator scoped properties in ValidationContext
+
+### New Feature
+* [HV-1541](https://hibernate.atlassian.net/browse/HV-1541) - engine               - Add new constraint for ISBN
+
+### Task
+* [HV-1546](https://hibernate.atlassian.net/browse/HV-1546) - engine               - Reintroduce AnnotationProcessingOptions
+* [HV-1545](https://hibernate.atlassian.net/browse/HV-1545) - engine               - Reintroduce hibernate.validator.constraint_mapping_contributor
+* [HV-1538](https://hibernate.atlassian.net/browse/HV-1538) - engine               - Make the @Incubating annotation @Documented
+* [HV-1537](https://hibernate.atlassian.net/browse/HV-1537) - engine               - Reintroduce ReflectionParameterNameProvider to avoid API breakage
+* [HV-1536](https://hibernate.atlassian.net/browse/HV-1536) - engine               - Update description of required permissions in the reference guide
+* [HV-1535](https://hibernate.atlassian.net/browse/HV-1535) - build                - Use the default style for JavaDoc
+
+## 6.0.5.Final (15-11-2017)
+
+### Bug
+* [HV-1520](https://hibernate.atlassian.net/browse/HV-1520) - engine              - Fix *ProcessedUnit equals() implementations
+* [HV-1516](https://hibernate.atlassian.net/browse/HV-1516) - validators          - E-mail validator does not allow IDN ascii domain labels
+
+### Improvement
+* [HV-1519](https://hibernate.atlassian.net/browse/HV-1519) - build               - Fix the jqassistant build
+* [HV-1518](https://hibernate.atlassian.net/browse/HV-1518) - engine              - Various minor cleanups
+* [HV-1515](https://hibernate.atlassian.net/browse/HV-1515) - translations        - Add missing strings to the simplified Chinese translation
+* [HV-1514](https://hibernate.atlassian.net/browse/HV-1514) - performance         - Update the versions used in the benchmarks and make the latest benchmark compatible with BV 1.1
+* [HV-1512](https://hibernate.atlassian.net/browse/HV-1512) - engine, performance - Improve initialization cost of all logger classes
+* [HV-1511](https://hibernate.atlassian.net/browse/HV-1511) - engine              - Don't expose AnnotationDescriptor in AnnotationDef
+* [HV-1505](https://hibernate.atlassian.net/browse/HV-1505) - engine              - Create ConstraintAnnotationDescriptor for typed access to groups() etc.
+* [HV-1497](https://hibernate.atlassian.net/browse/HV-1497) - engine              - Extend the ConstraintValidator#initialize() contract
+
+### New Feature
+* [HV-1493](https://hibernate.atlassian.net/browse/HV-1493) - engine              - Support a temporal validation tolerance when applying temporal constraints
+* [HV-1466](https://hibernate.atlassian.net/browse/HV-1466) - validators          - Add a @UniqueElements constraints
+
+### Task
+* [HV-1513](https://hibernate.atlassian.net/browse/HV-1513) - engine              - Rename static logger fields from "log" to "LOG"
+
+## 6.0.4.Final (25-10-2017)
+
+### Bug
+* [HV-1508](https://hibernate.atlassian.net/browse/HV-1508) - engine      - Reset the hashCode of PathImpl when we remove the leaf node
+* [HV-1373](https://hibernate.atlassian.net/browse/HV-1373) - engine      - Validator calls objects hashCode() after failed @NotNull validation
+
+### Improvement
+* [HV-1509](https://hibernate.atlassian.net/browse/HV-1509) - engine      - Reference constraint validator factory consistently
+* [HV-1507](https://hibernate.atlassian.net/browse/HV-1507) - engine      - Avoid resetting the PathImpl.hashCode() when setting the property value
+* [HV-1503](https://hibernate.atlassian.net/browse/HV-1503) - engine      - Store the initialized ConstraintValidator in ConstraintTree
+* [HV-1502](https://hibernate.atlassian.net/browse/HV-1502) - engine      - Use AnnotationDescriptor to access annotations information
+* [HV-1323](https://hibernate.atlassian.net/browse/HV-1323) - engine      - Drop WARN log message in ParameterMessageInterpolator instantiation
+* [HV-1040](https://hibernate.atlassian.net/browse/HV-1040) - engine      - Field-level constraint performance impairment
+
+### Task
+* [HV-1501](https://hibernate.atlassian.net/browse/HV-1501) - build       - Update the base versions for API comparison and performance tests
+* [HV-1472](https://hibernate.atlassian.net/browse/HV-1472) - integration - Provide patch file for WildFly 11 Final
+
+## 6.0.3.Final (19-10-2017)
+
+### Bug
+* [HV-1494](https://hibernate.atlassian.net/browse/HV-1494) - validators         - Hibernate Validator specific @NotEmpty used on return type throws an exception
+* [HV-1492](https://hibernate.atlassian.net/browse/HV-1492) - engine             - Parameters passed in wrong order to log method
+* [HV-1490](https://hibernate.atlassian.net/browse/HV-1490) - engine             - Feature detection in ConstraintHelper not consistent with what is required by HV
+* [HV-1485](https://hibernate.atlassian.net/browse/HV-1485) - engine             - ConstraintViolationImpl is not serializable if the constraint can target a generic type (typically Collection)
+* [HV-1481](https://hibernate.atlassian.net/browse/HV-1481) - engine             - @Valid ignores Iterables/Arrays returned by methods with a generic return type
+* [HV-1478](https://hibernate.atlassian.net/browse/HV-1478) - build, integration - hibernate-validator-cdi has invalid OSGi manifest
+* [HV-1474](https://hibernate.atlassian.net/browse/HV-1474) - engine             - Incorrect NodeImpl hashCode()/equals() contract
+* [HV-1184](https://hibernate.atlassian.net/browse/HV-1184) - engine             - JaCoCo code coverage fails since ConstraintDescriptorImpl#buildAnnotationParameterMap() does not filter out synthetic methods
+
+### Improvement
+* [HV-1499](https://hibernate.atlassian.net/browse/HV-1499) - documentation      - Update the getting started guide with the latest additions to the policy file
+* [HV-1487](https://hibernate.atlassian.net/browse/HV-1487) - engine             - Add an option to disable the TraversableResolver result cache
+* [HV-1486](https://hibernate.atlassian.net/browse/HV-1486) - engine             - Add a toString() to AnnotationParameters
+* [HV-1482](https://hibernate.atlassian.net/browse/HV-1482) - engine             - Reduce visibility of some of the value extractors
+* [HV-1480](https://hibernate.atlassian.net/browse/HV-1480) - engine             - Performance and memory allocation improvements
+* [HV-1479](https://hibernate.atlassian.net/browse/HV-1479) - validators         - Document requirement of java.xml.bind module on Java 9 when using XML descriptors
+* [HV-1476](https://hibernate.atlassian.net/browse/HV-1476) - build              - Update checkstyle to latest
+* [HV-1475](https://hibernate.atlassian.net/browse/HV-1475) - build              - Update Maven dependencies
+* [HV-1469](https://hibernate.atlassian.net/browse/HV-1469) - engine             - ScriptEvaluatorFactory should be scoped to the validator factory
+* [HV-1417](https://hibernate.atlassian.net/browse/HV-1417) - documentation      - Documentation - Discuss ContainerElementTypeDescriptor and al.
+* [HV-1415](https://hibernate.atlassian.net/browse/HV-1415) - documentation      - Documentation - Discuss the Path API
+* [HV-937](https://hibernate.atlassian.net/browse/HV-937) - documentation      - Make use of custom asciidoctor template to change numbering of examples and cross referencing in documentation
+
+### New Feature
+* [HV-1496](https://hibernate.atlassian.net/browse/HV-1496) - engine             - Add @CodePointLength constraint that validates code point length
+* [HV-1463](https://hibernate.atlassian.net/browse/HV-1463) - engine             - Make bootstrapping of script evaluators for @ScriptAssert more flexible
+
+### Task
+* [HV-1488](https://hibernate.atlassian.net/browse/HV-1488) - integration        - Upgrade WildFly to 11.0.0.CR1
+* [HV-1464](https://hibernate.atlassian.net/browse/HV-1464) - documentation      - Remove requirement for CLA
+
+## 6.0.2.Final (22-08-2017)
+
+### Bug
+* [HV-1471](https://hibernate.atlassian.net/browse/HV-1471) - engine               - Properly reset the context after constraint validation
+* [HV-1470](https://hibernate.atlassian.net/browse/HV-1470) - annotation-processor - ConstraintValidatorCheck should be made a warning
+
+### Task
+* [HV-1467](https://hibernate.atlassian.net/browse/HV-1467) - translations         - Add missing Portuguese constraint violation messages
+* [HV-1462](https://hibernate.atlassian.net/browse/HV-1462) - integration          - Provide patch file for WildFly 11 Beta1
+* [HV-1395](https://hibernate.atlassian.net/browse/HV-1395) - annotation-processor - Support OptionalInt/OptionalDouble/OptionalLong in the annotation processor
+
+## 6.0.1.Final (04-08-2017)
+
+### Improvement
+* [HV-1460](https://hibernate.atlassian.net/browse/HV-1460) - build         - Remove the Maven version prerequisite as it's redundant with the enforcer configuration and now generates a warning
+* [HV-1459](https://hibernate.atlassian.net/browse/HV-1459) - build         - Add a "sigtest" profile to make running the SigTest test easier
+* [HV-1457](https://hibernate.atlassian.net/browse/HV-1457) - translations  - Update the Persian translation
+* [HV-1456](https://hibernate.atlassian.net/browse/HV-1456) - engine        - Fix comments mixed up by Eclipse refactorings
+* [HV-1455](https://hibernate.atlassian.net/browse/HV-1455) - engine        - Improve Validator#validate...() sanity checks
+* [HV-1454](https://hibernate.atlassian.net/browse/HV-1454) - build         - Support JDK 9 build 180
+* [HV-1452](https://hibernate.atlassian.net/browse/HV-1452) - engine        - Add Spanish translations for BV 2.0 constraints
+* [HV-1448](https://hibernate.atlassian.net/browse/HV-1448) - engine        - Remove some superfluous fields from metamodel
+* [HV-1447](https://hibernate.atlassian.net/browse/HV-1447) - engine        - Remove metadata for unconstrained methods from the aggregated metamodel
+* [HV-1445](https://hibernate.atlassian.net/browse/HV-1445) - engine        - Remove BeanConfiguration cache in AnnotationMetadataProvider
+* [HV-1443](https://hibernate.atlassian.net/browse/HV-1443) - engine        - AbstractConstrainedElement#isConstrained() should also return true if there are group conversions without cascading
+* [HV-1442](https://hibernate.atlassian.net/browse/HV-1442) - engine        - Fix root cascading metadata for arrays in the programmatic API
+* [HV-1441](https://hibernate.atlassian.net/browse/HV-1441) - engine        - Clean up the initialization of CascadingMetaData
+* [HV-1439](https://hibernate.atlassian.net/browse/HV-1439) - engine        - Improve overall performances
+* [HV-1438](https://hibernate.atlassian.net/browse/HV-1438) - engine        - Narrow down value extractors considered for cascaded validation to the ones compatible
+* [HV-1437](https://hibernate.atlassian.net/browse/HV-1437) - engine        - Look at reducing the runtime memory usage of the ValidatorFactory
+* [HV-1422](https://hibernate.atlassian.net/browse/HV-1422) - documentation - Extract properties for base URLs commonly used in the reference guide
+* [HV-1405](https://hibernate.atlassian.net/browse/HV-1405) - tests         - Review assertCorrectPropertyPathStringRepresentations usage
+
+### Task
+* [HV-1446](https://hibernate.atlassian.net/browse/HV-1446) - engine        - Remove UnconstrainedEntityMetaDataSingleton
+* [HV-1440](https://hibernate.atlassian.net/browse/HV-1440) - integration   - Provide patch file for WildFly 11 Alpha1
+* [HV-1420](https://hibernate.atlassian.net/browse/HV-1420) - documentation - Reference documentation update
+
+## 6.0.0.Final (04-08-2017)
+
+### Improvement
+* [HV-1458](https://hibernate.atlassian.net/browse/HV-1458) - engine - Avoid performance regression for cascaded validation
+* [HV-1451](https://hibernate.atlassian.net/browse/HV-1451) - engine - Add @PastOrPresent and @FutureOrPresent messages
+
+### Task
+* [HV-1453](https://hibernate.atlassian.net/browse/HV-1453) - build  - Upgrade to final versions of BV API and TCK
+
+## 6.0.0.CR3 (11-07-2017)
+
+### Bug
+* [HV-1429](https://hibernate.atlassian.net/browse/HV-1429) - integration   - Incorrect URL in Paranamer Karaf feature
+* [HV-1384](https://hibernate.atlassian.net/browse/HV-1384) - engine        - Fix CascadingMetaData for arrays
+
+### Improvement
+* [HV-1434](https://hibernate.atlassian.net/browse/HV-1434) - engine        - Make order of <constraint> and <container-element-type> consistent in XSD
+* [HV-1433](https://hibernate.atlassian.net/browse/HV-1433) - validators    - Don't apply regular expression for @Email if no pattern or flags are given
+* [HV-1431](https://hibernate.atlassian.net/browse/HV-1431) - engine        - Clean up for constraint locations
+
+### Task
+* [HV-1435](https://hibernate.atlassian.net/browse/HV-1435) - build         - Upgrade to Bean Validation 2.0.0.CR3 (API + TCK)
+* [HV-1427](https://hibernate.atlassian.net/browse/HV-1427) - engine        - Improve consistency of method names in the Log class
+* [HV-1426](https://hibernate.atlassian.net/browse/HV-1426) - integration   - Make javax.el work in OSGi environment without requiring setting the external class loader
+* [HV-1389](https://hibernate.atlassian.net/browse/HV-1389) - tests         - Clean up @CandidateForTck tests
+* [HV-1371](https://hibernate.atlassian.net/browse/HV-1371) - tests         - Add missing examples to the specexample PropertyPath test
+* [HV-1351](https://hibernate.atlassian.net/browse/HV-1351) - engine        - Throw an exception when declaring a ValueExtractor with @ExtractedValue on a non wildcard type
+* [HV-1315](https://hibernate.atlassian.net/browse/HV-1315) - engine        - Remove container element type support for arrays
+* [HV-1248](https://hibernate.atlassian.net/browse/HV-1248) - documentation - Update links to the spec
+
+## 6.0.0.CR2 (05-07-2017)
+
+### Bug
+* [HV-1359](https://hibernate.atlassian.net/browse/HV-1359) - engine        - Loading ConstraintValidators with service loader does not take into account externalClassLoader
+
+### Improvement
+* [HV-1411](https://hibernate.atlassian.net/browse/HV-1411) - engine, tests - Use the full URLs in xsi:schemaLocation of our XML files
+* [HV-1410](https://hibernate.atlassian.net/browse/HV-1410) - extensions    - CDI Integration uses deprecated API
+* [HV-1409](https://hibernate.atlassian.net/browse/HV-1409) - engine        - Fix ContainerClassTypeParameterAndExtractor toString()
+
+### Task
+* [HV-1425](https://hibernate.atlassian.net/browse/HV-1425) - build         - Upgrade the Bean Validation API and TCK to 2.0.0.CR2
+* [HV-1423](https://hibernate.atlassian.net/browse/HV-1423) - engine        - from of @ConvertGroup and <convert-group /> now has a default value
+* [HV-1419](https://hibernate.atlassian.net/browse/HV-1419) - engine        - Introduce an HV specific ContainerElementNode with a getValue() method
+* [HV-1412](https://hibernate.atlassian.net/browse/HV-1412) - engine        - Take into account API changes introduced as part of BVAL-674
+* [HV-1408](https://hibernate.atlassian.net/browse/HV-1408) - engine        - Add small usage tests for each HV annotation
+* [HV-1391](https://hibernate.atlassian.net/browse/HV-1391) - documentation - First pass on the documentation for Bean Validation 2.0
+
+## 6.0.0.CR1 (29-06-2017)
+
+### Bug
+* [HV-1403](https://hibernate.atlassian.net/browse/HV-1403) - engine                       - Container class and type argument index information not present in case of implicit unwrapping
+* [HV-1381](https://hibernate.atlassian.net/browse/HV-1381) - engine                       - Unwrapping should work if there is only one VE compatible with the type even if there are 2 type arguments
+* [HV-1377](https://hibernate.atlassian.net/browse/HV-1377) - annotation-processor         - StackOverflowError during compilation with annotation-processor enabled
+* [HV-1358](https://hibernate.atlassian.net/browse/HV-1358) - engine                       - Class loading issue in modularized environment for value extractors loader by the service loader
+* [HV-1347](https://hibernate.atlassian.net/browse/HV-1347) - documentation                - Broken link in documentation: "Anatomy of Credit Card Numbers"
+
+### Improvement
+* [HV-1402](https://hibernate.atlassian.net/browse/HV-1402) - engine                       - Rename internal.engine.cascading package to internal.engine.valueextraction
+* [HV-1393](https://hibernate.atlassian.net/browse/HV-1393) - documentation                - Update schema coordinates in the documentation to use BV 2.0 schemas
+* [HV-1392](https://hibernate.atlassian.net/browse/HV-1392) - annotation-processor         - Annotation Processor should check that constraint payload does not contains both Unwrap and Skip at the same time
+* [HV-1378](https://hibernate.atlassian.net/browse/HV-1378) - engine                       - Having both Unwrap and Skip in the payload should throw a ConstraintDeclarationException and not a ConstraintDefinitionException
+* [HV-1375](https://hibernate.atlassian.net/browse/HV-1375) - engine                       - English javax.validation.constraints.NotNull.message not in line with the spec
+* [HV-1360](https://hibernate.atlassian.net/browse/HV-1360) - tests                        - Various infelicities in container element constraints XML tests
+* [HV-1337](https://hibernate.atlassian.net/browse/HV-1337) - tests                        - Test framework adjustments to improve consistency with the TCK
+
+### New Feature
+* [HV-1382](https://hibernate.atlassian.net/browse/HV-1382) - engine                       - Implement @PastOrPresent and @FutureOrPresent constraints
+* [HV-1376](https://hibernate.atlassian.net/browse/HV-1376) - annotation-processor         - Check that @Positive/@Negative and OrZero versions are taken into account in the annotation processor
+* [HV-1362](https://hibernate.atlassian.net/browse/HV-1362) - engine                       - Add support for @OverridesAttribute default name()
+* [HV-1356](https://hibernate.atlassian.net/browse/HV-1356) - engine                       - Enable CDI for value extractors added via the ServiceLoader
+
+### Task
+* [HV-1406](https://hibernate.atlassian.net/browse/HV-1406) - build                        - Upgrade to Bean Validation and TCK 2.0.0.CR1
+* [HV-1401](https://hibernate.atlassian.net/browse/HV-1401) - engine                       - Add missing Export clause to manifest file
+* [HV-1400](https://hibernate.atlassian.net/browse/HV-1400) - annotation-processor, engine - Replace remaining package.html files with equivalent package-info.java
+* [HV-1399](https://hibernate.atlassian.net/browse/HV-1399) - documentation                - Increase TOC depth for reference guide
+* [HV-1396](https://hibernate.atlassian.net/browse/HV-1396) - annotation-processor         - Move non-public classes of annotation processor to org.hibernate.validator.ap.internal
+* [HV-1394](https://hibernate.atlassian.net/browse/HV-1394) - tck-runner                   - Disable the access log of the security manager by default
+* [HV-1387](https://hibernate.atlassian.net/browse/HV-1387) - tests                        - Add tests for the string representation of the property path
+* [HV-1385](https://hibernate.atlassian.net/browse/HV-1385) - engine                       - Metadata adjustments following BVAL-655
+* [HV-1383](https://hibernate.atlassian.net/browse/HV-1383) - engine                       - Default type of @ExtractedValue is now void.class instead of Void.class
+* [HV-1380](https://hibernate.atlassian.net/browse/HV-1380) - engine                       - Wrap ValueExtractor#extractValues() exceptions in ValidationException
+* [HV-1372](https://hibernate.atlassian.net/browse/HV-1372) - engine                       - Implement @PositiveOrZero and @NegativeOrZero support
+* [HV-1369](https://hibernate.atlassian.net/browse/HV-1369) - engine                       - Add programmatic definitions for @Positive/@Negative and allegates
+* [HV-1368](https://hibernate.atlassian.net/browse/HV-1368) - engine                       - Update NotEmptyDef, NotBlankDef... to use the specification constraints
+* [HV-1366](https://hibernate.atlassian.net/browse/HV-1366) - engine                       - Declaring the exact same value extractor twice in XML should throw an exception
+* [HV-1365](https://hibernate.atlassian.net/browse/HV-1365) - tests                        - Make spec example 6.6 (property paths) an executable test
+* [HV-1354](https://hibernate.atlassian.net/browse/HV-1354) - tck-runner                   - Make JavaFX classes visible when running the TCK in incontainer mode
+* [HV-1350](https://hibernate.atlassian.net/browse/HV-1350) - tests                        - Use the new containsOnlyViolations test framework
+* [HV-1349](https://hibernate.atlassian.net/browse/HV-1349) - tests                        - Add an annotation to mark candidates for TCK
+* [HV-1348](https://hibernate.atlassian.net/browse/HV-1348) - engine                       - Add a toString() for GroupConversionHelper
+* [HV-1325](https://hibernate.atlassian.net/browse/HV-1325) - build                        - Add an Automatic-Module-Name entry to the jar manifests
+* [HV-1151](https://hibernate.atlassian.net/browse/HV-1151) - documentation                - Update the XML schema images of the documentation for BV 2.0
+* [HV-1051](https://hibernate.atlassian.net/browse/HV-1051) - build                        - OSGi tests fail using JDK 9
+
+## 6.0.0.Beta2 (24-05-2017)
+
+### Bug
+* [HV-1343](https://hibernate.atlassian.net/browse/HV-1343) - engine        - TypeArgumentConstraintLocation equals/hashCode implementation is broken 
+* [HV-1342](https://hibernate.atlassian.net/browse/HV-1342) - integration   - Use the default ParameterNameProvider in the startup stage of a CDI environment
+* [HV-1341](https://hibernate.atlassian.net/browse/HV-1341) - engine        - Validator#validateValue on a class with constraints leads to a ClassCastException
+
+### Improvement
+* [HV-1344](https://hibernate.atlassian.net/browse/HV-1344) - engine        - Change the way legacy @Valid on containers are handled
+* [HV-1339](https://hibernate.atlassian.net/browse/HV-1339) - engine        - Add support for non parameterized type in value extraction
+* [HV-1335](https://hibernate.atlassian.net/browse/HV-1335) - build         - Upgrade assertj-core to 3.7.0
+* [HV-1327](https://hibernate.atlassian.net/browse/HV-1327) - documentation - Use hibernate-asciidoctor-extension for example numbering in documentation
+* [HV-1307](https://hibernate.atlassian.net/browse/HV-1307) - validators    - SafeHtmlDef programmatic API should not use annotation proxies
+* [HV-1302](https://hibernate.atlassian.net/browse/HV-1302) - validators    - @SafeHtml should support adding additional protocols
+* [HV-1300](https://hibernate.atlassian.net/browse/HV-1300) - validators    - Split *ForNumber validators in an implementation per type
+
+### New Feature
+* [HV-1333](https://hibernate.atlassian.net/browse/HV-1333) - integration   - ValueExtractors should be CDI-enabled
+
+### Task
+* [HV-1346](https://hibernate.atlassian.net/browse/HV-1346) - build         - Upgrade Bean Validation API to 2.0.0.Beta2
+* [HV-1345](https://hibernate.atlassian.net/browse/HV-1345) - tck-runner    - Upgrade TCK to 2.0.0.Beta2
+* [HV-1340](https://hibernate.atlassian.net/browse/HV-1340) - engine        - Addition of container element nodes via the node builder API
+
+## 6.0.0.Beta1 (11-05-2017)
+
+### Bug
+* [HV-1330](https://hibernate.atlassian.net/browse/HV-1330) - engine               - Transient failure of XmlBasedMethodValidationTest#cascadingArrayParameter
+* [HV-1326](https://hibernate.atlassian.net/browse/HV-1326) - engine               - NPE when null value is encountered during nested cascaded validation
+* [HV-1311](https://hibernate.atlassian.net/browse/HV-1311) - engine               - Some jdk.internal annotations are not ignored in constraints discovery
+
+### Improvement
+* [HV-1321](https://hibernate.atlassian.net/browse/HV-1321) - engine               - Add missing method re-definitions to HibernateValidatorContext
+* [HV-1309](https://hibernate.atlassian.net/browse/HV-1309) - engine               - @Deprecated should be ignored as a potential composing constraint annotation
+* [HV-1308](https://hibernate.atlassian.net/browse/HV-1308) - build                - Use license-maven-plugin instead of checkstyle to check the licenses
+* [HV-1305](https://hibernate.atlassian.net/browse/HV-1305) - build                - Use HTML5 doclet when generating JavaDoc with Java 9
+* [HV-1303](https://hibernate.atlassian.net/browse/HV-1303) - validators           - @SafeHtml should support relative URLs
+
+### New Feature
+* [HV-1313](https://hibernate.atlassian.net/browse/HV-1313) - engine               - Support group conversion for container element types
+* [HV-1312](https://hibernate.atlassian.net/browse/HV-1312) - engine, tests        - In XML, containerElementType should be renamed container-element-type for consistency
+* [HV-1310](https://hibernate.atlassian.net/browse/HV-1310) - engine               - Support container element constraints for nested arrays
+* [HV-1304](https://hibernate.atlassian.net/browse/HV-1304) - engine               - Explore extension of meta-model to cover container element constraints
+* [HV-1298](https://hibernate.atlassian.net/browse/HV-1298) - validators           - Support @Positive/@Negative for monetary amount
+* [HV-1297](https://hibernate.atlassian.net/browse/HV-1297) - annotation-processor - Annotation processor support for @NotEmpty, @NotBlank, @Email, @Positive, @Negative
+
+### Sub-task
+* [HV-1306](https://hibernate.atlassian.net/browse/HV-1306) - engine               - Throw an exception if several value extractors are defined in parallel hierarchies
+
+### Task
+* [HV-1332](https://hibernate.atlassian.net/browse/HV-1332) - tck-runner           - Upgrade the TCK to 2.0.0.Beta1
+* [HV-1329](https://hibernate.atlassian.net/browse/HV-1329) - engine               - Add validation messages for new built-in constraints
+* [HV-1324](https://hibernate.atlassian.net/browse/HV-1324) - tests                - Fix annotation processor test issue with latest JDK 9
+* [HV-1320](https://hibernate.atlassian.net/browse/HV-1320) - engine               - Replace <iterable element> by <list element> in the node path of Lists
+* [HV-1319](https://hibernate.atlassian.net/browse/HV-1319) - build                - Update HV to use Bean Validation 2.0.0.Beta1
+* [HV-1318](https://hibernate.atlassian.net/browse/HV-1318) - engine               - Take into account the move of ValidateUnwrappedValue to javax.validation.metadata
+* [HV-1296](https://hibernate.atlassian.net/browse/HV-1296) - engine               - Follow-up to-dos around value extractor implementation
+* [HV-1288](https://hibernate.atlassian.net/browse/HV-1288) - build                - Don't use org.testng.AssertJUnit
+
+## 6.0.0.Alpha2 (30-03-2017)
+
+### Bug
+* [HV-1293](https://hibernate.atlassian.net/browse/HV-1293) - validators           - @Size validator is not declared for short[]
+* [HV-1284](https://hibernate.atlassian.net/browse/HV-1284) - build                - Reenable testing under the security manager
+* [HV-1280](https://hibernate.atlassian.net/browse/HV-1280) - engine               - Class loading conflict when custom Xerces is part of a deployment
+* [HV-1265](https://hibernate.atlassian.net/browse/HV-1265) - engine               - Supported nested container element constraints on property getters
+* [HV-1264](https://hibernate.atlassian.net/browse/HV-1264) - engine               - Message interpolation fails with single opening or closing brace in regex character class
+* [HV-1258](https://hibernate.atlassian.net/browse/HV-1258) - engine               - Make sure method validation options are correctly handled when given via ValidatorContext
+* [HV-1252](https://hibernate.atlassian.net/browse/HV-1252) - annotation-processor - Annotation processor is not aware of new constraint @Currency and validators for type MonetaryAmount
+
+### Improvement
+* [HV-1294](https://hibernate.atlassian.net/browse/HV-1294) - build                - hibernate-validator-cdi artefact is not OSGI'ed
+* [HV-1286](https://hibernate.atlassian.net/browse/HV-1286) - performance          - Improve performance tests
+* [HV-1285](https://hibernate.atlassian.net/browse/HV-1285) - engine               - Use the new toImmutable helpers where it makes sense
+* [HV-1283](https://hibernate.atlassian.net/browse/HV-1283) - engine               - Make HV engine more friendly towards usage as a Java 9 named module
+* [HV-1279](https://hibernate.atlassian.net/browse/HV-1279) - engine, tests        - Ensure that adding constraint on a generic type argument throw a proper exception
+* [HV-1277](https://hibernate.atlassian.net/browse/HV-1277) - engine               - HV 6 massive performance regression in cascaded validation
+* [HV-1269](https://hibernate.atlassian.net/browse/HV-1269) - performance          - Modify JMH performance tests to prevent JVM optimisation skewing results
+* [HV-1262](https://hibernate.atlassian.net/browse/HV-1262) - engine               - Add affected validator classes to exception messages if there are multiple matching ones
+* [HV-1259](https://hibernate.atlassian.net/browse/HV-1259) - engine               - Don't rely on descriptor model for BeanMetaDataImpl#hasConstraints()
+
+### New Feature
+* [HV-1292](https://hibernate.atlassian.net/browse/HV-1292) - validators           - Support new spec constraints @NotEmpty, @NotBlank, @Email, @Positive, @Negative
+* [HV-1278](https://hibernate.atlassian.net/browse/HV-1278) - performance          - Add performance test for multi-level container element validation
+* [HV-1275](https://hibernate.atlassian.net/browse/HV-1275) - annotation-processor - Annotation processor should detect if composed annotation has direct and List annotations of the same kind
+* [HV-1270](https://hibernate.atlassian.net/browse/HV-1270) - engine               - Throw an exception if a composed annotation has, for one given constraint type, a direct annotation and annotations in a List container
+* [HV-1256](https://hibernate.atlassian.net/browse/HV-1256) - engine               - Implement discovery of value extractors via service loader
+* [HV-1245](https://hibernate.atlassian.net/browse/HV-1245) - engine               - Use ElementKind.CONTAINER_ELEMENT for constraints located in type arguments
+* [HV-1239](https://hibernate.atlassian.net/browse/HV-1239) - engine               - Expand API for programmatic constraint definition to support type-argument constraints and cascades
+
+### Sub-task
+* [HV-1291](https://hibernate.atlassian.net/browse/HV-1291) - engine               - Support container element type constraints definition via XML
+* [HV-1290](https://hibernate.atlassian.net/browse/HV-1290) - engine               - Support exploring the parent classes and interfaces to search the ValueExtractor definition
+* [HV-1261](https://hibernate.atlassian.net/browse/HV-1261) - engine               - Allow value extractors to be contributed using service loader mechanism
+* [HV-1260](https://hibernate.atlassian.net/browse/HV-1260) - engine               - Allow to specify value extractors using validation.xml
+* [HV-1257](https://hibernate.atlassian.net/browse/HV-1257) - engine               - Implement Configuration#addValueExtractor() and ValidatorContext#addValueExtractor()
+
+### Task
+* [HV-1301](https://hibernate.atlassian.net/browse/HV-1301) - tck-runner           - Upgrade TCK to 2.0.0.Alpha3
+* [HV-1299](https://hibernate.atlassian.net/browse/HV-1299) - tck-runner           - Upgrade TCK to 2.0.0.Alpha2
+* [HV-1295](https://hibernate.atlassian.net/browse/HV-1295) - build                - Update to validation-api 2.0.0.Alpha2
+* [HV-1287](https://hibernate.atlassian.net/browse/HV-1287) - build                - Upgrade to CheckStyle 7.6
+* [HV-1276](https://hibernate.atlassian.net/browse/HV-1276) - performance          - Performance tests infrastructure updates and fixes
+* [HV-1273](https://hibernate.atlassian.net/browse/HV-1273) - tests                - Improve output in case ConstraintViolationSetAssert#containsOnlyPaths() fails
+* [HV-1266](https://hibernate.atlassian.net/browse/HV-1266) - build                - Update build instructions as per latest Java 9 releases
+* [HV-1255](https://hibernate.atlassian.net/browse/HV-1255) - build                - Remove obsolete "chronos-jmeter-maven-plugin" plug-in
+* [HV-1254](https://hibernate.atlassian.net/browse/HV-1254) - engine               - Remove unused ConstrainedElementKind TYPE_USE
+* [HV-1251](https://hibernate.atlassian.net/browse/HV-1251) - tck-runner           - Ensure we don't release anything with snapshot dependencies
+* [HV-1247](https://hibernate.atlassian.net/browse/HV-1247) - engine               - Follow-up to-dos around value extractor implementation
+* [HV-1230](https://hibernate.atlassian.net/browse/HV-1230) - documentation        - Update the groupId in README.md once the first alpha release of HV 6 is released
+* [HV-1152](https://hibernate.atlassian.net/browse/HV-1152) - documentation        - Make JavaDoc render correctly with Java 9
+
+## 6.0.0.Alpha1 (15-02-2017)
+
+### Bug
+* [HV-1088](https://hibernate.atlassian.net/browse/HV-1088) - engine             - Unexpected behavior multi threads accessing ConstraintValidatorManager
+
+### Improvement
+* [HV-1249](https://hibernate.atlassian.net/browse/HV-1249) - engine             - Improve collection allocations in hot code path
+* [HV-1246](https://hibernate.atlassian.net/browse/HV-1246) - engine, tests      - Make node names constants
+* [HV-1244](https://hibernate.atlassian.net/browse/HV-1244) - translations       - Add translation for Persian language
+* [HV-1238](https://hibernate.atlassian.net/browse/HV-1238) - engine             - Expand the initial capacity of future/past validators list for added validators
+* [HV-1235](https://hibernate.atlassian.net/browse/HV-1235) - validators         - Javadoc for PESEL mentions NIP
+* [HV-1202](https://hibernate.atlassian.net/browse/HV-1202) - engine             - Use toInstant() instead of timeInMillis() for @Past/@Future validators on Date/Calendar
+* [HV-1194](https://hibernate.atlassian.net/browse/HV-1194) - documentation      - BootstrappingTest of the documentation is not tested at all
+* [HV-1193](https://hibernate.atlassian.net/browse/HV-1193) - engine             - Avoid systematic resizing of collections when using CollectionHelper with a size
+* [HV-1186](https://hibernate.atlassian.net/browse/HV-1186) - build              - Move javax.money version properties outside of the WF dependencies block
+* [HV-1178](https://hibernate.atlassian.net/browse/HV-1178) - integration        - Custom ValidationProviderResolver no longer needed for OSGi with explicitely given provider
+* [HV-1175](https://hibernate.atlassian.net/browse/HV-1175) - engine             - Support type annotations on arrays and arrays of primitives
+* [HV-1174](https://hibernate.atlassian.net/browse/HV-1174) - tests              - Typos in test methods name of Executable*Test
+* [HV-1172](https://hibernate.atlassian.net/browse/HV-1172) - engine             - Remove unused methods from Cascadable
+* [HV-1171](https://hibernate.atlassian.net/browse/HV-1171) - engine             - Include the simple name of the class when logging a method name
+* [HV-1145](https://hibernate.atlassian.net/browse/HV-1145) - build              - Update checkstyle ParenPad rule to include RESOURCE_SPECIFICATION
+* [HV-1120](https://hibernate.atlassian.net/browse/HV-1120) - engine             - Remove deprecated ignoreAnnotations() method
+* [HV-1111](https://hibernate.atlassian.net/browse/HV-1111) - build              - Allow reference to types in JavaDoc without FQN 
+* [HV-1110](https://hibernate.atlassian.net/browse/HV-1110) - engine             - Additional TYPE_USE related cleanup
+* [HV-1108](https://hibernate.atlassian.net/browse/HV-1108) - engine             - Add Repeatable to NON_COMPOSING_CONSTRAINT_ANNOTATIONS
+* [HV-1105](https://hibernate.atlassian.net/browse/HV-1105) - engine             - Revisit shared state managed by ValidatorFactoryImpl
+* [HV-1103](https://hibernate.atlassian.net/browse/HV-1103) - engine             - Remove remaining pre-Java-8 code
+* [HV-1085](https://hibernate.atlassian.net/browse/HV-1085) - build              - Raise BV to 2.0.0-SNAPSHOT and Java baseline to version 8
+* [HV-1084](https://hibernate.atlassian.net/browse/HV-1084) - engine             - Move XML namespace to jcp.org from jboss.org
+* [HV-966](https://hibernate.atlassian.net/browse/HV-966) - engine             - ParameterNameProvider is called on methods with no parameter as well as Object methods
+
+### New Feature
+* [HV-1236](https://hibernate.atlassian.net/browse/HV-1236) - build              - Upgrade to BV API 2.0.0.Alpha1
+* [HV-1232](https://hibernate.atlassian.net/browse/HV-1232) - validators         - Implement constraint and validator for java.time.Duration
+* [HV-1166](https://hibernate.atlassian.net/browse/HV-1166) - engine             - Implement proposal for value extractors
+* [HV-1135](https://hibernate.atlassian.net/browse/HV-1135) - validators         - Implement initial BV 2.0 proposal for @Past/@Future support for JSR 310
+* [HV-1122](https://hibernate.atlassian.net/browse/HV-1122) - engine             - Explore constraints based on Lambda expressions
+* [HV-1118](https://hibernate.atlassian.net/browse/HV-1118) - engine             - Adapt default ParameterNameProvider to adhere to BV 2.0 rules
+* [HV-1094](https://hibernate.atlassian.net/browse/HV-1094) - engine             - Mark constraints to support TYPE_USE
+* [HV-875](https://hibernate.atlassian.net/browse/HV-875) - engine, validators - Mark built-in constraints with @Repeatable
+
+### Sub-task
+* [HV-1243](https://hibernate.atlassian.net/browse/HV-1243) - engine             - Throw an exception if extractor not found during cascaded validation
+* [HV-1237](https://hibernate.atlassian.net/browse/HV-1237) - engine             - Support nested extraction
+* [HV-1219](https://hibernate.atlassian.net/browse/HV-1219) - engine             - Implement latest changes to the exception model of value extraction
+* [HV-1213](https://hibernate.atlassian.net/browse/HV-1213) - engine             - Remove the implicit unwrapping of Optional
+* [HV-1208](https://hibernate.atlassian.net/browse/HV-1208) - engine             - Implicit unwrapping, e.g. @Min(1) IntegerProperty myInt; currently an explicit @UnwrapValidatedValue is required
+* [HV-1207](https://hibernate.atlassian.net/browse/HV-1207) - engine             - Move retrieval of extractors for constraints (not cascaded validation) to metadata retrieval time and implement per constraint unwrapping
+* [HV-1206](https://hibernate.atlassian.net/browse/HV-1206) - engine             - Require @ExtractedValue in extractor implementation when dealing with the annotated object itself
+
+### Task
+* [HV-1240](https://hibernate.atlassian.net/browse/HV-1240) - engine             - Don't call ValueExtractors on null values
+* [HV-1233](https://hibernate.atlassian.net/browse/HV-1233) - documentation      - Convert tabs to space in rendered doc to have a consistent behavior across browsers
+* [HV-1231](https://hibernate.atlassian.net/browse/HV-1231) - engine             - Set "ignore-annotations" to true in the mapping XSD by default for beans
+* [HV-1229](https://hibernate.atlassian.net/browse/HV-1229) - tests              - Upgrade OSGi test dependencies
+* [HV-1228](https://hibernate.atlassian.net/browse/HV-1228) - documentation      - Switch to the common AsciiDoctor theme for the documentation
+* [HV-1225](https://hibernate.atlassian.net/browse/HV-1225) - engine             - Remove unused method in ReflectionHelper
+* [HV-1224](https://hibernate.atlassian.net/browse/HV-1224) - build              - Change group id to "org.hibernate.validator"
+* [HV-1223](https://hibernate.atlassian.net/browse/HV-1223) - build              - Set up jQAssistant to create "Leaky API" report
+* [HV-1222](https://hibernate.atlassian.net/browse/HV-1222) - engine             - Update CollectionHelper.iteratorFromArray and add CollectionHelper.iterableFromArray
+* [HV-1215](https://hibernate.atlassian.net/browse/HV-1215) - build              - Rework the common release scripts to support Asciidoctor output
+
+## 5.4.0.Final (01-02-2017)
+
+### Bug
+* [HV-1220](https://hibernate.atlassian.net/browse/HV-1220) - engine        - Programmatically defined cross parameter method constraints don't work on method returning void
+* [HV-1205](https://hibernate.atlassian.net/browse/HV-1205) - engine        - Don't use @Repeatable on some constraints
+
+### Improvement
+* [HV-1218](https://hibernate.atlassian.net/browse/HV-1218) - engine        - Add missing programmatic constraint definitions 
+* [HV-1217](https://hibernate.atlassian.net/browse/HV-1217) - documentation - Simplify description of annotation processor set-up in docs
+* [HV-1204](https://hibernate.atlassian.net/browse/HV-1204) - engine        - Add CurrencyDef for programmatic usage of @Currency constraint
+
+### Task
+* [HV-1216](https://hibernate.atlassian.net/browse/HV-1216) - documentation - Avoid usage of tables in reference docs where feasible
+* [HV-1214](https://hibernate.atlassian.net/browse/HV-1214) - documentation - Switch to Asciidoctor output for the documentation
+* [HV-1210](https://hibernate.atlassian.net/browse/HV-1210) - build         - Upgrade to Groovy 2.4.8
+* [HV-1201](https://hibernate.atlassian.net/browse/HV-1201) - engine        - Allow to specify a field for reporting constraint violations from @ScriptAssert
+
+## 5.4.0.CR1 (14-01-2017)
+
+### Bug
+* [HV-1198](https://hibernate.atlassian.net/browse/HV-1198) - engine               - @Past and @Future break with too far in past/future for Java8
+
+### Improvement
+* [HV-1203](https://hibernate.atlassian.net/browse/HV-1203) - engine               - Add a @Currency annotation for javax.money
+* [HV-1195](https://hibernate.atlassian.net/browse/HV-1195) - documentation        - Fix link to annotation processor documentation in README.md
+* [HV-1189](https://hibernate.atlassian.net/browse/HV-1189) - engine               - Outdated javadoc comment for BeanMetaData#getDefaultValidationSequence
+* [HV-1187](https://hibernate.atlassian.net/browse/HV-1187) - build, engine        - Support JDK9 ea+148
+* [HV-1180](https://hibernate.atlassian.net/browse/HV-1180) - annotation-processor - Detect cyclic definition of group sequence due to group inheritance in the annotation processor
+* [HV-1124](https://hibernate.atlassian.net/browse/HV-1124) - integration          - Add integration test for javax.money validation on WildFly
+
+## 5.4.0.Beta1 (08-12-2016)
+
+### Bug
+* [HV-1170](https://hibernate.atlassian.net/browse/HV-1170) - documentation        - Typo in documentation
+* [HV-1149](https://hibernate.atlassian.net/browse/HV-1149) - build                - Missing javax.money dependency in the distribution pom
+
+### Improvement
+* [HV-1182](https://hibernate.atlassian.net/browse/HV-1182) - documentation        - Update WildFly patch name in the documentation
+* [HV-1177](https://hibernate.atlassian.net/browse/HV-1177) - integration          - Test our javax.money integration in OSGi environments
+* [HV-1173](https://hibernate.atlassian.net/browse/HV-1173) - engine               - Clean up some superfluous operations
+* [HV-1169](https://hibernate.atlassian.net/browse/HV-1169) - build                - Upgrade javax.el dependency to 3.0.1-b8
+* [HV-1161](https://hibernate.atlassian.net/browse/HV-1161) - tests                - osgi/integrationtest/pom.xml points to the wrong checkstyle configuration
+* [HV-1150](https://hibernate.atlassian.net/browse/HV-1150) - validators           - Minor infelicities in the Polish specific annotations javadoc
+* [HV-1138](https://hibernate.atlassian.net/browse/HV-1138) - engine               - Improve consistency of ValidatorImpl regarding parameters order
+* [HV-1137](https://hibernate.atlassian.net/browse/HV-1137) - engine               - Avoid unnecessary counting of constraint violations in ValidatorImpl
+* [HV-1136](https://hibernate.atlassian.net/browse/HV-1136) - translations         - Add translation of validation messages  to Ukrainian
+* [HV-1133](https://hibernate.atlassian.net/browse/HV-1133) - documentation        - Add group inheritance chapter in HV documentation
+* [HV-1119](https://hibernate.atlassian.net/browse/HV-1119) - annotation-processor - Verify that annotation parameters on method/constructor parameters are valid
+* [HV-1107](https://hibernate.atlassian.net/browse/HV-1107) - build                - Checkstyle: stricter ParenPad rule
+* [HV-1099](https://hibernate.atlassian.net/browse/HV-1099) - tests, validators    - Support quoted local part and extend tests around @Email constraint
+* [HV-1087](https://hibernate.atlassian.net/browse/HV-1087) - documentation        - Update all outdated links to java.sun.com
+* [HV-840](https://hibernate.atlassian.net/browse/HV-840) - annotation-processor - Annotation Processor doesn't detect errors in parameter constraints in inheritance hierarchies
+* [HV-763](https://hibernate.atlassian.net/browse/HV-763) - engine               - Streamline usage of logging API
+
+### New Feature
+* [HV-1116](https://hibernate.atlassian.net/browse/HV-1116) - engine               - Add support for javax.money
+* [HV-1095](https://hibernate.atlassian.net/browse/HV-1095) - build                - Provide module ZIP file for easily upgrading Hibernate Validator in a WildFly instance
+* [HV-991](https://hibernate.atlassian.net/browse/HV-991) - validators           - Add constraint annotations for Polish identification numbers
+* [HV-822](https://hibernate.atlassian.net/browse/HV-822) - annotation-processor - Add check on default message to recognize missing {} for keys
+* [HV-455](https://hibernate.atlassian.net/browse/HV-455) - annotation-processor - The annotation processor should verify the groups parameter of a constraint declaration
+* [HV-451](https://hibernate.atlassian.net/browse/HV-451) - annotation-processor - The annotation processor should check @GroupSequence
+* [HV-270](https://hibernate.atlassian.net/browse/HV-270) - annotation-processor - Verify in the annotation processor that constraints are not stupid
+
+### Task
+* [HV-1181](https://hibernate.atlassian.net/browse/HV-1181) - build                - Distribution contains some superfluous files
+* [HV-1168](https://hibernate.atlassian.net/browse/HV-1168) - integration          - Parameterize the versions in the patch.xml WildFly patch
+* [HV-1167](https://hibernate.atlassian.net/browse/HV-1167) - tck-runner           - Use the WildFly patch file in the TCK runner when in incontainer mode
+* [HV-1163](https://hibernate.atlassian.net/browse/HV-1163) - performance          - Update performance tests to 5.3.3.Final
+* [HV-1156](https://hibernate.atlassian.net/browse/HV-1156) - build                - Initialize 5.4 branch
+* [HV-1147](https://hibernate.atlassian.net/browse/HV-1147) - integration          - Generate a patch file for WildFly instead of a zip file
+* [HV-1146](https://hibernate.atlassian.net/browse/HV-1146) - build                - Upgrade previous stable used by japicmp to 5.3.1.Final
+* [HV-1144](https://hibernate.atlassian.net/browse/HV-1144) - documentation        - Link JavaDocs of javax.money
+* [HV-1114](https://hibernate.atlassian.net/browse/HV-1114) - engine               - Move the code generated by JAXB to its own package
+* [HV-1102](https://hibernate.atlassian.net/browse/HV-1102) - tests                - Prohibit org.junit usage
+* [HV-1100](https://hibernate.atlassian.net/browse/HV-1100) - documentation        - Convert the reference guide to use source includes
+* [HV-1069](https://hibernate.atlassian.net/browse/HV-1069) - tests                - Replace fest-assert with assertj
+* [HV-1056](https://hibernate.atlassian.net/browse/HV-1056) - engine               - Avoid usage of ReflectionHelper#getPropertyName() in validation code path
+* [HV-962](https://hibernate.atlassian.net/browse/HV-962) - build, tests         - Remove Chronos/JMeter performance test harness and replace with JMH based tests
+
+## 5.3.4.Final (08-12-2016)
+
+### Bug
+* [HV-1176](https://hibernate.atlassian.net/browse/HV-1176) - engine     - Type argument constraints for Optional are ignored for method parameters and return value if there are no other constraints
+* [HV-1165](https://hibernate.atlassian.net/browse/HV-1165) - engine     - Use type annotations for Set values with @NotNull annotation on the Set
+* [HV-1164](https://hibernate.atlassian.net/browse/HV-1164) - engine     - getDynamicPayload(Class<C> type) throws Nullpointerexception
+
+### Task
+* [HV-1183](https://hibernate.atlassian.net/browse/HV-1183) - validators - Upgrade JodaTime to 2.9.5
+
+## 5.3.3.Final (22-11-2016)
+
+### Bug
+* [HV-1155](https://hibernate.atlassian.net/browse/HV-1155) - engine - ClassLoader issues in modularized environments
+
+## 5.3.2.Final (10-11-2016)
+
+### Bug
+* [HV-1153](https://hibernate.atlassian.net/browse/HV-1153) - engine - Missing javax.el impl throws a javax.el.ELException instead of a ValidationException
+
+### Improvement
+* [HV-1154](https://hibernate.atlassian.net/browse/HV-1154) - build  - Make distribution and documentation buildable with JDK9
+
+## 5.3.1.Final (27-10-2016)
+
+### Bug
+* [HV-1140](https://hibernate.atlassian.net/browse/HV-1140) - engine        - StringHelper#decapitalize not working properly on turkish locale
+* [HV-1134](https://hibernate.atlassian.net/browse/HV-1134) - documentation - Asciidoc Docbook processing is missing the sourcedir attribute
+* [HV-1132](https://hibernate.atlassian.net/browse/HV-1132) - documentation - Force language in documentation tests
+* [HV-1131](https://hibernate.atlassian.net/browse/HV-1131) - engine        - EL once again a hard requirement
+* [HV-1032](https://hibernate.atlassian.net/browse/HV-1032) - engine        - Infinite Loop when validating custom type constraint under certain inheritance scheme
+* [HV-1002](https://hibernate.atlassian.net/browse/HV-1002) - engine        - validateProperty() behaviour for prop paths with a Set/ List inconsistent with validateValue() 
+
+### Improvement
+* [HV-1130](https://hibernate.atlassian.net/browse/HV-1130) - build         - Ensure 5.3 runs on JDK 9
+* [HV-1129](https://hibernate.atlassian.net/browse/HV-1129) - tests         - Upgrade WildFly Arquillian version
+* [HV-1128](https://hibernate.atlassian.net/browse/HV-1128) - tests         - Enable integration tests on JDK 9
+* [HV-1126](https://hibernate.atlassian.net/browse/HV-1126) - build         - Upgrade the plexus-archiver dependency used by the assembly plugin to support JDK9
+
+### Task
+* [HV-1125](https://hibernate.atlassian.net/browse/HV-1125) - build         - Latest Java 9 preview builds need --add-modules instead of -addmods as build option
+
+## 5.3.0.Final (11-10-2016)
+
+### Bug
+* [HV-1117](https://hibernate.atlassian.net/browse/HV-1117) - build         - Downgrade to surefire and failsafe 2.18.1
+* [HV-1109](https://hibernate.atlassian.net/browse/HV-1109) - documentation - Fix "Using validation groups" example
+* [HV-1101](https://hibernate.atlassian.net/browse/HV-1101) - engine        - Issues when using XML validation configuration
+
+### Improvement
+* [HV-1123](https://hibernate.atlassian.net/browse/HV-1123) - build         - Set up japicmp tooling to create API/SPI change reports
+* [HV-1121](https://hibernate.atlassian.net/browse/HV-1121) - engine        - Validation error path generation for TYPE_USE annotation
+* [HV-1112](https://hibernate.atlassian.net/browse/HV-1112) - translations  - ValidationMessages for Slovak
+* [HV-1098](https://hibernate.atlassian.net/browse/HV-1098) - tck-runner    - Adapt test.policy file of TCK runner for reading "validation.provider" property
+
+### Task
+* [HV-1093](https://hibernate.atlassian.net/browse/HV-1093) - build         - Change CI links in README.md and pom.xml
+
+## 5.3.0.CR1 (05-09-2016)
+
+### Bug
+* [HV-1057](https://hibernate.atlassian.net/browse/HV-1057) - engine        - Group sequences don't honor inheritance relationships properly
+* [HV-1055](https://hibernate.atlassian.net/browse/HV-1055) - engine        - Default group sequence does not honour group hierarchy
+* [HV-1068](https://hibernate.atlassian.net/browse/HV-1068) - engine        - Wrong import in MessageDescriptorFormatException
+* [HV-1071](https://hibernate.atlassian.net/browse/HV-1071) - engine        - HV-1049 prevents annotations in the default package working
+* [HV-1049](https://hibernate.atlassian.net/browse/HV-1049) - engine        - Don't access annotations from "jdk.internal" package
+* [HV-1054](https://hibernate.atlassian.net/browse/HV-1054) - engine        - Catch correct exception type in AbstractMessageInterpolator
+* [HV-1072](https://hibernate.atlassian.net/browse/HV-1072) - engine        - Parameter validation does not stop when group in sequence has cascaded constraint violations.
+* [HV-1050](https://hibernate.atlassian.net/browse/HV-1050) - build         - Build fails under Windows
+* [HV-1063](https://hibernate.atlassian.net/browse/HV-1063) - tests         - Upgrade dependencies used by OSGi integration tests
+* [HV-1080](https://hibernate.atlassian.net/browse/HV-1080) - engine        - Validation of Java 8 Optional throws ClassCastException
+* [HV-1066](https://hibernate.atlassian.net/browse/HV-1066) - validators    - email domains with a 63 character length fails EmailValidator
+* [HV-1048](https://hibernate.atlassian.net/browse/HV-1048) - engine        - Correctly interpret version string returned by JDK 9
+* [HV-1062](https://hibernate.atlassian.net/browse/HV-1062) - validators    - Use type annotations for map values with @NotNull annotation on the map
+* [HV-1013](https://hibernate.atlassian.net/browse/HV-1013) - validators    - Validator invokes hashCode() with null mandatory field 
+* [HV-1046](https://hibernate.atlassian.net/browse/HV-1046) - documentation - Fix example 11.4 in reference guide
+* [HV-1091](https://hibernate.atlassian.net/browse/HV-1091) - engine        - java.lang.StackOverflowError generated when using too big validation message
+* [HV-1031](https://hibernate.atlassian.net/browse/HV-1031) - engine        - Type parameter validations are not executed against all elements in a collection if elements contain the same object instance.
+
+### Improvement
+* [HV-1038](https://hibernate.atlassian.net/browse/HV-1038) - build         - Update to ClassMate 1.3.0
+* [HV-1058](https://hibernate.atlassian.net/browse/HV-1058) - engine        - Avoid repeated retrieval of default group sequence in BeanMetadataImpl#getConstrainedPropertiesAsDescriptors()
+* [HV-1060](https://hibernate.atlassian.net/browse/HV-1060) - engine        - Include messages for @EAN and @ParameterScriptAssert in Brazilian Portuguese error messages
+* [HV-1076](https://hibernate.atlassian.net/browse/HV-1076) - build         - Improve Checkstyle configuration
+* [HV-1081](https://hibernate.atlassian.net/browse/HV-1081) - build         - Reuse the release scripts of OGM to automatize the release process
+* [HV-1077](https://hibernate.atlassian.net/browse/HV-1077) - engine        - Add missing @Override annotation
+* [HV-1074](https://hibernate.atlassian.net/browse/HV-1074) - engine        - Add Arabic translation
+* [HV-1015](https://hibernate.atlassian.net/browse/HV-1015) - tests         - Provide test case template
+* [HV-1082](https://hibernate.atlassian.net/browse/HV-1082) - documentation - Upgrade maven-jdocbook-plugin and pressgang to generate valid HTML5 documentation
+* [HV-1078](https://hibernate.atlassian.net/browse/HV-1078) - documentation - Update the CONTRIBUTING.md file
+* [HV-1075](https://hibernate.atlassian.net/browse/HV-1075) - validators    - Update and improve the French translation
+* [HV-1083](https://hibernate.atlassian.net/browse/HV-1083) - build         - Properly ignore hibernate-noorm-release-scripts directory in the build
+* [HV-1014](https://hibernate.atlassian.net/browse/HV-1014) - documentation - Clarify what @ValidPart is in example 2.3 of the reference guide
+* [HV-1096](https://hibernate.atlassian.net/browse/HV-1096) - validators    - ValidationMessages for Russian
+* [HV-1086](https://hibernate.atlassian.net/browse/HV-1086) - build         - Update Maven dependencies and align with WildFly 10.1.0.Final
+
+### New Feature
+* [HV-1070](https://hibernate.atlassian.net/browse/HV-1070) - build         - Preparatory work for building with Java 9
+* [HV-501](https://hibernate.atlassian.net/browse/HV-501) - engine        - Extend programmatic API to allow alteration of ConstraintValidator list for a given constraint
+* [HV-1065](https://hibernate.atlassian.net/browse/HV-1065) - engine        - Add hibernate.validator.constraint_mapping_contributor*s* to take a list of contributors and deprecate hibernate.validator.constraint_mapping_contributor
+
+### Task
+* [HV-1053](https://hibernate.atlassian.net/browse/HV-1053) - build         - Use WildFly 10.0.0.Final for integration tests
+* [HV-1052](https://hibernate.atlassian.net/browse/HV-1052) - build         - Upgrade to current version of JBoss logging processor
+* [HV-1034](https://hibernate.atlassian.net/browse/HV-1034) - build         - Allow compilation using JDK9
+* [HV-1064](https://hibernate.atlassian.net/browse/HV-1064) - tests         - Add Travis support
+
+## 5.3.0.Alpha1 (15.01.2016)
+
+### New Feature
+* [HV-872](https://hibernate.atlassian.net/browse/HV-872) - Implement optional relaxation of parameter validation consistent with Section 4.5.5
+* [HV-1020](https://hibernate.atlassian.net/browse/HV-1020) - ConstraintValidatorContext should allow to attach arbitrary context information to a ConstrainViolation
+
+### Bug
+* [HV-864](https://hibernate.atlassian.net/browse/HV-864) - Cross-parameter constraint is disallowed by Annotation Processor
+* [HV-1019](https://hibernate.atlassian.net/browse/HV-1019) - Copying PathImpl results in hashCode==0
+* [HV-1022](https://hibernate.atlassian.net/browse/HV-1022) - Validator.validateValue does not work for JDK-8 TYPE_USE annotations
+* [HV-1023](https://hibernate.atlassian.net/browse/HV-1023) - Validator fails with Google App Engine due to use of restricted class java.util.ResourceBundle.Control
+* [HV-1025](https://hibernate.atlassian.net/browse/HV-1025) - Configuration streams not reusable on IBM JVM
+* [HV-1035](https://hibernate.atlassian.net/browse/HV-1035) - Wrong messages in Korean for NotNull and Null
+
+### Task
+* [HV-1041](https://hibernate.atlassian.net/browse/HV-1041) - Upgrade to jaxb2-maven-plugin 2.2
+* [HV-1045](https://hibernate.atlassian.net/browse/HV-1045) - Use WildFly 10.0.0.CR5 for integration tests and update to JodaTime 2.7
+
+### Improvement
+* [HV-1021](https://hibernate.atlassian.net/browse/HV-1021) - Monitor contention at ValidatorFactoryImpl
+* [HV-1026](https://hibernate.atlassian.net/browse/HV-1026) - Exceptions during execution of LoadClass don't provide enough context
+* [HV-1037](https://hibernate.atlassian.net/browse/HV-1037) - General code quality improvements
+* [HV-1039](https://hibernate.atlassian.net/browse/HV-1039) - Improve OSGi integration addressing class loading issues
+
+## 5.2.2.Final (29.09.2015)
+
+### Bug
+* [HV-862](https://hibernate.atlassian.net/browse/HV-862) - ExecutableHelper#overrides() should take visibilities into account
+* [HV-891](https://hibernate.atlassian.net/browse/HV-891) - CDI extension doesn't trigger validation if a method parameter is of a type parameter type
+* [HV-917](https://hibernate.atlassian.net/browse/HV-917) - Use map implementation safe for concurrent access in MetaDataProviderKeyedByClassName
+* [HV-1011](https://hibernate.atlassian.net/browse/HV-1011) - Generic Method is not recognized
+* [HV-1012](https://hibernate.atlassian.net/browse/HV-1012) - XSS vulnerability not caught by SafeHtml
+* [HV-1017](https://hibernate.atlassian.net/browse/HV-1017) - javafx detection uses TCCL but JavaFXPropertyValueUnwrapper does not
+* [HV-1018](https://hibernate.atlassian.net/browse/HV-1018) - NPE when validating an object tree whith a class whose parent has defined property constraints
+
+### Task
+* [HV-1006](https://hibernate.atlassian.net/browse/HV-1006) - Upgrade to WildFly 10
+
+### Improvement
+* [HV-807](https://hibernate.atlassian.net/browse/HV-807) - Make annotation ignores configurable via API for executables
+* [HV-995](https://hibernate.atlassian.net/browse/HV-995) - Add google analytics to the HTML documentation
+* [HV-1016](https://hibernate.atlassian.net/browse/HV-1016) - Let maven build support maven-color
+
+
+## 5.2.1.Final (30.07.2015)
+
+### Bug
+* [HV-1007](https://hibernate.atlassian.net/browse/HV-1007) - Unable to parse validation.xml with IBM JDK
+
+
+## 5.2.0.Final (20.07.2015)
+
+### Bug
+* [HV-992](https://hibernate.atlassian.net/browse/HV-992) - Documentation not very clear: do I need interceptor to trigger method validation?
+* [HV-1004](https://hibernate.atlassian.net/browse/HV-1004) - CnpjValidator validation is failing for a valid cnpj
+* [HV-1005](https://hibernate.atlassian.net/browse/HV-1005) - @Email incorrectly flags emails with 64 character length local-part as invalid
+
+### Improvement
+* [HV-984](https://hibernate.atlassian.net/browse/HV-984) - Further documentation review and improvements
+* [HV-999](https://hibernate.atlassian.net/browse/HV-999) - Update to Bean Validation TCK 1.1.4
+
+
+## 5.2.0.CR1 (22.05.2015)
+
+### Bug
+* [HV-726](https://hibernate.atlassian.net/browse/HV-726) - Retrieve constraint target from composing constraints for purely composed constraints
+* [HV-847](https://hibernate.atlassian.net/browse/HV-847) - Custom constraint causes "target cannot be inferred" exception when used for return value
+* [HV-897](https://hibernate.atlassian.net/browse/HV-897) - Create a TimeProvider contract to get the current data time
+* [HV-975](https://hibernate.atlassian.net/browse/HV-975) - NullPointerException in ValueContext.appendNode
+* [HV-976](https://hibernate.atlassian.net/browse/HV-976) - Optional and Type Annotations
+* [HV-977](https://hibernate.atlassian.net/browse/HV-977) - OptionalValueUnwrapper needs to handle null values passed to handleValidatedValue
+* [HV-978](https://hibernate.atlassian.net/browse/HV-978) - Generic method is not validated
+* [HV-979](https://hibernate.atlassian.net/browse/HV-979) - CPF Validation still fails (partly)
+* [HV-982](https://hibernate.atlassian.net/browse/HV-982) - SNAPSHOT deploy fails with compiler error
+* [HV-993](https://hibernate.atlassian.net/browse/HV-993) - OSGi metadata is missing optional import for com.thoughtworks.paranamer
+* [HV-997](https://hibernate.atlassian.net/browse/HV-997) - Upgrade asciidoctor plugin
+
+### Improvement
+* [HV-846](https://hibernate.atlassian.net/browse/HV-846) - Make hibernate-validator-cdi OSGI compliant
+* [HV-941](https://hibernate.atlassian.net/browse/HV-941) - Documentation review and improvements (chapter 1,2,11)
+* [HV-974](https://hibernate.atlassian.net/browse/HV-974) - Deploy the test util artifact
+* [HV-980](https://hibernate.atlassian.net/browse/HV-980) - Store violated element of a java.util.Set in Path
+* [HV-985](https://hibernate.atlassian.net/browse/HV-985) - Update to Classmate 1.1.0 or latest
+* [HV-989](https://hibernate.atlassian.net/browse/HV-989) - ConcurrentReferenceHashMap is inadvertently licensed as LGPL
+
+### Task
+* [HV-892](https://hibernate.atlassian.net/browse/HV-892) - Update javadoc css templates to match the JDK doclet output
+* [HV-899](https://hibernate.atlassian.net/browse/HV-899) - Errors during javadoc creations
+* [HV-981](https://hibernate.atlassian.net/browse/HV-981) - Remove @Future and @Past validators validation partial dates
+
+
+## 5.2.0.Beta1 (20.02.2015)
+
+### Bug
+* [HV-861](https://hibernate.atlassian.net/browse/HV-861) - AIOOBE in ReflectionHelper#parametersResolveToSameTypes
+* [HV-887](https://hibernate.atlassian.net/browse/HV-887) - Validator ParanamerParameterNameProvider with inheritance
+* [HV-890](https://hibernate.atlassian.net/browse/HV-890) - Take visibility into account for method override check
+* [HV-933](https://hibernate.atlassian.net/browse/HV-933) - @CPF and @CPNJ only works with input containing puctuation characters like 134.241.313-00
+* [HV-943](https://hibernate.atlassian.net/browse/HV-943) - Reference guide incorrect regarding DefaultTraversableResolver
+* [HV-948](https://hibernate.atlassian.net/browse/HV-948) - Incorrect JPA 2 detection
+* [HV-950](https://hibernate.atlassian.net/browse/HV-950) - Wrong warning log in TypeAnnotationAwareMetaDataProvider.getTypeParameter
+* [HV-957](https://hibernate.atlassian.net/browse/HV-957) - WhiteListType.RELAXED allows <div>, <span>
+* [HV-959](https://hibernate.atlassian.net/browse/HV-959) - CPF validation
+* [HV-965](https://hibernate.atlassian.net/browse/HV-965) - The module description list on the contribute page needs updating
+* [HV-969](https://hibernate.atlassian.net/browse/HV-969) - No tests are executed for the CDI module
+
+### Improvement
+* [HV-913](https://hibernate.atlassian.net/browse/HV-913) - Provide a way to run the test suite using a security manager
+* [HV-914](https://hibernate.atlassian.net/browse/HV-914) - Document permissions required to run Hibernate Validator with a security manager
+* [HV-944](https://hibernate.atlassian.net/browse/HV-944) - French translation of @Min and @Max messages is incorrect
+* [HV-946](https://hibernate.atlassian.net/browse/HV-946) - French translation of @DecimalMin and @DecimalMax messages is incorrect (with inclusive parameter)
+* [HV-951](https://hibernate.atlassian.net/browse/HV-951) - Make expression variables accessible from ConstraintViolation
+* [HV-953](https://hibernate.atlassian.net/browse/HV-953) - Create possiblity to contribute resource bundles as part of a ConstraintDefinitionContributor
+* [HV-964](https://hibernate.atlassian.net/browse/HV-964) - Create a dedicated module for the testutils code
+* [HV-968](https://hibernate.atlassian.net/browse/HV-968) - Performance improvements for ConstraintHelper
+* [HV-970](https://hibernate.atlassian.net/browse/HV-970) - Avoid accessing package javax.xml.stream.* when not working with XML descriptors
+* [HV-971](https://hibernate.atlassian.net/browse/HV-971) - Remove requirement to use JBoss's Maven repositories
+
+### New Feature
+* [HV-582](https://hibernate.atlassian.net/browse/HV-582) - Introduce a class loading service
+* [HV-955](https://hibernate.atlassian.net/browse/HV-955) - Using the fluent API in a JavaEE environment
+
+### Task
+* [HV-896](https://hibernate.atlassian.net/browse/HV-896) - Add "ParenPad" CheckStyle rule
+* [HV-915](https://hibernate.atlassian.net/browse/HV-915) - Make it possible to import the project in Eclipse
+* [HV-942](https://hibernate.atlassian.net/browse/HV-942) - Upgrade Wildfly version for tck/integration tests to 8.2.0.Final
+* [HV-960](https://hibernate.atlassian.net/browse/HV-960) - Create Karaf-based integration test for running HV in OSGi
+* [HV-963](https://hibernate.atlassian.net/browse/HV-963) - Upgrade to the latest JBoss Logging version
+* [HV-967](https://hibernate.atlassian.net/browse/HV-967) - Updating old and broken links in documentation, README.md and CONTRIBUTING.md
+* [HV-972](https://hibernate.atlassian.net/browse/HV-972) - Avoid dependency on ASM4 (upgrade groovy-jsr223)
+
+
+## 5.2.0.Alpha1 (22.10.2014)
+
+### Sub-task
+* [HV-874](https://hibernate.atlassian.net/browse/HV-874) - Support new date/time datatypes (JSR 310)
+* [HV-876](https://hibernate.atlassian.net/browse/HV-876) - Retrieve parameter names via reflection to report parameter constraint violations
+* [HV-877](https://hibernate.atlassian.net/browse/HV-877) - Use type annotations to support constraints on collection elements
+* [HV-878](https://hibernate.atlassian.net/browse/HV-878) - Integrate with the new Optional type and/or JavaFX types
+* [HV-884](https://hibernate.atlassian.net/browse/HV-884) - Switch build to use JDK 8
+* [HV-900](https://hibernate.atlassian.net/browse/HV-900) - Add dedicated Java 8 chapter to summarize and reference Java 8 features and specifics
+
+### Bug
+* [HV-881](https://hibernate.atlassian.net/browse/HV-881) - @CreditCardNumber throws PropertyNotFoundException on validation error
+* [HV-886](https://hibernate.atlassian.net/browse/HV-886) - Javadoc of URL constraint is really misleading
+* [HV-889](https://hibernate.atlassian.net/browse/HV-889) - Translation error in ValidationMessages_zh_CN.properties
+* [HV-895](https://hibernate.atlassian.net/browse/HV-895) - @Valid doesn't work together with @UnwrapValidatedValue
+* [HV-901](https://hibernate.atlassian.net/browse/HV-901) - Luhn Credit Card Validator incorrect return statement
+* [HV-902](https://hibernate.atlassian.net/browse/HV-902) - Cascading validation does not work on classes which implement Iterable.
+* [HV-906](https://hibernate.atlassian.net/browse/HV-906) - org.hibernate.validator.constraints.CreditCardNumber does not fail on a non-numbers string
+* [HV-907](https://hibernate.atlassian.net/browse/HV-907) - Unwanted classes during build created in source tree of annotation-processor
+* [HV-908](https://hibernate.atlassian.net/browse/HV-908) - Fix Chinese translation file
+* [HV-924](https://hibernate.atlassian.net/browse/HV-924) - Make HV 5.1.x compatible with Java 6
+* [HV-929](https://hibernate.atlassian.net/browse/HV-929) - Minimum requirement for 5.5.2 is Java 7 not Java 6 as indicated
+* [HV-930](https://hibernate.atlassian.net/browse/HV-930) - ConstraintLocation does not specify equals() and hashCode()
+* [HV-931](https://hibernate.atlassian.net/browse/HV-931) - Using NaN and Infinity triggers an exception for (Decimal)Min and (Decimal)Max constraints
+* [HV-940](https://hibernate.atlassian.net/browse/HV-940) - ConstraintDescriptorImpl.equals does not match Annotation Proxies
+
+### Improvement
+* [HV-853](https://hibernate.atlassian.net/browse/HV-853) - Provide a NonElMessageInterpolator for usecases where no EL is provided
+* [HV-888](https://hibernate.atlassian.net/browse/HV-888) - ValidationMessage for Korean
+* [HV-893](https://hibernate.atlassian.net/browse/HV-893) - Improve execution speed of BeanMetaDataManagerTest under JDK 8
+* [HV-903](https://hibernate.atlassian.net/browse/HV-903) - Improve error message HV000030
+* [HV-905](https://hibernate.atlassian.net/browse/HV-905) - Allow for auto unwrapping of values
+* [HV-920](https://hibernate.atlassian.net/browse/HV-920) - URLValidator performance
+* [HV-921](https://hibernate.atlassian.net/browse/HV-921) - Use precompiled regexp Pattern instances in AbstractMessageInterpolator for meta character replacements
+* [HV-922](https://hibernate.atlassian.net/browse/HV-922) - Avoid unnecessary conversions from Collections to arrays and vice versa
+* [HV-923](https://hibernate.atlassian.net/browse/HV-923) - Precalculate identifier of Executable element instead of using string concatenation on each getIdentifier() call
+* [HV-936](https://hibernate.atlassian.net/browse/HV-936) - Upgrade JSoup dependecy
+
+### New Feature
+* [HV-296](https://hibernate.atlassian.net/browse/HV-296) - Apply constraints on the elements of an Iterable instance
+* [HV-825](https://hibernate.atlassian.net/browse/HV-825) - Integration with Java 8
+
+### Task
+* [HV-826](https://hibernate.atlassian.net/browse/HV-826) - Switch from docbook to asciidoc
+* [HV-828](https://hibernate.atlassian.net/browse/HV-828) - Provide a mechanism to automatically discover custom constraint validators
+* [HV-894](https://hibernate.atlassian.net/browse/HV-894) - Check release process for Java 8
+* [HV-912](https://hibernate.atlassian.net/browse/HV-912) - Improve integration with Java's security manager
+* [HV-916](https://hibernate.atlassian.net/browse/HV-916) - Disable BeanMetaDataManagerTest
+* [HV-925](https://hibernate.atlassian.net/browse/HV-925) - Implement rules for automatic value unwrapping
+* [HV-926](https://hibernate.atlassian.net/browse/HV-926) - Remove license headers in source files
+* [HV-939](https://hibernate.atlassian.net/browse/HV-939) - Assembly plugin logs warning about javax.el:el-api exclusion
+
+
+## 5.1.3.Final (22.10.2014)
+
+### Bug
+* [HV-924](https://hibernate.atlassian.net/browse/HV-924) - Make HV 5.1.x compatible with Java 6
+* [HV-929](https://hibernate.atlassian.net/browse/HV-929) - Minimum requirement for 5.5.2 is Java 7 not Java 6 as indicated
+* [HV-930](https://hibernate.atlassian.net/browse/HV-930) - ConstraintLocation does not specify equals() and hashCode()
+* [HV-931](https://hibernate.atlassian.net/browse/HV-931) - Using NaN and Infinity triggers an exception for (Decimal)Min and (Decimal)Max constraints
+* [HV-940](https://hibernate.atlassian.net/browse/HV-940) - ConstraintDescriptorImpl.equals does not match Annotation Proxies
+
+
+## 5.1.2.Final (25.07.2014)
+
+### Bug
+* [HV-889](https://hibernate.atlassian.net/browse/HV-889) - Translation error in ValidationMessages_zh_CN.properties
+* [HV-901](https://hibernate.atlassian.net/browse/HV-901) - Luhn Credit Card Validator incorrect return statement
+* [HV-902](https://hibernate.atlassian.net/browse/HV-902) - Cascading validation does not work on classes which implement Iterable.
+* [HV-906](https://hibernate.atlassian.net/browse/HV-906) - org.hibernate.validator.constraints.CreditCardNumber does not fail on a non-numbers string
+* [HV-908](https://hibernate.atlassian.net/browse/HV-908) - Fix Chinese translation file
+
+### Task
+* [HV-912](https://hibernate.atlassian.net/browse/HV-912) - Improve integration with Java's security manager
+
+
+## 5.1.1.Final (06.05.2014)
+
+### Bug
+* [HV-871](https://hibernate.atlassian.net/browse/HV-871) - hv test suite isn't compatible with java 8
+* [HV-873](https://hibernate.atlassian.net/browse/HV-873) - @SafeHtml(whitelistType = WhiteListType.NONE) allow <td>, <tr>
+* [HV-882](https://hibernate.atlassian.net/browse/HV-882) - ValidationExtension must not expect a ProcessBean event to be fired right after AfterBeanDiscovery.addBean() is called
+
+
+## 5.1.0.Final (02.03.2014)
+
+### Bug
+* [HV-865](https://hibernate.atlassian.net/browse/HV-865) - java.lang.NullPointerException at org.hibernate.validator.internal.cdi.InjectingConstraintValidatorFactory.releaseInstance
+
+
+## 5.1.0.CR1 (17.02.2014)
+
+### Bug
+* [HV-834](https://hibernate.atlassian.net/browse/HV-834) - Support curly braces within EL expressions
+* [HV-858](https://hibernate.atlassian.net/browse/HV-858) - ValidatorFactoryBean should use default BV provider
+* [HV-860](https://hibernate.atlassian.net/browse/HV-860) - Leverage validated value unwrapper for validateProperty() and validateValue()
+
+### Improvement
+* [HV-859](https://hibernate.atlassian.net/browse/HV-859) - Allow to upload to  /docs_htdocs/hibernate/stable/validator for final releases
+
+### New Feature
+* [HV-814](https://hibernate.atlassian.net/browse/HV-814) - Re-consider semantics of options of mod check constraints
+
+### Remove Feature
+* [HV-799](https://hibernate.atlassian.net/browse/HV-799) - EANValidator removed from the latest versions
+
+### Task
+* [HV-812](https://hibernate.atlassian.net/browse/HV-812) - Make @Mod10Check and @Mod11Check constraints usable via API
+* [HV-837](https://hibernate.atlassian.net/browse/HV-837) - Re-enable CustomValidatorFactoryInPersistenceUnitIT#testValidatorFactoryPassedToPersistenceUnit
+
+
+## 5.1.0.Beta1 (15.01.2014)
+
+### Bug
+* [HV-596](https://hibernate.atlassian.net/browse/HV-596) - Improve error message for unsupported validateValue() invocations
+* [HV-808](https://hibernate.atlassian.net/browse/HV-808) - Brazilian CPF and ModCheck Validator are returning false positives
+* [HV-809](https://hibernate.atlassian.net/browse/HV-809) - Create Dedicated Mod10 and Mod11 constraints
+* [HV-810](https://hibernate.atlassian.net/browse/HV-810) - @Email constraint accepts addresses with trailing @ characters
+* [HV-818](https://hibernate.atlassian.net/browse/HV-818) - ArrayIndexOutOfBoundsException in ReflectionHelper#parametersResolveToSameTypes()
+* [HV-838](https://hibernate.atlassian.net/browse/HV-838) - ReflectionHelper leaks deployment classes in wildfly integration
+* [HV-842](https://hibernate.atlassian.net/browse/HV-842) - XmlParserHelper can leak deployment classloader in wildfly integration
+* [HV-843](https://hibernate.atlassian.net/browse/HV-843) - Make members of non-public constraint types accessible
+* [HV-848](https://hibernate.atlassian.net/browse/HV-848) - ValidationContext$BeanAndPath shouldn't access hashCode() of validated beans
+
+### Improvement
+* [HV-589](https://hibernate.atlassian.net/browse/HV-589) - Keep a constant metadata placeholder for unconstrained entities
+* [HV-789](https://hibernate.atlassian.net/browse/HV-789) - Update dependencies for CDI, Weld etc.
+* [HV-793](https://hibernate.atlassian.net/browse/HV-793) - Fail during building of validator factory in case EL dependencies are missing
+* [HV-805](https://hibernate.atlassian.net/browse/HV-805) - Raise descriptive exception in case parameter array passed to validation engine has wrong length
+* [HV-815](https://hibernate.atlassian.net/browse/HV-815) - German translation of @Length message is incorrect
+* [HV-817](https://hibernate.atlassian.net/browse/HV-817) - Rethink Validator SafeHtml design to support custom "WhiteListType"
+* [HV-821](https://hibernate.atlassian.net/browse/HV-821) - Improve reference documentation for EL interpolation
+* [HV-835](https://hibernate.atlassian.net/browse/HV-835) - Update to Classmate 1.0.0
+* [HV-841](https://hibernate.atlassian.net/browse/HV-841) - Add "UnusedImports" check to checkstyle.xml
+* [HV-845](https://hibernate.atlassian.net/browse/HV-845) - ValidationMessage for Korean
+* [HV-850](https://hibernate.atlassian.net/browse/HV-850) - Add checkstyle IllegalImport configuration for junit.framework
+
+### New Feature
+* [HV-565](https://hibernate.atlassian.net/browse/HV-565) - @Valid for custom composite types
+* [HV-813](https://hibernate.atlassian.net/browse/HV-813) - Make @Mod10 check constraint more generic
+* [HV-819](https://hibernate.atlassian.net/browse/HV-819) - Add an API/SPI which allows to make the process of value retrieval customizable
+* [HV-824](https://hibernate.atlassian.net/browse/HV-824) - Use WildFly for integration tests
+
+
+## 5.1.0.Alpha1 (09.08.2013)
+
+### Bug
+* [HV-691](https://hibernate.atlassian.net/browse/HV-691) - Failed tests:   testBeanMetaDataCanBeGarbageCollected(org.hibernate.validator.test.internal.metadata.BeanMetaDataManagerTest)
+* [HV-716](https://hibernate.atlassian.net/browse/HV-716) - Refactor programmatic API to instantiate the raw model classes directly
+* [HV-798](https://hibernate.atlassian.net/browse/HV-798) - Escaping validator messages doesn't work
+
+### Improvement
+* [HV-652](https://hibernate.atlassian.net/browse/HV-652) - Update JavaDoc stylesheet when building with Java 7
+* [HV-760](https://hibernate.atlassian.net/browse/HV-760) - Align line endings style
+* [HV-769](https://hibernate.atlassian.net/browse/HV-769) - Derive constraint target automatically for XML-configured constraints
+* [HV-779](https://hibernate.atlassian.net/browse/HV-779) - Remove dependency to run in Android
+* [HV-796](https://hibernate.atlassian.net/browse/HV-796) - Convert missing files with incorrect line endings
+
+### New Feature
+* [HV-642](https://hibernate.atlassian.net/browse/HV-642) - Extend programmatic constraint API to support new constructs from BV 1.1
+* [HV-701](https://hibernate.atlassian.net/browse/HV-701) - Provide API to make additional objects available for message interpolation
+* [HV-714](https://hibernate.atlassian.net/browse/HV-714) - Provide cross-parameter validator for @ScriptAssert
+
+### Patch
+* [HV-797](https://hibernate.atlassian.net/browse/HV-797) - Require Maven 3.0.3 to build
+
+### Task
+* [HV-619](https://hibernate.atlassian.net/browse/HV-619) - Use WildFly for tck-runner module
+* [HV-637](https://hibernate.atlassian.net/browse/HV-637) - Investigate performance regression between HV 4.3 and 5.0
+* [HV-684](https://hibernate.atlassian.net/browse/HV-684) - Some follow-up tasks/minor todos
+* [HV-802](https://hibernate.atlassian.net/browse/HV-802) - Investigate integration with ParaNamer
+
+
+## 5.0.1.Final (30.04.2013)
+
+### Bug
+* [HV-702](https://hibernate.atlassian.net/browse/HV-702) - Upgrade JPA version used in HV
+* [HV-725](https://hibernate.atlassian.net/browse/HV-725) - Update docbook documentation to reflect the changes of Bean Validation 1.1
+* [HV-790](https://hibernate.atlassian.net/browse/HV-790) - Change EL impl dependency scope from runtime to provided
+* [HV-791](https://hibernate.atlassian.net/browse/HV-791) - XML configuration fails for primitive types
+
+### Improvement
+* [HV-604](https://hibernate.atlassian.net/browse/HV-604) - Class-level constraints section of online docs refers to PassengerCount example which is never shown
+
+
+## 5.0.0.Final (11.04.2013)
+
+### Bug
+* [HV-787](https://hibernate.atlassian.net/browse/HV-787) - javax.enterprise.inject.spi.Bean implementations should also implement PassivationCapable
+* [HV-788](https://hibernate.atlassian.net/browse/HV-788) - Upgrade BV API and TCK to final versions
+
+### Improvement
+* [HV-752](https://hibernate.atlassian.net/browse/HV-752) - Check transitive dependencies from CDI API
+* [HV-785](https://hibernate.atlassian.net/browse/HV-785) - Improve structure of JavaDoc
+
+### Task
+* [HV-781](https://hibernate.atlassian.net/browse/HV-781) - Align with latest Weld release
+
+
+## 5.0.0.CR5 (02.04.2013)
+
+### Bug
+* [HV-778](https://hibernate.atlassian.net/browse/HV-778) - Provide a way to deactivate cdi extension
+* [HV-782](https://hibernate.atlassian.net/browse/HV-782) - Multiple constraint-mappings files for one constraint to not work
+
+### Improvement
+* [HV-648](https://hibernate.atlassian.net/browse/HV-648) - Script documentation and distribution upload
+* [HV-724](https://hibernate.atlassian.net/browse/HV-724) - Remove JavaDoc warnings
+* [HV-783](https://hibernate.atlassian.net/browse/HV-783) - Extract hierarchy related functionality from ReflectionHelper
+* [HV-786](https://hibernate.atlassian.net/browse/HV-786) - Update dependencies to Weld and BV TCK
+
+
+## 5.0.0.CR4 (20.03.2013)
+
+### Bug
+* [HV-678](https://hibernate.atlassian.net/browse/HV-678) - Constraint is validated several times if part of several groups
+* [HV-766](https://hibernate.atlassian.net/browse/HV-766) - Method return values are allowed to be marked with @Valid in parallel methods
+* [HV-767](https://hibernate.atlassian.net/browse/HV-767) - Group conversions not correctly applied for inherited group
+* [HV-771](https://hibernate.atlassian.net/browse/HV-771) - @ValidateOnExecution not retrieved from overridden methods for sub-classes
+* [HV-772](https://hibernate.atlassian.net/browse/HV-772) - @ValidateOnExecution not always retrieved from highest method in inheritance hierarchy
+* [HV-773](https://hibernate.atlassian.net/browse/HV-773) - @ValidateOnExecution(type=IMPLICIT) on type-level causes getters to be validated
+* [HV-774](https://hibernate.atlassian.net/browse/HV-774) - Consider return type when detecting getter methods
+* [HV-775](https://hibernate.atlassian.net/browse/HV-775) - Node#as() doesn't throw ClassCastException if wrong type is passed
+* [HV-776](https://hibernate.atlassian.net/browse/HV-776) - ValidationExtension should throw an exception in case of invalid @ValidateOnExecution configuration
+
+### Improvement
+* [HV-672](https://hibernate.atlassian.net/browse/HV-672) - Throw meaningful exception in case object and method passed to validateParameters() don't match
+* [HV-768](https://hibernate.atlassian.net/browse/HV-768) - Eagerly throw exceptions in case of illegal method constraints
+* [HV-770](https://hibernate.atlassian.net/browse/HV-770) - Cascaded return value validation causes exception when used with Weld
+* [HV-777](https://hibernate.atlassian.net/browse/HV-777) - Adapt to changed option name for excluding integration tests from TCK run
+
+
+## 5.0.0.CR3 (15.03.2013)
+
+### Bug
+* [HV-704](https://hibernate.atlassian.net/browse/HV-704) - Mark dependency to UEL as provided
+* [HV-728](https://hibernate.atlassian.net/browse/HV-728) - ConstraintViolation#getLeafBean() returns null for constructor return value validation
+* [HV-729](https://hibernate.atlassian.net/browse/HV-729) - Consider "\$" as the literal "$" instead of considering it as the beginning of a message expression
+* [HV-730](https://hibernate.atlassian.net/browse/HV-730) - Propagate "validationAppliesTo" to composing constraints
+* [HV-732](https://hibernate.atlassian.net/browse/HV-732) - Verification whether group conversions is specified on cascaded element cannot be made in raw model
+* [HV-734](https://hibernate.atlassian.net/browse/HV-734) - Align XML parsing code with the latest xsd in the BV API
+* [HV-735](https://hibernate.atlassian.net/browse/HV-735) - Xml parsing needs to track whether 'ignore-annotations' is set to true or false or not at all
+* [HV-737](https://hibernate.atlassian.net/browse/HV-737) - A getter method can only by configured via XML by either a getter or method node, not both
+* [HV-743](https://hibernate.atlassian.net/browse/HV-743) - Messages using EL should stay unchanged also if RuntimeExceptions are raised
+* [HV-744](https://hibernate.atlassian.net/browse/HV-744) - Wrap exceptions from message interpolators into ValidationException
+* [HV-747](https://hibernate.atlassian.net/browse/HV-747) - Wrong validator used when constraint has generic and cross-parameter validator for the same type
+* [HV-748](https://hibernate.atlassian.net/browse/HV-748) - Throw UnexpectedTypeException if there are two validators for the same type
+
+### Improvement
+* [HV-723](https://hibernate.atlassian.net/browse/HV-723) - Re-enable CDI portable extension
+* [HV-736](https://hibernate.atlassian.net/browse/HV-736) - Provide patched JAR for making AS 7.1.1 usable with HV 5.x
+
+### Task
+* [HV-439](https://hibernate.atlassian.net/browse/HV-439) - Revisit the use of generics in ValidatorImpl
+* [HV-740](https://hibernate.atlassian.net/browse/HV-740) - Implement programmatic addition of method validation interceptor binding
+* [HV-745](https://hibernate.atlassian.net/browse/HV-745) - Default package is not taken into account for class-typed constraint attributes configured via XML
+
+
+## 5.0.0.CR2 (11.03.2013)
+
+### Bug
+* [HV-704](https://hibernate.atlassian.net/browse/HV-704) - Mark dependency to UEL as provided
+* [HV-728](https://hibernate.atlassian.net/browse/HV-728) - ConstraintViolation#getLeafBean() returns null for constructor return value validation
+* [HV-729](https://hibernate.atlassian.net/browse/HV-729) - Consider "\$" as the literal "$" instead of considering it as the beginning of a message expression
+* [HV-730](https://hibernate.atlassian.net/browse/HV-730) - Propagate "validationAppliesTo" to composing constraints
+* [HV-732](https://hibernate.atlassian.net/browse/HV-732) - Verification whether group conversions is specified on cascaded element cannot be made in raw model
+* [HV-734](https://hibernate.atlassian.net/browse/HV-734) - Align XML parsing code with the latest xsd in the BV API
+* [HV-735](https://hibernate.atlassian.net/browse/HV-735) - Xml parsing needs to track whether 'ignore-annotations' is set to true or false or not at all
+* [HV-737](https://hibernate.atlassian.net/browse/HV-737) - A getter method can only by configured via XML by either a getter or method node, not both
+* [HV-743](https://hibernate.atlassian.net/browse/HV-743) - Messages using EL should stay unchanged also if RuntimeExceptions are raised
+* [HV-744](https://hibernate.atlassian.net/browse/HV-744) - Wrap exceptions from message interpolators into ValidationException
+* [HV-747](https://hibernate.atlassian.net/browse/HV-747) - Wrong validator used when constraint has generic and cross-parameter validator for the same type
+* [HV-748](https://hibernate.atlassian.net/browse/HV-748) - Throw UnexpectedTypeException if there are two validators for the same type
+
+### Improvement
+* [HV-723](https://hibernate.atlassian.net/browse/HV-723) - Re-enable CDI portable extension
+* [HV-736](https://hibernate.atlassian.net/browse/HV-736) - Provide patched JAR for making AS 7.1.1 usable with HV 5.x
+
+### Task
+* [HV-439](https://hibernate.atlassian.net/browse/HV-439) - Revisit the use of generics in ValidatorImpl
+* [HV-740](https://hibernate.atlassian.net/browse/HV-740) - Implement programmatic addition of method validation interceptor binding
+* [HV-745](https://hibernate.atlassian.net/browse/HV-745) - Default package is not taken into account for class-typed constraint attributes configured via XML
+
+
+## 5.0.0.CR1 (21.02.2013)
+
+### Bug
+* [HV-683](https://hibernate.atlassian.net/browse/HV-683) - Meta model should not be retrievable in case of illegal parameter constraints in hierarchies
+* [HV-699](https://hibernate.atlassian.net/browse/HV-699) - Import EL packages in OSGi manifest
+* [HV-703](https://hibernate.atlassian.net/browse/HV-703) - Upgrade Jsoups dependency
+* [HV-707](https://hibernate.atlassian.net/browse/HV-707) - BootstrapConfiguration#getValidatedExecutableTypes() returns wrong default value
+* [HV-708](https://hibernate.atlassian.net/browse/HV-708) - Adapt to API changes around Node#getKind()
+* [HV-710](https://hibernate.atlassian.net/browse/HV-710) - Implement CrossParameterNode and ExecutableDescriptor#getCrossParameterDescriptor()
+* [HV-711](https://hibernate.atlassian.net/browse/HV-711) - Updates around ReturnValueNode and ReturnValueDescriptor
+* [HV-717](https://hibernate.atlassian.net/browse/HV-717) - Implement Beandescriptor#hasConstrainedExecutables
+* [HV-719](https://hibernate.atlassian.net/browse/HV-719) - Use List instead of arrays in ParameterNameProvider
+* [HV-720](https://hibernate.atlassian.net/browse/HV-720) - Use @SupportValidationTarget instead of @CrossParameterConstraint for cross paramter constraints
+
+### Improvement
+* [HV-713](https://hibernate.atlassian.net/browse/HV-713) - Implement new methods on ConstraintViolation
+* [HV-722](https://hibernate.atlassian.net/browse/HV-722) - Temporarily disable CDI portable extension
+
+### New Feature
+* [HV-373](https://hibernate.atlassian.net/browse/HV-373) - XML-based configuration of method-level constraints and group conversions
+* [HV-698](https://hibernate.atlassian.net/browse/HV-698) - Don't support unwrapping to internal implementation classes
+* [HV-709](https://hibernate.atlassian.net/browse/HV-709) - Implement new methods in node builder API
+
+### Task
+* [HV-690](https://hibernate.atlassian.net/browse/HV-690) - Update XML schema and parsing code
+
+
+## 5.0.0.Beta1 (06.02.2013)
+
+### Bug
+* [HV-618](https://hibernate.atlassian.net/browse/HV-618) - Unable to validate methods in complex inheritance hierarchy
+* [HV-646](https://hibernate.atlassian.net/browse/HV-646) - Shouldn't access the index for non-indexable types
+* [HV-656](https://hibernate.atlassian.net/browse/HV-656) - MethodValidationContext.isReturnValueValidation throws NPE
+* [HV-657](https://hibernate.atlassian.net/browse/HV-657) - Remove tests in BeanMetaDataImplTest
+* [HV-658](https://hibernate.atlassian.net/browse/HV-658) - Escape special characters in README.md
+* [HV-659](https://hibernate.atlassian.net/browse/HV-659) - ValidatorContextImpl ignores custom ParameterNameProvider
+* [HV-660](https://hibernate.atlassian.net/browse/HV-660) - BeanDescriptor#getConstrainedProperties() must return no elements for class-level constraints
+* [HV-662](https://hibernate.atlassian.net/browse/HV-662) - ConstraintValidatorManager caching fails for XML-defined constraints
+* [HV-663](https://hibernate.atlassian.net/browse/HV-663) - ParameterNameProviders passed via ValidatorFactory#usingContext() are ignored
+* [HV-664](https://hibernate.atlassian.net/browse/HV-664) - Path nodes representing executable return values must return null as name
+* [HV-665](https://hibernate.atlassian.net/browse/HV-665) - Consider concerned constraint in identity of constraint violations
+* [HV-666](https://hibernate.atlassian.net/browse/HV-666) - ExecutableDescriptorImpl#areParametersConstrained() must consider cross-parameter constraints
+* [HV-668](https://hibernate.atlassian.net/browse/HV-668) - ExecutableDescriptorImpl must honor contract for hasConstrained() etc.
+* [HV-675](https://hibernate.atlassian.net/browse/HV-675) - Method return values must not be marked with @Valid if the super-type/interface method is marked
+* [HV-676](https://hibernate.atlassian.net/browse/HV-676) - Implement EL expression interpolation in message interpolation
+* [HV-677](https://hibernate.atlassian.net/browse/HV-677) - ElementDescriptor is null for property nodes reached via traversing a Map- or array-typed parameter
+* [HV-679](https://hibernate.atlassian.net/browse/HV-679) - Must pass Default group to cascaded object when validating object with redefined default group sequence
+* [HV-680](https://hibernate.atlassian.net/browse/HV-680) - No cascaded validation is performed when return value constraints are failing
+* [HV-681](https://hibernate.atlassian.net/browse/HV-681) - Throw IllegalArgumentExceptions in ExecutableValidator methods as described in API
+* [HV-682](https://hibernate.atlassian.net/browse/HV-682) - ExecutableDescriptor#findConstraints() returns constraints with wrong scope
+* [HV-685](https://hibernate.atlassian.net/browse/HV-685) - The tck runner setup fails to run in container
+* [HV-692](https://hibernate.atlassian.net/browse/HV-692) - Implement missing functionality after latest  BV 1.1 changes
+* [HV-695](https://hibernate.atlassian.net/browse/HV-695) - CDI extension throws exception due to calling BeanManager#getBeans during AfterBeanDiscovery event processing
+* [HV-700](https://hibernate.atlassian.net/browse/HV-700) - Update dependency to TCK, include JUEL in distribution
+
+### Improvement
+* [HV-256](https://hibernate.atlassian.net/browse/HV-256) - Add 'exclusive' boolean attribute to @DecimalMin/@DecimalMax constraints
+* [HV-576](https://hibernate.atlassian.net/browse/HV-576) - Consistently apply coding guidelines throughout the code base
+* [HV-661](https://hibernate.atlassian.net/browse/HV-661) - Make sure Hibernate Validator can be used on Java 6 < 1.6.0_18
+* [HV-673](https://hibernate.atlassian.net/browse/HV-673) - JPATraversableResolver must handle method parameters when invoked during method validation
+* [HV-687](https://hibernate.atlassian.net/browse/HV-687) - Constraints for non overridden super-type method have wrong scope
+
+### New Feature
+* [HV-697](https://hibernate.atlassian.net/browse/HV-697) - Create HV-specific MessageInterpolator.Context extension exposing the root bean type
+
+
+## 5.0.0.Alpha2 (28.11.2012)
+
+### Sub-task
+* [HV-629](https://hibernate.atlassian.net/browse/HV-629) - Move methods related to method validation to delegate interface
+* [HV-631](https://hibernate.atlassian.net/browse/HV-631) - Extend the meta-data API with required convenience methods for method validation
+* [HV-632](https://hibernate.atlassian.net/browse/HV-632) - Support cross-parameter constraints
+
+### Bug
+* [HV-601](https://hibernate.atlassian.net/browse/HV-601) - NPE w/ overloaded methods on class validated with MethodValidationInterceptor
+* [HV-602](https://hibernate.atlassian.net/browse/HV-602) - Docs are wrong about location of /validation.xml or the code is
+* [HV-603](https://hibernate.atlassian.net/browse/HV-603) - XML based configuration fails when context class loader is not set
+* [HV-612](https://hibernate.atlassian.net/browse/HV-612) - Documentation fails to build on locales with accented months
+* [HV-615](https://hibernate.atlassian.net/browse/HV-615) - Create a CDI extension to activate Bean Validation
+* [HV-622](https://hibernate.atlassian.net/browse/HV-622) - Assumes all getX/setX methods are bean properties and errors with "wrong number of arguments"
+* [HV-623](https://hibernate.atlassian.net/browse/HV-623) - Wrong constraint validator type resolution in case of constraint placed on parameterized type in class hierachy
+* [HV-626](https://hibernate.atlassian.net/browse/HV-626) - AnnotationMetaDataProvider should use #getDeclaredAnnotations instead of #getAnnotations when reading metadata from class and members
+* [HV-638](https://hibernate.atlassian.net/browse/HV-638) - Support groups translation during cascaded validations
+* [HV-647](https://hibernate.atlassian.net/browse/HV-647) - Don't add JMeter API doc to distribution
+
+### Improvement
+* [HV-557](https://hibernate.atlassian.net/browse/HV-557) - Refactor package organisation to clearly separate spi, public and private APIs - part 2 (public packages)
+* [HV-620](https://hibernate.atlassian.net/browse/HV-620) - Improve error message for HV000085
+* [HV-621](https://hibernate.atlassian.net/browse/HV-621) - Avoid GroupChainGenerator to use reflection at runtime
+* [HV-628](https://hibernate.atlassian.net/browse/HV-628) - Method validation changes from BV 1.1 PR
+* [HV-630](https://hibernate.atlassian.net/browse/HV-630) - Refinements around ConfigurationSource
+* [HV-636](https://hibernate.atlassian.net/browse/HV-636) - Investigate possiblity to run tests in parallel
+
+### Task
+* [HV-584](https://hibernate.atlassian.net/browse/HV-584) - Remove deprecated types
+* [HV-595](https://hibernate.atlassian.net/browse/HV-595) - Determine how to handle different versions of validation-configuration and validation-mapping xsd
+* [HV-597](https://hibernate.atlassian.net/browse/HV-597) - Update tck-runner module
+* [HV-635](https://hibernate.atlassian.net/browse/HV-635) - Align TCK runner with beta release of BVTCK
+* [HV-639](https://hibernate.atlassian.net/browse/HV-639) - Evaluation of composed constraints should stops on first validation error when @ReportAsSingleViolation is used
+* [HV-649](https://hibernate.atlassian.net/browse/HV-649) - Upgrade the tck runner module to BV TCK release 1.1.0.Beta2
+
+
+## 4.3.1.Final (28.11.2012)
+
+### Bug
+* [HV-591](https://hibernate.atlassian.net/browse/HV-591) - EmailValidator throws an IllegalArgumentException for long email addresses
+* [HV-601](https://hibernate.atlassian.net/browse/HV-601) - NPE w/ overloaded methods on class validated with MethodValidationInterceptor
+* [HV-607](https://hibernate.atlassian.net/browse/HV-607) - Email Validator producing error for large email addresses
+* [HV-609](https://hibernate.atlassian.net/browse/HV-609) - EmailValidator fails where email address is large
+* [HV-613](https://hibernate.atlassian.net/browse/HV-613) - email handles complete address as idn label and fails for valid longer addresses
+* [HV-622](https://hibernate.atlassian.net/browse/HV-622) - Assumes all getX/setX methods are bean properties and errors with "wrong number of arguments"
+* [HV-623](https://hibernate.atlassian.net/browse/HV-623) - Wrong constraint validator type resolution in case of constraint placed on parameterized type in class hierachy
+* [HV-625](https://hibernate.atlassian.net/browse/HV-625) - EmailValidator.isValid sometimes throws an exception instead of returning false
+* [HV-626](https://hibernate.atlassian.net/browse/HV-626) - AnnotationMetaDataProvider should use #getDeclaredAnnotations instead of #getAnnotations when reading metadata from class and members
+
+### Task
+* [HV-639](https://hibernate.atlassian.net/browse/HV-639) - Evaluation of composed constraints should stops on first validation error when @ReportAsSingleViolation is used
+
+
+## 5.0.0.Alpha1 (21.06.2012)
+
+### Bug
+* [HV-590](https://hibernate.atlassian.net/browse/HV-590) - Update copyright year in reference guide
+* [HV-591](https://hibernate.atlassian.net/browse/HV-591) - EmailValidator throws an IllegalArgumentException for long email addresses
+
+### Improvement
+* [HV-583](https://hibernate.atlassian.net/browse/HV-583) - Upgrade JBoss Logging dependency
+
+### Task
+* [HV-541](https://hibernate.atlassian.net/browse/HV-541) - The hibernate-validator-tck-runner project should not be deployed to the maven repository
+* [HV-571](https://hibernate.atlassian.net/browse/HV-571) - Align method level validation w/ Bean Validation 1.1
+
+
+## 4.3.0.Final (09.05.2012)
+
+### Improvement
+* [HV-568](https://hibernate.atlassian.net/browse/HV-568) - Perform a profiling of the annotation processor code and make use of caching where appropriate
+* [HV-577](https://hibernate.atlassian.net/browse/HV-577) - Include javadoc jar in Maven repo
+
+### Task
+* [HV-578](https://hibernate.atlassian.net/browse/HV-578) - Remove remaining references to slf4j
+* [HV-580](https://hibernate.atlassian.net/browse/HV-580) - Remove deprecation of package org.hibernate.validator.group
+
+
+## 4.3.0.CR1 (30.04.2012)
+
+### Bug
+* [HV-572](https://hibernate.atlassian.net/browse/HV-572) - Ensure the docs directory gets properly included into the distribution
+* [HV-573](https://hibernate.atlassian.net/browse/HV-573) - Need graceful handling of return value constraint applied to method with void return type
+* [HV-574](https://hibernate.atlassian.net/browse/HV-574) - Annotations processing fails with 4.3.0 Beta1
+* [HV-575](https://hibernate.atlassian.net/browse/HV-575) - NPE in annotation processor ConstraintHelper.getName()
+
+### Improvement
+* [HV-538](https://hibernate.atlassian.net/browse/HV-538) - Perform a profiling of the HV code in order to identify performance bottlenecks
+* [HV-554](https://hibernate.atlassian.net/browse/HV-554) -  Regular Expression for @Email
+
+### Task
+* [HV-100](https://hibernate.atlassian.net/browse/HV-100) - Implement a performance test harness for Bean Validation
+* [HV-569](https://hibernate.atlassian.net/browse/HV-569) - Switch to Java 6
+
+
+## 4.3.0.Beta1 (04.04.2012)
+
+### Bug
+* [HV-563](https://hibernate.atlassian.net/browse/HV-563) - Enable Configuration#buildValidatorFactory() to be callable several times
+* [HV-567](https://hibernate.atlassian.net/browse/HV-567) - @Email reported as "disallowed" for String field
+
+### Improvement
+* [HV-457](https://hibernate.atlassian.net/browse/HV-457) - Simplify annotation processor setup in IDEs in regards to required dependencies
+* [HV-463](https://hibernate.atlassian.net/browse/HV-463) - Revisit the class and implementation of Group/GroupChain
+* [HV-479](https://hibernate.atlassian.net/browse/HV-479) - Implement an eviction strategy for BeanMetaDataCache
+* [HV-517](https://hibernate.atlassian.net/browse/HV-517) - Establish the notion of AnnotationIgnores for programmatic API
+* [HV-564](https://hibernate.atlassian.net/browse/HV-564) - Allow caching of ConstraintValidator instances also for custom ConstraintValidatorFactories
+* [HV-566](https://hibernate.atlassian.net/browse/HV-566) - Shorten directory names
+
+### Task
+* [HV-558](https://hibernate.atlassian.net/browse/HV-558) - Upgrade AS 7 dependencies
+* [HV-561](https://hibernate.atlassian.net/browse/HV-561) - Determine and mark the API to be deprecated for HV5
+
+
+## 4.3.0.Alpha1 (06.03.2012)
+
+### Bug
+* [HV-443](https://hibernate.atlassian.net/browse/HV-443) - Scope of ConstraintDescriptors sometimes wrong in type hierarchies
+* [HV-472](https://hibernate.atlassian.net/browse/HV-472) - E-Mail Validator does not validate IDN E-Mail-Addresses
+* [HV-480](https://hibernate.atlassian.net/browse/HV-480) - Constraints configured via XML and programmatic API aren't merged
+* [HV-506](https://hibernate.atlassian.net/browse/HV-506) - Message interpolation should check whether an interpolated annotation paramter is an array
+* [HV-508](https://hibernate.atlassian.net/browse/HV-508) - DecimalMaxValidatorForNumber for a double values is not correct
+* [HV-509](https://hibernate.atlassian.net/browse/HV-509) - Property path is wrong for cascaded validation of class-level constraints
+* [HV-511](https://hibernate.atlassian.net/browse/HV-511) - Minor documentation error
+* [HV-516](https://hibernate.atlassian.net/browse/HV-516) - Hibernate Validator doesn't work well with hibernate persistence when generating DDL
+* [HV-519](https://hibernate.atlassian.net/browse/HV-519) - Typos in ValidationMessages_de.properties
+* [HV-524](https://hibernate.atlassian.net/browse/HV-524) - java.util.NoSuchElementException in type level validation using EclipseLink
+* [HV-525](https://hibernate.atlassian.net/browse/HV-525) - tests fail on openjdk
+* [HV-531](https://hibernate.atlassian.net/browse/HV-531) - hibernate-validator-annotation-processor tests fails when running against JDK7
+* [HV-537](https://hibernate.atlassian.net/browse/HV-537) - Reintroduce jdocbook.ignoreTranslations in the docbook configuration
+* [HV-543](https://hibernate.atlassian.net/browse/HV-543) - spelling mistake in org.hibernate.valisdator.validationMessages_fr.properties
+* [HV-546](https://hibernate.atlassian.net/browse/HV-546) - LazyValidatorFactory does not allow alternative bean validation providers
+* [HV-550](https://hibernate.atlassian.net/browse/HV-550) - fail-fast doesn't work on composite constraints
+* [HV-551](https://hibernate.atlassian.net/browse/HV-551) - @Size doesn't work on List with bounded wildcard
+
+### Improvement
+* [HV-473](https://hibernate.atlassian.net/browse/HV-473) - Add option to Canonicalize String Input
+* [HV-491](https://hibernate.atlassian.net/browse/HV-491) - Add support for MOD11 Algorithm
+* [HV-500](https://hibernate.atlassian.net/browse/HV-500) - ConfigurationImpl should support multiple programmatic constraint mappings
+* [HV-502](https://hibernate.atlassian.net/browse/HV-502) - Changing Generic Type on @Size, @Pattern a.s.o. from String to CharacterSequence
+* [HV-515](https://hibernate.atlassian.net/browse/HV-515) - Performance improvement for MinValidatorForString
+* [HV-518](https://hibernate.atlassian.net/browse/HV-518) - Create copyright.txt as mentioned by the license headers
+* [HV-520](https://hibernate.atlassian.net/browse/HV-520) - Remove package cycle between "descriptor" and "aggregated" packages
+* [HV-527](https://hibernate.atlassian.net/browse/HV-527) - ValidationMessages in Czech language
+* [HV-529](https://hibernate.atlassian.net/browse/HV-529) - ConstraintHelper is obsolete in ValidatorImpl
+* [HV-539](https://hibernate.atlassian.net/browse/HV-539) - Modify how MANIFESTs are generated
+* [HV-545](https://hibernate.atlassian.net/browse/HV-545) - Update TCK runner to run against AS 7.1
+* [HV-547](https://hibernate.atlassian.net/browse/HV-547) - Make Hibernate Validator build not fail
+
+### Task
+* [HV-441](https://hibernate.atlassian.net/browse/HV-441) - Refactor BeanMetaDataImpl
+* [HV-465](https://hibernate.atlassian.net/browse/HV-465) - Remove obsolete type parameter from MetaConstraint#validateConstraint()
+* [HV-481](https://hibernate.atlassian.net/browse/HV-481) - Move to i18n logs and exception via JBoss Logging
+* [HV-484](https://hibernate.atlassian.net/browse/HV-484) - Refactor package organisation to clearly separate spi, public and private APIs - part 1 (internal packages)
+* [HV-496](https://hibernate.atlassian.net/browse/HV-496) - Include Hibernate Validator test classes in a different classifier
+* [HV-505](https://hibernate.atlassian.net/browse/HV-505) - Update tck runner to run against AS 7.0.0.Final
+* [HV-510](https://hibernate.atlassian.net/browse/HV-510) - Upgrade BV TCK dependency to 1.0.6.GA
+* [HV-528](https://hibernate.atlassian.net/browse/HV-528) - Compilation fails with JDK 7 due to incompatabilites of JAXB versions
+* [HV-530](https://hibernate.atlassian.net/browse/HV-530) - Explain propagation of redefined default groups across associated instances annotated with @Valid
+* [HV-534](https://hibernate.atlassian.net/browse/HV-534) - Consider removing the shading plug-in
+* [HV-536](https://hibernate.atlassian.net/browse/HV-536) - Upgrade JSoup dependency
+* [HV-540](https://hibernate.atlassian.net/browse/HV-540) - Remove repository settings from the master pom
+* [HV-544](https://hibernate.atlassian.net/browse/HV-544) - Create a integration test moodule
+
+## 4.2.0.Final (20.06.2011)
+
+### Improvement
+* [HV-315](https://hibernate.atlassian.net/browse/HV-315) - Create package-level JavaDoc for the AP
+* [HV-485](https://hibernate.atlassian.net/browse/HV-485) - Determine an order for the constraint mapping fluent API
+* [HV-486](https://hibernate.atlassian.net/browse/HV-486) - Remove getMethod() from MethodConstraintViolation
+* [HV-490](https://hibernate.atlassian.net/browse/HV-490) - Create @SafeHtml annotation
+* [HV-493](https://hibernate.atlassian.net/browse/HV-493) - Add support for Brazilian Portuguese for ValidationMessages
+
+### New Feature
+* [HV-372](https://hibernate.atlassian.net/browse/HV-372) - Add section to method-level validation to the HV reference guide
+
+### Task
+* [HV-489](https://hibernate.atlassian.net/browse/HV-489) - Upgrade dependency to BV TCK to 1.0.5.GA
+* [HV-494](https://hibernate.atlassian.net/browse/HV-494) - upgrade to hibernate-jpa-2.0-api-1.0.1.Final
+* [HV-497](https://hibernate.atlassian.net/browse/HV-497) - Create aggregated javadocs for the distribution and deployment on docs server
+
+## 4.2.0.CR1 (09.06.2011)
+
+### Bug
+* [HV-406](https://hibernate.atlassian.net/browse/HV-406) - URL Validator not effective
+* [HV-437](https://hibernate.atlassian.net/browse/HV-437) - Improve the javadocs of the URL constraints
+* [HV-447](https://hibernate.atlassian.net/browse/HV-447) - Create documentation for boolean composition of composing constraints
+* [HV-452](https://hibernate.atlassian.net/browse/HV-452) - Incorrect Paths when using fluent API to add constraints to a context
+* [HV-458](https://hibernate.atlassian.net/browse/HV-458) - Wrong behaviour determining default group constraints in conjunction with @GroupSequence
+* [HV-459](https://hibernate.atlassian.net/browse/HV-459) - Run TCK against AS 7
+* [HV-466](https://hibernate.atlassian.net/browse/HV-466) - Avoid repeated validation of constraints in certain type hierarchies
+* [HV-468](https://hibernate.atlassian.net/browse/HV-468) - Determine whether a property is indexed based on the runtime not static type
+* [HV-470](https://hibernate.atlassian.net/browse/HV-470) - resolvedMessages in ResourceBundleMessageInterpolator needs to be synchronized
+
+### Improvement
+* [HV-407](https://hibernate.atlassian.net/browse/HV-407) - Update "Presentation layer validation" section
+* [HV-417](https://hibernate.atlassian.net/browse/HV-417) - Add section on public API and it's changes to the reference guide
+* [HV-434](https://hibernate.atlassian.net/browse/HV-434) - ValidatorImpl#shouldFailFast() and ValidationContext#shouldFailFast() seem redundant
+* [HV-442](https://hibernate.atlassian.net/browse/HV-442) - Make clear in the documentation which types are supported for built-in constraints
+* [HV-446](https://hibernate.atlassian.net/browse/HV-446) - The annotation processor should allow constraint annotations at non-getter methods
+* [HV-449](https://hibernate.atlassian.net/browse/HV-449) - Remove interface check in BeanMetaDataImpl#newGroupSequenceProviderInstance()
+* [HV-453](https://hibernate.atlassian.net/browse/HV-453) - Add an example of default group sequence provider configuration with the programmatic API
+* [HV-454](https://hibernate.atlassian.net/browse/HV-454) - Fix a mistake in the reference guide about custom properties supported by Hibernate Validator
+* [HV-461](https://hibernate.atlassian.net/browse/HV-461) - Refactor TestUtil class
+* [HV-475](https://hibernate.atlassian.net/browse/HV-475) - Add required and public packages to the OSGi manifest
+* [HV-488](https://hibernate.atlassian.net/browse/HV-488) - Rename MethodDescriptor#getParameterConstraints() method
+
+### New Feature
+* [HV-436](https://hibernate.atlassian.net/browse/HV-436) - The annotation processor should check @GroupSequenceProvider
+
+### Patch
+* [HV-483](https://hibernate.atlassian.net/browse/HV-483) - ValidationMessages translation to Spanish
+
+### Task
+* [HV-400](https://hibernate.atlassian.net/browse/HV-400) - Align the configuration of the archetype plugin with the configuration in search
+* [HV-431](https://hibernate.atlassian.net/browse/HV-431) - Extend programmatic API to allow the definition of method level constraints
+* [HV-464](https://hibernate.atlassian.net/browse/HV-464) - Remove obsolete type parameter from ParameterMetaConstraint
+* [HV-471](https://hibernate.atlassian.net/browse/HV-471) - Group has to be an interface - Documentation or code bug
+* [HV-474](https://hibernate.atlassian.net/browse/HV-474) - Get Hibernate Validator a proper changelog file
+* [HV-487](https://hibernate.atlassian.net/browse/HV-487) - Settle on an approach for instantiating constraint definitions
+
+## 4.2.0.Beta2 (09.02.2011)
+
+### Bug
+* [HV-376](https://hibernate.atlassian.net/browse/HV-376) - validateValue() and validateProperty() are too restrictive regarding processable property names
+* [HV-381](https://hibernate.atlassian.net/browse/HV-381) - Provide a fail fast switch to stop processing constraints on first failure
+* [HV-414](https://hibernate.atlassian.net/browse/HV-414) - Assembly plugin fails with maven 3.0.1
+* [HV-418](https://hibernate.atlassian.net/browse/HV-418) - The annotation processor shouldn't report @Past/@Future given at Joda types as errors
+* [HV-421](https://hibernate.atlassian.net/browse/HV-421) - Reconsider behavior of parameter validation for inheritance hierarchies
+* [HV-422](https://hibernate.atlassian.net/browse/HV-422) - slf4j version in hibernate-validator
+* [HV-426](https://hibernate.atlassian.net/browse/HV-426) - Wrong name in version logging message
+* [HV-428](https://hibernate.atlassian.net/browse/HV-428) - Java 1.6 specific method used in programmatic validation API
+* [HV-429](https://hibernate.atlassian.net/browse/HV-429) - validateValue and validateProperty using wrong default group sequence
+* [HV-430](https://hibernate.atlassian.net/browse/HV-430) - XML configuration does not allow configuration of public fields in superclass
+* [HV-433](https://hibernate.atlassian.net/browse/HV-433) - Cascaded validation on superclass fields does not work if only @Valid is used
+* [HV-444](https://hibernate.atlassian.net/browse/HV-444) - Default group sequence defined with programmatic API is not used if the configured class doesn't define programmatic constraints
+
+### Improvement
+* [HV-415](https://hibernate.atlassian.net/browse/HV-415) - Rename validateParameters to validateAllParameters
+* [HV-419](https://hibernate.atlassian.net/browse/HV-419) - Update the dependency to slf4j-api to 1.6.x
+* [HV-424](https://hibernate.atlassian.net/browse/HV-424) - Validators for Joda types should be specified for ReadableInstant/ReadablePartial
+
+### New Feature
+* [HV-94](https://hibernate.atlassian.net/browse/HV-94) - Support dynamic default group sequence definition
+* [HV-371](https://hibernate.atlassian.net/browse/HV-371) - Support method-level constraints in meta-data API
+
+### Task
+* [HV-420](https://hibernate.atlassian.net/browse/HV-420) - Deprecate legacy validator
+* [HV-440](https://hibernate.atlassian.net/browse/HV-440) - Extend programmatic API to allow the definition of default group sequence provider
+
+## 4.2.0.Beta1 (13.01.2011)
+
+### Sub-task
+* [HV-367](https://hibernate.atlassian.net/browse/HV-367) - Evaluate @Valid annotation given at parameters
+* [HV-368](https://hibernate.atlassian.net/browse/HV-368) - Evaluate @Valid annotation given at return values
+* [HV-369](https://hibernate.atlassian.net/browse/HV-369) - Evaluate constraint annotations given at parameters
+* [HV-370](https://hibernate.atlassian.net/browse/HV-370) - Evaluate constraint annotations given at return values
+
+### Bug
+* [HV-350](https://hibernate.atlassian.net/browse/HV-350) - Inherited Bean validates non-default constraints as default
+* [HV-352](https://hibernate.atlassian.net/browse/HV-352) - In some cexceptional cases the original stacktrace is not preserved
+* [HV-355](https://hibernate.atlassian.net/browse/HV-355) - RangeDef's min() and max() are just wrong
+* [HV-362](https://hibernate.atlassian.net/browse/HV-362) - Including Annotation Processor in Eclipse results in java.lang.OutOfMemoryError: Java heap space
+* [HV-363](https://hibernate.atlassian.net/browse/HV-363) - HV uses Thread's context class loader to load internal implementation classes
+* [HV-374](https://hibernate.atlassian.net/browse/HV-374) - NoSuchMethodError on Persistence.getPersistenceUtil() on WebLogic 10.3.3 (11g)
+* [HV-379](https://hibernate.atlassian.net/browse/HV-379) - Remove obsolete dependency exlusion from tck-runner pom
+* [HV-382](https://hibernate.atlassian.net/browse/HV-382) - "java.lang.NoSuchMethodError: java.lang.String.isEmpty" in ScriptAssertValidator.java
+* [HV-384](https://hibernate.atlassian.net/browse/HV-384) - Performence problem when using programatic constrain declaration
+* [HV-385](https://hibernate.atlassian.net/browse/HV-385) - Typo in German validation messages
+* [HV-387](https://hibernate.atlassian.net/browse/HV-387) - org.hibernate.validator.cfg.defs.GenericConstraintDef should (probably) not extend the raw type ConstraintDef
+* [HV-391](https://hibernate.atlassian.net/browse/HV-391) - Review assertions of @Past and @Future tests
+* [HV-395](https://hibernate.atlassian.net/browse/HV-395) - Align Path.Node implementation with the Bean Validation specification
+* [HV-396](https://hibernate.atlassian.net/browse/HV-396) - Build for hibernate-validator module fails using Maven 3 due to problem with the maven-shade-plugin
+* [HV-398](https://hibernate.atlassian.net/browse/HV-398) - Build of Hibernate Validator Quickstart failed with another default locale than en
+* [HV-402](https://hibernate.atlassian.net/browse/HV-402) - Make sure that Validator still works on JDK 5 due to ValueMessageInterpolator
+* [HV-403](https://hibernate.atlassian.net/browse/HV-403) - Create a ValueMessageInterpolator based on java.text.Format instead of the scripting engine
+* [HV-405](https://hibernate.atlassian.net/browse/HV-405) - Hibernate validator doesn't work well on JDK5
+* [HV-408](https://hibernate.atlassian.net/browse/HV-408) - Validator throws wrongly an exception for constraints placed on  non-getter methods
+
+### Improvement
+* [HV-346](https://hibernate.atlassian.net/browse/HV-346) - Improve some of the default debug/info messages
+* [HV-353](https://hibernate.atlassian.net/browse/HV-353) - Support inheritance for group validation
+* [HV-359](https://hibernate.atlassian.net/browse/HV-359) - chinese message template
+* [HV-365](https://hibernate.atlassian.net/browse/HV-365) - It is very hard to find the HV annotation processor
+* [HV-366](https://hibernate.atlassian.net/browse/HV-366) - The documentation refers to http://repository.jboss.com/maven2: this should be fixed to point to the new maven settings
+* [HV-410](https://hibernate.atlassian.net/browse/HV-410) - Clarify the license on both the website and the reference documentation
+* [HV-412](https://hibernate.atlassian.net/browse/HV-412) - Move GenericConstraintDef into org.hibernate.validator.cfg
+
+### New Feature
+* [HV-299](https://hibernate.atlassian.net/browse/HV-299) - Annotation processor should check constraint annotation type declarations
+* [HV-307](https://hibernate.atlassian.net/browse/HV-307) - Support @Past/@Future annotations at types from the Joda Time API
+* [HV-347](https://hibernate.atlassian.net/browse/HV-347) - Create method level validation
+* [HV-357](https://hibernate.atlassian.net/browse/HV-357) - Create a chapter for the reference guide describing the meta-data API
+* [HV-358](https://hibernate.atlassian.net/browse/HV-358) - Create a pluggable MessageInterpolator which can interploate ${value}
+* [HV-390](https://hibernate.atlassian.net/browse/HV-390) - Boolean composition of constraints
+* [HV-401](https://hibernate.atlassian.net/browse/HV-401) - Ensure that the default validation provider is Hibernate Validator in LazyValidatorFactory
+
+### Task
+* [HV-327](https://hibernate.atlassian.net/browse/HV-327) - Update TCK runner dependecies to not depend on the JBoss deprecated repo
+* [HV-348](https://hibernate.atlassian.net/browse/HV-348) - Add note to JPA integration section about access type when using lazy loaded OneToOne and ManyToOne associations
+* [HV-349](https://hibernate.atlassian.net/browse/HV-349) - Hungarian translation for ValidationMessages.properties
+* [HV-351](https://hibernate.atlassian.net/browse/HV-351) - Translate hv document into chinese
+* [HV-375](https://hibernate.atlassian.net/browse/HV-375) - Update jboss-testharness and bv tck dependecies
+* [HV-378](https://hibernate.atlassian.net/browse/HV-378) - Cleanup the pom
+* [HV-383](https://hibernate.atlassian.net/browse/HV-383) - Update VCS information in pom
+* [HV-386](https://hibernate.atlassian.net/browse/HV-386) - Move readme.txt into top level directory
+* [HV-392](https://hibernate.atlassian.net/browse/HV-392) - Update entity-manager tests dependecy to 3.6.0.Final
+* [HV-393](https://hibernate.atlassian.net/browse/HV-393) - Version class should get the version injected via the maven-injection-plugin
+* [HV-394](https://hibernate.atlassian.net/browse/HV-394) - Change log level from info to debug in DefaultTraversableResolver
+* [HV-413](https://hibernate.atlassian.net/browse/HV-413) - Activate chinese transalation, update po and pot files and make sure that the translation gets included in the dist bundle
+
+## 4.1.0.Final (21.06.2010)
+
+### Bug
+* [HV-335](https://hibernate.atlassian.net/browse/HV-335) - @Max, @Min, @DecimalMax and @DecimalMin can give wrong results
+* [HV-339](https://hibernate.atlassian.net/browse/HV-339) - ^ not allowed in Email
+* [HV-343](https://hibernate.atlassian.net/browse/HV-343) - Package type in the documentation example
+
+### Improvement
+* [HV-338](https://hibernate.atlassian.net/browse/HV-338) - Move the discovery of constraint types into the constructor of ConstraintTree
+* [HV-340](https://hibernate.atlassian.net/browse/HV-340) - When checking for composing constraints ignore annotations like @Target, @Documented, ...
+* [HV-341](https://hibernate.atlassian.net/browse/HV-341) - Reduce the amounf of Annotation.annotationType() calls since reflection calls are expensive
+* [HV-342](https://hibernate.atlassian.net/browse/HV-342) - Reduce the amout of calls to ConstraintHelper.isMultiValueConstraint
+* [HV-344](https://hibernate.atlassian.net/browse/HV-344) - Add example for configuring hibernate validator through Spring session factory bean
+
+### Task
+* [HV-334](https://hibernate.atlassian.net/browse/HV-334) - Stop hibernate-validator-legacy to be deployed in the maven repo
+* [HV-336](https://hibernate.atlassian.net/browse/HV-336) - Remove deprecated constructor in ResourceBundleMessageInterpolator
+* [HV-337](https://hibernate.atlassian.net/browse/HV-337) - Update documentation regarding the effects of @Length during DDL generation
+
+## 4.1.0.CR1 (14.06.2010)
+
+### Bug
+* [HV-332](https://hibernate.atlassian.net/browse/HV-332) - Investigate the usage of CachingResourceBundleLocator in ResourceBundleMessageInterpolator
+* [HV-333](https://hibernate.atlassian.net/browse/HV-333) - Verify that MessageInterpolatorContext.getValidatedValue returns the right value
+
+### Task
+* [HV-331](https://hibernate.atlassian.net/browse/HV-331) - Investigate use of  field/method.setAccessible( true )
+
+## 4.1.0.Beta2 (02.06.2010)
+
+### Bug
+* [HV-281](https://hibernate.atlassian.net/browse/HV-281) - validation of a persisted map
+* [HV-293](https://hibernate.atlassian.net/browse/HV-293) - Annotation processor fails in Eclipse when evaluating custom constraints not defined in the current project
+* [HV-305](https://hibernate.atlassian.net/browse/HV-305) - JPATraversableResolver tries to access properties that do not exist
+* [HV-306](https://hibernate.atlassian.net/browse/HV-306) - Falling back to system´s default locale if chosen locale was EN
+* [HV-309](https://hibernate.atlassian.net/browse/HV-309) - POM file's content-type is text/plain
+* [HV-312](https://hibernate.atlassian.net/browse/HV-312) - Close all input streams opened by HV
+* [HV-319](https://hibernate.atlassian.net/browse/HV-319) - Example in online documention reference javax.validation.ConstraintPayload instead of  javax.validation.Payload
+* [HV-321](https://hibernate.atlassian.net/browse/HV-321) - javax.persistence.PersistenceException when trying to validate an object graphs with a class-level constraint annotation. In addition to the error report HV-266
+* [HV-323](https://hibernate.atlassian.net/browse/HV-323) - URL Validator needs to pass on empty Strings
+* [HV-324](https://hibernate.atlassian.net/browse/HV-324) - Default annotation not executing when group selector activated
+* [HV-326](https://hibernate.atlassian.net/browse/HV-326) - Verify that for caching user objects during the validation process we use a IdentityHashMap or IdentityHashSet
+* [HV-328](https://hibernate.atlassian.net/browse/HV-328) - Configuration.addMapping( null ) should throw IllegalArgumentException
+* [HV-329](https://hibernate.atlassian.net/browse/HV-329) - Update quickstart section and remove reference to archetype catalog
+
+### Improvement
+* [HV-156](https://hibernate.atlassian.net/browse/HV-156) - Exploring properties and cascade is unnecessary if TraversableResolver returns false
+* [HV-298](https://hibernate.atlassian.net/browse/HV-298) - Add a section on using the annotation processor to the HV reference guide
+* [HV-302](https://hibernate.atlassian.net/browse/HV-302) - JAXB shouldn't be required when not using XML configuration
+* [HV-310](https://hibernate.atlassian.net/browse/HV-310) - Define, which parts of HV constitute its public API
+* [HV-313](https://hibernate.atlassian.net/browse/HV-313) - Extract messaging related stuff from ConstraintAnnotationVisitor
+* [HV-314](https://hibernate.atlassian.net/browse/HV-314) - Add @List annotations to the HV-specific constraints
+* [HV-316](https://hibernate.atlassian.net/browse/HV-316) - Extract constraint checking from ConstraintAnnotationVisitor into separate check classes
+* [HV-322](https://hibernate.atlassian.net/browse/HV-322) - Establish a processor option "verbose"
+
+### New Feature
+* [HV-230](https://hibernate.atlassian.net/browse/HV-230) - Database Connective or @Unique
+* [HV-274](https://hibernate.atlassian.net/browse/HV-274) - Write a programmatic mapping API for constraint declarations
+* [HV-292](https://hibernate.atlassian.net/browse/HV-292) - Provide a constraint annotation @ScriptAssert
+
+### Patch
+* [HV-151](https://hibernate.atlassian.net/browse/HV-151) - The mongolian validation message translation patch.
+
+### Task
+* [HV-311](https://hibernate.atlassian.net/browse/HV-311) - Update pom to use the new distributationManagement information
+* [HV-317](https://hibernate.atlassian.net/browse/HV-317) - Rename Global- and LocalExecutionContext
+* [HV-325](https://hibernate.atlassian.net/browse/HV-325) - Align javadoc styles with the Core javadoc styles
+* [HV-330](https://hibernate.atlassian.net/browse/HV-330) - Add a new constructor to ResourceBundleMessageInterpolator which enable/disables internal message caching
+
+## 4.1.0.Beta1 (24.03.2010)
+
+### Bug
+* [HV-246](https://hibernate.atlassian.net/browse/HV-246) - BeanValidationEventListener has a bug (technically a problem with hibernate-annotations 3.5.0beta1... but I couldn't find that project)
+* [HV-261](https://hibernate.atlassian.net/browse/HV-261) - Invalid license info
+* [HV-266](https://hibernate.atlassian.net/browse/HV-266) - NullPointerException when trying to validate an object with a class-level constraint annotation.
+* [HV-272](https://hibernate.atlassian.net/browse/HV-272) - jaxb dependencies should be dependencies with scope 'provided' instead of profile dependencies
+* [HV-275](https://hibernate.atlassian.net/browse/HV-275) - Update french message template for @Email
+* [HV-279](https://hibernate.atlassian.net/browse/HV-279) - Validator docbook files still reference GPL
+* [HV-288](https://hibernate.atlassian.net/browse/HV-288) - The validator doesn't validate correctly groups composing a group sequence
+* [HV-290](https://hibernate.atlassian.net/browse/HV-290) - Check the right copyright header is used in documenation
+* [HV-291](https://hibernate.atlassian.net/browse/HV-291) - ConstraintViolation not serializable for composed constraints
+* [HV-294](https://hibernate.atlassian.net/browse/HV-294) - Annotation processor should raise an error when @Valid is given at wrong places
+* [HV-297](https://hibernate.atlassian.net/browse/HV-297) - Custom error messages built via ConstraintValidatorContext get ignored when constraint uses @ReportAsSingleViolation
+* [HV-300](https://hibernate.atlassian.net/browse/HV-300) - Relocation from com.googlecode.jtype to org.hibernate.validator.jtype didn't catch all references
+
+### Improvement
+* [HV-251](https://hibernate.atlassian.net/browse/HV-251) - ResourceMessageInterpolater - allow create with map of user resource bundles
+* [HV-267](https://hibernate.atlassian.net/browse/HV-267) - Enhance distribution jar to make it OSGi bundle
+* [HV-278](https://hibernate.atlassian.net/browse/HV-278) - ValidationMessages_de.properties spelling: "erwartet" instead of "erwarted"
+* [HV-287](https://hibernate.atlassian.net/browse/HV-287) - French translation is not complete
+
+### New Feature
+* [HV-229](https://hibernate.atlassian.net/browse/HV-229) - @Url needs to be added
+* [HV-238](https://hibernate.atlassian.net/browse/HV-238) - Introduce a ResourceBundleLocatorStrategy interface which allows the ResourceBundleMessageInterpolator to delegate the loading of the resource bundle
+* [HV-269](https://hibernate.atlassian.net/browse/HV-269) - Create an annotation processor validating constraint and property matching
+* [HV-301](https://hibernate.atlassian.net/browse/HV-301) - Add a trim property to @NotEmpty please
+
+### Patch
+* [HV-227](https://hibernate.atlassian.net/browse/HV-227) - hibernate validator message for turkish locale
+* [HV-284](https://hibernate.atlassian.net/browse/HV-284) - Documentation fixes for hibernate-core integration
+* [HV-286](https://hibernate.atlassian.net/browse/HV-286) - NoSuchMethodError on Persistence.getPersistenceUtil() when one follows the README file
+
+### Task
+* [HV-141](https://hibernate.atlassian.net/browse/HV-141) - Use commons-annotations to apply the configuration specified in XML
+* [HV-254](https://hibernate.atlassian.net/browse/HV-254) - Add section about ConstraintValidatorContext to documentation
+* [HV-273](https://hibernate.atlassian.net/browse/HV-273) - Upgrade jtype and jpa2 dependency
+* [HV-276](https://hibernate.atlassian.net/browse/HV-276) - Make sure that all used maven plugins specify their version explicitly
+* [HV-282](https://hibernate.atlassian.net/browse/HV-282) - Create CreditCardValidator
+* [HV-283](https://hibernate.atlassian.net/browse/HV-283) - Remove the legacy module from the main aggregator
+* [HV-289](https://hibernate.atlassian.net/browse/HV-289) - Add requirements section to online manual about usage of Validator in JDK 5 and 6
+
+## 4.0.2.GA (06.11.2009)
+
+### Bug
+* [HV-263](https://hibernate.atlassian.net/browse/HV-263) - NullPointerException when no constraint in xml
+* [HV-265](https://hibernate.atlassian.net/browse/HV-265) - Constraints not loaded consistently for inherited classes
+* [HV-268](https://hibernate.atlassian.net/browse/HV-268) - Wrong message templates for @Email and @Range
+
+## 4.0.1.GA (28.10.2009)
+
+### Bug
+* [HV-250](https://hibernate.atlassian.net/browse/HV-250) - No validator could be found for type: T
+* [HV-252](https://hibernate.atlassian.net/browse/HV-252) - HV with XML config tells me "Invalid property path." even though I know there is such a property.
+* [HV-255](https://hibernate.atlassian.net/browse/HV-255) - Improve error handling for validateValue and validateProperty
+* [HV-257](https://hibernate.atlassian.net/browse/HV-257) - ReflectionHelper.getValue fails to retrieve values from methods defined on a parent interface
+* [HV-258](https://hibernate.atlassian.net/browse/HV-258) - The documentation for HV contains a invalid reference in section 2.1.3 class level constraints
+* [HV-262](https://hibernate.atlassian.net/browse/HV-262) - Using interface in xml configuration does not work
+
+### Improvement
+* [HV-253](https://hibernate.atlassian.net/browse/HV-253) - Fluent API to add path nodes is not flexible enough
+
+### Task
+* [HV-259](https://hibernate.atlassian.net/browse/HV-259) - Add a payload example to the documentation
+
+## 4.0.0.GA (08.10.2009)
+
+### Sub-task
+* [HV-217](https://hibernate.atlassian.net/browse/HV-217) - ValidatorResolutionTest#testResolutionOfMultipleSizeValidators uses generics in the constraintValidator resolution
+* [HV-218](https://hibernate.atlassian.net/browse/HV-218) - Validator implementation resolution is based on the returned value (at runtime) instead of the returned type
+* [HV-222](https://hibernate.atlassian.net/browse/HV-222) - MessageInterpolationTest#testFallbackToDefaultLocale
+* [HV-223](https://hibernate.atlassian.net/browse/HV-223) - BeanDescriptorTest#testGetConstraintsForNullProperty should be mapped
+* [HV-224](https://hibernate.atlassian.net/browse/HV-224) - ConstraintValidatorContextTest#testDisableDefaultErrorWithoutAddingCustomError should raise a ValidationException
+* [HV-225](https://hibernate.atlassian.net/browse/HV-225) - Tests in GroupSequenceIsolationTest and NestedConstraintCompositionTest need to be mapped or moved to the HV test suite
+* [HV-244](https://hibernate.atlassian.net/browse/HV-244) - Cache the type to ConstraintValidator class computation per constraint declaration
+
+### Bug
+* [HV-134](https://hibernate.atlassian.net/browse/HV-134) - Built-in constraint parameter validation
+* [HV-180](https://hibernate.atlassian.net/browse/HV-180) - Failure when compiling Hibernate Validator
+* [HV-199](https://hibernate.atlassian.net/browse/HV-199) - Various TCK issues
+* [HV-213](https://hibernate.atlassian.net/browse/HV-213) - Should we mark ConstraintViolation as Serializable?
+* [HV-231](https://hibernate.atlassian.net/browse/HV-231) - Add default messages for DecimalMin and DecimalMax to resource bundle
+* [HV-234](https://hibernate.atlassian.net/browse/HV-234) - make sure int[] is converted in Integer[] when needed by a constraintValidator call
+* [HV-249](https://hibernate.atlassian.net/browse/HV-249) - findConstraints() .unorderedAndMatchingGroups in ElementDescriptor honors default sequence overriding
+
+### Improvement
+* [HV-129](https://hibernate.atlassian.net/browse/HV-129) - ResourceBundleMessageInterpolatorTest should not test ResourceBundleMessageInterpolato but rather the Bean Validation provider default bundle
+* [HV-132](https://hibernate.atlassian.net/browse/HV-132) - Support hasBoolean format
+* [HV-235](https://hibernate.atlassian.net/browse/HV-235) - More useful exception error messages
+* [HV-236](https://hibernate.atlassian.net/browse/HV-236) - Spring/Hibernate integration, and maven suggestions
+* [HV-239](https://hibernate.atlassian.net/browse/HV-239) - Rename ValidatorConfiguration to HibernateValidatorConfiguration and move from o.h.v.engine to o.h.v package
+* [HV-240](https://hibernate.atlassian.net/browse/HV-240) - Replace Red Hat Middleware LLC to Red Hat, Inc. and/or its affiliates
+* [HV-242](https://hibernate.atlassian.net/browse/HV-242) - Cache ConstraintValidator instances per ValidatorFactory and not per ConstraintTree
+* [HV-245](https://hibernate.atlassian.net/browse/HV-245) - Make ConstraintViolation + Path implementations Serializable
+
+### Task
+* [HV-220](https://hibernate.atlassian.net/browse/HV-220) - Complete documentation
+* [HV-221](https://hibernate.atlassian.net/browse/HV-221) - Create a JPAValidateListener equivalent in the new hibernate validator
+* [HV-232](https://hibernate.atlassian.net/browse/HV-232) - Modify the BeanValidationEventListener in the annotation project to be configurable via the hibernate config file
+* [HV-233](https://hibernate.atlassian.net/browse/HV-233) - Make sure jtype implements the following rules
+* [HV-237](https://hibernate.atlassian.net/browse/HV-237) - Add a toString implementation to ConstraintViolationImpl
+* [HV-241](https://hibernate.atlassian.net/browse/HV-241) - Add @Email and @Range constraints
+* [HV-247](https://hibernate.atlassian.net/browse/HV-247) - Implement latest changes to meta data API in ri
+
+## 4.0.0.CR1 (27.08.2009)
+
+### Sub-task
+* [HV-200](https://hibernate.atlassian.net/browse/HV-200) - ValidationProviderResolverTest#testValidationExceptionIsThrownInCaseValidatorFactoryCreationFails => enable=false?
+* [HV-201](https://hibernate.atlassian.net/browse/HV-201) - BootstrapTest#testServiceFileExists shouldn't we test for the actual provider passing the TCK ie get the right name?
+* [HV-202](https://hibernate.atlassian.net/browse/HV-202) - BootstrapTest#testCustomMessageInterpolatorViaConfiguration is not testing via configuration but via validator context (ie like testCustomMessageInterpolatorViaValidatorContext)
+* [HV-203](https://hibernate.atlassian.net/browse/HV-203) - MappingStreamHandlingTest#testMappingStreamGetsClosed and testMappingStreamGetsClosedInExceptionalCondition are wrong and a failure for HV
+* [HV-206](https://hibernate.atlassian.net/browse/HV-206) - CustomConstraintValidatorTest#testNonInterpolatedMessageParameterIsUsed assumes English locale, needs fix before commented line reactivation
+
+### Bug
+* [HV-183](https://hibernate.atlassian.net/browse/HV-183) - Composite constraints have to honour the payload parameter as well
+* [HV-191](https://hibernate.atlassian.net/browse/HV-191) - JPA 2 Dependency
+* [HV-208](https://hibernate.atlassian.net/browse/HV-208) - Wrong Path in ConstraintViolation
+* [HV-209](https://hibernate.atlassian.net/browse/HV-209) - Correctly handle <valid> configured in xml
+* [HV-210](https://hibernate.atlassian.net/browse/HV-210) - XML constraint declaration with missing mandatory elements throws IllegalArgumentException insteadof  ValidationException
+* [HV-212](https://hibernate.atlassian.net/browse/HV-212) - Group sequence resolution has to take sequence order of composing groups (via inheritance or other group sequence) into account
+* [HV-214](https://hibernate.atlassian.net/browse/HV-214) - Constraints from interfaces and superclasses are not inherited when XML descriptors are used
+* [HV-216](https://hibernate.atlassian.net/browse/HV-216) - Add the payload parameter to the xml configuration
+
+
+### Improvement
+* [HV-185](https://hibernate.atlassian.net/browse/HV-185) - Change package name in codebase from org.hibernate.validation to org.hibernate.validator
+* [HV-189](https://hibernate.atlassian.net/browse/HV-189) - ResourceBundleMessageInterpolator should cache the interpolation results for step 1-3 of the interpolation algorithm
+
+### New Feature
+* [HV-91](https://hibernate.atlassian.net/browse/HV-91) - Make sure Validator<T> is thread-safe in the RI
+* [HV-176](https://hibernate.atlassian.net/browse/HV-176) - Return the list of matching ConstraintDescriptor for a given set of groups
+
+
+
+### Task
+* [HV-99](https://hibernate.atlassian.net/browse/HV-99) - Write unit tests for bootstrapping
+* [HV-140](https://hibernate.atlassian.net/browse/HV-140) - Review all unchecked warnings
+* [HV-188](https://hibernate.atlassian.net/browse/HV-188) - Cleanup ElementDescriptorImpl after we depend on bv api post CR3
+* [HV-211](https://hibernate.atlassian.net/browse/HV-211) - Class name refactoring
+* [HV-215](https://hibernate.atlassian.net/browse/HV-215) - Rename ConstraintPayload to Payload
+
+## 4.0.0.Beta3 (12.08.2009)
+
+### Bug
+* [HV-124](https://hibernate.atlassian.net/browse/HV-124) - Hundreds of raw type use across the codebase
+* [HV-186](https://hibernate.atlassian.net/browse/HV-186) - ResourceBundleMessageInterpolator has to allow all characters as message parameter
+* [HV-187](https://hibernate.atlassian.net/browse/HV-187) - An exception occuring during a cal to the TraversableResolver has to be wrapped in a ValidationException
+* [HV-190](https://hibernate.atlassian.net/browse/HV-190) - The Path implementation has to be matched with the specification
+* [HV-192](https://hibernate.atlassian.net/browse/HV-192) - DigitsValidatorForNumber should strip trailing zeros
+* [HV-193](https://hibernate.atlassian.net/browse/HV-193) - @OverridesAttribute.index starts at 0, not 1
+* [HV-194](https://hibernate.atlassian.net/browse/HV-194) - Loading XML resources leads to NPE if the context classloader is not set
+* [HV-196](https://hibernate.atlassian.net/browse/HV-196) - validateValue incorrectly reports java.lang.IllegalArgumentException on non constrained properties
+* [HV-198](https://hibernate.atlassian.net/browse/HV-198) - Wrong constraint violation path when adding subnode error to subnode
+
+
+### Improvement
+* [HV-171](https://hibernate.atlassian.net/browse/HV-171) - Hibernate Validator must specify how to run in environments that use a SecurityManager
+* [HV-195](https://hibernate.atlassian.net/browse/HV-195) - Be permissive to heading '/' in mapping file names
+
+### New Feature
+* [HV-197](https://hibernate.atlassian.net/browse/HV-197) - Implement a LazyValidatorFactory
+
+
+## 4.0.0.Beta2 (20.07.2009)
+
+### Bug
+* [HV-79](https://hibernate.atlassian.net/browse/HV-79) - The test suite assumes Hibernate Validator as the BV provider
+* [HV-146](https://hibernate.atlassian.net/browse/HV-146) - ConstraintValidator impls cannot inherit from a super class implementing ConstraintValidator
+* [HV-149](https://hibernate.atlassian.net/browse/HV-149) - ReflectionHelper.containsMethod ignores "is" methods
+* [HV-150](https://hibernate.atlassian.net/browse/HV-150) - TraversableResolver pathToTraversableObject incorrectly includes traversableProperty
+* [HV-153](https://hibernate.atlassian.net/browse/HV-153) - ConstraintValidators created out of CVF should be cached to minimize initialization overhead
+* [HV-154](https://hibernate.atlassian.net/browse/HV-154) - isTraversable is called with a root bean class null when validateValue is used
+* [HV-157](https://hibernate.atlassian.net/browse/HV-157) - properties are cascaded despite TraversableResolver answering no
+* [HV-158](https://hibernate.atlassian.net/browse/HV-158) - ClassCastException in org.hibernate.validation.constraints.FutureValidatorForDate.initialize
+* [HV-159](https://hibernate.atlassian.net/browse/HV-159) - NullPointerException in ValidatorFactoryImpl, if XML config file doesn't contain at least one constraint and one cascade configuration
+* [HV-162](https://hibernate.atlassian.net/browse/HV-162) - XML based configuration should be tolerant to line breaks and white spaces where appropriate
+* [HV-164](https://hibernate.atlassian.net/browse/HV-164) - Add test for default group sequence isolation
+* [HV-165](https://hibernate.atlassian.net/browse/HV-165) - Hibernate Validator does not validate groups in class level annotations.
+* [HV-169](https://hibernate.atlassian.net/browse/HV-169) - Make sure Validator is concurrent safe
+* [HV-170](https://hibernate.atlassian.net/browse/HV-170) - Refactor the group sequence expansion and take the default sequence expansion of the validated entity into considertation
+* [HV-172](https://hibernate.atlassian.net/browse/HV-172) - Static fields and methods annotated with constraints should be ignored
+* [HV-173](https://hibernate.atlassian.net/browse/HV-173) - @Valid on an array type does not properly validate the elements of the array
+* [HV-174](https://hibernate.atlassian.net/browse/HV-174) - When using Matcher.appendReplacement all \ and $ characters must be escaped
+* [HV-175](https://hibernate.atlassian.net/browse/HV-175) - @Valid should be polymorphic
+* [HV-181](https://hibernate.atlassian.net/browse/HV-181) - Refactor ConstraintDescriptorImpl
+* [HV-182](https://hibernate.atlassian.net/browse/HV-182) - Error when using composite constraints (wrong messages and stack traces)
+* [HV-184](https://hibernate.atlassian.net/browse/HV-184) - ResourceBundlerMessageInterpolator fails to meet the spec in some issues
+
+### Improvement
+* [HV-155](https://hibernate.atlassian.net/browse/HV-155) - Use a TraversableResolver caching results within a call stack to reduce overhead
+* [HV-166](https://hibernate.atlassian.net/browse/HV-166) - Move constraints validator impl into org.hibernate.validation.constraints.impl
+* [HV-167](https://hibernate.atlassian.net/browse/HV-167) - Rewrite @NotEmpty as a composition of @NotNull, @Size(min=1) @ReportAsSingleViolation
+
+### New Feature
+* [HV-89](https://hibernate.atlassian.net/browse/HV-89) - Implement XML mapping
+* [HV-97](https://hibernate.atlassian.net/browse/HV-97) - Support XML Configuration and merge of configuration metadata
+* [HV-131](https://hibernate.atlassian.net/browse/HV-131) - Support @DecimalMin / @DecimalMax
+* [HV-160](https://hibernate.atlassian.net/browse/HV-160) - Make use of the TraversableResolver contract spliting reachability and cascadability
+* [HV-163](https://hibernate.atlassian.net/browse/HV-163) - Add [] to non-indexed iterable in paths
+
+### Task
+* [HV-101](https://hibernate.atlassian.net/browse/HV-101) - Write unit tests for constraint composition
+* [HV-107](https://hibernate.atlassian.net/browse/HV-107) - Implement a Hibernate Core specifc implementation of TraversableResolver
+* [HV-109](https://hibernate.atlassian.net/browse/HV-109) - Implement test for bootstrapping with multiple providers
+* [HV-127](https://hibernate.atlassian.net/browse/HV-127) - Implement test for the different types of Size validators
+* [HV-133](https://hibernate.atlassian.net/browse/HV-133) - Create test baseclass to allow test to run w and w/o xml configuration
+* [HV-147](https://hibernate.atlassian.net/browse/HV-147) - Invetigate problem with maven release plugin
+* [HV-148](https://hibernate.atlassian.net/browse/HV-148) - Make sure that context as well as current class loader are used when trying to load xml configuration files
+* [HV-168](https://hibernate.atlassian.net/browse/HV-168) - Add validators for DecimalMin and DecimalMax
+* [HV-177](https://hibernate.atlassian.net/browse/HV-177) - Integrate the new Path model
+* [HV-178](https://hibernate.atlassian.net/browse/HV-178) - Add check for payload parameter
+
+
+## 4.0.0.Beta1 (27.04.2009)
+
+### Bug
+* [HV-139](https://hibernate.atlassian.net/browse/HV-139) - BeanMetaDataCache and ConstraintValidatorDefinitionsCache should not be static
+
+### New Feature
+* [HV-144](https://hibernate.atlassian.net/browse/HV-144) - Add support for ConstraintViolation.getRootBeanClass
+
+### Task
+* [HV-110](https://hibernate.atlassian.net/browse/HV-110) - Implement parser for validation.xml
+* [HV-111](https://hibernate.atlassian.net/browse/HV-111) - Bootstrap HV using validation.xml
+* [HV-112](https://hibernate.atlassian.net/browse/HV-112) - Map constraints using XML
+* [HV-137](https://hibernate.atlassian.net/browse/HV-137) - Create a Hibernate Validator maven archetype
+* [HV-142](https://hibernate.atlassian.net/browse/HV-142) - Extract the xml parsing code from ValidatorFactoryImpl and delegate the parsing to a seperate class
+
+
+## 4.0.0.Alpha3 (20.03.2009)
+
+### Bug
+* [HV-78](https://hibernate.atlassian.net/browse/HV-78) - ValidatorImpl.expandGroupName() does not seem to expand recursively, this goes against the spec
+* [HV-80](https://hibernate.atlassian.net/browse/HV-80) - Group sequence sequences can contain group sequence names
+* [HV-83](https://hibernate.atlassian.net/browse/HV-83) - Object graph traversed too many times
+* [HV-85](https://hibernate.atlassian.net/browse/HV-85) - Group sequence expansion and validation execution should be decoupled
+* [HV-117](https://hibernate.atlassian.net/browse/HV-117) - BuiltinConstraints doesn't contain @Digits
+* [HV-118](https://hibernate.atlassian.net/browse/HV-118) - BuiltinConstraints doesn't contain @Past
+* [HV-120](https://hibernate.atlassian.net/browse/HV-120) - ConstraintDescriptor.getGroups() returns Default.class if no group is declared on the constraint
+* [HV-123](https://hibernate.atlassian.net/browse/HV-123) - Wrong elementType in MetaConstraint constructor
+
+### Improvement
+* [HV-103](https://hibernate.atlassian.net/browse/HV-103) - Default error message for Min/Max constraints doesn't reflect constraint specification and implementation
+
+### New Feature
+* [HV-92](https://hibernate.atlassian.net/browse/HV-92) - Implement sequences on group interfaces and group inheritance
+* [HV-121](https://hibernate.atlassian.net/browse/HV-121) - @Pattern support
+* [HV-122](https://hibernate.atlassian.net/browse/HV-122) - Add byte support for numeric constraints (digits, max etc)
+
+### Task
+* [HV-106](https://hibernate.atlassian.net/browse/HV-106) - Integrate TraversableResolver into reference implementation
+* [HV-108](https://hibernate.atlassian.net/browse/HV-108) - Verify correct polymorphic behaviour for validation
+* [HV-113](https://hibernate.atlassian.net/browse/HV-113) - Redefining the Default group for a class
+* [HV-114](https://hibernate.atlassian.net/browse/HV-114) - Implement error report customization via ConstraintValidatorContext
+
+
+
+## 4.0.0.Alpha2 (03.03.2009)
+
+### Bug
+* [HV-78](https://hibernate.atlassian.net/browse/HV-78) - ValidatorImpl.expandGroupName() does not seem to expand recursively, this goes against the spec
+* [HV-80](https://hibernate.atlassian.net/browse/HV-80) - Group sequence sequences can contain group sequence names
+* [HV-83](https://hibernate.atlassian.net/browse/HV-83) - Object graph traversed too many times
+* [HV-85](https://hibernate.atlassian.net/browse/HV-85) - Group sequence expansion and validation execution should be decoupled
+* [HV-117](https://hibernate.atlassian.net/browse/HV-117) - BuiltinConstraints doesn't contain @Digits
+* [HV-118](https://hibernate.atlassian.net/browse/HV-118) - BuiltinConstraints doesn't contain @Past
+* [HV-120](https://hibernate.atlassian.net/browse/HV-120) - ConstraintDescriptor.getGroups() returns Default.class if no group is declared on the constraint
+* [HV-123](https://hibernate.atlassian.net/browse/HV-123) - Wrong elementType in MetaConstraint constructor
+
+### Improvement
+* [HV-103](https://hibernate.atlassian.net/browse/HV-103) - Default error message for Min/Max constraints doesn't reflect constraint specification and implementation
+
+### New Feature
+* [HV-92](https://hibernate.atlassian.net/browse/HV-92) - Implement sequences on group interfaces and group inheritance
+* [HV-121](https://hibernate.atlassian.net/browse/HV-121) - @Pattern support
+* [HV-122](https://hibernate.atlassian.net/browse/HV-122) - Add byte support for numeric constraints (digits, max etc)
+
+### Task
+* [HV-106](https://hibernate.atlassian.net/browse/HV-106) - Integrate TraversableResolver into reference implementation
+* [HV-108](https://hibernate.atlassian.net/browse/HV-108) - Verify correct polymorphic behaviour for validation
+* [HV-113](https://hibernate.atlassian.net/browse/HV-113) - Redefining the Default group for a class
+* [HV-114](https://hibernate.atlassian.net/browse/HV-114) - Implement error report customization via ConstraintValidatorContext
+
+
