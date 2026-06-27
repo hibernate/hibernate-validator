@@ -51,7 +51,14 @@ public class XmlParserHelper {
 
 	// xmlInputFactory used to be static in order to cache the factory, but that introduced a leakage of
 	// class loader in WildFly. See HV-842
-	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+	private final XMLInputFactory xmlInputFactory = createSecureXmlInputFactory();
+
+	private static XMLInputFactory createSecureXmlInputFactory() {
+		XMLInputFactory factory = XMLInputFactory.newInstance();
+		factory.setProperty( XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE );
+		factory.setProperty( XMLInputFactory.SUPPORT_DTD, Boolean.FALSE );
+		return factory;
+	}
 
 	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>(
 			NUMBER_OF_SCHEMAS
