@@ -22,6 +22,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.ValidationServiceManager;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
@@ -275,6 +276,22 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return configured.copy();
+	}
+
+	static ValidationServiceManager initializeValidationServiceManager(ConfigurationState configurationState,
+			ScriptEvaluatorFactory scriptEvaluatorFactory) {
+		ValidationServiceManager configured = null;
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
+			if ( hibernateSpecificConfig.getValidationServiceManager() != null ) {
+				configured = hibernateSpecificConfig.getValidationServiceManager();
+			}
+		}
+		if ( configured == null ) {
+			configured = new ValidationServiceManager();
+		}
+
+		configured.register( ScriptEvaluatorFactory.class, scriptEvaluatorFactory );
+		return configured.seal();
 	}
 
 	static ExpressionLanguageFeatureLevel determineConstraintExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,

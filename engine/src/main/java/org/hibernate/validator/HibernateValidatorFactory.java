@@ -68,6 +68,21 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	PropertyNodeNameProvider getPropertyNodeNameProvider();
 
 	/**
+	 * Returns a validation service instance of the specified type, or {@code null} if no service
+	 * of this type has been registered.
+	 * <p>
+	 * Validation services are registered via
+	 * {@link BaseHibernateValidatorConfiguration#addValidationService(Class, Object)}.
+	 *
+	 * @param serviceType the type of the service to retrieve
+	 * @return the service instance, or {@code null} if not registered
+	 *
+	 * @since 9.2.0
+	 */
+	@Incubating
+	<T> T getValidationService(Class<T> serviceType);
+
+	/**
 	 * Returns a context for validator configuration via options from the
 	 * Bean Validation API as well as specific ones from Hibernate Validator.
 	 *
