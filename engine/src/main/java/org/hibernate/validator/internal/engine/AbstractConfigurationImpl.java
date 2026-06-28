@@ -39,6 +39,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.ValidationServiceManager;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -117,6 +118,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	// HV-specific options
 	private final HibernateConstraintValidatorInitializationSharedDataManager sharedDataManager;
+	private final ValidationServiceManager validationServiceManager;
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean failFast;
@@ -164,6 +166,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 		this.defaultPropertyNodeNameProvider = new DefaultPropertyNodeNameProvider();
 		this.sharedDataManager = new HibernateConstraintValidatorInitializationSharedDataManager();
+		this.validationServiceManager = new ValidationServiceManager();
 	}
 
 	@Override
@@ -375,6 +378,15 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
+	public <V> T addValidationService(Class<V> serviceType, V serviceInstance) {
+		Contracts.assertNotNull( serviceType, MESSAGES.parameterMustNotBeNull( "serviceType" ) );
+		Contracts.assertNotNull( serviceInstance, MESSAGES.parameterMustNotBeNull( "serviceInstance" ) );
+
+		this.validationServiceManager.register( serviceType, serviceInstance );
+		return thisAsT();
+	}
+
+	@Override
 	public T getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
 		Contracts.assertNotNull( getterPropertySelectionStrategy, MESSAGES.parameterMustNotBeNull( "getterPropertySelectionStrategy" ) );
 
@@ -581,6 +593,10 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public HibernateConstraintValidatorInitializationSharedDataManager getSharedDataManager() {
 		return sharedDataManager;
+	}
+
+	public ValidationServiceManager getValidationServiceManager() {
+		return validationServiceManager;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
