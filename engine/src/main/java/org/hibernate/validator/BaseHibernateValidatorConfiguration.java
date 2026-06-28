@@ -389,6 +389,23 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	<T, V extends T> S addConstraintValidatorInitializationSharedData(Class<T> dataClass, V constraintValidatorInitializationSharedData);
 
 	/**
+	 * Registers a validation service that will be available to constraint validators via
+	 * {@link org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext#getValidationService(Class)}
+	 * and externally via
+	 * {@link org.hibernate.validator.HibernateValidatorFactory#getValidationService(Class)}.
+	 * <p>
+	 * If the method is called multiple times passing the same {@code serviceType},
+	 * only the instance passed last will be available for that type.
+	 *
+	 * @param serviceType the type under which the service is registered
+	 * @param serviceInstance the service instance
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.2.0
+	 */
+	@Incubating
+	<T> S addValidationService(Class<T> serviceType, T serviceInstance);
+
+	/**
 	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter
 	 * or not.
 	 *
