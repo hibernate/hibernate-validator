@@ -980,4 +980,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 279, value = "The prefix must not end with %1$s.")
 	IllegalArgumentException getPrefixCannotEndWithException(char c);
+
+	@Message(id = 280, value = "No PasswordStrengthEstimator has been registered as a validation service. "
+			+ "Register one via HibernateValidatorConfiguration.addValidationService(PasswordStrengthEstimator.class, estimatorInstance).")
+	ValidationException getNoPasswordStrengthEstimatorException();
 }
