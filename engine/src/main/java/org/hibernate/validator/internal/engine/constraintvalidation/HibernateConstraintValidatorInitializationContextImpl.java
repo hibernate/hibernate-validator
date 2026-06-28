@@ -26,15 +26,19 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager;
 
+	private final ValidationServiceManager validationServiceManager;
+
 	private final int hashCode;
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
-			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager
+			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
+			ValidationServiceManager validationServiceManager
 	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.constraintValidatorInitializationSharedServiceManager = constraintValidatorInitializationSharedServiceManager;
+		this.validationServiceManager = validationServiceManager;
 		this.hashCode = createHashCode();
 	}
 
@@ -47,7 +51,8 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 			return defaultContext;
 		}
 
-		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager );
+		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance,
+				constraintValidatorInitializationSharedServiceManager, defaultContext.validationServiceManager );
 	}
 
 	@Override
@@ -75,8 +80,17 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		return constraintValidatorInitializationSharedServiceManager.retrieve( type, createIfNotPresent );
 	}
 
+	@Override
+	public <T> T getValidationService(Class<T> serviceType) {
+		return validationServiceManager.retrieve( serviceType );
+	}
+
 	public HibernateConstraintValidatorInitializationSharedDataManager getConstraintValidatorInitializationSharedServiceManager() {
 		return constraintValidatorInitializationSharedServiceManager;
+	}
+
+	public ValidationServiceManager getValidationServiceManager() {
+		return validationServiceManager;
 	}
 
 	@Override
@@ -94,6 +108,9 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 			return false;
 		}
 		if ( constraintValidatorInitializationSharedServiceManager != hibernateConstraintValidatorInitializationContextImpl.constraintValidatorInitializationSharedServiceManager ) {
+			return false;
+		}
+		if ( validationServiceManager != hibernateConstraintValidatorInitializationContextImpl.validationServiceManager ) {
 			return false;
 		}
 		if ( clockProvider != hibernateConstraintValidatorInitializationContextImpl.clockProvider ) {
@@ -115,6 +132,7 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		result = 31 * result + System.identityHashCode( clockProvider );
 		result = 31 * result + temporalValidationTolerance.hashCode();
 		result = 31 * result + System.identityHashCode( constraintValidatorInitializationSharedServiceManager );
+		result = 31 * result + System.identityHashCode( validationServiceManager );
 		return result;
 	}
 }
