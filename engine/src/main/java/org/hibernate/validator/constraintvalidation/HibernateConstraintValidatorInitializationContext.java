@@ -88,4 +88,19 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 */
 	@Incubating
 	<C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent);
+
+	/**
+	 * Returns a validation service instance of the specified type, or {@code null} if no service
+	 * of this type has been registered.
+	 * <p>
+	 * Validation services are registered via
+	 * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addValidationService(Class, Object)}.
+	 *
+	 * @param serviceType the type of the service to retrieve
+	 * @return the service instance, or {@code null} if not registered
+	 *
+	 * @since 9.2.0
+	 */
+	@Incubating
+	<T> T getValidationService(Class<T> serviceType);
 }
