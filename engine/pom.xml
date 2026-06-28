@@ -104,6 +104,16 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>me.gosimple</groupId>
+            <artifactId>nbvcxz</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nulab-inc</groupId>
+            <artifactId>zxcvbn</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <!-- We exclude this dependency from the classpath when running tests with OracleJDK 8,
                  because OracleJDK 8 already bundles JavaFX. -->
             <groupId>org.openjfx</groupId>
