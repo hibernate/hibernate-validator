@@ -184,6 +184,10 @@
         <!-- Used in the Karaf features file: it is a dependency of Moneta, and for the documentation -->
         <version.javax.annotation>1.2</version.javax.annotation>
 
+        <!-- Password strength estimator dependencies -->
+        <version.me.gosimple.nbvcxz>1.5.1</version.me.gosimple.nbvcxz>
+        <version.com.nulab-inc.zxcvbn4j>1.9.0</version.com.nulab-inc.zxcvbn4j>
+
         <!-- JavaFX dependencies -->
         <version.org.openjfx>17.0.19</version.org.openjfx>
 
@@ -473,6 +477,16 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-base</artifactId>
                 <version>${version.org.openjfx}</version>
+            </dependency>
+            <dependency>
+                <groupId>me.gosimple</groupId>
+                <artifactId>nbvcxz</artifactId>
+                <version>${version.me.gosimple.nbvcxz}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nulab-inc</groupId>
+                <artifactId>zxcvbn</artifactId>
+                <version>${version.com.nulab-inc.zxcvbn4j}</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
