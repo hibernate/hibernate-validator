@@ -968,4 +968,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 275, value = "The minRequired parameter (%1$d) cannot exceed the number of values (%2$d).")
 	IllegalArgumentException getMinRequiredCannotExceedNumberOfValuesException(int minRequired, int valuesLength);
+
+	@Message(id = 276, value = "No PasswordStrengthEstimator has been registered as a validation service. "
+			+ "Register one via HibernateValidatorConfiguration.addValidationService(PasswordStrengthEstimator.class, estimatorInstance).")
+	ValidationException getNoPasswordStrengthEstimatorException();
 }
