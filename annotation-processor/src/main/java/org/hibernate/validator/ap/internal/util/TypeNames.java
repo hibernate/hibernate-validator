@@ -84,6 +84,7 @@ public class TypeNames {
 		public static final String KOR_RRN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".kor.KorRRN";
 		public static final String PASSWORD_STRENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".PasswordStrength";
 		public static final String PORT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Port";
+		public static final String NOT_COMPROMISED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotCompromised";
 		public static final String NORMALIZED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Normalized";
 		public static final String NULL_OR_NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NullOrNotBlank";
 		public static final String NULL_OR_NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NullOrNotEmpty";
