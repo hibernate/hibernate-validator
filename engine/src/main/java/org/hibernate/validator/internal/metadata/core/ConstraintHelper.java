@@ -33,6 +33,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_DATE_TIME_FORMAT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN;
@@ -109,6 +110,7 @@ import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.IpAddress;
@@ -333,6 +335,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorprese
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.IpAddressValidator;
@@ -776,6 +779,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER ) ) {
 			putBuiltinConstraint( tmpConstraints, CreditCardNumber.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_DATE_TIME_FORMAT ) ) {
+			putBuiltinConstraint( tmpConstraints, DateTimeFormat.class, DateTimeFormatValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX ) ) {
 			putBuiltinConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );

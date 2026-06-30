@@ -47,6 +47,7 @@ import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
@@ -135,6 +136,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
 		testConstraint( UUID.class, new UUIDBean() );
+		testConstraint( DateTimeFormat.class, new DateTimeFormatBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -467,6 +469,12 @@ public class PredefinedScopeAllConstraintsTest {
 		@UUID
 		private String uuid = "invalid";
 
+	}
+
+	private static class DateTimeFormatBean {
+
+		@DateTimeFormat(pattern = "dd-MM-yyyy")
+		private String dateTimeFormat = "invalid";
 	}
 
 }
