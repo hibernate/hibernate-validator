@@ -694,6 +694,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@DateTimeFormat`:: Checks that the annotated character sequence is valid for the date and/or time format. The `pattern` parameter specifies the date/time format pattern (e.g., "yyyy-MM-dd", "dd/MM/yyyy HH:mm:ss") following `java.time.format.DateTimeFormatter` conventions. The `locale` parameter accepts one or more locale strings (e.g., `"en-US"`, `{"en-US", "fr-FR"}`), validation succeeds if the value parses with any of them; defaults to `"ROOT"` which works for numeric patterns but not text-based ones like month names. The `lenient` parameter determines date validation behaviour: when `false` (default), invalid dates like February 31st are rejected; when `true`, invalid dates are accepted and rolled over to subsequent months (e.g., February 30th becomes March 2nd). `null` values are always considered valid.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@Length(min=, max=)`:: Validates that the annotated character sequence is between `min` and `max` included
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: Column length will be set to max

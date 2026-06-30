@@ -48,6 +48,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
@@ -151,6 +152,7 @@ public class MessagePropertiesTest {
 							violationOf( Size.class ),
 							violationOf( CreditCardNumber.class ),
 							violationOf( Currency.class ),
+							violationOf( DateTimeFormat.class ),
 							violationOf( EAN.class ),
 							violationOf( ISBN.class ),
 							violationOf( Length.class ),
@@ -356,6 +358,9 @@ public class MessagePropertiesTest {
 
 		@UUID
 		private String uuid = "invalid";
+
+		@DateTimeFormat(pattern = "dd-MM-yyyy")
+		private String dateTimeFormat = "invalid";
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;

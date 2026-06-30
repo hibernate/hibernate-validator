@@ -21,6 +21,7 @@ import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInCon
 import org.hibernate.validator.ap.testmodel.ModelWithBitcoinAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithIpAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
@@ -877,6 +878,23 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 20 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2226")
+	public void dateTimeFormatConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithDateTimeFormatConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 19 )
 		);
 	}
 }
