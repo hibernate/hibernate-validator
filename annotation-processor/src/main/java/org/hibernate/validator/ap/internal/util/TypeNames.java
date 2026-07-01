@@ -82,6 +82,7 @@ public class TypeNames {
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";
 		public static final String INN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ru.INN";
 		public static final String KOR_RRN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".kor.KorRRN";
+		public static final String PASSWORD_POLICY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".PasswordPolicy";
 		public static final String PASSWORD_STRENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".PasswordStrength";
 		public static final String PORT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Port";
 		public static final String NOT_COMPROMISED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotCompromised";

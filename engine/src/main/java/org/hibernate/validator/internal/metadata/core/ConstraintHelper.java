@@ -46,6 +46,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_BLANK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_EMPTY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_POLICY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_STRENGTH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL;
@@ -123,6 +124,7 @@ import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
@@ -378,6 +380,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharArray;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.hv.password.PasswordPolicyValidatorForCharArray;
+import org.hibernate.validator.internal.constraintvalidators.hv.password.PasswordPolicyValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.PasswordStrengthValidatorForCharArray;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.PasswordStrengthValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
@@ -894,6 +898,12 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraints( tmpConstraints, NotCompromised.class, Arrays.asList(
 					NotCompromisedValidatorForCharSequence.class,
 					NotCompromisedValidatorForCharArray.class
+			) );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_POLICY ) ) {
+			putBuiltinConstraints( tmpConstraints, PasswordPolicy.class, Arrays.asList(
+					PasswordPolicyValidatorForCharSequence.class,
+					PasswordPolicyValidatorForCharArray.class
 			) );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_STRENGTH ) ) {
