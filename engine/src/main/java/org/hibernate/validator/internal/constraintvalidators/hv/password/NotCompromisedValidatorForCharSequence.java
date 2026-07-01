@@ -40,7 +40,7 @@ public class NotCompromisedValidatorForCharSequence implements HibernateConstrai
 			return true;
 		}
 
-		char[] chars = toCharArray( value );
+		char[] chars = PasswordPolicyValidationHelper.toCharArray( value );
 		try {
 			final CompromisedPasswordResult result = checker.check( chars );
 			if ( !result.compromised() ) {
@@ -52,13 +52,5 @@ public class NotCompromisedValidatorForCharSequence implements HibernateConstrai
 		finally {
 			Arrays.fill( chars, '\0' );
 		}
-	}
-
-	private static char[] toCharArray(CharSequence cs) {
-		char[] chars = new char[cs.length()];
-		for ( int i = 0; i < cs.length(); i++ ) {
-			chars[i] = cs.charAt( i );
-		}
-		return chars;
 	}
 }

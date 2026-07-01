@@ -583,6 +583,139 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/HaveIBeenP
 ----
 ====
 
+[[section-password-policy]]
+==== Composable password policies
+
+The `@PasswordPolicy` constraint lets you define composable password validation rules in a single annotation.
+Unlike `@PasswordStrength` or `@NotCompromised`, which each check one aspect, `@PasswordPolicy` combines
+multiple rules -- and each failing rule produces its own constraint violation with a specific message.
+
+A policy is defined by implementing `PasswordPolicyDefinition` and configuring rules via the `PasswordPolicyBuilder`:
+
+[[example-password-policy-basic]]
+.Defining a password policy
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=policyDefinition]
+----
+====
+
+Apply it to a field using `@PasswordPolicy`:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=policyUsage]
+----
+====
+
+===== Built-in rules
+
+The builder provides convenience methods for common password policy rules:
+
+[cols="3,5", options="header"]
+|===
+| Builder method | Description
+
+| `minLength(int min)` | Password must be at least `min` characters long
+| `maxLength(int max)` | Password must be at most `max` characters long
+| `requireCharacters(CharacterType type, int min)` | Password must contain at least `min` characters of the given type (`UPPERCASE`, `LOWERCASE`, `DIGIT`, `SPECIAL`)
+| `noSequence()` | Rejects passwords containing 3+ sequential characters (e.g. "abc", "321")
+| `noKeyboardWalk()` | Rejects passwords containing walks across adjacent keys (e.g. "qwerty", "asdf", "4eszxdr5"). Defaults to the QWERTY layout with a minimum walk length of 4. Use `noKeyboardWalk(KeyboardLayout...)` to specify different layouts (QWERTY, AZERTY, DVORAK, NORDIC, CYRILLIC_UA), or `noKeyboardWalk(int, KeyboardLayout...)` to also set a custom minimum walk length. Custom layouts can be created via `KeyboardLayout.of(...)`. Shifted and diacritical characters are mapped to their base key.
+| `noWhitespace()` | Rejects passwords containing whitespace characters
+| `noRepeatingCharacters(int max)` | Rejects passwords where the same character repeats more than `max` times consecutively (e.g. "aaa")
+| `allowedCharacters(char... chars)` | Restricts the password to only the specified characters
+| `illegalCharacters(char... chars)` | Rejects passwords containing any of the specified characters
+| `strengthEstimator(int minScore, PasswordStrengthEstimator)` | Requires a minimum strength score from a registered strength estimator (see <<section-password-validation-services>>)
+| `compromisedChecker(CompromisedPasswordChecker)` | Rejects passwords flagged as compromised by a registered compromised checker (see <<section-password-validation-services>>)
+|===
+
+===== Custom rules
+
+For requirements not covered by the built-in methods, use `addRule()` with either a lambda or a full
+`PasswordPolicyRule` implementation.
+
+====== Lambda rules
+
+Simple checks can be expressed as one-liners:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=lambdaRules]
+----
+====
+
+====== Custom rules with external services
+
+Rules that depend on external resources -- dictionary lookups, password history checks, breach databases -- should
+delegate to an external service interface. The application provides the implementation; the rule only needs the contract.
+
+Define a service interface for each concern, or use one of your current application service interfaces.
+The implementation is the application's responsibility -- it decides where data comes from
+(file, database, external API) and how matching works (exact, substring, hashed comparison):
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/DictionaryService.java[tags=include]
+----
+====
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHistoryService.java[tags=include]
+----
+====
+
+The rules receive the service via their constructor and delegate to it:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/DictionaryRule.java[tags=include]
+----
+====
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHistoryRule.java[tags=include]
+----
+====
+
+These services are application concerns -- they should be injected by your DI framework, not looked up
+via `getValidationService()` (which is reserved for Hibernate Validator's own validation service SPIs).
+Register a custom `PasswordPolicyDefinitionResolver` that delegates to CDI (or Arc, Spring, Guice, etc.),
+and let the policy definition receive its dependencies through standard injection:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=serviceRules]
+----
+====
+
+See <<section-constraint-definition-resolver>> for how to register the resolver, and <<section-getting-started-cdi>>
+for CDI integration details.
+
+[[section-constraint-definition-resolver]]
+===== Custom policy definition resolver
+
+By default, `PasswordPolicyDefinition` classes are instantiated via their no-arg constructor.
+For dependency injection or custom initialization, register a `PasswordPolicyDefinitionResolver`
+as a validation service:
+
+[[example-password-policy-resolver]]
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=resolverRegistration]
+----
+====
+
 ==== Logging of values under validation
 
 In some cases it might be useful to inspect logs produced by Hibernate Validator.
