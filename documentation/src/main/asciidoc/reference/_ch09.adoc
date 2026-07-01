@@ -525,6 +525,64 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 ----
 ====
 
+[[section-password-validation-services]]
+==== Configuring password validation services
+
+The `@PasswordStrength` and `@NotCompromised` constraints delegate to user-provided validation services
+that must be registered at bootstrap time. The two service interfaces are:
+
+* `PasswordStrengthEstimator` -- estimates password strength on a 0–4 scale (see `PasswordStrengthScore`)
+* `CompromisedPasswordChecker` -- checks whether a password has appeared in a known data breach
+
+Both accept `char[]` rather than `String` so the caller can zero the array after validation.
+
+Register services via the `addValidationService()` method on the Hibernate Validator configuration:
+
+[[example-password-strength-registration]]
+.Registering a `PasswordStrengthEstimator`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordValidationServicesTest.java[tags=weightRegistration]
+----
+====
+
+[[example-compromised-password-registration]]
+.Registering a `CompromisedPasswordChecker`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordValidationServicesTest.java[tags=compromisedRegistration]
+----
+====
+
+===== Example: zxcvbn4j-based password strength estimator
+
+The https://github.com/nulab/zxcvbn4j[zxcvbn4j] library is a Java port of the
+https://github.com/dropbox/zxcvbn[Dropbox zxcvbn] algorithm. It can be wrapped in a few lines:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Zxcvbn4jPasswordStrengthEstimator.java[tags=include]
+----
+====
+
+Other libraries such as https://github.com/GoSimpleLLC/nbvcxz[nbvcxz] can be wrapped in the same way.
+
+===== Example: Have I Been Pwned compromised password checker
+
+The https://haveibeenpwned.com/Passwords[Have I Been Pwned] service exposes a free, anonymous
+API that uses k-anonymity: only the first five characters of the SHA-1 hash are sent to the server.
+The following implementation uses the JDK `HttpClient`:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/HaveIBeenPwnedPasswordChecker.java[tags=include]
+----
+====
+
 ==== Logging of values under validation
 
 In some cases it might be useful to inspect logs produced by Hibernate Validator.
