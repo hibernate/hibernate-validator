@@ -93,6 +93,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID( "org.hibernate.validator.constraints.UUID" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS( "org.hibernate.validator.constraints.BitcoinAddress" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_COMPROMISED( "org.hibernate.validator.constraints.NotCompromised" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_POLICY( "org.hibernate.validator.constraints.PasswordPolicy" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_STRENGTH( "org.hibernate.validator.constraints.PasswordStrength" );
 
 	private static final Map<String, Set<BuiltinConstraint>> CONSTRAINT_MAPPING;

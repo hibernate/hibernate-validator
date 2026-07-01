@@ -32,6 +32,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNotCompromisedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithPasswordPolicyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordStrengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
@@ -916,6 +917,22 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 17 )
+		);
+	}
+
+	@Test
+	public void passwordPolicyConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithPasswordPolicyConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 27 )
 		);
 	}
 
