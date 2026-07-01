@@ -124,6 +124,7 @@ import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordStrength;
+import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
