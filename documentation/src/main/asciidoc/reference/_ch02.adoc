@@ -756,10 +756,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 `@BitcoinAddress(value=)`:: Checks that the annotated character sequence is a valid Bitcoin address. `null` values are considered valid. The option `value` allows to specify which types of Bitcoin addresses should be considered as valid. By default, all address types are considered as valid. See `BitcoinAddress.BitcoinAddressType` for a list of available address types.
         Supported data types::: `CharSequence`
         Hibernate metadata impact::: None
-`@NotCompromised`:: Checks that the annotated password has not been compromised in a data breach, as determined by a registered `CompromisedPasswordChecker` validation service. `null` is considered valid. A `CompromisedPasswordChecker` must be registered via `addValidationService()` before using this constraint.
+`@NotCompromised`:: Checks that the annotated password has not been compromised in a data breach, as determined by a registered `CompromisedPasswordChecker` validation service. `null` is considered valid. A `CompromisedPasswordChecker` must be registered via `addValidationService()` before using this constraint. See <<section-password-validation-services>> for example implementations.
         Supported data types::: `CharSequence`, `char[]`
         Hibernate metadata impact::: None
-`@PasswordStrength(min=)`:: Checks that the annotated password meets a minimum strength score as determined by a registered `PasswordStrengthEstimator` validation service. `null` is considered valid. The `min` parameter defaults to `PasswordStrengthScore.FAIR`. Adapter implementations are provided for the https://github.com/GoSimpleLLC/nbvcxz[nbvcxz] and https://github.com/nulab/zxcvbn4j[zxcvbn4j] libraries. A `PasswordStrengthEstimator` must be registered via `addValidationService()` before using this constraint.
+`@PasswordStrength(min=)`:: Checks that the annotated password meets a minimum strength score as determined by a registered `PasswordStrengthEstimator` validation service. `null` is considered valid. The `min` parameter defaults to `PasswordStrengthScore.FAIR`. A `PasswordStrengthEstimator` must be registered via `addValidationService()` before using this constraint. See <<section-password-validation-services>> for example implementations.
         Supported data types::: `CharSequence`, `char[]`
         Hibernate metadata impact::: None
 
