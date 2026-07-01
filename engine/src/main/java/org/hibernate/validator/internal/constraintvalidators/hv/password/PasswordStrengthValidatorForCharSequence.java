@@ -42,7 +42,7 @@ public class PasswordStrengthValidatorForCharSequence implements HibernateConstr
 			return true;
 		}
 
-		char[] chars = toCharArray( value );
+		char[] chars = PasswordPolicyValidationHelper.toCharArray( value );
 		try {
 			PasswordStrengthResult result = estimator.estimate( chars );
 
@@ -57,13 +57,5 @@ public class PasswordStrengthValidatorForCharSequence implements HibernateConstr
 		finally {
 			Arrays.fill( chars, '\0' );
 		}
-	}
-
-	private static char[] toCharArray(CharSequence cs) {
-		char[] chars = new char[cs.length()];
-		for ( int i = 0; i < cs.length(); i++ ) {
-			chars[i] = cs.charAt( i );
-		}
-		return chars;
 	}
 }

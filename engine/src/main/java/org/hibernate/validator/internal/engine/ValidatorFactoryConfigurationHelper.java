@@ -21,6 +21,7 @@ import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.constraintvalidators.hv.password.DefaultPasswordPolicyDefinitionResolver;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ValidationServiceManager;
@@ -42,6 +43,7 @@ import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -292,6 +294,9 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		configured.register( ScriptEvaluatorFactory.class, scriptEvaluatorFactory );
+		if ( configured.retrieve( PasswordPolicyDefinitionResolver.class ) == null ) {
+			configured.register( PasswordPolicyDefinitionResolver.class, new DefaultPasswordPolicyDefinitionResolver() );
+		}
 		return configured.seal();
 	}
 
