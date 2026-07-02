@@ -74,6 +74,24 @@ public class PasswordStrengthValidatorTest {
 	}
 
 	@Test
+	public void emptyStringIsValidated() {
+		Set<ConstraintViolation<CharSequenceBean>> violations = validator.validate( new CharSequenceBean( "" ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( PasswordStrength.class ) );
+	}
+
+	@Test
+	public void veryWeakPasswordScoreZeroFails() {
+		Set<ConstraintViolation<WeakMinBean>> violations = validator.validate( new WeakMinBean( "" ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( PasswordStrength.class ) );
+	}
+
+	@Test
+	public void passwordAtExactMinScorePasses() {
+		Set<ConstraintViolation<CharSequenceBean>> violations = validator.validate( new CharSequenceBean( "abcd" ) );
+		assertNoViolations( violations );
+	}
+
+	@Test
 	public void customMinScore() {
 		Set<ConstraintViolation<CustomMinBean>> violations = validator.validate( new CustomMinBean( "abcd" ) );
 		assertThat( violations ).containsOnlyViolations( violationOf( PasswordStrength.class ) );
@@ -109,6 +127,15 @@ public class PasswordStrengthValidatorTest {
 		}
 	}
 
+	private static class WeakMinBean {
+		@PasswordStrength(min = PasswordStrengthScore.WEAK)
+		private final String password;
+
+		WeakMinBean(String password) {
+			this.password = password;
+		}
+	}
+
 	private static class CustomMinBean {
 		@PasswordStrength(min = PasswordStrengthScore.VERY_STRONG)
 		private final String password;
@@ -122,7 +149,10 @@ public class PasswordStrengthValidatorTest {
 		@Override
 		public PasswordStrengthResult estimate(char[] password) {
 			int score;
-			if ( password.length < 4 ) {
+			if ( password.length < 2 ) {
+				score = PasswordStrengthScore.VERY_WEAK;
+			}
+			else if ( password.length < 4 ) {
 				score = PasswordStrengthScore.WEAK;
 			}
 			else if ( password.length < 8 ) {

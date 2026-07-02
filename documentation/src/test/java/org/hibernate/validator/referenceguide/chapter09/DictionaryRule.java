@@ -6,6 +6,7 @@ package org.hibernate.validator.referenceguide.chapter09;
 
 //tag::include[]
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 public class DictionaryRule implements PasswordPolicyRule {
@@ -22,8 +23,8 @@ public class DictionaryRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-		return !dictionaryService.containsDictionaryWord( new String( password ) );
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		return !dictionaryService.containsDictionaryWord( new String( passwordContext.password() ) );
 	}
 }
 //end::include[]

@@ -9,6 +9,7 @@ import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -38,7 +39,7 @@ import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
  */
 @Documented
 @Constraint(validatedBy = { })
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE, TYPE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
 @Incubating
@@ -60,7 +61,7 @@ public @interface PasswordPolicy {
 	/**
 	 * Defines several {@code @PasswordPolicy} annotations on the same element.
 	 */
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE, TYPE })
 	@Retention(RUNTIME)
 	@Documented
 	@interface List {

@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv.password;
 import java.util.function.Predicate;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 class LambdaRule implements PasswordPolicyRule {
@@ -25,7 +26,7 @@ class LambdaRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-		return predicate.test( password );
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		return predicate.test( passwordContext.password() );
 	}
 }
