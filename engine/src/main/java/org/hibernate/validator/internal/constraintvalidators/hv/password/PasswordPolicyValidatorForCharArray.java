@@ -12,8 +12,6 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 public class PasswordPolicyValidatorForCharArray implements HibernateConstraintValidator<PasswordPolicy, char[]> {
@@ -23,13 +21,7 @@ public class PasswordPolicyValidatorForCharArray implements HibernateConstraintV
 	@Override
 	public void initialize(ConstraintDescriptor<PasswordPolicy> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
-		Class<? extends PasswordPolicyDefinition> definitionClass = constraintDescriptor.getAnnotation().value();
-
-		PasswordPolicyDefinitionResolver resolver = initializationContext.getValidationService( PasswordPolicyDefinitionResolver.class );
-		PasswordPolicyDefinition definition = resolver.resolve( definitionClass );
-		DefaultPasswordPolicyBuilder builder = new DefaultPasswordPolicyBuilder();
-		definition.configure( builder, initializationContext );
-		this.rules = builder.build();
+		this.rules = PasswordPolicyValidationHelper.buildRules( constraintDescriptor, initializationContext );
 	}
 
 	@Override
@@ -38,6 +30,6 @@ public class PasswordPolicyValidatorForCharArray implements HibernateConstraintV
 			return true;
 		}
 
-		return PasswordPolicyValidationHelper.validate( value, rules, context );
+		return PasswordPolicyValidationHelper.validate( PasswordPolicyValidationHelper.createContext( value ), rules, context );
 	}
 }

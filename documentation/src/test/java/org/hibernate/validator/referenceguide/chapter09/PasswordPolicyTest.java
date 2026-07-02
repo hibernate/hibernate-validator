@@ -16,12 +16,18 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.PasswordPolicy;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.spi.password.AbstractPasswordPolicyValidator;
 import org.hibernate.validator.spi.password.CharacterType;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
+import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 import org.junit.Test;
 
@@ -177,5 +183,107 @@ public class PasswordPolicyTest {
 		StrictPolicyBean(String password) {
 			this.password = password;
 		}
+	}
+
+	//tag::classLevelPolicy[]
+	public static class RegistrationPolicy implements PasswordPolicyDefinition {
+
+		@Override
+		public void configure(PasswordPolicyBuilder builder,
+				HibernateConstraintValidatorInitializationContext context) {
+			builder.minLength( 8 )
+					.requireCharacters( CharacterType.UPPERCASE, 1 )
+					.requireCharacters( CharacterType.DIGIT, 1 )
+					.addRule( new NoUsernameInPasswordRule() );
+		}
+	}
+	//end::classLevelPolicy[]
+
+	//tag::noUsernameRule[]
+	public static class NoUsernameInPasswordRule implements PasswordPolicyRule {
+
+		@Override
+		public String getMessage() {
+			return "password must not contain the username '{username}'";
+		}
+
+		@Override
+		public boolean isValid(PasswordContext passwordContext,
+				HibernateConstraintValidatorContext context) {
+			String username = passwordContext.get( "username", String.class );
+			if ( username == null ) {
+				return true;
+			}
+			context.addMessageParameter( "username", username );
+			return !new String( passwordContext.password() )
+					.toLowerCase().contains( username.toLowerCase() );
+		}
+	}
+	//end::noUsernameRule[]
+
+	//tag::classLevelBean[]
+	@PasswordPolicy(RegistrationPolicy.class)
+	public static class RegistrationForm {
+
+		private final String username;
+		private final String password;
+
+		public RegistrationForm(String username, String password) {
+			this.username = username;
+			this.password = password;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+	}
+	//end::classLevelBean[]
+
+	//tag::classLevelValidator[]
+	public static class RegistrationFormPasswordPolicyValidator
+			extends AbstractPasswordPolicyValidator<RegistrationForm> {
+
+		@Override
+		protected char[] getPassword(RegistrationForm bean) {
+			return bean.getPassword().toCharArray();
+		}
+
+		@Override
+		protected void bindProperties(RegistrationForm bean, PasswordContext context) {
+			context.property( "username", bean.getUsername() );
+		}
+	}
+	//end::classLevelValidator[]
+
+	@Test
+	public void classLevelPolicy() {
+		//tag::classLevelUsage[]
+		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
+				.configure();
+
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.constraintDefinition( PasswordPolicy.class )
+				.validatedBy( RegistrationFormPasswordPolicyValidator.class );
+
+		Validator validator = configuration
+				.addMapping( mapping )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<RegistrationForm>> violations = validator.validate(
+				new RegistrationForm( "john", "Str0ngP@ss" ) );
+		assertNoViolations( violations );
+
+		violations = validator.validate(
+				new RegistrationForm( "john", "john1234A" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( PasswordPolicy.class )
+						.withMessage( "password must not contain the username 'john'" )
+		);
+		//end::classLevelUsage[]
 	}
 }

@@ -13,8 +13,6 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 public class PasswordPolicyValidatorForCharSequence implements HibernateConstraintValidator<PasswordPolicy, CharSequence> {
@@ -24,13 +22,7 @@ public class PasswordPolicyValidatorForCharSequence implements HibernateConstrai
 	@Override
 	public void initialize(ConstraintDescriptor<PasswordPolicy> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
-		Class<? extends PasswordPolicyDefinition> definitionClass = constraintDescriptor.getAnnotation().value();
-
-		PasswordPolicyDefinitionResolver resolver = initializationContext.getValidationService( PasswordPolicyDefinitionResolver.class );
-		PasswordPolicyDefinition definition = resolver.resolve( definitionClass );
-		DefaultPasswordPolicyBuilder builder = new DefaultPasswordPolicyBuilder();
-		definition.configure( builder, initializationContext );
-		this.rules = builder.build();
+		this.rules = PasswordPolicyValidationHelper.buildRules( constraintDescriptor, initializationContext );
 	}
 
 	@Override
@@ -41,7 +33,7 @@ public class PasswordPolicyValidatorForCharSequence implements HibernateConstrai
 
 		char[] chars = PasswordPolicyValidationHelper.toCharArray( value );
 		try {
-			return PasswordPolicyValidationHelper.validate( chars, rules, context );
+			return PasswordPolicyValidationHelper.validate( PasswordPolicyValidationHelper.createContext( chars ), rules, context );
 		}
 		finally {
 			Arrays.fill( chars, '\0' );

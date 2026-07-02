@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv.password;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 class CompromisedRule implements PasswordPolicyRule {
@@ -25,8 +26,8 @@ class CompromisedRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-		CompromisedPasswordResult result = checker.check( password );
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		CompromisedPasswordResult result = checker.check( passwordContext.password() );
 
 		if ( !result.compromised() ) {
 			return true;

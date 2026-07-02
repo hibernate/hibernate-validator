@@ -25,6 +25,7 @@ import org.hibernate.validator.spi.password.CharacterType;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
 import org.hibernate.validator.spi.password.KeyboardLayout;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
@@ -682,8 +683,8 @@ public class PasswordPolicyValidatorTest {
 		}
 
 		@Override
-		public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-			return password.length >= 10;
+		public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+			return passwordContext.password().length >= 10;
 		}
 	}
 
