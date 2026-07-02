@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 class AllowedCharactersRule implements PasswordPolicyRule {
@@ -29,8 +30,8 @@ class AllowedCharactersRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-		for ( char c : password ) {
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		for ( char c : passwordContext.password() ) {
 			if ( !allowed.contains( c ) ) {
 				return false;
 			}

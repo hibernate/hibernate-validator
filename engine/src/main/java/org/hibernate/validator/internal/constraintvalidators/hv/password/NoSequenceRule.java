@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 class NoSequenceRule implements PasswordPolicyRule {
@@ -18,7 +19,8 @@ class NoSequenceRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		char[] password = passwordContext.password();
 		if ( password.length < MIN_SEQUENCE_LENGTH ) {
 			return true;
 		}
