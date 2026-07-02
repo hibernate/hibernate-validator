@@ -4,16 +4,45 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.password.PasswordContext;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
-class PasswordPolicyValidationHelper {
+public class PasswordPolicyValidationHelper {
+
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private PasswordPolicyValidationHelper() {
+	}
+
+	public static List<PasswordPolicyRule> buildRules(ConstraintDescriptor<PasswordPolicy> constraintDescriptor,
+			HibernateConstraintValidatorInitializationContext initializationContext) {
+		Class<? extends PasswordPolicyDefinition> definitionClass = constraintDescriptor.getAnnotation().value();
+
+		PasswordPolicyDefinitionResolver resolver = initializationContext.getValidationService( PasswordPolicyDefinitionResolver.class );
+		if ( resolver == null ) {
+			throw LOG.getNoPasswordPolicyDefinitionResolverException();
+		}
+		PasswordPolicyDefinition definition = resolver.resolve( definitionClass );
+		DefaultPasswordPolicyBuilder builder = new DefaultPasswordPolicyBuilder();
+		definition.configure( builder, initializationContext );
+		return builder.build();
+	}
+
+	public static DefaultPasswordContext createContext(char[] password) {
+		return new DefaultPasswordContext( password );
 	}
 
 	static char[] toCharArray(CharSequence cs) {
@@ -24,12 +53,12 @@ class PasswordPolicyValidationHelper {
 		return chars;
 	}
 
-	static boolean validate(char[] password, List<PasswordPolicyRule> rules, ConstraintValidatorContext context) {
+	public static boolean validate(PasswordContext passwordContext, List<PasswordPolicyRule> rules, ConstraintValidatorContext context) {
 		HibernateConstraintValidatorContext hvContext = context.unwrap( HibernateConstraintValidatorContext.class );
 
 		boolean allValid = true;
 		for ( PasswordPolicyRule rule : rules ) {
-			if ( !rule.isValid( password, hvContext ) ) {
+			if ( !rule.isValid( passwordContext, hvContext ) ) {
 				if ( allValid ) {
 					hvContext.disableDefaultConstraintViolation();
 					allValid = false;
