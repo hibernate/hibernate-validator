@@ -965,4 +965,12 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 274, value = "Unsupported operation for the current constraint validator kind.")
 	AssertionError getUnexpectedConstraintValidatorContextCall();
+
+	@Message(id = 275, value = "No PasswordStrengthEstimator has been registered as a validation service. "
+			+ "Register one via HibernateValidatorConfiguration.addValidationService(PasswordStrengthEstimator.class, estimatorInstance).")
+	ValidationException getNoPasswordStrengthEstimatorException();
+
+	@Message(id = 276, value = "No CompromisedPasswordChecker has been registered as a validation service. "
+			+ "Register one via HibernateValidatorConfiguration.addValidationService(CompromisedPasswordChecker.class, checkerInstance).")
+	ValidationException getNoCompromisedPasswordCheckerException();
 }

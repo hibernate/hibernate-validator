@@ -14,6 +14,7 @@ import jakarta.validation.TraversableResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
+import org.hibernate.validator.internal.engine.constraintvalidation.ValidationServiceManager;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
@@ -84,6 +85,11 @@ public class ValidatorFactoryScopedContext {
 	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
 	/**
+	 * The validation service manager.
+	 */
+	private final ValidationServiceManager validationServiceManager;
+
+	/**
 	 * The constraint validator initialization context.
 	 */
 	private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
@@ -105,13 +111,14 @@ public class ValidatorFactoryScopedContext {
 			boolean showValidatedValuesInTraceLogs,
 			Object constraintValidatorPayload,
 			HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
+			ValidationServiceManager validationServiceManager,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
-				customViolationExpressionLanguageFeatureLevel,
+				customViolationExpressionLanguageFeatureLevel, validationServiceManager,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager
+						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager, validationServiceManager
 				) );
 	}
 
@@ -128,6 +135,7 @@ public class ValidatorFactoryScopedContext {
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			ValidationServiceManager validationServiceManager,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -142,6 +150,7 @@ public class ValidatorFactoryScopedContext {
 		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
 		this.customViolationExpressionLanguageFeatureLevel = customViolationExpressionLanguageFeatureLevel;
 		this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
+		this.validationServiceManager = validationServiceManager;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 	}
 
@@ -185,6 +194,10 @@ public class ValidatorFactoryScopedContext {
 		return this.constraintValidatorPayload;
 	}
 
+	public ValidationServiceManager getValidationServiceManager() {
+		return this.validationServiceManager;
+	}
+
 	public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
 		return this.constraintValidatorInitializationContext;
 	}
@@ -217,6 +230,7 @@ public class ValidatorFactoryScopedContext {
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 		private boolean showValidatedValuesInTraceLogs;
+		private final ValidationServiceManager validationServiceManager;
 		private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		Builder(ValidatorFactoryScopedContext defaultContext) {
@@ -236,6 +250,7 @@ public class ValidatorFactoryScopedContext {
 			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
 			this.customViolationExpressionLanguageFeatureLevel = defaultContext.customViolationExpressionLanguageFeatureLevel;
 			this.showValidatedValuesInTraceLogs = defaultContext.showValidatedValuesInTraceLogs;
+			this.validationServiceManager = defaultContext.validationServiceManager;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
 		}
 
@@ -347,6 +362,7 @@ public class ValidatorFactoryScopedContext {
 					showValidatedValuesInTraceLogs, constraintValidatorPayload,
 					constraintExpressionLanguageFeatureLevel,
 					customViolationExpressionLanguageFeatureLevel,
+					validationServiceManager,
 					HibernateConstraintValidatorInitializationContextImpl.of(
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,

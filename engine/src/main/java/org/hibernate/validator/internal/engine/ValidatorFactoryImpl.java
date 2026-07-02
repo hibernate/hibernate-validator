@@ -21,6 +21,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTemporalValidationTolerance;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.initializeConstraintValidatorInitializationShareDataManager;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.initializeValidationServiceManager;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -157,19 +158,22 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						determineAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
+		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
+
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				configurationState.getMessageInterpolator(),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
-				determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader ),
+				scriptEvaluatorFactory,
 				determineFailFast( hibernateSpecificConfig, properties ),
 				determineFailFastOnPropertyViolation( hibernateSpecificConfig, properties ),
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				initializeConstraintValidatorInitializationShareDataManager( hibernateSpecificConfig ),
+				initializeValidationServiceManager( configurationState, scriptEvaluatorFactory ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
 				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
 		);
@@ -298,6 +302,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public PropertyNodeNameProvider getPropertyNodeNameProvider() {
 		return javaBeanHelper.getPropertyNodeNameProvider();
+	}
+
+	@Override
+	public <T> T getValidationService(Class<T> serviceType) {
+		return validatorFactoryScopedContext.getValidationServiceManager().retrieve( serviceType );
 	}
 
 	public boolean isFailFast() {

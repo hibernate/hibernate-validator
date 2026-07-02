@@ -107,6 +107,11 @@ public class ConstraintValidatorInitializationHelper {
 			public <C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent) {
 				return createIfNotPresent.get();
 			}
+
+			@Override
+			public <T> T getValidationService(Class<T> serviceType) {
+				return null;
+			}
 		};
 	}
 }
