@@ -627,8 +627,8 @@ The builder provides convenience methods for common password policy rules:
 | `noRepeatingCharacters(int max)` | Rejects passwords where the same character repeats more than `max` times consecutively (e.g. "aaa")
 | `allowedCharacters(char... chars)` | Restricts the password to only the specified characters
 | `illegalCharacters(char... chars)` | Rejects passwords containing any of the specified characters
-| `strengthEstimator(int minScore, PasswordStrengthEstimator)` | Requires a minimum strength score from a registered strength estimator (see <<section-password-validation-services>>)
-| `compromisedChecker(CompromisedPasswordChecker)` | Rejects passwords flagged as compromised by a registered compromised checker (see <<section-password-validation-services>>)
+| `strengthEstimator(int minScore, PasswordStrengthEstimator)` | Requires a minimum strength score using a `PasswordStrengthEstimator` obtained from the initialization context (see <<section-password-validation-services>>)
+| `compromisedChecker(CompromisedPasswordChecker)` | Rejects passwords flagged as compromised using a `CompromisedPasswordChecker` obtained from the initialization context (see <<section-password-validation-services>>)
 |===
 
 ===== Custom rules
@@ -715,6 +715,68 @@ as a validation service:
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=resolverRegistration]
 ----
 ====
+
+[[section-password-policy-class-level]]
+===== Class-level validation with `AbstractPasswordPolicyValidator`
+
+When a password policy rule needs access to other bean properties -- for example, to reject passwords
+that contain the username -- `@PasswordPolicy` can be placed on the class instead of the password field.
+
+Hibernate Validator does not ship a class-level validator; you provide your own by extending
+`AbstractPasswordPolicyValidator<T>`. This base class resolves the policy definition, builds
+the rules, and runs the validation. You only need to implement two methods:
+
+* `getPassword(T)` -- extracts the password from the bean
+* `bindProperties(T, BiConsumer<String, Object>)` -- binds additional properties that rules can read
+via `PasswordContext.get(name, type)`
+
+For example, first, define a rule that reads a property from the context:
+
+[[example-password-policy-no-username-rule]]
+.A rule that rejects passwords containing the username
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=noUsernameRule]
+----
+====
+
+Define a policy that uses this rule alongside standard rules:
+
+[[example-password-policy-class-level-policy]]
+.A policy definition using cross-field rules
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=classLevelPolicy]
+----
+====
+
+Annotate the bean with `@PasswordPolicy` at the class level:
+
+[[example-password-policy-class-level-bean]]
+.A bean with class-level `@PasswordPolicy`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=classLevelBean]
+----
+====
+
+Implement the validator by extending `AbstractPasswordPolicyValidator`:
+
+[[example-password-policy-class-level-validator]]
+.Class-level validator implementation
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=classLevelValidator]
+----
+====
+
+Since this is a custom validator for an existing constraint, it must be registered with Hibernate
+Validator. This can be done via XML, the `ServiceLoader` mechanism, or the programmatic API.
+See <<section-constraint-definition-contribution>> for details.
 
 ==== Logging of values under validation
 

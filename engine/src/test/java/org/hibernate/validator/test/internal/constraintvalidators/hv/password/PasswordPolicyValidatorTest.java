@@ -25,6 +25,7 @@ import org.hibernate.validator.spi.password.CharacterType;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
 import org.hibernate.validator.spi.password.KeyboardLayout;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
@@ -274,10 +275,31 @@ public class PasswordPolicyValidatorTest {
 	}
 
 	@Test
+	public void emptyStringIsValidated() {
+		Set<ConstraintViolation<BasicPolicyBean>> violations = validator.validate( new BasicPolicyBean( "" ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( PasswordPolicy.class ),
+				violationOf( PasswordPolicy.class ),
+				violationOf( PasswordPolicy.class )
+		);
+	}
+
+	@Test
+	public void repeatablePasswordPolicy() {
+		Set<ConstraintViolation<RepeatablePolicyBean>> violations = validator.validate(
+				new RepeatablePolicyBean( "Password1" ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( PasswordPolicy.class ) );
+
+		violations = validator.validate( new RepeatablePolicyBean( "Password1!" ) );
+		assertNoViolations( violations );
+	}
+
+	@Test
 	public void customResolver() {
+		TestResolver customResolver = new TestResolver();
 		Validator v = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordPolicyDefinitionResolver.class, new TestResolver() )
+				.addValidationService( PasswordPolicyDefinitionResolver.class, customResolver )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -501,6 +523,13 @@ public class PasswordPolicyValidatorTest {
 		}
 	}
 
+	public static class RequireSpecialPolicy implements PasswordPolicyDefinition {
+		@Override
+		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
+			builder.requireCharacters( CharacterType.SPECIAL, 1 );
+		}
+	}
+
 	// --- Beans ---
 
 	private static class BasicPolicyBean {
@@ -665,6 +694,16 @@ public class PasswordPolicyValidatorTest {
 		}
 	}
 
+	private static class RepeatablePolicyBean {
+		@PasswordPolicy(BasicPolicy.class)
+		@PasswordPolicy(RequireSpecialPolicy.class)
+		private final String password;
+
+		RepeatablePolicyBean(String password) {
+			this.password = password;
+		}
+	}
+
 	private static class ProgrammaticBean {
 		private final String password;
 
@@ -682,8 +721,8 @@ public class PasswordPolicyValidatorTest {
 		}
 
 		@Override
-		public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-			return password.length >= 10;
+		public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+			return passwordContext.password().length >= 10;
 		}
 	}
 
@@ -724,6 +763,7 @@ public class PasswordPolicyValidatorTest {
 	}
 
 	private static class TestResolver implements PasswordPolicyDefinitionResolver {
+
 		@Override
 		public <T extends PasswordPolicyDefinition> T resolve(Class<T> definitionClass) {
 			try {

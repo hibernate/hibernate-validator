@@ -973,4 +973,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 276, value = "No CompromisedPasswordChecker has been registered as a validation service. "
 			+ "Register one via HibernateValidatorConfiguration.addValidationService(CompromisedPasswordChecker.class, checkerInstance).")
 	ValidationException getNoCompromisedPasswordCheckerException();
+
+	@Message(id = 277, value = "No PasswordPolicyDefinitionResolver has been registered as a validation service.")
+	ValidationException getNoPasswordPolicyDefinitionResolverException();
 }

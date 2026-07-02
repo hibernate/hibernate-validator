@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
@@ -27,8 +28,8 @@ class StrengthRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-		PasswordStrengthResult result = estimator.estimate( password );
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		PasswordStrengthResult result = estimator.estimate( passwordContext.password() );
 		if ( result.score() >= minScore ) {
 			return true;
 		}

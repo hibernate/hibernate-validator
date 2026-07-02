@@ -5,6 +5,7 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 class WhitespaceRule implements PasswordPolicyRule {
@@ -17,8 +18,8 @@ class WhitespaceRule implements PasswordPolicyRule {
 	}
 
 	@Override
-	public boolean isValid(char[] password, HibernateConstraintValidatorContext context) {
-		for ( char c : password ) {
+	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+		for ( char c : passwordContext.password() ) {
 			if ( Character.isWhitespace( c ) ) {
 				return false;
 			}

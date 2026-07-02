@@ -32,9 +32,9 @@ public interface PasswordPolicyRule {
 	/**
 	 * Validates the given password against this rule.
 	 *
-	 * @param password the password to validate (never {@code null})
+	 * @param passwordContext the password context providing the password and optional properties (never {@code null})
 	 * @param context the constraint validator context for adding message parameters
 	 * @return {@code true} if the password satisfies this rule, {@code false} otherwise
 	 */
-	boolean isValid(char[] password, HibernateConstraintValidatorContext context);
+	boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context);
 }
