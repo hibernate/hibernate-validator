@@ -38,6 +38,11 @@ public class CUITValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
+	public void null_cuit_validates() {
+		assertNoViolations( validator.validate( new Person( null ) ) );
+	}
+
+	@Test
 	public void invalid_cuit_creates_constraint_violation() {
 		assertThat( validator.validate( new Person( "20-12345678-7" ) ) )
 				.containsOnlyViolations(
