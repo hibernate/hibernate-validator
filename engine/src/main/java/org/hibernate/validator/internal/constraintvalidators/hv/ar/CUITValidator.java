@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.ar.CUIT;
  */
 public class CUITValidator extends AbstractArgentineTaxIdValidator<CUIT> {
 
-	private static final String[] PREFIXES = { "20", "23", "24", "27", "30", "33", "34" };
+	private static final String[] PREFIXES = { "20", "23", "24", "25", "26", "27", "30", "33", "34" };
 
 	@Override
 	protected String[] getValidPrefixes() {
