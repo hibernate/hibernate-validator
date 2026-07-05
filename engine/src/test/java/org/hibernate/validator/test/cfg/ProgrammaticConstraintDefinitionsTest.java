@@ -24,6 +24,8 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.LuhnCheckDef;
 import org.hibernate.validator.cfg.defs.ParameterScriptAssertDef;
+import org.hibernate.validator.cfg.defs.ar.CUILDef;
+import org.hibernate.validator.cfg.defs.ar.CUITDef;
 import org.hibernate.validator.cfg.defs.br.CNPJDef;
 import org.hibernate.validator.cfg.defs.br.CPFDef;
 import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
@@ -31,8 +33,11 @@ import org.hibernate.validator.cfg.defs.kor.KorRRNDef;
 import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
 import org.hibernate.validator.cfg.defs.pl.REGONDef;
+import org.hibernate.validator.cfg.defs.py.RUCDef;
 import org.hibernate.validator.cfg.defs.ru.INNDef;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.ar.CUIL;
+import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
@@ -40,6 +45,7 @@ import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 
@@ -52,6 +58,9 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 	@Test
 	public void countrySpecificProgrammaticDefinition() {
+		doProgrammaticTest( CUIL.class, new CUILDef(), "20-12345678-6", "30-12345678-1", "invalid Argentine Unique Labor Identification Code (CUIL)" );
+		doProgrammaticTest( CUIT.class, new CUITDef(), "30-12345678-1", "21-12345678-2", "invalid Argentine Unique Tax Identification Code (CUIT)" );
+
 		doProgrammaticTest( TituloEleitoral.class, new TituloEleitoralDef(), "083578481406", "48255-77", "invalid Brazilian Voter ID card number" );
 		doProgrammaticTest( CPF.class, new CPFDef(), "134.241.313-00", "48255-77", "invalid Brazilian individual taxpayer registry number (CPF)" );
 		doProgrammaticTest( CNPJ.class, new CNPJDef(), "91.509.901/0001-69", "91.509.901/0001-60",
@@ -62,6 +71,8 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( REGON.class, new REGONDef(), "858336997", "691657185", "invalid Polish Taxpayer Identification Number (REGON)" );
 		doProgrammaticTest( PESEL.class, new PESELDef(), "12252918020", "44051401358", "invalid Polish National Identification Number (PESEL)" );
 		doProgrammaticTest( NIP.class, new NIPDef(), "1786052059", "2596048505", "invalid VAT Identification Number (NIP)" );
+
+		doProgrammaticTest( RUC.class, new RUCDef(), "1234567A-2", "1234567A-3", "invalid Paraguayan Unique Taxpayer Registry number (RUC)" );
 
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.INDIVIDUAL ), "127530851622", "127530851623", "invalid Russian taxpayer identification number (INN)" );
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.JURIDICAL ), "8606995694", "8606995695", "invalid Russian taxpayer identification number (INN)" );
