@@ -20,6 +20,8 @@ public class CUITValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( validator.validate( new Person( "20123456786" ) ) );
 		assertNoViolations( validator.validate( new Person( "23123456785" ) ) );
 		assertNoViolations( validator.validate( new Person( "24123456781" ) ) );
+		assertNoViolations( validator.validate( new Person( "25123456788" ) ) );
+		assertNoViolations( validator.validate( new Person( "26123456784" ) ) );
 		assertNoViolations( validator.validate( new Person( "27123456780" ) ) );
 		assertNoViolations( validator.validate( new Person( "30123456781" ) ) );
 		assertNoViolations( validator.validate( new Person( "33123456780" ) ) );
@@ -31,6 +33,8 @@ public class CUITValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( validator.validate( new Person( "20-12345678-6" ) ) );
 		assertNoViolations( validator.validate( new Person( "23-12345678-5" ) ) );
 		assertNoViolations( validator.validate( new Person( "24-12345678-1" ) ) );
+		assertNoViolations( validator.validate( new Person( "25-12345678-8" ) ) );
+		assertNoViolations( validator.validate( new Person( "26-12345678-4" ) ) );
 		assertNoViolations( validator.validate( new Person( "27-12345678-0" ) ) );
 		assertNoViolations( validator.validate( new Person( "30-12345678-1" ) ) );
 		assertNoViolations( validator.validate( new Person( "33-12345678-0" ) ) );
