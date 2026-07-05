@@ -63,12 +63,15 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.ar.CUIL;
+import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
@@ -124,12 +127,15 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( URL.class, new URLBean() );
+		testConstraint( CUIL.class, new CUILBean() );
+		testConstraint( CUIT.class, new CUITBean() );
 		testConstraint( CNPJ.class, new CNPJBean() );
 		testConstraint( CPF.class, new CPFBean() );
 		testConstraint( TituloEleitoral.class, new TituloEleitoralBean() );
 		testConstraint( REGON.class, new REGONBean() );
 		testConstraint( NIP.class, new NIPBean() );
 		testConstraint( PESEL.class, new PESELBean() );
+		testConstraint( RUC.class, new RUCBean() );
 		testConstraint( INN.class, new INNBean() );
 		testConstraint( DurationMax.class, new DurationMaxBean() );
 		testConstraint( DurationMin.class, new DurationMinBean() );
@@ -393,6 +399,18 @@ public class PredefinedScopeAllConstraintsTest {
 		private String url = "invalid";
 	}
 
+	private static class CUILBean {
+
+		@CUIL
+		private String cuil = "invalid";
+	}
+
+	private static class CUITBean {
+
+		@CUIT
+		private String cuit = "invalid";
+	}
+
 	private static class CNPJBean {
 
 		@CNPJ
@@ -427,6 +445,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@PESEL
 		private String pesel = "invalid";
+	}
+
+	private static class RUCBean {
+
+		@RUC
+		private String ruc = "invalid";
 	}
 
 	private static class INNBean {

@@ -64,12 +64,15 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.ar.CUIL;
+import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
@@ -165,12 +168,15 @@ public class MessagePropertiesTest {
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( URL.class ),
+							violationOf( CUIL.class ),
+							violationOf( CUIT.class ),
 							violationOf( CNPJ.class ),
 							violationOf( CPF.class ),
 							violationOf( TituloEleitoral.class ),
 							violationOf( REGON.class ),
 							violationOf( NIP.class ),
 							violationOf( PESEL.class ),
+							violationOf( RUC.class ),
 							violationOf( INN.class ),
 							violationOf( DurationMax.class ),
 							violationOf( DurationMin.class ),
@@ -327,6 +333,12 @@ public class MessagePropertiesTest {
 		@URL
 		private String url = "invalid";
 
+		@CUIL
+		private String cuil = "invalid";
+
+		@CUIT
+		private String cuit = "invalid";
+
 		@CNPJ
 		private String cnpj = "invalid";
 
@@ -344,6 +356,9 @@ public class MessagePropertiesTest {
 
 		@PESEL
 		private String pesel = "invalid";
+
+		@RUC
+		private String ruc = "invalid";
 
 		@INN
 		private String inn = "invalid";
