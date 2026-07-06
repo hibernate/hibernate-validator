@@ -1,5 +1,13 @@
 # Hibernate Validator Changelog
 
+## 9.1.2.Final (2026-07-06)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/39824)
+
+
+### Bug
+* [HV-2222](https://hibernate.atlassian.net/browse/HV-2222) - ParameterNode.getParameterIndex throws NPE
+
 ## 9.1.1.Final (2026-06-22)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/36015)
