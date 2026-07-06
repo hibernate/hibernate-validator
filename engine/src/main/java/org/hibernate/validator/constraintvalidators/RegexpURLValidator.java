@@ -55,7 +55,7 @@ public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence
 			return false;
 		}
 
-		if ( !DomainNameUtil.isValidDomainAddress( values.getHost() ) ) {
+		if ( values.getHost() == null || !DomainNameUtil.isValidDomainAddress( values.getHost() ) ) {
 			return false;
 		}
 
