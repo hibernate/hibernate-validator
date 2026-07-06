@@ -25,6 +25,8 @@ import org.hibernate.validator.Incubating;
 
 /**
  * Validates that a {@code CharSequence} is an Argentine CUIL (Unique Labor Identification Code).
+ *
+ * @since 9.2
  */
 @Incubating
 @Documented

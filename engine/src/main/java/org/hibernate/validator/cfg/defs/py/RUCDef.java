@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.py.RUC;
 
 /**
  * A {@link RUC} constraint definition.
+ *
+ * @since 9.2
  */
 @Incubating
 public class RUCDef extends ConstraintDef<RUCDef, RUC> {
