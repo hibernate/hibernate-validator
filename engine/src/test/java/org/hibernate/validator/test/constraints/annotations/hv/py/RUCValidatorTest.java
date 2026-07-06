@@ -29,7 +29,6 @@ public class RUCValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( validator.validate( new Taxpayer( "1234567A-2" ) ) );
 		assertNoViolations( validator.validate( new Taxpayer( "a123456-5" ) ) );
 		assertNoViolations( validator.validate( new Taxpayer( "123A-0" ) ) );
-		assertNoViolations( validator.validate( new Taxpayer( "12345678901-5" ) ) );
 	}
 
 	@Test
@@ -52,6 +51,18 @@ public class RUCValidatorTest extends AbstractConstrainedTest {
 						violationOf( RUC.class ).withProperty( "ruc" )
 				);
 		assertThat( validator.validate( new Taxpayer( "80009735/1" ) ) )
+				.containsOnlyViolations(
+						violationOf( RUC.class ).withProperty( "ruc" )
+				);
+		assertThat( validator.validate( new Taxpayer( "12345678901-5" ) ) )
+				.containsOnlyViolations(
+						violationOf( RUC.class ).withProperty( "ruc" )
+				);
+		assertThat( validator.validate( new Taxpayer( "123456789012-1" ) ) )
+				.containsOnlyViolations(
+						violationOf( RUC.class ).withProperty( "ruc" )
+				);
+		assertThat( validator.validate( new Taxpayer( "1234567890121" ) ) )
 				.containsOnlyViolations(
 						violationOf( RUC.class ).withProperty( "ruc" )
 				);
