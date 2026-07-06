@@ -247,7 +247,7 @@ pipeline {
                                         extensions: [],
                                         userRemoteConfigs: [[credentialsId: 'ed25519.Hibernate-CI.github.com', url: 'git@github.com:hibernate/hibernate.org.git']]
                                 )
-                                sh "../scripts/website-release.sh ${env.SCRIPT_OPTIONS} ${env.PROJECT} ${env.RELEASE_VERSION}"
+                                sh "../scripts/website-release.sh ${env.ADDITIONAL_SCRIPT_ARGS} ${env.PROJECT} ${env.RELEASE_VERSION}"
                             }
                         }
                     }
