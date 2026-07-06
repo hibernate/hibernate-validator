@@ -243,6 +243,15 @@ public class URLValidatorTest {
 		assertDefaultURLConstraintValidatorOverridden( config, constraintValidatorFactory );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-2231")
+	public void url_without_authority_component_is_invalid_and_does_not_throw() {
+		URL url = descriptorBuilder.build().getAnnotation();
+		regexpURLValidator.initialize( url );
+
+		assertFalse( regexpURLValidator.isValid( "http:host.com", null ) );
+	}
+
 	private void assertDefaultURLConstraintValidatorOverridden(Configuration config,
 			DelegatingConstraintValidatorFactory constraintValidatorFactory) {
 		Validator validator = config.buildValidatorFactory().getValidator();
