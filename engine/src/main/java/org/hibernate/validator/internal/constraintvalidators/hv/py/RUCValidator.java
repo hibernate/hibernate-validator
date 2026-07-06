@@ -4,7 +4,6 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.py;
 
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import jakarta.validation.ConstraintValidator;
@@ -48,16 +47,21 @@ public class RUCValidator implements ConstraintValidator<RUC, CharSequence> {
 	}
 
 	private int calculateCheckDigit(String number) {
-		String normalizedNumber = replaceLettersWithAscii( number );
-
 		int total = 0;
 		int multiplier = 2;
-		for ( int i = normalizedNumber.length() - 1; i >= 0; i-- ) {
-			if ( multiplier > BASE_MAX ) {
-				multiplier = 2;
+		for ( int i = number.length() - 1; i >= 0; i-- ) {
+			char character = Character.toUpperCase( number.charAt( i ) );
+			if ( Character.isDigit( character ) ) {
+				total += Character.digit( character, 10 ) * multiplier;
+				multiplier = increaseMultiplier( multiplier );
 			}
-			total += Character.digit( normalizedNumber.charAt( i ), 10 ) * multiplier;
-			multiplier++;
+			else {
+				int asciiValue = character;
+				total += ( asciiValue % 10 ) * multiplier;
+				multiplier = increaseMultiplier( multiplier );
+				total += ( asciiValue / 10 ) * multiplier;
+				multiplier = increaseMultiplier( multiplier );
+			}
 		}
 
 		int remainder = total % 11;
@@ -67,18 +71,10 @@ public class RUCValidator implements ConstraintValidator<RUC, CharSequence> {
 		return 0;
 	}
 
-	private String replaceLettersWithAscii(String number) {
-		StringBuilder normalizedNumber = new StringBuilder();
-		String upperCaseNumber = number.toUpperCase( Locale.ROOT );
-		for ( int i = 0; i < upperCaseNumber.length(); i++ ) {
-			char character = upperCaseNumber.charAt( i );
-			if ( Character.isDigit( character ) ) {
-				normalizedNumber.append( character );
-			}
-			else {
-				normalizedNumber.append( (int) character );
-			}
+	private int increaseMultiplier(int multiplier) {
+		if ( multiplier == BASE_MAX ) {
+			return 2;
 		}
-		return normalizedNumber.toString();
+		return multiplier + 1;
 	}
 }
