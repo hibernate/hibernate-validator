@@ -4,12 +4,14 @@
  */
 package org.hibernate.validator.cfg.defs.ar;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.ar.CUIL;
 
 /**
  * A {@link CUIL} constraint definition.
  */
+@Incubating
 public class CUILDef extends ConstraintDef<CUILDef, CUIL> {
 
 	public CUILDef() {
