@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.ar.CUIT;
 
 /**
  * A {@link CUIT} constraint definition.
+ *
+ * @since 9.2
  */
 @Incubating
 public class CUITDef extends ConstraintDef<CUITDef, CUIT> {

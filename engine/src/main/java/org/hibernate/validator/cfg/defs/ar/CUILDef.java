@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.ar.CUIL;
 
 /**
  * A {@link CUIL} constraint definition.
+ *
+ * @since 9.2
  */
 @Incubating
 public class CUILDef extends ConstraintDef<CUILDef, CUIL> {

@@ -25,6 +25,8 @@ import org.hibernate.validator.Incubating;
 
 /**
  * Validates that a {@code CharSequence} is an Argentine CUIT (Unique Tax Identification Code).
+ *
+ * @since 9.2
  */
 @Incubating
 @Documented
