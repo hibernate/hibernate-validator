@@ -21,9 +21,12 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
 
+import org.hibernate.validator.Incubating;
+
 /**
  * Validates that a {@code CharSequence} is an Argentine CUIL (Unique Labor Identification Code).
  */
+@Incubating
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
