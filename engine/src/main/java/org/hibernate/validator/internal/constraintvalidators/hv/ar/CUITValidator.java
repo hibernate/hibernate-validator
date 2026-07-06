@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.ar;
 
+import java.util.Set;
+
 import org.hibernate.validator.constraints.ar.CUIT;
 
 /**
@@ -11,10 +13,10 @@ import org.hibernate.validator.constraints.ar.CUIT;
  */
 public class CUITValidator extends AbstractArgentineTaxIdValidator<CUIT> {
 
-	private static final String[] PREFIXES = { "20", "23", "24", "25", "26", "27", "30", "33", "34" };
+	private static final Set<String> PREFIXES = Set.of( "20", "23", "24", "25", "26", "27", "30", "33", "34" );
 
 	@Override
-	protected String[] getValidPrefixes() {
+	protected Set<String> getValidPrefixes() {
 		return PREFIXES;
 	}
 }

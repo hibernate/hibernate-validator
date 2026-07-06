@@ -5,10 +5,8 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.ar;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -22,13 +20,6 @@ public abstract class AbstractArgentineTaxIdValidator<T extends Annotation> impl
 	private static final Pattern FORMATTED_PATTERN = Pattern.compile( "[0-9]{2}-[0-9]{8}-[0-9]" );
 
 	private static final int[] WEIGHTS = { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
-
-	private Set<String> validPrefixes;
-
-	@Override
-	public void initialize(T constraintAnnotation) {
-		this.validPrefixes = Arrays.stream( getValidPrefixes() ).collect( Collectors.toSet() );
-	}
 
 	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
@@ -44,7 +35,7 @@ public abstract class AbstractArgentineTaxIdValidator<T extends Annotation> impl
 			return false;
 		}
 
-		if ( !validPrefixes.contains( taxId.substring( 0, 2 ) ) ) {
+		if ( !getValidPrefixes().contains( taxId.substring( 0, 2 ) ) ) {
 			return false;
 		}
 
@@ -64,5 +55,5 @@ public abstract class AbstractArgentineTaxIdValidator<T extends Annotation> impl
 		return checkDigit == Character.digit( taxId.charAt( taxId.length() - 1 ), 10 );
 	}
 
-	protected abstract String[] getValidPrefixes();
+	protected abstract Set<String> getValidPrefixes();
 }
