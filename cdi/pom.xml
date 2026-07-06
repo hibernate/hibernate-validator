@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-public-parent</artifactId>
-        <version>9.1.2.Final</version>
+        <version>9.1.3-SNAPSHOT</version>
         <relativePath>../parents/public/pom.xml</relativePath>
     </parent>
 
