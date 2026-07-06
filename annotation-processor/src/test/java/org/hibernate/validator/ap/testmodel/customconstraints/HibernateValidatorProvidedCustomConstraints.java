@@ -16,12 +16,15 @@ import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.ar.CUIL;
+import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
 
@@ -39,12 +42,15 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@Port
 	@Range
 	@URL
+	@CUIL
+	@CUIT
 	@CNPJ
 	@CPF
 	@TituloEleitoral
 	@REGON
 	@NIP
 	@PESEL
+	@RUC
 	public String string;
 
 	@DurationMax
@@ -62,12 +68,15 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@Port
 	@Range
 	@URL
+	@CUIL
+	@CUIT
 	@CNPJ
 	@CPF
 	@TituloEleitoral
 	@REGON
 	@NIP
 	@PESEL
+	@RUC
 	@DurationMax
 	@DurationMin
 	public Date date;

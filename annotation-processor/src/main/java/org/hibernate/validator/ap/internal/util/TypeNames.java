@@ -77,10 +77,13 @@ public class TypeNames {
 		public static final String LUHN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LuhnCheck";
 		public static final String MOD_10_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod10Check";
 		public static final String MOD_11_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod11Check";
+		public static final String CUIL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ar.CUIL";
+		public static final String CUIT_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ar.CUIT";
 		public static final String CNPJ_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.CNPJ";
 		public static final String REGON_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.REGON";
 		public static final String NIP_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.NIP";
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";
+		public static final String RUC_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".py.RUC";
 		public static final String INN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ru.INN";
 		public static final String KOR_RRN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".kor.KorRRN";
 		public static final String PORT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Port";
