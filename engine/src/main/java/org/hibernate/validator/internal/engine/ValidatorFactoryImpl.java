@@ -16,13 +16,17 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageInterpolator;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determinePasswordPolicyDefinitionResolver;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTemporalValidationTolerance;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.initializeBeanResolver;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.initializeConstraintValidatorInitializationShareDataManager;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.initializeValidationServiceManager;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.logValidatorFactoryScopedConfiguration;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.registerCustomConstraintValidators;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -48,6 +52,7 @@ import jakarta.validation.spi.ConfigurationState;
 import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
@@ -160,10 +165,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						determineAllowParallelMethodsDefineParameterConstraints( hibernateSpecificConfig, properties )
 				).build();
 
-		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( configurationState, properties, externalClassLoader );
+		BeanResolver beanResolver = initializeBeanResolver( configurationState );
+
+		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( hibernateSpecificConfig, properties, beanResolver );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
-				configurationState.getMessageInterpolator(),
+				determineMessageInterpolator( hibernateSpecificConfig, configurationState, beanResolver ),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
 				configurationState.getClockProvider(),
@@ -175,9 +182,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineShowValidatedValuesInTraceLogs( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				initializeConstraintValidatorInitializationShareDataManager( hibernateSpecificConfig ),
-				initializeValidationServiceManager( configurationState, scriptEvaluatorFactory ),
+				beanResolver,
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				determinePasswordPolicyDefinitionResolver( hibernateSpecificConfig, properties, beanResolver )
 		);
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
@@ -194,10 +202,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintCreationContext = new ConstraintCreationContext( constraintHelper, constraintValidatorManager, typeResolutionHelper, valueExtractorManager );
 
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader ),
-				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader ),
+		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, beanResolver ),
+				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, beanResolver ),
 				determineAccessorFactory( hibernateSpecificConfig, properties, externalClassLoader ) );
-		this.beanMetadataClassNormalizer = determineBeanMetaDataClassNormalizer( hibernateSpecificConfig );
+		this.beanMetadataClassNormalizer = determineBeanMetaDataClassNormalizer( hibernateSpecificConfig, properties, beanResolver );
 
 		// first we want to register any validators coming from a service loader. Since they are just loaded and there's
 		// no control over them (include/exclude the ones that already exists from any other sources etc.)
@@ -313,8 +321,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	@Override
-	public <T> T getValidationService(Class<T> serviceType) {
-		return validatorFactoryScopedContext.getValidationServiceManager().retrieve( serviceType );
+	public BeanResolver getBeanResolver() {
+		return validatorFactoryScopedContext.getBeanResolver();
 	}
 
 	public boolean isFailFast() {

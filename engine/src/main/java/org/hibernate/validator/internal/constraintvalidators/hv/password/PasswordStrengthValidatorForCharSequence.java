@@ -4,24 +4,21 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanReference;
+import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 
 public class PasswordStrengthValidatorForCharSequence implements HibernateConstraintValidator<PasswordStrength, CharSequence> {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private int minScore;
 	private PasswordStrengthEstimator estimator;
@@ -30,9 +27,14 @@ public class PasswordStrengthValidatorForCharSequence implements HibernateConstr
 	public void initialize(ConstraintDescriptor<PasswordStrength> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
 		this.minScore = constraintDescriptor.getAnnotation().min();
-		this.estimator = initializationContext.getValidationService( PasswordStrengthEstimator.class );
-		if ( this.estimator == null ) {
-			throw LOG.getNoPasswordStrengthEstimatorException();
+		String estimatorRef = constraintDescriptor.getAnnotation().estimator();
+		if ( estimatorRef.isEmpty() ) {
+			this.estimator = initializationContext.getBeanResolver()
+					.resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY ).get();
+		}
+		else {
+			this.estimator = initializationContext.getBeanResolver()
+					.resolve( BeanReference.parse( PasswordStrengthEstimator.class, estimatorRef ) ).get();
 		}
 	}
 

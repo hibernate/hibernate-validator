@@ -9,6 +9,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
@@ -21,8 +22,6 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import java.util.function.BiConsumer;
-
 import org.hibernate.validator.spi.password.AbstractPasswordPolicyValidator;
 import org.hibernate.validator.spi.password.CharacterType;
 import org.hibernate.validator.spi.password.PasswordContext;
@@ -168,7 +167,7 @@ public class PasswordPolicyTest {
 		//tag::resolverRegistration[]
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordPolicyDefinitionResolver.class, new MyResolver() )
+				.passwordPolicyDefinitionResolver( new MyResolver() )
 				.buildValidatorFactory()
 				.getValidator();
 		//end::resolverRegistration[]

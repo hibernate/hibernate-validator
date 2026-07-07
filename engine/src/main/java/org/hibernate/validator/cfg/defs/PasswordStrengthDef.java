@@ -25,4 +25,9 @@ public class PasswordStrengthDef extends ConstraintDef<PasswordStrengthDef, Pass
 		addParameter( "min", min );
 		return this;
 	}
+
+	public PasswordStrengthDef estimator(String estimator) {
+		addParameter( "estimator", estimator );
+		return this;
+	}
 }

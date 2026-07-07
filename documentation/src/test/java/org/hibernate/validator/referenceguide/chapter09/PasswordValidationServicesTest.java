@@ -18,6 +18,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
@@ -65,8 +66,9 @@ public class PasswordValidationServicesTest {
 		//tag::weightRegistration[]
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordStrengthEstimator.class,
-						new Zxcvbn4jPasswordStrengthEstimator() )
+				.addBeanConfigurer( context -> context.define(
+						PasswordStrengthEstimator.class,
+						BeanReference.ofInstance( new Zxcvbn4jPasswordStrengthEstimator() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 		//end::weightRegistration[]
@@ -87,8 +89,9 @@ public class PasswordValidationServicesTest {
 		//tag::compromisedRegistration[]
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( CompromisedPasswordChecker.class,
-						new HaveIBeenPwnedPasswordChecker() )
+				.addBeanConfigurer( context -> context.define(
+						CompromisedPasswordChecker.class,
+						BeanReference.ofInstance( new HaveIBeenPwnedPasswordChecker() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 		//end::compromisedRegistration[]

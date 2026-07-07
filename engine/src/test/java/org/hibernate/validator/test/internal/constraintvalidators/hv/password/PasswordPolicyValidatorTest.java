@@ -16,6 +16,8 @@ import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.bean.BeanReference;
+import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.PasswordPolicyDef;
 import org.hibernate.validator.constraints.PasswordPolicy;
@@ -246,7 +248,9 @@ public class PasswordPolicyValidatorTest {
 	public void strengthEstimatorIntegration() {
 		Validator v = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordStrengthEstimator.class, new StubStrengthEstimator() )
+				.addBeanConfigurer( context -> context.define(
+						PasswordStrengthEstimator.class,
+						BeanReference.ofInstance( new StubStrengthEstimator() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -262,7 +266,9 @@ public class PasswordPolicyValidatorTest {
 	public void compromisedCheckerIntegration() {
 		Validator v = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( CompromisedPasswordChecker.class, new StubCompromisedChecker() )
+				.addBeanConfigurer( context -> context.define(
+						CompromisedPasswordChecker.class,
+						BeanReference.ofInstance( new StubCompromisedChecker() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -299,7 +305,7 @@ public class PasswordPolicyValidatorTest {
 		TestResolver customResolver = new TestResolver();
 		Validator v = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordPolicyDefinitionResolver.class, customResolver )
+				.passwordPolicyDefinitionResolver( customResolver )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -476,7 +482,7 @@ public class PasswordPolicyValidatorTest {
 		@Override
 		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
 			builder.strengthEstimator( PasswordStrengthScore.STRONG,
-					context.getValidationService( PasswordStrengthEstimator.class ) );
+					context.getBeanResolver().resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY ).get() );
 		}
 	}
 
@@ -484,7 +490,7 @@ public class PasswordPolicyValidatorTest {
 		@Override
 		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
 			builder.compromisedChecker(
-					context.getValidationService( CompromisedPasswordChecker.class ) );
+					context.getBeanResolver().resolve( CompromisedPasswordChecker.class, BeanRetrieval.ANY ).get() );
 		}
 	}
 
