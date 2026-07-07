@@ -20,6 +20,7 @@ public class RUCValidatorTest extends AbstractConstrainedTest {
 		assertNoViolations( validator.validate( new Taxpayer( "800097351" ) ) );
 		assertNoViolations( validator.validate( new Taxpayer( "1234567A2" ) ) );
 		assertNoViolations( validator.validate( new Taxpayer( "A1234565" ) ) );
+		assertNoViolations( validator.validate( new Taxpayer( "AB1234562" ) ) );
 		assertNoViolations( validator.validate( new Taxpayer( "123A0" ) ) );
 	}
 
