@@ -9,6 +9,7 @@ import java.time.Duration;
 
 import jakarta.validation.ValidatorFactory;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -68,19 +69,16 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	PropertyNodeNameProvider getPropertyNodeNameProvider();
 
 	/**
-	 * Returns a validation service instance of the specified type, or {@code null} if no service
-	 * of this type has been registered.
-	 * <p>
-	 * Validation services are registered via
-	 * {@link BaseHibernateValidatorConfiguration#addValidationService(Class, Object)}.
+	 * Returns the {@link BeanResolver} for resolving beans registered via
+	 * {@link BaseHibernateValidatorConfiguration#addBeanConfigurer(org.hibernate.validator.spi.bean.BeanConfigurer)}
+	 * or discovered via {@link java.util.ServiceLoader}.
 	 *
-	 * @param serviceType the type of the service to retrieve
-	 * @return the service instance, or {@code null} if not registered
+	 * @return the bean resolver
 	 *
 	 * @since 9.2.0
 	 */
 	@Incubating
-	<T> T getValidationService(Class<T> serviceType);
+	BeanResolver getBeanResolver();
 
 	/**
 	 * Returns a context for validator configuration via options from the

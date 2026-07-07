@@ -4,32 +4,33 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
-import java.lang.invoke.MethodHandles;
-
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanReference;
+import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
 
 public class NotCompromisedValidatorForCharArray implements HibernateConstraintValidator<NotCompromised, char[]> {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private CompromisedPasswordChecker checker;
 
 	@Override
 	public void initialize(ConstraintDescriptor<NotCompromised> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
-		this.checker = initializationContext.getValidationService( CompromisedPasswordChecker.class );
-		if ( this.checker == null ) {
-			throw LOG.getNoCompromisedPasswordCheckerException();
+		String checkerRef = constraintDescriptor.getAnnotation().checker();
+		if ( checkerRef.isEmpty() ) {
+			this.checker = initializationContext.getBeanResolver()
+					.resolve( CompromisedPasswordChecker.class, BeanRetrieval.ANY ).get();
+		}
+		else {
+			this.checker = initializationContext.getBeanResolver()
+					.resolve( BeanReference.parse( CompromisedPasswordChecker.class, checkerRef ) ).get();
 		}
 	}
 

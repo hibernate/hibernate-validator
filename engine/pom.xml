@@ -414,7 +414,8 @@
                                     </exports>
                                     <uses>
                                         jakarta.validation.valueextraction.ValueExtractor;
-                                        jakarta.validation.ConstraintValidator
+                                        jakarta.validation.ConstraintValidator;
+                                        org.hibernate.validator.spi.bean.BeanConfigurer
                                     </uses>
                                 </moduleInfo>
                             </module>

@@ -16,6 +16,9 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProviderCont
  * @author Damir Alibegovic
  */
 public class DefaultPropertyNodeNameProvider implements PropertyNodeNameProvider, Serializable {
+
+	public static final String NAME = "default";
+
 	@Override
 	public String getName(Property property, PropertyNodeNameProviderContext context) {
 		return property.getName();

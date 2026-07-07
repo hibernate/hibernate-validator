@@ -14,6 +14,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
@@ -30,7 +31,9 @@ public class PasswordStrengthConstrainedTest extends AbstractConstrainedTest {
 	public void setUp() throws Exception {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordStrengthEstimator.class, new LengthBasedEstimator() )
+				.addBeanConfigurer( context -> context.define(
+						PasswordStrengthEstimator.class,
+						BeanReference.ofInstance( new LengthBasedEstimator() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 	}
