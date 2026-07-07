@@ -25,8 +25,11 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.bean.BeanConfigurer;
+import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -178,6 +181,16 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
+
+	/**
+	 * Property for specifying the {@link org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver}
+	 * implementation to use. Accepts a fully qualified class name, a bean name,
+	 * or a bean reference string (e.g. {@code "bean:myResolver"}).
+	 *
+	 * @since 9.2.0
+	 */
+	@Incubating
+	String PASSWORD_POLICY_DEFINITION_RESOLVER_CLASSNAME = "hibernate.validator.password_policy_definition_resolver";
 
 	/**
 	 * <p>
@@ -389,21 +402,42 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	<T, V extends T> S addConstraintValidatorInitializationSharedData(Class<T> dataClass, V constraintValidatorInitializationSharedData);
 
 	/**
-	 * Registers a validation service that will be available to constraint validators via
-	 * {@link org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext#getValidationService(Class)}
-	 * and externally via
-	 * {@link org.hibernate.validator.HibernateValidatorFactory#getValidationService(Class)}.
-	 * <p>
-	 * If the method is called multiple times passing the same {@code serviceType},
-	 * only the instance passed last will be available for that type.
+	 * Registers a {@link BeanConfigurer} that will be used to define beans
+	 * resolvable through the {@link org.hibernate.validator.bean.BeanResolver}.
 	 *
-	 * @param serviceType the type under which the service is registered
-	 * @param serviceInstance the service instance
+	 * @param beanConfigurer the bean configurer to register
 	 * @return {@code this} following the chaining method pattern
 	 * @since 9.2.0
 	 */
 	@Incubating
-	<T> S addValidationService(Class<T> serviceType, T serviceInstance);
+	S addBeanConfigurer(BeanConfigurer beanConfigurer);
+
+	/**
+	 * Sets the {@link BeanProvider} to be used for bean resolution.
+	 * <p>
+	 * A bean provider bridges Hibernate Validator's bean resolution with a
+	 * dependency injection framework such as CDI.
+	 * <p>
+	 * If not set, only beans registered via {@link BeanConfigurer} and
+	 * reflective instantiation will be available.
+	 *
+	 * @param beanProvider the bean provider to use
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.2.0
+	 */
+	@Incubating
+	S beanProvider(BeanProvider beanProvider);
+
+	/**
+	 * Sets the {@link org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver}
+	 * to be used for resolving password policy definitions.
+	 *
+	 * @param resolver the resolver to use
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.2.0
+	 */
+	@Incubating
+	S passwordPolicyDefinitionResolver(PasswordPolicyDefinitionResolver resolver);
 
 	/**
 	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter

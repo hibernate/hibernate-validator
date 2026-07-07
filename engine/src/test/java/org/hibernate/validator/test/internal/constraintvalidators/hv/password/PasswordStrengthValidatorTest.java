@@ -16,6 +16,7 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
@@ -32,7 +33,9 @@ public class PasswordStrengthValidatorTest {
 	public void setUp() {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordStrengthEstimator.class, new StubPasswordStrengthEstimator() )
+				.addBeanConfigurer( context -> context.define(
+						PasswordStrengthEstimator.class,
+						BeanReference.ofInstance( new StubPasswordStrengthEstimator() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 	}

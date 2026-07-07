@@ -28,6 +28,8 @@ import org.hibernate.validator.spi.scripting.ScriptEvaluator;
  */
 public class DefaultScriptEvaluatorFactory extends AbstractCachingScriptEvaluatorFactory {
 
+	public static final String NAME = "default";
+
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private ClassLoader classLoader;

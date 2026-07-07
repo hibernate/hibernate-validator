@@ -9,7 +9,9 @@ import java.util.function.Supplier;
 
 import jakarta.validation.ClockProvider;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -24,21 +26,24 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Duration temporalValidationTolerance;
 
+	private final PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver;
+
 	private final HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager;
 
-	private final ValidationServiceManager validationServiceManager;
+	private final BeanResolver beanResolver;
 
 	private final int hashCode;
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
 			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
-			ValidationServiceManager validationServiceManager
+			BeanResolver beanResolver, PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver
 	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.constraintValidatorInitializationSharedServiceManager = constraintValidatorInitializationSharedServiceManager;
-		this.validationServiceManager = validationServiceManager;
+		this.beanResolver = beanResolver;
+		this.passwordPolicyDefinitionResolver = passwordPolicyDefinitionResolver;
 		this.hashCode = createHashCode();
 	}
 
@@ -52,7 +57,8 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		}
 
 		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance,
-				constraintValidatorInitializationSharedServiceManager, defaultContext.validationServiceManager );
+				constraintValidatorInitializationSharedServiceManager, defaultContext.beanResolver,
+				defaultContext.passwordPolicyDefinitionResolver );
 	}
 
 	@Override
@@ -81,16 +87,17 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 	}
 
 	@Override
-	public <T> T getValidationService(Class<T> serviceType) {
-		return validationServiceManager.retrieve( serviceType );
+	public BeanResolver getBeanResolver() {
+		return beanResolver;
+	}
+
+	@Override
+	public PasswordPolicyDefinitionResolver getPasswordPolicyDefinitionResolver() {
+		return passwordPolicyDefinitionResolver;
 	}
 
 	public HibernateConstraintValidatorInitializationSharedDataManager getConstraintValidatorInitializationSharedServiceManager() {
 		return constraintValidatorInitializationSharedServiceManager;
-	}
-
-	public ValidationServiceManager getValidationServiceManager() {
-		return validationServiceManager;
 	}
 
 	@Override
@@ -110,7 +117,10 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		if ( constraintValidatorInitializationSharedServiceManager != hibernateConstraintValidatorInitializationContextImpl.constraintValidatorInitializationSharedServiceManager ) {
 			return false;
 		}
-		if ( validationServiceManager != hibernateConstraintValidatorInitializationContextImpl.validationServiceManager ) {
+		if ( beanResolver != hibernateConstraintValidatorInitializationContextImpl.beanResolver ) {
+			return false;
+		}
+		if ( passwordPolicyDefinitionResolver != hibernateConstraintValidatorInitializationContextImpl.passwordPolicyDefinitionResolver ) {
 			return false;
 		}
 		if ( clockProvider != hibernateConstraintValidatorInitializationContextImpl.clockProvider ) {
@@ -132,7 +142,8 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		result = 31 * result + System.identityHashCode( clockProvider );
 		result = 31 * result + temporalValidationTolerance.hashCode();
 		result = 31 * result + System.identityHashCode( constraintValidatorInitializationSharedServiceManager );
-		result = 31 * result + System.identityHashCode( validationServiceManager );
+		result = 31 * result + System.identityHashCode( beanResolver );
+		result = 31 * result + System.identityHashCode( passwordPolicyDefinitionResolver );
 		return result;
 	}
 }

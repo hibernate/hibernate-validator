@@ -12,11 +12,14 @@ import java.util.function.Supplier;
 import jakarta.validation.ClockProvider;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
+import org.hibernate.validator.internal.constraintvalidators.hv.password.DefaultPasswordPolicyDefinitionResolver;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
+import org.hibernate.validator.internal.engine.bean.BeanResolverImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -25,6 +28,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -109,8 +113,15 @@ public class ConstraintValidatorInitializationHelper {
 			}
 
 			@Override
-			public <T> T getValidationService(Class<T> serviceType) {
-				return null;
+			public BeanResolver getBeanResolver() {
+				return BeanResolverImpl.create(
+						ConstraintValidatorInitializationHelper.class.getClassLoader(),
+						Collections.emptyList(), null );
+			}
+
+			@Override
+			public PasswordPolicyDefinitionResolver getPasswordPolicyDefinitionResolver() {
+				return new DefaultPasswordPolicyDefinitionResolver();
 			}
 		};
 	}

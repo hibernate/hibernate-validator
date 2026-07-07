@@ -20,4 +20,9 @@ public class NotCompromisedDef extends ConstraintDef<NotCompromisedDef, NotCompr
 	public NotCompromisedDef() {
 		super( NotCompromised.class );
 	}
+
+	public NotCompromisedDef checker(String checker) {
+		addParameter( "checker", checker );
+		return this;
+	}
 }

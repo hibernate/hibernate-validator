@@ -9,8 +9,8 @@ import org.hibernate.validator.Incubating;
 /**
  * Checks whether a password has been compromised (e.g. found in a data breach).
  * <p>
- * Register via
- * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addValidationService(Class, Object)}.
+ * Can be registered as a bean via a
+ * {@link org.hibernate.validator.spi.bean.BeanConfigurer}.
  *
  * @since 9.2.0
  */

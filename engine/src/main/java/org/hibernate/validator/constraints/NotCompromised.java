@@ -49,6 +49,18 @@ public @interface NotCompromised {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
+	 * A bean reference to the {@link org.hibernate.validator.spi.password.CompromisedPasswordChecker}
+	 * to use.
+	 * <p>
+	 * If empty (default), the single registered checker is used. If multiple checkers are registered,
+	 * a reference must be specified to avoid ambiguity.
+	 *
+	 * @return the bean reference string, or empty to resolve the single registered checker
+	 * @see org.hibernate.validator.bean.BeanReference
+	 */
+	String checker() default "";
+
+	/**
 	 * Defines several {@code @NotCompromised} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })

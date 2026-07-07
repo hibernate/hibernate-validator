@@ -11,13 +11,14 @@ import jakarta.validation.MessageInterpolator;
 import jakarta.validation.ParameterNameProvider;
 import jakarta.validation.TraversableResolver;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
-import org.hibernate.validator.internal.engine.constraintvalidation.ValidationServiceManager;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 public class ValidatorFactoryScopedContext {
@@ -85,9 +86,9 @@ public class ValidatorFactoryScopedContext {
 	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
 	/**
-	 * The validation service manager.
+	 * The bean resolver.
 	 */
-	private final ValidationServiceManager validationServiceManager;
+	private final BeanResolver beanResolver;
 
 	/**
 	 * The constraint validator initialization context.
@@ -111,14 +112,16 @@ public class ValidatorFactoryScopedContext {
 			boolean showValidatedValuesInTraceLogs,
 			Object constraintValidatorPayload,
 			HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
-			ValidationServiceManager validationServiceManager,
+			BeanResolver beanResolver,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
-			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
-				customViolationExpressionLanguageFeatureLevel, validationServiceManager,
+				customViolationExpressionLanguageFeatureLevel, beanResolver,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager, validationServiceManager
+						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager, beanResolver,
+						passwordPolicyDefinitionResolver
 				) );
 	}
 
@@ -135,7 +138,7 @@ public class ValidatorFactoryScopedContext {
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
-			ValidationServiceManager validationServiceManager,
+			BeanResolver beanResolver,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
@@ -150,7 +153,7 @@ public class ValidatorFactoryScopedContext {
 		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
 		this.customViolationExpressionLanguageFeatureLevel = customViolationExpressionLanguageFeatureLevel;
 		this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
-		this.validationServiceManager = validationServiceManager;
+		this.beanResolver = beanResolver;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 	}
 
@@ -194,8 +197,8 @@ public class ValidatorFactoryScopedContext {
 		return this.constraintValidatorPayload;
 	}
 
-	public ValidationServiceManager getValidationServiceManager() {
-		return this.validationServiceManager;
+	public BeanResolver getBeanResolver() {
+		return this.beanResolver;
 	}
 
 	public HibernateConstraintValidatorInitializationContext getConstraintValidatorInitializationContext() {
@@ -230,7 +233,7 @@ public class ValidatorFactoryScopedContext {
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 		private boolean showValidatedValuesInTraceLogs;
-		private final ValidationServiceManager validationServiceManager;
+		private final BeanResolver beanResolver;
 		private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
 
 		Builder(ValidatorFactoryScopedContext defaultContext) {
@@ -250,7 +253,7 @@ public class ValidatorFactoryScopedContext {
 			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
 			this.customViolationExpressionLanguageFeatureLevel = defaultContext.customViolationExpressionLanguageFeatureLevel;
 			this.showValidatedValuesInTraceLogs = defaultContext.showValidatedValuesInTraceLogs;
-			this.validationServiceManager = defaultContext.validationServiceManager;
+			this.beanResolver = defaultContext.beanResolver;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
 		}
 
@@ -362,7 +365,7 @@ public class ValidatorFactoryScopedContext {
 					showValidatedValuesInTraceLogs, constraintValidatorPayload,
 					constraintExpressionLanguageFeatureLevel,
 					customViolationExpressionLanguageFeatureLevel,
-					validationServiceManager,
+					beanResolver,
 					HibernateConstraintValidatorInitializationContextImpl.of(
 							constraintValidatorInitializationContext,
 							scriptEvaluatorFactory,

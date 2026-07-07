@@ -59,6 +59,18 @@ public @interface PasswordStrength {
 	int min() default PasswordStrengthScore.FAIR;
 
 	/**
+	 * A bean reference to the {@link org.hibernate.validator.spi.password.PasswordStrengthEstimator}
+	 * to use for strength estimation.
+	 * <p>
+	 * If empty (default), the single registered estimator is used. If multiple estimators are registered,
+	 * a reference must be specified to avoid ambiguity.
+	 *
+	 * @return the bean reference string, or empty to resolve the single registered estimator
+	 * @see org.hibernate.validator.bean.BeanReference
+	 */
+	String estimator() default "";
+
+	/**
 	 * Defines several {@code @PasswordStrength} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })

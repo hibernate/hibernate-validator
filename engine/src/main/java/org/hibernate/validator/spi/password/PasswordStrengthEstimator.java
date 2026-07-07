@@ -13,8 +13,8 @@ import org.hibernate.validator.Incubating;
  * <a href="https://github.com/GoSimpleLLC/nbvcxz">nbvcxz</a> or
  * <a href="https://github.com/nulab/zxcvbn4j">zxcvbn4j</a>.
  * <p>
- * Register via
- * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addValidationService(Class, Object)}.
+ * Can be registered as a bean via a
+ * {@link org.hibernate.validator.spi.bean.BeanConfigurer}.
  *
  * @since 9.2.0
  */

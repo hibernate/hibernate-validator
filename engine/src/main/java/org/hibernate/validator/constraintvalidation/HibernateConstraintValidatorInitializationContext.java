@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.bean.BeanResolver;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -90,17 +92,24 @@ public interface HibernateConstraintValidatorInitializationContext {
 	<C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent);
 
 	/**
-	 * Returns a validation service instance of the specified type, or {@code null} if no service
-	 * of this type has been registered.
-	 * <p>
-	 * Validation services are registered via
-	 * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addValidationService(Class, Object)}.
+	 * Returns the {@link BeanResolver} for resolving beans registered via
+	 * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addBeanConfigurer(org.hibernate.validator.spi.bean.BeanConfigurer)}
+	 * or discovered via {@link java.util.ServiceLoader}.
 	 *
-	 * @param serviceType the type of the service to retrieve
-	 * @return the service instance, or {@code null} if not registered
+	 * @return the bean resolver
 	 *
 	 * @since 9.2.0
 	 */
 	@Incubating
-	<T> T getValidationService(Class<T> serviceType);
+	BeanResolver getBeanResolver();
+
+	/**
+	 * Returns the {@link PasswordPolicyDefinitionResolver} for resolving password policy definitions.
+	 *
+	 * @return the password policy definition resolver
+	 *
+	 * @since 9.2.0
+	 */
+	@Incubating
+	PasswordPolicyDefinitionResolver getPasswordPolicyDefinitionResolver();
 }

@@ -4,7 +4,6 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.password;
 
-import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import jakarta.validation.ConstraintValidatorContext;
@@ -13,16 +12,12 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 public class PasswordPolicyValidationHelper {
-
-	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private PasswordPolicyValidationHelper() {
 	}
@@ -31,10 +26,7 @@ public class PasswordPolicyValidationHelper {
 			HibernateConstraintValidatorInitializationContext initializationContext) {
 		Class<? extends PasswordPolicyDefinition> definitionClass = constraintDescriptor.getAnnotation().value();
 
-		PasswordPolicyDefinitionResolver resolver = initializationContext.getValidationService( PasswordPolicyDefinitionResolver.class );
-		if ( resolver == null ) {
-			throw LOG.getNoPasswordPolicyDefinitionResolverException();
-		}
+		PasswordPolicyDefinitionResolver resolver = initializationContext.getPasswordPolicyDefinitionResolver();
 		PasswordPolicyDefinition definition = resolver.resolve( definitionClass );
 		DefaultPasswordPolicyBuilder builder = new DefaultPasswordPolicyBuilder();
 		definition.configure( builder, initializationContext );

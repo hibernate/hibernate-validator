@@ -10,6 +10,8 @@ import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 
 public class DefaultPasswordPolicyDefinitionResolver implements PasswordPolicyDefinitionResolver {
 
+	public static final String NAME = "default";
+
 	@Override
 	public <T extends PasswordPolicyDefinition> T resolve(Class<T> definitionClass) {
 		return NewInstance.action( definitionClass, "the password policy rule" );

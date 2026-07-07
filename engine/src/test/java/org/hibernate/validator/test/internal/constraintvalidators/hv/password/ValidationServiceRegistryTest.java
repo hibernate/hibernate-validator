@@ -6,12 +6,13 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
 
 import jakarta.validation.Validation;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.bean.BeanReference;
+import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -21,7 +22,7 @@ import org.testng.annotations.Test;
 public class ValidationServiceRegistryTest {
 
 	@Test
-	public void registeredServiceIsRetrievable() {
+	public void registeredBeanIsRetrievable() {
 		PasswordStrengthEstimator estimator = password -> new PasswordStrengthResult() {
 			@Override
 			public int score() {
@@ -36,11 +37,14 @@ public class ValidationServiceRegistryTest {
 
 		HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( PasswordStrengthEstimator.class, estimator )
+				.addBeanConfigurer( context -> context.define(
+						PasswordStrengthEstimator.class,
+						BeanReference.ofInstance( estimator ) ) )
 				.buildValidatorFactory()
 				.unwrap( HibernateValidatorFactory.class );
 
-		PasswordStrengthEstimator retrieved = factory.getValidationService( PasswordStrengthEstimator.class );
+		PasswordStrengthEstimator retrieved = factory.getBeanResolver()
+				.resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY ).get();
 		assertNotNull( retrieved );
 
 		PasswordStrengthResult result = retrieved.estimate( "test".toCharArray() );
@@ -48,24 +52,14 @@ public class ValidationServiceRegistryTest {
 	}
 
 	@Test
-	public void unregisteredServiceReturnsNull() {
+	public void scriptEvaluatorFactoryIsAccessibleAsBean() {
 		HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.buildValidatorFactory()
 				.unwrap( HibernateValidatorFactory.class );
 
-		PasswordStrengthEstimator retrieved = factory.getValidationService( PasswordStrengthEstimator.class );
-		assertNull( retrieved );
-	}
-
-	@Test
-	public void scriptEvaluatorFactoryIsAccessibleAsService() {
-		HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.unwrap( HibernateValidatorFactory.class );
-
-		ScriptEvaluatorFactory scriptFactory = factory.getValidationService( ScriptEvaluatorFactory.class );
+		ScriptEvaluatorFactory scriptFactory = factory.getBeanResolver()
+				.resolve( ScriptEvaluatorFactory.class, BeanRetrieval.ANY ).get();
 		assertNotNull( scriptFactory );
 	}
 }

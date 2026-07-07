@@ -10,9 +10,8 @@ import org.hibernate.validator.Incubating;
  * Resolves {@link PasswordPolicyDefinition} instances from their class.
  * <p>
  * The default implementation uses the definition class's no-arg constructor.
- * A custom resolver can be registered via
- * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addValidationService(Class, Object)
- * addValidationService(PasswordPolicyDefinitionResolver.class, resolver)}
+ * A custom resolver can be registered as a bean via a
+ * {@link org.hibernate.validator.spi.bean.BeanConfigurer}
  * to support dependency injection or other instantiation strategies.
  *
  * @since 9.2.0
