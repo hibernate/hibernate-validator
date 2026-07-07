@@ -21,6 +21,8 @@ import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
  */
 public class DefaultGetterPropertySelectionStrategy implements GetterPropertySelectionStrategy {
 
+	public static final String NAME = "default";
+
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String GETTER_PREFIX_GET = "get";

@@ -18,6 +18,7 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
@@ -34,7 +35,9 @@ public class NotCompromisedValidatorTest {
 	public void setUp() {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidationService( CompromisedPasswordChecker.class, new StubCompromisedPasswordChecker() )
+				.addBeanConfigurer( context -> context.define(
+						CompromisedPasswordChecker.class,
+						BeanReference.ofInstance( new StubCompromisedPasswordChecker() ) ) )
 				.buildValidatorFactory()
 				.getValidator();
 	}

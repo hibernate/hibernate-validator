@@ -124,6 +124,8 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 		if ( config instanceof HibernateValidatorConfiguration ) {
 			HibernateValidatorConfiguration hvConfig = (HibernateValidatorConfiguration) config;
+			hvConfig.beanProvider( new CdiBeanProvider( beanManager ) );
+
 			Instance<BeanMetaDataClassNormalizer> beanMetaDataClassNormalizerInstance =
 					beanManager.createInstance()
 							.select(
