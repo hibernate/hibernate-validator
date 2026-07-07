@@ -16,8 +16,8 @@ import org.hibernate.validator.constraints.py.RUC;
  */
 public class RUCValidator implements ConstraintValidator<RUC, CharSequence> {
 
-	private static final Pattern UNFORMATTED_PATTERN = Pattern.compile( "[0-9A-Za-z]{3,8}[0-9]" );
-	private static final Pattern FORMATTED_PATTERN = Pattern.compile( "[0-9A-Za-z]{3,8}-[0-9]" );
+	private static final Pattern UNFORMATTED_PATTERN = Pattern.compile( "[0-9A-Za-z]{3,8}\\d" );
+	private static final Pattern FORMATTED_PATTERN = Pattern.compile( "[0-9A-Za-z]{3,8}-\\d" );
 	private static final int BASE_MAX = 11;
 
 	@Override

@@ -16,8 +16,8 @@ import jakarta.validation.ConstraintValidatorContext;
  */
 public abstract class AbstractArgentineTaxIdValidator<T extends Annotation> implements ConstraintValidator<T, CharSequence> {
 
-	private static final Pattern UNFORMATTED_PATTERN = Pattern.compile( "[0-9]{11}" );
-	private static final Pattern FORMATTED_PATTERN = Pattern.compile( "[0-9]{2}-[0-9]{8}-[0-9]" );
+	private static final Pattern UNFORMATTED_PATTERN = Pattern.compile( "\\d{11}" );
+	private static final Pattern FORMATTED_PATTERN = Pattern.compile( "\\d{2}-\\d{8}-\\d" );
 
 	private static final int[] WEIGHTS = { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
 
