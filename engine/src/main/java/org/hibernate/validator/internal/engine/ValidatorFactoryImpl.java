@@ -357,6 +357,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
 		constraintCreationContext.getValueExtractorManager().clear();
+
+		BeanResolver beanResolver = validatorFactoryScopedContext.getBeanResolver();
+		beanResolver.close();
 	}
 
 	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
