@@ -430,6 +430,82 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 Refer to <<section-fail-fast>> and <<section-programmatic-api>> to learn more about the fail fast
 mode and the constraint declaration API.
 
+[[section-bean-system]]
+==== Bean resolution and pluggable components
+
+Hibernate Validator uses a bean resolution system to manage its pluggable components.
+
+===== Registering beans programmatically
+
+Use `addBeanConfigurer()` on the Hibernate Validator configuration to register custom implementations:
+
+====
+[source, java, indent=0]
+----
+Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.addBeanConfigurer( context -> {
+			context.define( PasswordStrengthEstimator.class,
+					BeanReference.ofInstance( new MyPasswordStrengthEstimator() ) );
+			context.define( CompromisedPasswordChecker.class,
+					BeanReference.ofInstance( new MyCompromisedPasswordChecker() ) );
+		} )
+		.buildValidatorFactory()
+		.getValidator();
+----
+====
+
+Each `define()` call associates an implementation with a type (and optionally a name).
+
+===== CDI integration
+
+In CDI environments, when using the `hibernate-validator-cdi` extension,
+Hibernate Validator automatically discovers a `BeanProvider`
+backed by the CDI `BeanManager`. Any bean available in the CDI container can be
+resolved -- no explicit registration is needed.
+
+For other DI frameworks, set a custom `BeanProvider` via the configuration:
+
+====
+[source, java, indent=0]
+----
+Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.beanProvider( myCustomBeanProvider )
+		.buildValidatorFactory();
+----
+====
+
+===== ServiceLoader discovery
+
+`BeanConfigurer` implementations discovered via `java.util.ServiceLoader` are applied
+automatically at bootstrap. Create a file named
+`META-INF/services/org.hibernate.validator.spi.bean.BeanConfigurer` containing
+the fully-qualified class names of your configurers.
+
+===== Pluggable components
+
+The following components can be configured through the bean system.
+
+[cols="2,3", options="header"]
+|===
+| Component | Description
+
+| `ScriptEvaluatorFactory` | Controls how script engines are initialized for `@ScriptAssert` and `@ParameterScriptAssert`
+| `GetterPropertySelectionStrategy` | Determines which methods are considered property getters
+| `PropertyNodeNameProvider` | Resolves property names in constraint violation paths
+| `LocaleResolver` | Resolves the locale for message interpolation
+| `BeanMetaDataClassNormalizer` | Normalizes bean classes (e.g. for proxy unwrapping)
+| `PasswordStrengthEstimator` | Estimates password strength for `@PasswordStrength`
+| `CompromisedPasswordChecker` | Checks for compromised passwords for `@NotCompromised`
+| `PasswordPolicyDefinitionResolver` | Resolves `PasswordPolicyDefinition` instances for `@PasswordPolicy`
+| `MessageInterpolator` | Interpolates constraint violation messages
+|===
+
+Most of these components also support configuration via the dedicated programmatic setters
+on the Hibernate Validator configuration object (e.g. `scriptEvaluatorFactory()`, `localeResolver()`)
+or via properties. The explicit setter takes priority over bean-registered implementations.
+
 [[section-script-evaluator-factory]]
 ==== Configuring the `ScriptEvaluatorFactory`
 
@@ -526,17 +602,17 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 ====
 
 [[section-password-validation-services]]
-==== Configuring password validation services
+==== Configuring password validation beans
 
-The `@PasswordStrength` and `@NotCompromised` constraints delegate to user-provided validation services
-that must be registered at bootstrap time. The two service interfaces are:
+The `@PasswordStrength` and `@NotCompromised` constraints delegate to user-provided implementations
+that must be registered as beans at bootstrap time. The two interfaces are:
 
 * `PasswordStrengthEstimator` -- estimates password strength on a 0–4 scale (see `PasswordStrengthScore`)
 * `CompromisedPasswordChecker` -- checks whether a password has appeared in a known data breach
 
 Both accept `char[]` rather than `String` so the caller can zero the array after validation.
 
-Register services via the `addValidationService()` method on the Hibernate Validator configuration:
+Register beans via the `addBeanConfigurer()` method on the Hibernate Validator configuration:
 
 [[example-password-strength-registration]]
 .Registering a `PasswordStrengthEstimator`
@@ -627,8 +703,8 @@ The builder provides convenience methods for common password policy rules:
 | `noRepeatingCharacters(int max)` | Rejects passwords where the same character repeats more than `max` times consecutively (e.g. "aaa")
 | `allowedCharacters(char... chars)` | Restricts the password to only the specified characters
 | `illegalCharacters(char... chars)` | Rejects passwords containing any of the specified characters
-| `strengthEstimator(int minScore, PasswordStrengthEstimator)` | Requires a minimum strength score using a `PasswordStrengthEstimator` obtained from the initialization context (see <<section-password-validation-services>>)
-| `compromisedChecker(CompromisedPasswordChecker)` | Rejects passwords flagged as compromised using a `CompromisedPasswordChecker` obtained from the initialization context (see <<section-password-validation-services>>)
+| `strengthEstimator(int minScore, PasswordStrengthEstimator)` | Requires a minimum strength score using a `PasswordStrengthEstimator` (see <<section-password-validation-services>>)
+| `compromisedChecker(CompromisedPasswordChecker)` | Rejects passwords flagged as compromised using a `CompromisedPasswordChecker` (see <<section-password-validation-services>>)
 |===
 
 ===== Custom rules
@@ -686,8 +762,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHi
 ----
 ====
 
-These services are application concerns -- they should be injected by your DI framework, not looked up
-via `getValidationService()` (which is reserved for Hibernate Validator's own validation service SPIs).
+These services are application concerns -- they should be injected by your DI framework.
 Register a custom `PasswordPolicyDefinitionResolver` that delegates to CDI (or Arc, Spring, Guice, etc.),
 and let the policy definition receive its dependencies through standard injection:
 
@@ -705,8 +780,7 @@ for CDI integration details.
 ===== Custom policy definition resolver
 
 By default, `PasswordPolicyDefinition` classes are instantiated via their no-arg constructor.
-For dependency injection or custom initialization, register a `PasswordPolicyDefinitionResolver`
-as a validation service:
+For dependency injection or custom initialization, register a custom `PasswordPolicyDefinitionResolver`:
 
 [[example-password-policy-resolver]]
 ====
