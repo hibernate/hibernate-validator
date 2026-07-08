@@ -24,7 +24,6 @@ import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
-import org.hibernate.validator.spi.password.PasswordStrengthScore;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -104,7 +103,7 @@ public class PasswordValidationServicesTest {
 
 	public static class UserAccount {
 
-		@PasswordStrength
+		@PasswordStrength(min = PasswordStrengthScore.FAIR)
 		private final String password;
 
 		UserAccount(String password) {
