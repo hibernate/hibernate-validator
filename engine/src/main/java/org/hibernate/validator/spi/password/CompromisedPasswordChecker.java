@@ -11,6 +11,16 @@ import org.hibernate.validator.Incubating;
  * <p>
  * Can be registered as a bean via a
  * {@link org.hibernate.validator.spi.bean.BeanConfigurer}.
+ * <p>
+ * @hv.securityNote Implementations must handle password data securely.
+ * Check with the most current rules and standards for handling passwords.
+ * Following are a few examples of what to check for (applicable at the time of writing this documentation):
+ * <ul>
+ *     <li>Never send plaintext passwords or complete hashes to external services — use techniques
+ *     such as k-anonymity (e.g. sending only a hash prefix).</li>
+ *     <li>Never log passwords.</li>
+ *     <li>The {@code char[]} array should not be stored beyond the scope of the {@link #check(char[])} call.</li>
+ * </ul>
  *
  * @since 9.2.0
  */

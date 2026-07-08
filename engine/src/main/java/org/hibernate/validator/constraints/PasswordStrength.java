@@ -31,7 +31,11 @@ import org.hibernate.validator.spi.password.PasswordStrengthScore;
  * The supported types are {@code CharSequence} and {@code char[]}. {@code null} is considered valid.
  * <p>
  * A {@link org.hibernate.validator.spi.password.PasswordStrengthEstimator} must be registered as a
- * validation service before using this constraint.
+ * bean before using this constraint.
+ * <p>
+ * @hv.securityNote The security of this constraint depends entirely on the registered
+ * {@code PasswordStrengthEstimator} implementation. It is the application's responsibility
+ * to ensure that the implementation handles password data securely.
  *
  * @since 9.2.0
  */

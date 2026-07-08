@@ -1149,6 +1149,11 @@
                                 <placement>a</placement>
                                 <head>Experimental</head>
                             </tag>
+                            <tag>
+                                <name>hv.securityNote</name>
+                                <placement>a</placement>
+                                <head>Security Note</head>
+                            </tag>
                         </tags>
                         <additionalOptions>
                             <!-- Java 9+ supports HTML5 for javadoc generation -->
