@@ -139,7 +139,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				beanResolver, passwordPolicyDefinitionResolver );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
-				determineMessageInterpolator( hibernateSpecificConfig, configurationState, beanResolver ),
+				determineMessageInterpolator( hibernateSpecificConfig, configurationState, properties, beanResolver ),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
 				configurationState.getClockProvider(),

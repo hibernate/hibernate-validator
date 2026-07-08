@@ -168,7 +168,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( hibernateSpecificConfig, properties, beanResolver );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
-				determineMessageInterpolator( hibernateSpecificConfig, configurationState, beanResolver ),
+				determineMessageInterpolator( hibernateSpecificConfig, configurationState, properties, beanResolver ),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
 				configurationState.getClockProvider(),
