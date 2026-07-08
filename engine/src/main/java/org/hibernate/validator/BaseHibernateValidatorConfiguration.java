@@ -183,6 +183,28 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
 
 	/**
+	 * Property for configuring the message interpolator, allowing to set a custom implementation of
+	 * {@link jakarta.validation.MessageInterpolator} which will be used for message interpolation.
+	 * Accepts a fully qualified class name, or a bean reference string.
+	 *
+	 * @since 9.2.0
+	 * @see org.hibernate.validator.bean.BeanReference
+	 */
+	@Incubating
+	String MESSAGE_INTERPOLATOR = "hibernate.validator.message_interpolator";
+
+	/**
+	 * Property for configuring the bean metadata class normalizer, allowing to set a custom implementation of
+	 * {@link BeanMetaDataClassNormalizer} which will be used to normalize bean classes (e.g. for proxy unwrapping).
+	 * Accepts a fully qualified class name, or a bean reference string.
+	 *
+	 * @since 9.2.0
+	 * @see org.hibernate.validator.bean.BeanReference
+	 */
+	@Incubating
+	String BEAN_META_DATA_CLASS_NORMALIZER = "hibernate.validator.bean_meta_data_class_normalizer";
+
+	/**
 	 * Property for specifying the {@link org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver}
 	 * implementation to use. Accepts a fully qualified class name, a bean name,
 	 * or a bean reference string (e.g. {@code "bean:myResolver"}).

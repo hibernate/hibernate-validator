@@ -357,9 +357,13 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static MessageInterpolator determineMessageInterpolator(AbstractConfigurationImpl<?> hibernateSpecificConfig,
-			ConfigurationState configurationState, BeanResolver beanResolver) {
+			ConfigurationState configurationState, Map<String, String> properties, BeanResolver beanResolver) {
 		if ( hibernateSpecificConfig == null || hibernateSpecificConfig.isMessageInterpolatorExplicitlySet() ) {
 			return configurationState.getMessageInterpolator();
+		}
+		String prop = properties.get( HibernateValidatorConfiguration.MESSAGE_INTERPOLATOR );
+		if ( prop != null ) {
+			return beanResolver.resolve( BeanReference.parse( MessageInterpolator.class, prop ) ).get();
 		}
 		return beanResolver.resolve( MessageInterpolator.class, "default", BeanRetrieval.BUILTIN ).get();
 	}
@@ -419,7 +423,7 @@ final class ValidatorFactoryConfigurationHelper {
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig,
 			Map<String, String> properties, BeanResolver beanResolver) {
 		return resolveBeanComponent( BeanMetaDataClassNormalizer.class, DefaultBeanMetaDataClassNormalizer.NAME,
-				null,
+				HibernateValidatorConfiguration.BEAN_META_DATA_CLASS_NORMALIZER,
 				hibernateSpecificConfig, AbstractConfigurationImpl::getBeanMetaDataClassNormalizer,
 				properties, beanResolver );
 	}
