@@ -621,7 +621,7 @@ a production deployment would require.
 The `@PasswordStrength` and `@NotCompromised` constraints delegate to user-provided implementations
 that must be registered as beans at bootstrap time. The two interfaces are:
 
-* `PasswordStrengthEstimator` -- estimates password strength on a 0–4 scale (see `PasswordStrengthScore`)
+* `PasswordStrengthEstimator` -- estimates password strength (the score scale is defined by the implementation)
 * `CompromisedPasswordChecker` -- checks whether a password has appeared in a known data breach
 
 Both accept `char[]` rather than `String` so the caller can zero the array after validation.
