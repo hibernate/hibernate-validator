@@ -113,7 +113,7 @@ public class PasswordStrengthValidatorTest {
 	}
 
 	private static class CharSequenceBean {
-		@PasswordStrength
+		@PasswordStrength(min = PasswordStrengthScore.FAIR)
 		private final String password;
 
 		CharSequenceBean(String password) {
@@ -122,7 +122,7 @@ public class PasswordStrengthValidatorTest {
 	}
 
 	private static class CharArrayBean {
-		@PasswordStrength
+		@PasswordStrength(min = PasswordStrengthScore.FAIR)
 		private final char[] password;
 
 		CharArrayBean(char[] password) {

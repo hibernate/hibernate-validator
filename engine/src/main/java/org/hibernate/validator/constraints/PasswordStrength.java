@@ -22,7 +22,6 @@ import jakarta.validation.Payload;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.PasswordStrength.List;
-import org.hibernate.validator.spi.password.PasswordStrengthScore;
 
 /**
  * Validates that the annotated password meets a minimum strength score
@@ -56,11 +55,13 @@ public @interface PasswordStrength {
 	/**
 	 * The minimum strength score required. Passwords with a score below this value
 	 * will be considered invalid.
+	 * <p>
+	 * The score scale is determined by the registered
+	 * {@link org.hibernate.validator.spi.password.PasswordStrengthEstimator}.
 	 *
 	 * @return the minimum score
-	 * @see PasswordStrengthScore
 	 */
-	int min() default PasswordStrengthScore.FAIR;
+	int min();
 
 	/**
 	 * A bean reference to the {@link org.hibernate.validator.spi.password.PasswordStrengthEstimator}

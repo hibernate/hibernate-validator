@@ -52,7 +52,7 @@ public class PasswordStrengthConstrainedTest extends AbstractConstrainedTest {
 
 	private static class Foo {
 
-		@PasswordStrength
+		@PasswordStrength(min = PasswordStrengthScore.FAIR)
 		private final String password;
 
 		Foo(String password) {

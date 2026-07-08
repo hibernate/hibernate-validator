@@ -43,7 +43,7 @@ public interface PasswordPolicyBuilder {
 	/**
 	 * Requires the password to meet a minimum strength score as determined by the given estimator.
 	 *
-	 * @param minScore the minimum score (see {@link PasswordStrengthScore} for named constants)
+	 * @param minScore the minimum score (the scale depends on the estimator implementation)
 	 * @param estimator the strength estimator to use
 	 */
 	PasswordPolicyBuilder strengthEstimator(int minScore, PasswordStrengthEstimator estimator);

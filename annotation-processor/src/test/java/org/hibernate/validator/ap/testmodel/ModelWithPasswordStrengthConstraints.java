@@ -8,12 +8,12 @@ import org.hibernate.validator.constraints.PasswordStrength;
 
 public class ModelWithPasswordStrengthConstraints {
 
-	@PasswordStrength
+	@PasswordStrength(min = 3)
 	private String string;
 
-	@PasswordStrength
+	@PasswordStrength(min = 3)
 	private char[] charArray;
 
-	@PasswordStrength
+	@PasswordStrength(min = 3)
 	private Integer integer;
 }
