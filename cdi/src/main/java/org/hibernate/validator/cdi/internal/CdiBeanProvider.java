@@ -5,7 +5,9 @@
 package org.hibernate.validator.cdi.internal;
 
 import java.lang.annotation.Annotation;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.literal.NamedLiteral;
@@ -26,6 +28,7 @@ import org.hibernate.validator.spi.bean.BeanProvider;
 public class CdiBeanProvider implements BeanProvider {
 
 	private final BeanManager beanManager;
+	private final Queue<CreationalContext<?>> creationalContexts = new ConcurrentLinkedQueue<>();
 
 	public CdiBeanProvider(BeanManager beanManager) {
 		this.beanManager = beanManager;
@@ -43,7 +46,24 @@ public class CdiBeanProvider implements BeanProvider {
 
 	@Override
 	public void close() {
-		// Nothing to close — CDI manages bean lifecycle
+		RuntimeException ex = null;
+		CreationalContext<?> context;
+		while ( ( context = creationalContexts.poll() ) != null ) {
+			try {
+				context.release();
+			}
+			catch (RuntimeException e) {
+				if ( ex == null ) {
+					ex = e;
+				}
+				else {
+					ex.addSuppressed( e );
+				}
+			}
+		}
+		if ( ex != null ) {
+			throw ex;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -54,8 +74,9 @@ public class CdiBeanProvider implements BeanProvider {
 		}
 		Bean<?> bean = beanManager.resolve( beans );
 		CreationalContext<?> creationalContext = beanManager.createCreationalContext( bean );
+		creationalContexts.add( creationalContext );
 		T instance = (T) beanManager.getReference( bean, typeReference, creationalContext );
-		return new CdiBeanHolder<>( instance, bean, creationalContext, beanManager );
+		return new CdiBeanHolder<>( instance, bean, creationalContext );
 	}
 
 	private static class CdiBeanHolder<T> implements BeanHolder<T> {
@@ -63,13 +84,11 @@ public class CdiBeanProvider implements BeanProvider {
 		private final T instance;
 		private final Bean<?> bean;
 		private final CreationalContext<?> creationalContext;
-		private final BeanManager beanManager;
 
-		CdiBeanHolder(T instance, Bean<?> bean, CreationalContext<?> creationalContext, BeanManager beanManager) {
+		CdiBeanHolder(T instance, Bean<?> bean, CreationalContext<?> creationalContext) {
 			this.instance = instance;
 			this.bean = bean;
 			this.creationalContext = creationalContext;
-			this.beanManager = beanManager;
 		}
 
 		@Override

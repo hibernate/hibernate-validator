@@ -58,6 +58,11 @@ public final class BeanResolverImpl implements BeanResolver {
 	}
 
 	@Override
+	public void close() {
+		beanManagerBeanProvider.close();
+	}
+
+	@Override
 	public <T> BeanHolder<T> resolve(Class<T> typeReference, BeanRetrieval retrieval) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		return resolveFromFirstSuccessfulSource( typeReference, retrieval );

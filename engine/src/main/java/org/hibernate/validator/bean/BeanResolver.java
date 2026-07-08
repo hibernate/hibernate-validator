@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.util.Contracts;
  * @since 9.2.0
  */
 @Incubating
-public interface BeanResolver {
+public interface BeanResolver extends AutoCloseable {
 
 	/**
 	 * Resolve a bean by its type.
@@ -138,4 +138,10 @@ public interface BeanResolver {
 	 */
 	<T> Map<String, BeanReference<T>> namedConfiguredForRole(Class<T> role);
 
+
+	/**
+	 * Releases any resources that the resolver is holding to.
+	 */
+	@Override
+	void close();
 }

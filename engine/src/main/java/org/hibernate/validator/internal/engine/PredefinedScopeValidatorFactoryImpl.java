@@ -356,6 +356,9 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		beanMetaDataManager.clear();
 		validatorFactoryScopedContext.getScriptEvaluatorFactory().clear();
 		valueExtractorManager.clear();
+
+		BeanResolver beanResolver = validatorFactoryScopedContext.getBeanResolver();
+		beanResolver.close();
 	}
 
 	public ValidatorFactoryScopedContext getValidatorFactoryScopedContext() {
