@@ -30,7 +30,11 @@ import org.hibernate.validator.constraints.NotCompromised.List;
  * The supported types are {@code CharSequence} and {@code char[]}. {@code null} is considered valid.
  * <p>
  * A {@link org.hibernate.validator.spi.password.CompromisedPasswordChecker} must be registered as a
- * validation service before using this constraint.
+ * bean before using this constraint.
+ * <p>
+ * @hv.securityNote The security of this constraint depends entirely on the registered
+ * {@code CompromisedPasswordChecker} implementation. It is the application's responsibility
+ * to ensure that the implementation handles password data securely.
  *
  * @since 9.2.0
  */

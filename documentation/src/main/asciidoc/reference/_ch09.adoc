@@ -604,6 +604,20 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 [[section-password-validation-services]]
 ==== Configuring password validation beans
 
+[WARNING]
+====
+The security of password validation depends entirely on your implementations of
+`PasswordStrengthEstimator`, `CompromisedPasswordChecker`, and any custom `PasswordPolicyRule`.
+Implementations must handle password data securely. Check with the most current rules and
+standards for handling passwords. Following are a few examples of what to check for
+(applicable at the time of writing this documentation): never send plaintext passwords to
+external services, never log passwords, and zero `char[]` arrays after use.
+
+The example implementations in this section are provided for illustration only and are *not*
+production-ready -- they lack error handling, timeouts, retries, and circuit breaking that
+a production deployment would require.
+====
+
 The `@PasswordStrength` and `@NotCompromised` constraints delegate to user-provided implementations
 that must be registered as beans at bootstrap time. The two interfaces are:
 
@@ -657,6 +671,14 @@ The following implementation uses the JDK `HttpClient`:
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/HaveIBeenPwnedPasswordChecker.java[tags=include]
 ----
+====
+
+[CAUTION]
+====
+This example is for illustration only. A production implementation should include proper error handling,
+timeouts, retries with backoff, and circuit breaking. Consider caching results and respecting the
+API's rate limits. Always verify that your implementation never sends the full password or
+its complete hash to any external service.
 ====
 
 [[section-password-policy]]
