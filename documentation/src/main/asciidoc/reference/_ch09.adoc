@@ -487,24 +487,44 @@ the fully-qualified class names of your configurers.
 
 The following components can be configured through the bean system.
 
+====== Components with builtin defaults
+
+These components have a builtin default implementation. To override the default, you must
+either use the programmatic setter on the configuration object or set the corresponding
+configuration property. The property value is resolved as a bean reference through the
+bean system -- so you can register a custom implementation, e.g. via `addBeanConfigurer()`, and
+then select it using the property.
+
+The resolution order is: explicit programmatic setter > configuration property > builtin default.
+
+[cols="2,3,2", options="header"]
+|===
+| Component | Description | Property
+
+| `ScriptEvaluatorFactory` | Controls how script engines are initialized for `@ScriptAssert` and `@ParameterScriptAssert` | `hibernate.validator.script_evaluator_factory`
+| `GetterPropertySelectionStrategy` | Determines which methods are considered property getters | `hibernate.validator.getter_property_selection_strategy`
+| `PropertyNodeNameProvider` | Resolves property names in constraint violation paths | `hibernate.validator.property_node_name_provider`
+| `LocaleResolver` | Resolves the locale for message interpolation | `hibernate.validator.locale_resolver`
+| `BeanMetaDataClassNormalizer` | Normalizes bean classes (e.g. for proxy unwrapping) | `hibernate.validator.bean_meta_data_class_normalizer`
+| `PasswordPolicyDefinitionResolver` | Resolves `PasswordPolicyDefinition` instances for `@PasswordPolicy` | `hibernate.validator.password_policy_definition_resolver`
+| `MessageInterpolator` | Interpolates constraint violation messages | `hibernate.validator.message_interpolator`
+|===
+
+====== Components without defaults
+
+These components have no builtin default. Registering a single implementation is
+sufficient -- the validator will auto-discover it. When multiple implementations
+are registered, you would need to resolve the ambiguity. For example, in case of
+password-related constraints, use the bean reference in the constraint annotation
+attribute to select which one to use (e.g. `@PasswordStrength(estimator = "myEstimator")`).
+
 [cols="2,3", options="header"]
 |===
 | Component | Description
 
-| `ScriptEvaluatorFactory` | Controls how script engines are initialized for `@ScriptAssert` and `@ParameterScriptAssert`
-| `GetterPropertySelectionStrategy` | Determines which methods are considered property getters
-| `PropertyNodeNameProvider` | Resolves property names in constraint violation paths
-| `LocaleResolver` | Resolves the locale for message interpolation
-| `BeanMetaDataClassNormalizer` | Normalizes bean classes (e.g. for proxy unwrapping)
 | `PasswordStrengthEstimator` | Estimates password strength for `@PasswordStrength`
 | `CompromisedPasswordChecker` | Checks for compromised passwords for `@NotCompromised`
-| `PasswordPolicyDefinitionResolver` | Resolves `PasswordPolicyDefinition` instances for `@PasswordPolicy`
-| `MessageInterpolator` | Interpolates constraint violation messages
 |===
-
-Most of these components also support configuration via the dedicated programmatic setters
-on the Hibernate Validator configuration object (e.g. `scriptEvaluatorFactory()`, `localeResolver()`)
-or via properties. The explicit setter takes priority over bean-registered implementations.
 
 [[section-script-evaluator-factory]]
 ==== Configuring the `ScriptEvaluatorFactory`
