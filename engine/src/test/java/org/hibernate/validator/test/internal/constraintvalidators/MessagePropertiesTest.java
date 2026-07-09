@@ -45,6 +45,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
@@ -56,9 +57,12 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.PasswordPolicy;
+import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -77,6 +81,13 @@ import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
+import org.hibernate.validator.spi.password.CompromisedPasswordResult;
+import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
+import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
+import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 
 import org.javamoney.moneta.Money;
@@ -124,6 +135,12 @@ public class MessagePropertiesTest {
 			Validator validator = Validation.byProvider( HibernateValidator.class )
 					.configure()
 					.defaultLocale( locale )
+					.addBeanConfigurer( context -> {
+						context.define( PasswordStrengthEstimator.class,
+								BeanReference.ofInstance( password -> PasswordStrengthResult.simple( 0, "weak" ) ) );
+						context.define( CompromisedPasswordChecker.class,
+								BeanReference.ofInstance( password -> CompromisedPasswordResult.simple( 1 ) ) );
+					} )
 					.buildValidatorFactory()
 					.getValidator();
 
@@ -183,7 +200,10 @@ public class MessagePropertiesTest {
 							violationOf( DurationMax.class ),
 							violationOf( DurationMin.class ),
 							violationOf( ScriptAssert.class ),
-							violationOf( UUID.class )
+							violationOf( UUID.class ),
+							violationOf( NotCompromised.class ),
+							violationOf( PasswordStrength.class ),
+							violationOf( PasswordPolicy.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -377,8 +397,24 @@ public class MessagePropertiesTest {
 		@DateTimeFormat(pattern = "dd-MM-yyyy")
 		private String dateTimeFormat = "invalid";
 
+		@NotCompromised
+		private String notCompromised = "compromised";
+
+		@PasswordStrength(min = 4)
+		private String passwordStrength = "weak";
+
+		@PasswordPolicy(FailingPolicy.class)
+		private String passwordPolicy = "ab";
+
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;
+	}
+
+	public static class FailingPolicy implements PasswordPolicyDefinition {
+		@Override
+		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
+			builder.minLength( 8 );
+		}
 	}
 
 	private static class ParameterScriptAssertBean {
