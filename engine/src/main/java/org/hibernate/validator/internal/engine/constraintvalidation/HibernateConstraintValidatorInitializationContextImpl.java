@@ -11,7 +11,6 @@ import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -26,8 +25,6 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final Duration temporalValidationTolerance;
 
-	private final PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver;
-
 	private final HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager;
 
 	private final BeanResolver beanResolver;
@@ -36,14 +33,13 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
 			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
-			BeanResolver beanResolver, PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver
+			BeanResolver beanResolver
 	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.constraintValidatorInitializationSharedServiceManager = constraintValidatorInitializationSharedServiceManager;
 		this.beanResolver = beanResolver;
-		this.passwordPolicyDefinitionResolver = passwordPolicyDefinitionResolver;
 		this.hashCode = createHashCode();
 	}
 
@@ -57,8 +53,7 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		}
 
 		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance,
-				constraintValidatorInitializationSharedServiceManager, defaultContext.beanResolver,
-				defaultContext.passwordPolicyDefinitionResolver );
+				constraintValidatorInitializationSharedServiceManager, defaultContext.beanResolver );
 	}
 
 	@Override
@@ -91,11 +86,6 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		return beanResolver;
 	}
 
-	@Override
-	public PasswordPolicyDefinitionResolver getPasswordPolicyDefinitionResolver() {
-		return passwordPolicyDefinitionResolver;
-	}
-
 	public HibernateConstraintValidatorInitializationSharedDataManager getConstraintValidatorInitializationSharedServiceManager() {
 		return constraintValidatorInitializationSharedServiceManager;
 	}
@@ -120,9 +110,6 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		if ( beanResolver != hibernateConstraintValidatorInitializationContextImpl.beanResolver ) {
 			return false;
 		}
-		if ( passwordPolicyDefinitionResolver != hibernateConstraintValidatorInitializationContextImpl.passwordPolicyDefinitionResolver ) {
-			return false;
-		}
 		if ( clockProvider != hibernateConstraintValidatorInitializationContextImpl.clockProvider ) {
 			return false;
 		}
@@ -143,7 +130,6 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		result = 31 * result + temporalValidationTolerance.hashCode();
 		result = 31 * result + System.identityHashCode( constraintValidatorInitializationSharedServiceManager );
 		result = 31 * result + System.identityHashCode( beanResolver );
-		result = 31 * result + System.identityHashCode( passwordPolicyDefinitionResolver );
 		return result;
 	}
 }

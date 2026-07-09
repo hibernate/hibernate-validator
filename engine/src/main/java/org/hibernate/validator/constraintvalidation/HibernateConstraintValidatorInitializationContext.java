@@ -12,7 +12,6 @@ import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.Incubating;
 import org.hibernate.validator.bean.BeanResolver;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -103,13 +102,4 @@ public interface HibernateConstraintValidatorInitializationContext {
 	@Incubating
 	BeanResolver getBeanResolver();
 
-	/**
-	 * Returns the {@link PasswordPolicyDefinitionResolver} for resolving password policy definitions.
-	 *
-	 * @return the password policy definition resolver
-	 *
-	 * @since 9.2.0
-	 */
-	@Incubating
-	PasswordPolicyDefinitionResolver getPasswordPolicyDefinitionResolver();
 }

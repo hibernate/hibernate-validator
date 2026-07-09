@@ -506,7 +506,6 @@ The resolution order is: explicit programmatic setter > configuration property >
 | `PropertyNodeNameProvider` | Resolves property names in constraint violation paths | `hibernate.validator.property_node_name_provider`
 | `LocaleResolver` | Resolves the locale for message interpolation | `hibernate.validator.locale_resolver`
 | `BeanMetaDataClassNormalizer` | Normalizes bean classes (e.g. for proxy unwrapping) | `hibernate.validator.bean_meta_data_class_normalizer`
-| `PasswordPolicyDefinitionResolver` | Resolves `PasswordPolicyDefinition` instances for `@PasswordPolicy` | `hibernate.validator.password_policy_definition_resolver`
 | `MessageInterpolator` | Interpolates constraint violation messages | `hibernate.validator.message_interpolator`
 |===
 
@@ -767,19 +766,9 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPo
 
 ====== Custom rules with external services
 
-Rules that depend on external resources -- dictionary lookups, password history checks, breach databases -- should
-delegate to an external service interface. The application provides the implementation; the rule only needs the contract.
-
-Define a service interface for each concern, or use one of your current application service interfaces.
-The implementation is the application's responsibility -- it decides where data comes from
-(file, database, external API) and how matching works (exact, substring, hashed comparison):
-
-====
-[source, java, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/DictionaryService.java[tags=include]
-----
-====
+More complex rules that depend on external resources -- dictionary lookups, password history checks,
+breach databases -- should delegate to an external service interface. The application provides the
+implementation; the rule only needs the contract:
 
 ====
 [source, java, indent=0]
@@ -788,14 +777,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHi
 ----
 ====
 
-The rules receive the service via their constructor and delegate to it:
-
-====
-[source, java, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/DictionaryRule.java[tags=include]
-----
-====
+The rule receives the service via its constructor and delegates to it:
 
 ====
 [source, java, indent=0]
@@ -804,31 +786,16 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHi
 ----
 ====
 
-These services are application concerns -- they should be injected by your DI framework.
-Register a custom `PasswordPolicyDefinitionResolver` that delegates to CDI (or Arc, Spring, Guice, etc.),
-and let the policy definition receive its dependencies through standard injection:
+`PasswordPolicyDefinition` classes are resolved through the bean system
+(see <<section-bean-system>>). By default, they are instantiated via their no-arg constructor.
+In other environments, you can make the definition a managed bean --
+its dependencies will be injected by the container. You can also register it
+via `addBeanConfigurer()` to wire dependencies programmatically:
 
 ====
 [source, java, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=serviceRules]
-----
-====
-
-See <<section-constraint-definition-resolver>> for how to register the resolver, and <<section-getting-started-cdi>>
-for CDI integration details.
-
-[[section-constraint-definition-resolver]]
-===== Custom policy definition resolver
-
-By default, `PasswordPolicyDefinition` classes are instantiated via their no-arg constructor.
-For dependency injection or custom initialization, register a custom `PasswordPolicyDefinitionResolver`:
-
-[[example-password-policy-resolver]]
-====
-[source, java, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=resolverRegistration]
 ----
 ====
 

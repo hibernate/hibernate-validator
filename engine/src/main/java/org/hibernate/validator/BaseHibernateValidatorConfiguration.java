@@ -29,7 +29,6 @@ import org.hibernate.validator.spi.bean.BeanConfigurer;
 import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -204,15 +203,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	@Incubating
 	String BEAN_META_DATA_CLASS_NORMALIZER = "hibernate.validator.bean_meta_data_class_normalizer";
 
-	/**
-	 * Property for specifying the {@link org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver}
-	 * implementation to use. Accepts a fully qualified class name, a bean name,
-	 * or a bean reference string (e.g. {@code "bean:myResolver"}).
-	 *
-	 * @since 9.2.0
-	 */
-	@Incubating
-	String PASSWORD_POLICY_DEFINITION_RESOLVER_CLASSNAME = "hibernate.validator.password_policy_definition_resolver";
 
 	/**
 	 * <p>
@@ -449,17 +439,6 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S beanProvider(BeanProvider beanProvider);
-
-	/**
-	 * Sets the {@link org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver}
-	 * to be used for resolving password policy definitions.
-	 *
-	 * @param resolver the resolver to use
-	 * @return {@code this} following the chaining method pattern
-	 * @since 9.2.0
-	 */
-	@Incubating
-	S passwordPolicyDefinitionResolver(PasswordPolicyDefinitionResolver resolver);
 
 	/**
 	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter

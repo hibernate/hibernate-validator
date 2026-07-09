@@ -18,7 +18,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.HibernateCon
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 public class ValidatorFactoryScopedContext {
@@ -114,14 +113,12 @@ public class ValidatorFactoryScopedContext {
 			HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
 			BeanResolver beanResolver,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
-			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
-			PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver) {
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
 				customViolationExpressionLanguageFeatureLevel, beanResolver,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
-						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager, beanResolver,
-						passwordPolicyDefinitionResolver
+						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager, beanResolver
 				) );
 	}
 

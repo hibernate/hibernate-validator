@@ -11,9 +11,10 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
  * Defines a password validation policy by configuring rules on a {@link PasswordPolicyBuilder}.
  * <p>
  * Implementations are referenced from the {@link org.hibernate.validator.constraints.PasswordPolicy @PasswordPolicy}
- * annotation and resolved at validator initialization time. By default, the implementation class
- * is instantiated via its no-arg constructor. A custom {@link PasswordPolicyDefinitionResolver}
- * can be registered to support dependency injection or other instantiation strategies.
+ * annotation and resolved at validator initialization time via the
+ * {@link org.hibernate.validator.bean.BeanResolver bean resolver}. By default, the implementation class
+ * is instantiated via its no-arg constructor. Implementations can also be registered as beans
+ * (e.g. via a {@link org.hibernate.validator.spi.bean.BeanConfigurer}) to support dependency injection.
  * <p>
  * The {@link HibernateConstraintValidatorInitializationContext} provides access to registered
  * validation services (e.g. {@link PasswordStrengthEstimator}, {@link CompromisedPasswordChecker}).
