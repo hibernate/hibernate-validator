@@ -16,7 +16,6 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageInterpolator;
-import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determinePasswordPolicyDefinitionResolver;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
@@ -70,7 +69,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -131,12 +129,10 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( hibernateSpecificConfig, properties, beanResolver );
 		Duration temporalValidationTolerance = determineTemporalValidationTolerance( configurationState, properties );
 
-		PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver = determinePasswordPolicyDefinitionResolver( hibernateSpecificConfig, properties, beanResolver );
-
 		HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext = new HibernateConstraintValidatorInitializationContextImpl(
 				scriptEvaluatorFactory, configurationState.getClockProvider(), temporalValidationTolerance,
 				initializeConstraintValidatorInitializationShareDataManager( hibernateSpecificConfig ),
-				beanResolver, passwordPolicyDefinitionResolver );
+				beanResolver );
 
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				determineMessageInterpolator( hibernateSpecificConfig, configurationState, properties, beanResolver ),

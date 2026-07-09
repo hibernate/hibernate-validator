@@ -5,7 +5,7 @@
 package org.hibernate.validator.internal.engine.bean;
 
 import org.hibernate.validator.bean.BeanHolder;
-import org.hibernate.validator.internal.constraintvalidators.hv.password.DefaultPasswordPolicyDefinitionResolver;
+
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
@@ -16,7 +16,7 @@ import org.hibernate.validator.spi.bean.BeanConfigurationContext;
 import org.hibernate.validator.spi.bean.BeanConfigurer;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
+
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -34,7 +34,5 @@ public class HibernateValidatorBuiltinBeanConfigurer implements BeanConfigurer {
 				resolver -> BeanHolder.of( new DefaultLocaleResolver() ) );
 		context.define( BeanMetaDataClassNormalizer.class, DefaultBeanMetaDataClassNormalizer.NAME,
 				resolver -> BeanHolder.of( new DefaultBeanMetaDataClassNormalizer() ) );
-		context.define( PasswordPolicyDefinitionResolver.class, DefaultPasswordPolicyDefinitionResolver.NAME,
-				resolver -> BeanHolder.of( new DefaultPasswordPolicyDefinitionResolver() ) );
 	}
 }
