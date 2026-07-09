@@ -23,6 +23,7 @@ import org.hibernate.validator.cfg.defs.PasswordPolicyDef;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.spi.password.AbstractPasswordPolicyValidator;
 import org.hibernate.validator.spi.password.CharacterType;
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
@@ -83,6 +84,16 @@ public class PasswordPolicyValidatorTest {
 		Set<ConstraintViolation<BasicPolicyBean>> violations = validator.validate(
 				new BasicPolicyBean( "Password!x" ) );
 		assertThat( violations ).containsOnlyViolations( violationOf( PasswordPolicy.class ) );
+	}
+
+	@Test
+	public void passwordMissingLowercaseFails() {
+		Set<ConstraintViolation<RequireLowercaseBean>> violations = validator.validate(
+				new RequireLowercaseBean( "ALLUPPERCASE123" ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( PasswordPolicy.class ) );
+
+		violations = validator.validate( new RequireLowercaseBean( "UPPERwithLower1" ) );
+		assertNoViolations( violations );
 	}
 
 	@Test
@@ -397,6 +408,41 @@ public class PasswordPolicyValidatorTest {
 		);
 	}
 
+	@Test
+	public void classLevelValidationWithAbstractPasswordPolicyValidator() {
+		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.constraintDefinition( PasswordPolicy.class )
+				.validatedBy( UserRegistrationValidator.class );
+
+		Validator v = config.addMapping( mapping )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<UserRegistration>> violations = v.validate(
+				new UserRegistration( "admin", "myAdminPass1!" ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( PasswordPolicy.class ) );
+
+		violations = v.validate( new UserRegistration( "admin", "Str0ng!Pwd" ) );
+		assertNoViolations( violations );
+	}
+
+	@Test
+	public void classLevelValidationNullPasswordIsValid() {
+		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.constraintDefinition( PasswordPolicy.class )
+				.validatedBy( UserRegistrationValidator.class );
+
+		Validator v = config.addMapping( mapping )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<UserRegistration>> violations = v.validate(
+				new UserRegistration( "admin", null ) );
+		assertNoViolations( violations );
+	}
+
 	// --- Policy definitions ---
 
 	public static class BasicPolicy implements PasswordPolicyDefinition {
@@ -533,6 +579,21 @@ public class PasswordPolicyValidatorTest {
 		@Override
 		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
 			builder.requireCharacters( CharacterType.SPECIAL, 1 );
+		}
+	}
+
+	public static class RequireLowercasePolicy implements PasswordPolicyDefinition {
+		@Override
+		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
+			builder.requireCharacters( CharacterType.LOWERCASE, 1 );
+		}
+	}
+
+	public static class NoUsernamePolicy implements PasswordPolicyDefinition {
+		@Override
+		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
+			builder.minLength( 8 )
+					.addRule( new NoUsernameRule() );
 		}
 	}
 
@@ -700,6 +761,15 @@ public class PasswordPolicyValidatorTest {
 		}
 	}
 
+	private static class RequireLowercaseBean {
+		@PasswordPolicy(RequireLowercasePolicy.class)
+		private final String password;
+
+		RequireLowercaseBean(String password) {
+			this.password = password;
+		}
+	}
+
 	private static class RepeatablePolicyBean {
 		@PasswordPolicy(BasicPolicy.class)
 		@PasswordPolicy(RequireSpecialPolicy.class)
@@ -765,6 +835,48 @@ public class PasswordPolicyValidatorTest {
 					return compromised ? 42 : 0;
 				}
 			};
+		}
+	}
+
+	@PasswordPolicy(NoUsernamePolicy.class)
+	private static class UserRegistration {
+		private final String username;
+		private final String password;
+
+		UserRegistration(String username, String password) {
+			this.username = username;
+			this.password = password;
+		}
+	}
+
+	public static class UserRegistrationValidator
+			extends AbstractPasswordPolicyValidator<UserRegistration> {
+
+		@Override
+		protected char[] getPassword(UserRegistration bean) {
+			return bean.password != null ? bean.password.toCharArray() : null;
+		}
+
+		@Override
+		protected void bindProperties(UserRegistration bean, java.util.function.BiConsumer<String, Object> propertyBinder) {
+			propertyBinder.accept( "username", bean.username );
+		}
+	}
+
+	private static class NoUsernameRule implements PasswordPolicyRule {
+		@Override
+		public String getMessage() {
+			return "password must not contain the username";
+		}
+
+		@Override
+		public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
+			String username = passwordContext.get( "username", String.class );
+			if ( username == null ) {
+				return true;
+			}
+			return !new String( passwordContext.password() ).toLowerCase()
+					.contains( username.toLowerCase() );
 		}
 	}
 
