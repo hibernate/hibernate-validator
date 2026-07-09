@@ -29,7 +29,6 @@ import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.constraintvalidators.hv.password.DefaultPasswordPolicyDefinitionResolver;
 import org.hibernate.validator.internal.engine.bean.BeanResolverImpl;
 import org.hibernate.validator.internal.engine.bean.HibernateValidatorBuiltinBeanConfigurer;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
@@ -57,7 +56,6 @@ import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
@@ -460,14 +458,6 @@ final class ValidatorFactoryConfigurationHelper {
 		return resolveBeanComponent( PropertyNodeNameProvider.class, DefaultPropertyNodeNameProvider.NAME,
 				HibernateValidatorConfiguration.PROPERTY_NODE_NAME_PROVIDER_CLASSNAME,
 				hibernateSpecificConfig, AbstractConfigurationImpl::getPropertyNodeNameProvider,
-				properties, beanResolver );
-	}
-
-	static PasswordPolicyDefinitionResolver determinePasswordPolicyDefinitionResolver(AbstractConfigurationImpl<?> hibernateSpecificConfig,
-			Map<String, String> properties, BeanResolver beanResolver) {
-		return resolveBeanComponent( PasswordPolicyDefinitionResolver.class, DefaultPasswordPolicyDefinitionResolver.NAME,
-				HibernateValidatorConfiguration.PASSWORD_POLICY_DEFINITION_RESOLVER_CLASSNAME,
-				hibernateSpecificConfig, AbstractConfigurationImpl::getPasswordPolicyDefinitionResolver,
 				properties, beanResolver );
 	}
 

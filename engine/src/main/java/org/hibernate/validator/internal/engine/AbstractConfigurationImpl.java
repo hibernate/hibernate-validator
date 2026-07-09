@@ -64,7 +64,6 @@ import org.hibernate.validator.spi.bean.BeanConfigurer;
 import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -123,7 +122,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private final HibernateConstraintValidatorInitializationSharedDataManager sharedDataManager;
 	private final List<BeanConfigurer> beanConfigurers = new ArrayList<>();
 	private BeanProvider beanProvider;
-	private PasswordPolicyDefinitionResolver passwordPolicyDefinitionResolver;
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean failFast;
@@ -395,12 +393,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public T passwordPolicyDefinitionResolver(PasswordPolicyDefinitionResolver resolver) {
-		this.passwordPolicyDefinitionResolver = resolver;
-		return thisAsT();
-	}
-
-	@Override
 	public T getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
 		Contracts.assertNotNull( getterPropertySelectionStrategy, MESSAGES.parameterMustNotBeNull( "getterPropertySelectionStrategy" ) );
 
@@ -623,10 +615,6 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public BeanProvider getBeanProvider() {
 		return beanProvider;
-	}
-
-	public PasswordPolicyDefinitionResolver getPasswordPolicyDefinitionResolver() {
-		return passwordPolicyDefinitionResolver;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
