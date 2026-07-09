@@ -31,7 +31,6 @@ import org.hibernate.validator.spi.password.KeyboardLayout;
 import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
@@ -308,20 +307,6 @@ public class PasswordPolicyValidatorTest {
 		assertThat( violations ).containsOnlyViolations( violationOf( PasswordPolicy.class ) );
 
 		violations = validator.validate( new RepeatablePolicyBean( "Password1!" ) );
-		assertNoViolations( violations );
-	}
-
-	@Test
-	public void customResolver() {
-		TestResolver customResolver = new TestResolver();
-		Validator v = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.passwordPolicyDefinitionResolver( customResolver )
-				.buildValidatorFactory()
-				.getValidator();
-
-		Set<ConstraintViolation<BasicPolicyBean>> violations = v.validate(
-				new BasicPolicyBean( "Passw0rd!xyz" ) );
 		assertNoViolations( violations );
 	}
 
@@ -880,16 +865,4 @@ public class PasswordPolicyValidatorTest {
 		}
 	}
 
-	private static class TestResolver implements PasswordPolicyDefinitionResolver {
-
-		@Override
-		public <T extends PasswordPolicyDefinition> T resolve(Class<T> definitionClass) {
-			try {
-				return definitionClass.getDeclaredConstructor().newInstance();
-			}
-			catch (ReflectiveOperationException e) {
-				throw new RuntimeException( e );
-			}
-		}
-	}
 }

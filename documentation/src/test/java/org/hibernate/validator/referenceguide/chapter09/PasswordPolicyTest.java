@@ -11,13 +11,13 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
@@ -27,7 +27,6 @@ import org.hibernate.validator.spi.password.CharacterType;
 import org.hibernate.validator.spi.password.PasswordContext;
 import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
-import org.hibernate.validator.spi.password.PasswordPolicyDefinitionResolver;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
 import org.junit.Test;
@@ -91,35 +90,17 @@ public class PasswordPolicyTest {
 	//tag::serviceRules[]
 	public static class EnterprisePolicy implements PasswordPolicyDefinition {
 
-		@Inject
-		private DictionaryService dictionaryService;
-
-		@Inject
-		private PasswordHistoryService historyService;
-
 		@Override
 		public void configure(PasswordPolicyBuilder builder,
 				HibernateConstraintValidatorInitializationContext context) {
+			PasswordHistoryService historyService = context.getBeanResolver()
+					.resolve( PasswordHistoryService.class, BeanRetrieval.ANY ).get();
 			builder.minLength( 8 )
 					.noSequence()
-					.addRule( new DictionaryRule( dictionaryService ) )
 					.addRule( new PasswordHistoryRule( historyService ) );
 		}
 	}
 	//end::serviceRules[]
-
-	public static class MyResolver implements PasswordPolicyDefinitionResolver {
-
-		@Override
-		public <T extends PasswordPolicyDefinition> T resolve(Class<T> definitionClass) {
-			try {
-				return definitionClass.getDeclaredConstructor().newInstance();
-			}
-			catch (ReflectiveOperationException e) {
-				throw new RuntimeException( e );
-			}
-		}
-	}
 
 	@Test
 	public void basicPolicy() {
@@ -159,21 +140,6 @@ public class PasswordPolicyTest {
 		);
 
 		violations = validator.validate( new StrictPolicyBean( "S3cureV@lue" ) );
-		assertNoViolations( violations );
-	}
-
-	@Test
-	public void customResolver() {
-		//tag::resolverRegistration[]
-		Validator validator = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.passwordPolicyDefinitionResolver( new MyResolver() )
-				.buildValidatorFactory()
-				.getValidator();
-		//end::resolverRegistration[]
-
-		Set<ConstraintViolation<UserAccount>> violations = validator.validate(
-				new UserAccount( "Passw0rd!" ) );
 		assertNoViolations( violations );
 	}
 
