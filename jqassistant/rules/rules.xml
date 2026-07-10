@@ -66,10 +66,35 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:ConstraintAnnotationsMustBeDocumentedAndRepeatable">
+        <description>Constraint annotations must be annotated with both @Documented and @Repeatable.</description>
+        <cypher><![CDATA[
+            MATCH
+                (annotationType)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(constraintType)
+            WHERE
+                constraintType.fqn = "jakarta.validation.Constraint"
+                AND annotationType.fqn =~ "^org\\.hibernate\\.validator\\.constraints\\..*"
+                AND NOT (annotationType)-[:ANNOTATED_BY]->()-[:OF_TYPE]->({fqn: "java.lang.annotation.Documented"})
+            RETURN
+                annotationType.fqn AS ConstraintAnnotation, "Missing @Documented" AS Issue
+
+            UNION ALL
+            MATCH
+                (annotationType)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(constraintType)
+            WHERE
+                constraintType.fqn = "jakarta.validation.Constraint"
+                AND annotationType.fqn =~ "^org\\.hibernate\\.validator\\.constraints\\..*"
+                AND NOT (annotationType)-[:ANNOTATED_BY]->()-[:OF_TYPE]->({fqn: "java.lang.annotation.Repeatable"})
+            RETURN
+                annotationType.fqn AS ConstraintAnnotation, "Missing @Repeatable" AS Issue
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
         <includeConstraint refId="my-rules:PublicFieldsMayNotExposeInternalTypes" />
+        <includeConstraint refId="my-rules:ConstraintAnnotationsMustBeDocumentedAndRepeatable" />
     </group>
 
 </jqa:jqassistant-rules>
