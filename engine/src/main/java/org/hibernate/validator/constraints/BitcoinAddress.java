@@ -13,6 +13,7 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -20,6 +21,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.constraints.BitcoinAddress.List;
 
 /**
  * The string has to be a well-formed BTC (Bitcoin) Mainnet address. Accepts {@code CharSequence}.
@@ -36,6 +38,7 @@ import org.hibernate.validator.Incubating;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
+@Repeatable(List.class)
 public @interface BitcoinAddress {
 
 	String message() default "{org.hibernate.validator.constraints.BitcoinAddress.message}";
@@ -52,5 +55,15 @@ public @interface BitcoinAddress {
 
 	enum BitcoinAddressType {
 		ANY, P2PKH, P2SH, BECH32, P2WSH, P2WPKH, P2TR;
+	}
+
+	/**
+	 * Defines several {@code @BitcoinAddress} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		BitcoinAddress[] value();
 	}
 }
