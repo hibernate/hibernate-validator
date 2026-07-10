@@ -46,6 +46,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.CodePointLength;
+import org.hibernate.validator.constraints.Contains;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
@@ -160,6 +161,7 @@ public class MessagePropertiesTest {
 							violationOf( ISBN.class ),
 							violationOf( Length.class ),
 							violationOf( CodePointLength.class ),
+							violationOf( Contains.class ),
 							violationOf( LuhnCheck.class ),
 							violationOf( Mod10Check.class ),
 							violationOf( Mod11Check.class ),
@@ -304,6 +306,9 @@ public class MessagePropertiesTest {
 
 		@CodePointLength(min = 2, max = 4)
 		private String codePointLength = "666666";
+
+		@Contains("xyz")
+		private String contains = "no match here";
 
 		@LuhnCheck
 		private String luhnCheck = "4";

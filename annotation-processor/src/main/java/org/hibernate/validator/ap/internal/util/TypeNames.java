@@ -67,6 +67,7 @@ public class TypeNames {
 		public static final String BITCOIN_ADDRESS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".BitcoinAddress";
 
 		public static final String CODE_POINT_LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".CodePointLength";
+		public static final String CONTAINS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Contains";
 		public static final String CURRENCY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Currency";
 		public static final String DATE_TIME_FORMAT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".DateTimeFormat";
 		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";

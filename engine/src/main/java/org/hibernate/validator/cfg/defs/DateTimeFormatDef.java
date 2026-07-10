@@ -7,6 +7,7 @@ package org.hibernate.validator.cfg.defs;
 
 import java.util.Locale;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.DateTimeFormat;
 
@@ -15,6 +16,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
  * @author Sean Okafor
  * @since 9.2
  */
+@Incubating
 public class DateTimeFormatDef extends ConstraintDef<DateTimeFormatDef, DateTimeFormat> {
 
 	public DateTimeFormatDef() {
