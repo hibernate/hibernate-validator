@@ -45,6 +45,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.constraints.CodePointLength;
+import org.hibernate.validator.constraints.Contains;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
@@ -118,6 +119,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( ISBN.class, new ISBNBean() );
 		testConstraint( Length.class, new LengthBean() );
 		testConstraint( CodePointLength.class, new CodePointLengthBean() );
+		testConstraint( Contains.class, new ContainsBean() );
 		testConstraint( LuhnCheck.class, new LuhnCheckBean() );
 		testConstraint( Mod10Check.class, new Mod10CheckBean() );
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
@@ -336,6 +338,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@CodePointLength(min = 2, max = 4)
 		private String codePointLength = "666666";
+	}
+
+	private static class ContainsBean {
+
+		@Contains("xyz")
+		private String contains = "no match here";
 	}
 
 	private static class LuhnCheckBean {

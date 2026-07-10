@@ -965,4 +965,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 274, value = "Unsupported operation for the current constraint validator kind.")
 	AssertionError getUnexpectedConstraintValidatorContextCall();
+
+	@Message(id = 275, value = "The minRequired parameter (%1$d) cannot exceed the number of values (%2$d).")
+	IllegalArgumentException getMinRequiredCannotExceedNumberOfValuesException(int minRequired, int valuesLength);
 }

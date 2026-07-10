@@ -665,6 +665,10 @@ message, groups and payload. This is a requirement of the Jakarta Validation spe
 In addition to the constraints defined by the Jakarta Validation API, Hibernate Validator provides several useful custom constraints which are listed below.
 With one exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-level constraint.
 
+`@Contains(value=, minRequired=, ignoreCase=)`:: Validates that the annotated character sequence contains the specified substrings. By default, all substrings must be present. Use `minRequired` to specify a minimum number of substrings that must match (e.g., `minRequired=1` for an OR-style check). When `ignoreCase` is set to `true`, the comparison is case-insensitive.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@CreditCardNumber(ignoreNonDigitCharacters=)`:: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.dirigodev.com/blog/ecommerce/anatomy-of-a-credit-card-number/[Anatomy of a credit card number]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
