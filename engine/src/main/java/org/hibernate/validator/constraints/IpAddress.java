@@ -13,6 +13,7 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -20,6 +21,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.constraints.IpAddress.List;
 
 /**
  * Checks that the annotated character sequence is a valid
@@ -34,6 +36,7 @@ import org.hibernate.validator.Incubating;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
+@Repeatable(List.class)
 public @interface IpAddress {
 
 	String message() default "{org.hibernate.validator.constraints.IpAddress.message}";
@@ -59,5 +62,15 @@ public @interface IpAddress {
 		IPv4,
 		IPv6,
 		ANY
+	}
+
+	/**
+	 * Defines several {@code @IpAddress} annotations on the same element.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface List {
+		IpAddress[] value();
 	}
 }
