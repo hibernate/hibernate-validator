@@ -19,13 +19,6 @@
     <description>Aggregates dependencies and runs the Jakarta Validation TCK</description>
 
     <properties>
-        <!--
-            We are overriding the AssertJ version here and adding a dependency management for it
-            to override the one we are using for the main build.
-            The version here must be the exact same version as the one used in the Bean Validation TCK
-        -->
-        <version.org.assertj.assertj-core>3.27.4</version.org.assertj.assertj-core>
-
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
 
@@ -34,16 +27,6 @@
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${version.org.assertj.assertj-core}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -70,8 +53,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -85,8 +72,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.jboss.arquillian.testng</groupId>
-            <artifactId>arquillian-testng-container</artifactId>
+            <groupId>org.jboss.arquillian.junit5</groupId>
+            <artifactId>arquillian-junit5-container</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -95,8 +82,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite</artifactId>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -151,6 +138,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <dependenciesToScan>
+                        <dependency>jakarta.validation:validation-tck-tests</dependency>
+                    </dependenciesToScan>
                     <systemPropertyVariables>
                         <validation.provider>${validation.provider}</validation.provider>
                     </systemPropertyVariables>
@@ -201,6 +191,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <excludes>
+                                <exclude>**/integration/cdi/**</exclude>
+                            </excludes>
                             <systemPropertyVariables>
                                 <validation.provider>${validation.provider}</validation.provider>
                                 <excludeIntegrationTests>true</excludeIntegrationTests>
