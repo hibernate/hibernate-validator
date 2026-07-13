@@ -51,7 +51,7 @@ public class XmlParserHelper {
 
 	// xmlInputFactory used to be static in order to cache the factory, but that introduced a leakage of
 	// class loader in WildFly. See HV-842
-	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+	private final XMLInputFactory xmlInputFactory = createXmlInputFactory();
 
 	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>(
 			NUMBER_OF_SCHEMAS
@@ -90,6 +90,17 @@ public class XmlParserHelper {
 		catch (Exception e) {
 			throw LOG.getUnableToCreateXMLEventReader( resourceName, e );
 		}
+	}
+
+	private static XMLInputFactory createXmlInputFactory() {
+		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+		// The validation and constraint mapping descriptors never rely on a DTD, so refuse doctype
+		// declarations and external entities. Otherwise an external parameter entity in the internal
+		// subset is fetched while reading the schema version, before the schema itself gets a chance to
+		// reject the document, which lets an untrusted descriptor reach out to a local file or a remote host.
+		xmlInputFactory.setProperty( XMLInputFactory.SUPPORT_DTD, false );
+		xmlInputFactory.setProperty( XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false );
+		return xmlInputFactory;
 	}
 
 	private String getVersionValue(StartElement startElement) {
