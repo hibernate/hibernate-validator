@@ -87,7 +87,20 @@ public abstract class AbstractConstraintValidatorManagerImpl implements Constrai
 		constraintValidator = validatorDescriptor.newInstance( constraintValidatorFactory );
 		initializeValidator( descriptor, constraintValidator, initializationContext );
 
+		if ( constraintValidator instanceof HibernateConstraintValidator<?, ?> hibernateConstraintValidator ) {
+			onValidatorCreated( hibernateConstraintValidator );
+		}
+
 		return constraintValidator;
+	}
+
+	protected void onValidatorCreated(HibernateConstraintValidator<?, ?> hibernateConstraintValidator) {
+	}
+
+	protected static void closeValidator(ConstraintValidator<?, ?> validator) {
+		if ( validator instanceof HibernateConstraintValidator<?, ?> hibernateConstraintValidator ) {
+			hibernateConstraintValidator.close();
+		}
 	}
 
 	/**

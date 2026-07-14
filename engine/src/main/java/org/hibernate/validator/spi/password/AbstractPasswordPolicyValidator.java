@@ -11,6 +11,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.bean.BeanHolder;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
@@ -49,7 +50,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.password.Passwor
 public abstract class AbstractPasswordPolicyValidator<T>
 		implements HibernateConstraintValidator<PasswordPolicy, T> {
 
-	private List<PasswordPolicyRule> rules;
+	private BeanHolder<List<PasswordPolicyRule>> rulesHolder;
 
 	/**
 	 * Extracts the password from the bean being validated.
@@ -79,7 +80,7 @@ public abstract class AbstractPasswordPolicyValidator<T>
 	@Override
 	public void initialize(ConstraintDescriptor<PasswordPolicy> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
-		this.rules = PasswordPolicyValidationHelper.buildRules( constraintDescriptor, initializationContext );
+		this.rulesHolder = PasswordPolicyValidationHelper.buildRules( constraintDescriptor, initializationContext );
 	}
 
 	@Override
@@ -93,6 +94,13 @@ public abstract class AbstractPasswordPolicyValidator<T>
 		}
 		DefaultPasswordContext passwordContext = PasswordPolicyValidationHelper.createContext( password );
 		bindProperties( value, passwordContext::property );
-		return PasswordPolicyValidationHelper.validate( passwordContext, rules, context );
+		return PasswordPolicyValidationHelper.validate( passwordContext, rulesHolder.get(), context );
+	}
+
+	@Override
+	public void close() {
+		if ( rulesHolder != null ) {
+			rulesHolder.close();
+		}
 	}
 }

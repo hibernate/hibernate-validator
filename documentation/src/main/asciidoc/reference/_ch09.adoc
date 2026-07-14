@@ -491,11 +491,13 @@ The following components can be configured through the bean system.
 
 These components have a builtin default implementation. To override the default, you must
 either use the programmatic setter on the configuration object or set the corresponding
-configuration property. The property value is resolved as a bean reference through the
-bean system -- so you can register a custom implementation, e.g. via `addBeanConfigurer()`, and
-then select it using the property.
+configuration property.
 
 The resolution order is: explicit programmatic setter > configuration property > builtin default.
+
+The following components are required at factory construction time and have a simpler resolution.
+When configured through a property, the property value is treated as a fully-qualified class name
+and the component is instantiated via its no-arg constructor.
 
 [cols="2,3,2", options="header"]
 |===
