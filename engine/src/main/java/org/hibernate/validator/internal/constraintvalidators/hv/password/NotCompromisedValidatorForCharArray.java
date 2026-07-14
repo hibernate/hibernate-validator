@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.constraintvalidators.hv.password;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanHolder;
 import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.constraints.NotCompromised;
@@ -18,19 +19,19 @@ import org.hibernate.validator.spi.password.CompromisedPasswordResult;
 
 public class NotCompromisedValidatorForCharArray implements HibernateConstraintValidator<NotCompromised, char[]> {
 
-	private CompromisedPasswordChecker checker;
+	private BeanHolder<CompromisedPasswordChecker> checkerHolder;
 
 	@Override
 	public void initialize(ConstraintDescriptor<NotCompromised> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
 		String checkerRef = constraintDescriptor.getAnnotation().checker();
 		if ( checkerRef.isEmpty() ) {
-			this.checker = initializationContext.getBeanResolver()
-					.resolve( CompromisedPasswordChecker.class, BeanRetrieval.ANY ).get();
+			this.checkerHolder = initializationContext.getBeanResolver()
+					.resolve( CompromisedPasswordChecker.class, BeanRetrieval.ANY );
 		}
 		else {
-			this.checker = initializationContext.getBeanResolver()
-					.resolve( BeanReference.parse( CompromisedPasswordChecker.class, checkerRef ) ).get();
+			this.checkerHolder = initializationContext.getBeanResolver()
+					.resolve( BeanReference.parse( CompromisedPasswordChecker.class, checkerRef ) );
 		}
 	}
 
@@ -40,11 +41,18 @@ public class NotCompromisedValidatorForCharArray implements HibernateConstraintV
 			return true;
 		}
 
-		final CompromisedPasswordResult result = checker.check( value );
+		final CompromisedPasswordResult result = checkerHolder.get().check( value );
 		if ( !result.compromised() ) {
 			return true;
 		}
 		result.addMessageParameters( context.unwrap( HibernateConstraintValidatorContext.class ) );
 		return false;
+	}
+
+	@Override
+	public void close() {
+		if ( checkerHolder != null ) {
+			checkerHolder.close();
+		}
 	}
 }

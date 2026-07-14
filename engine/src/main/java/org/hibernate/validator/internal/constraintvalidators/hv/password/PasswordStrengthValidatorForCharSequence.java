@@ -9,6 +9,7 @@ import java.util.Arrays;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanHolder;
 import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -21,7 +22,7 @@ import org.hibernate.validator.spi.password.PasswordStrengthResult;
 public class PasswordStrengthValidatorForCharSequence implements HibernateConstraintValidator<PasswordStrength, CharSequence> {
 
 	private int minScore;
-	private PasswordStrengthEstimator estimator;
+	private BeanHolder<PasswordStrengthEstimator> estimatorHolder;
 
 	@Override
 	public void initialize(ConstraintDescriptor<PasswordStrength> constraintDescriptor,
@@ -29,12 +30,12 @@ public class PasswordStrengthValidatorForCharSequence implements HibernateConstr
 		this.minScore = constraintDescriptor.getAnnotation().min();
 		String estimatorRef = constraintDescriptor.getAnnotation().estimator();
 		if ( estimatorRef.isEmpty() ) {
-			this.estimator = initializationContext.getBeanResolver()
-					.resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY ).get();
+			this.estimatorHolder = initializationContext.getBeanResolver()
+					.resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY );
 		}
 		else {
-			this.estimator = initializationContext.getBeanResolver()
-					.resolve( BeanReference.parse( PasswordStrengthEstimator.class, estimatorRef ) ).get();
+			this.estimatorHolder = initializationContext.getBeanResolver()
+					.resolve( BeanReference.parse( PasswordStrengthEstimator.class, estimatorRef ) );
 		}
 	}
 
@@ -46,7 +47,7 @@ public class PasswordStrengthValidatorForCharSequence implements HibernateConstr
 
 		char[] chars = PasswordPolicyValidationHelper.toCharArray( value );
 		try {
-			PasswordStrengthResult result = estimator.estimate( chars );
+			PasswordStrengthResult result = estimatorHolder.get().estimate( chars );
 
 			if ( result.meetsMinimumStrength( minScore ) ) {
 				return true;
@@ -58,6 +59,13 @@ public class PasswordStrengthValidatorForCharSequence implements HibernateConstr
 		}
 		finally {
 			Arrays.fill( chars, '\0' );
+		}
+	}
+
+	@Override
+	public void close() {
+		if ( estimatorHolder != null ) {
+			estimatorHolder.close();
 		}
 	}
 }

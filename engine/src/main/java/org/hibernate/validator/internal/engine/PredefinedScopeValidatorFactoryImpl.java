@@ -15,7 +15,9 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageInterpolator;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
@@ -159,8 +161,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 		this.validationOrderGenerator = new ValidationOrderGenerator();
 
-		this.getterPropertySelectionStrategy = ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, beanResolver );
-		this.propertyNodeNameProvider = ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, beanResolver );
+		this.getterPropertySelectionStrategy = determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, beanResolver );
+		this.propertyNodeNameProvider = determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, beanResolver );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		ConstraintHelper constraintHelper = ConstraintHelper.forBuiltinConstraints(

@@ -9,6 +9,7 @@ import java.util.List;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanHolder;
 import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
@@ -22,15 +23,14 @@ public class PasswordPolicyValidationHelper {
 	private PasswordPolicyValidationHelper() {
 	}
 
-	public static List<PasswordPolicyRule> buildRules(ConstraintDescriptor<PasswordPolicy> constraintDescriptor,
+	public static BeanHolder<List<PasswordPolicyRule>> buildRules(ConstraintDescriptor<PasswordPolicy> constraintDescriptor,
 			HibernateConstraintValidatorInitializationContext initializationContext) {
 		Class<? extends PasswordPolicyDefinition> definitionClass = constraintDescriptor.getAnnotation().value();
 
-		PasswordPolicyDefinition definition = initializationContext.getBeanResolver()
-				.resolve( definitionClass, BeanRetrieval.ANY ).get();
-		DefaultPasswordPolicyBuilder builder = new DefaultPasswordPolicyBuilder();
-		definition.configure( builder, initializationContext );
-		return builder.build();
+		BeanHolder<? extends PasswordPolicyDefinition> definitionHolder = initializationContext.getBeanResolver()
+				.resolve( definitionClass, BeanRetrieval.ANY );
+
+		return new PasswordPolicyRulesBeanHolder( definitionHolder, initializationContext );
 	}
 
 	public static DefaultPasswordContext createContext(char[] password) {
@@ -61,5 +61,40 @@ public class PasswordPolicyValidationHelper {
 		}
 
 		return allValid;
+	}
+
+	private static class PasswordPolicyRulesBeanHolder implements BeanHolder<List<PasswordPolicyRule>> {
+		private final BeanHolder<? extends PasswordPolicyDefinition> definitionHolder;
+		private final HibernateConstraintValidatorInitializationContext initializationContext;
+		private volatile List<PasswordPolicyRule> rules;
+
+		public PasswordPolicyRulesBeanHolder(
+				BeanHolder<? extends PasswordPolicyDefinition> definitionHolder,
+				HibernateConstraintValidatorInitializationContext initializationContext) {
+			this.definitionHolder = definitionHolder;
+			this.initializationContext = initializationContext;
+		}
+
+		@Override
+		public List<PasswordPolicyRule> get() {
+			List<PasswordPolicyRule> result = rules;
+			if ( result == null ) {
+				synchronized (this) {
+					result = rules;
+					if ( result == null ) {
+						DefaultPasswordPolicyBuilder builder = new DefaultPasswordPolicyBuilder();
+						definitionHolder.get().configure( builder, initializationContext );
+						result = builder.build();
+						rules = result;
+					}
+				}
+			}
+			return result;
+		}
+
+		@Override
+		public void close() {
+			definitionHolder.close();
+		}
 	}
 }

@@ -23,7 +23,6 @@ import jakarta.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.bean.BeanHolder;
-import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -216,6 +215,16 @@ final class ValidatorFactoryConfigurationHelper {
 		return tmpFailFastOnPropertyViolation;
 	}
 
+	/**
+	 * Resolves a factory-scoped infrastructure bean that must be available at construction time.
+	 * <p>
+	 * These beans are resolved eagerly and cannot benefit from lazy {@link BeanHolder} resolution,
+	 * so property-based resolution uses {@link BeanRetrieval#CONSTRUCTOR} (reflection only) to avoid
+	 * going through the {@link org.hibernate.validator.spi.bean.BeanProvider}.
+	 * <p>
+	 * For beans that can be resolved lazily (e.g. {@code MessageInterpolator}, {@code ScriptEvaluatorFactory}),
+	 * use {@link #resolveBeanComponentHolder} instead.
+	 */
 	static <T> T resolveBeanComponent(Class<T> beanType, String defaultName, String propertyKey,
 			AbstractConfigurationImpl<?> config, Function<AbstractConfigurationImpl<?>, T> getter,
 			Map<String, String> properties, BeanResolver beanResolver) {
@@ -228,7 +237,7 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( propertyKey != null ) {
 			String prop = properties.get( propertyKey );
 			if ( prop != null ) {
-				return beanResolver.resolve( BeanReference.parse( beanType, prop ) ).get();
+				return beanResolver.resolve( beanType, prop, BeanRetrieval.CONSTRUCTOR ).get();
 			}
 		}
 		return beanResolver.resolve( beanType, defaultName, BeanRetrieval.BUILTIN ).get();
@@ -361,7 +370,7 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 		String prop = properties.get( HibernateValidatorConfiguration.MESSAGE_INTERPOLATOR );
 		if ( prop != null ) {
-			return beanResolver.resolve( BeanReference.parse( MessageInterpolator.class, prop ) ).get();
+			return beanResolver.resolve( MessageInterpolator.class, prop, BeanRetrieval.CONSTRUCTOR ).get();
 		}
 		return beanResolver.resolve( MessageInterpolator.class, "default", BeanRetrieval.BUILTIN ).get();
 	}

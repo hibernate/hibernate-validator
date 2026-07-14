@@ -164,15 +164,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		BeanResolver beanResolver = initializeBeanResolver( configurationState );
 
-		ScriptEvaluatorFactory scriptEvaluatorFactory = determineScriptEvaluatorFactory( hibernateSpecificConfig, properties, beanResolver );
-
 		this.validatorFactoryScopedContext = new ValidatorFactoryScopedContext(
 				determineMessageInterpolator( hibernateSpecificConfig, configurationState, properties, beanResolver ),
 				configurationState.getTraversableResolver(),
 				new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() ),
 				configurationState.getClockProvider(),
 				determineTemporalValidationTolerance( configurationState, properties ),
-				scriptEvaluatorFactory,
+				determineScriptEvaluatorFactory( hibernateSpecificConfig, properties, beanResolver ),
 				determineFailFast( hibernateSpecificConfig, properties ),
 				determineFailFastOnPropertyViolation( hibernateSpecificConfig, properties ),
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
