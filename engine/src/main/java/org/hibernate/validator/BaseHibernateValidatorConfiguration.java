@@ -25,6 +25,8 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.bean.BeanConfigurer;
+import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -178,6 +180,29 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
+
+	/**
+	 * Property for configuring the message interpolator, allowing to set a custom implementation of
+	 * {@link jakarta.validation.MessageInterpolator} which will be used for message interpolation.
+	 * Accepts a fully qualified class name, or a bean reference string.
+	 *
+	 * @since 9.2.0
+	 * @see org.hibernate.validator.bean.BeanReference
+	 */
+	@Incubating
+	String MESSAGE_INTERPOLATOR = "hibernate.validator.message_interpolator";
+
+	/**
+	 * Property for configuring the bean metadata class normalizer, allowing to set a custom implementation of
+	 * {@link BeanMetaDataClassNormalizer} which will be used to normalize bean classes (e.g. for proxy unwrapping).
+	 * Accepts a fully qualified class name, or a bean reference string.
+	 *
+	 * @since 9.2.0
+	 * @see org.hibernate.validator.bean.BeanReference
+	 */
+	@Incubating
+	String BEAN_META_DATA_CLASS_NORMALIZER = "hibernate.validator.bean_meta_data_class_normalizer";
+
 
 	/**
 	 * <p>
@@ -387,6 +412,33 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	<T, V extends T> S addConstraintValidatorInitializationSharedData(Class<T> dataClass, V constraintValidatorInitializationSharedData);
+
+	/**
+	 * Registers a {@link BeanConfigurer} that will be used to define beans
+	 * resolvable through the {@link org.hibernate.validator.bean.BeanResolver}.
+	 *
+	 * @param beanConfigurer the bean configurer to register
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.2.0
+	 */
+	@Incubating
+	S addBeanConfigurer(BeanConfigurer beanConfigurer);
+
+	/**
+	 * Sets the {@link BeanProvider} to be used for bean resolution.
+	 * <p>
+	 * A bean provider bridges Hibernate Validator's bean resolution with a
+	 * dependency injection framework such as CDI.
+	 * <p>
+	 * If not set, only beans registered via {@link BeanConfigurer} and
+	 * reflective instantiation will be available.
+	 *
+	 * @param beanProvider the bean provider to use
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.2.0
+	 */
+	@Incubating
+	S beanProvider(BeanProvider beanProvider);
 
 	/**
 	 * Allows to set a getter property selection strategy defining the rules determining if a method is a getter

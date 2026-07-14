@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,8 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.bean.BeanConfigurer;
+import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -116,6 +119,8 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	// HV-specific options
 	private final HibernateConstraintValidatorInitializationSharedDataManager sharedDataManager;
+	private final List<BeanConfigurer> beanConfigurers = new ArrayList<>();
+	private BeanProvider beanProvider;
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 	private boolean failFast;
@@ -373,6 +378,19 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
+	public T addBeanConfigurer(BeanConfigurer beanConfigurer) {
+		Contracts.assertNotNull( beanConfigurer, MESSAGES.parameterMustNotBeNull( "beanConfigurer" ) );
+		this.beanConfigurers.add( beanConfigurer );
+		return thisAsT();
+	}
+
+	@Override
+	public T beanProvider(BeanProvider beanProvider) {
+		this.beanProvider = beanProvider;
+		return thisAsT();
+	}
+
+	@Override
 	public T getterPropertySelectionStrategy(GetterPropertySelectionStrategy getterPropertySelectionStrategy) {
 		Contracts.assertNotNull( getterPropertySelectionStrategy, MESSAGES.parameterMustNotBeNull( "getterPropertySelectionStrategy" ) );
 
@@ -556,6 +574,14 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return localeResolver;
 	}
 
+	Locale getDefaultLocale() {
+		return defaultLocale;
+	}
+
+	boolean isMessageInterpolatorExplicitlySet() {
+		return validationBootstrapParameters.getMessageInterpolator() != null;
+	}
+
 	public ScriptEvaluatorFactory getScriptEvaluatorFactory() {
 		return scriptEvaluatorFactory;
 	}
@@ -570,6 +596,14 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public HibernateConstraintValidatorInitializationSharedDataManager getSharedDataManager() {
 		return sharedDataManager;
+	}
+
+	public List<BeanConfigurer> getBeanConfigurers() {
+		return beanConfigurers;
+	}
+
+	public BeanProvider getBeanProvider() {
+		return beanProvider;
 	}
 
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
@@ -878,7 +912,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		}
 	}
 
-	private Set<Locale> getAllSupportedLocales() {
+	Set<Locale> getAllSupportedLocales() {
 		if ( locales.isEmpty() ) {
 			return Collections.singleton( defaultLocale );
 		}

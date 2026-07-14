@@ -44,6 +44,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
+import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
@@ -55,9 +56,12 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.PasswordPolicy;
+import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -76,6 +80,13 @@ import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
+import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
+import org.hibernate.validator.spi.password.CompromisedPasswordResult;
+import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
+import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
+import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
+import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 
 import org.javamoney.moneta.Money;
@@ -143,6 +154,9 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
 		testConstraint( UUID.class, new UUIDBean() );
 		testConstraint( DateTimeFormat.class, new DateTimeFormatBean() );
+		testConstraint( NotCompromised.class, new NotCompromisedBean() );
+		testConstraint( PasswordStrength.class, new PasswordStrengthBean() );
+		testConstraint( PasswordPolicy.class, new PasswordPolicyBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -166,6 +180,12 @@ public class PredefinedScopeAllConstraintsTest {
 				.configure()
 				.builtinConstraints( Collections.singleton( constraint.getName() ) )
 				.initializeBeanMetaData( Collections.singleton( beanClass ) )
+				.addBeanConfigurer( context -> {
+					context.define( PasswordStrengthEstimator.class,
+							BeanReference.ofInstance( password -> PasswordStrengthResult.simple( 0, "weak" ) ) );
+					context.define( CompromisedPasswordChecker.class,
+							BeanReference.ofInstance( password -> CompromisedPasswordResult.simple( 1 ) ) );
+				} )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -492,7 +512,31 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@UUID
 		private String uuid = "invalid";
+	}
 
+	private static class NotCompromisedBean {
+
+		@NotCompromised
+		private String password = "compromised";
+	}
+
+	private static class PasswordStrengthBean {
+
+		@PasswordStrength(min = 4)
+		private String password = "weak";
+	}
+
+	private static class PasswordPolicyBean {
+
+		@PasswordPolicy(FailingPolicy.class)
+		private String password = "ab";
+	}
+
+	public static class FailingPolicy implements PasswordPolicyDefinition {
+		@Override
+		public void configure(PasswordPolicyBuilder builder, HibernateConstraintValidatorInitializationContext context) {
+			builder.minLength( 8 );
+		}
 	}
 
 	private static class DateTimeFormatBean {

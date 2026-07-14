@@ -12,11 +12,13 @@ import java.util.function.Supplier;
 import jakarta.validation.ClockProvider;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultClockProvider;
+import org.hibernate.validator.internal.engine.bean.BeanResolverImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
@@ -106,6 +108,13 @@ public class ConstraintValidatorInitializationHelper {
 			@Override
 			public <C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent) {
 				return createIfNotPresent.get();
+			}
+
+			@Override
+			public BeanResolver getBeanResolver() {
+				return BeanResolverImpl.create(
+						ConstraintValidatorInitializationHelper.class.getClassLoader(),
+						Collections.emptyList(), null );
 			}
 		};
 	}

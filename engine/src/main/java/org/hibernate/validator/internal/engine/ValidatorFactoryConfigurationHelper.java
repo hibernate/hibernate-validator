@@ -10,16 +10,25 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
+import jakarta.validation.MessageInterpolator;
 import jakarta.validation.spi.ConfigurationState;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.bean.BeanHolder;
+import org.hibernate.validator.bean.BeanResolver;
+import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.bean.BeanResolverImpl;
+import org.hibernate.validator.internal.engine.bean.HibernateValidatorBuiltinBeanConfigurer;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationSharedDataManager;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
@@ -31,12 +40,17 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
+import org.hibernate.validator.internal.util.actions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.internal.util.actions.NewInstance;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.bean.BeanConfigurer;
+import org.hibernate.validator.spi.bean.BeanProvider;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -201,32 +215,40 @@ final class ValidatorFactoryConfigurationHelper {
 		return tmpFailFastOnPropertyViolation;
 	}
 
-	static ScriptEvaluatorFactory determineScriptEvaluatorFactory(ConfigurationState configurationState, Map<String, String> properties,
-			ClassLoader externalClassLoader) {
-		if ( configurationState instanceof AbstractConfigurationImpl ) {
-			AbstractConfigurationImpl<?> hibernateSpecificConfig = (AbstractConfigurationImpl<?>) configurationState;
-			if ( hibernateSpecificConfig.getScriptEvaluatorFactory() != null ) {
-				LOG.usingScriptEvaluatorFactory( hibernateSpecificConfig.getScriptEvaluatorFactory().getClass() );
-				return hibernateSpecificConfig.getScriptEvaluatorFactory();
+	/**
+	 * Resolves a factory-scoped infrastructure bean that must be available at construction time.
+	 * <p>
+	 * These beans are resolved eagerly and cannot benefit from lazy {@link BeanHolder} resolution,
+	 * so property-based resolution uses {@link BeanRetrieval#CONSTRUCTOR} (reflection only) to avoid
+	 * going through the {@link org.hibernate.validator.spi.bean.BeanProvider}.
+	 * <p>
+	 * For beans that can be resolved lazily (e.g. {@code MessageInterpolator}, {@code ScriptEvaluatorFactory}),
+	 * use {@link #resolveBeanComponentHolder} instead.
+	 */
+	static <T> T resolveBeanComponent(Class<T> beanType, String defaultName, String propertyKey,
+			AbstractConfigurationImpl<?> config, Function<AbstractConfigurationImpl<?>, T> getter,
+			Map<String, String> properties, BeanResolver beanResolver) {
+		if ( config != null && getter != null ) {
+			T val = getter.apply( config );
+			if ( val != null ) {
+				return val;
 			}
 		}
-
-		String scriptEvaluatorFactoryFqcn = properties.get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME );
-		if ( scriptEvaluatorFactoryFqcn != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends ScriptEvaluatorFactory> clazz = (Class<? extends ScriptEvaluatorFactory>) LoadClass.action( scriptEvaluatorFactoryFqcn, externalClassLoader );
-				ScriptEvaluatorFactory scriptEvaluatorFactory = NewInstance.action( clazz, "script evaluator factory class" );
-				LOG.usingScriptEvaluatorFactory( clazz );
-
-				return scriptEvaluatorFactory;
-			}
-			catch (Exception e) {
-				throw LOG.getUnableToInstantiateScriptEvaluatorFactoryClassException( scriptEvaluatorFactoryFqcn, e );
+		if ( propertyKey != null ) {
+			String prop = properties.get( propertyKey );
+			if ( prop != null ) {
+				return beanResolver.resolve( beanType, prop, BeanRetrieval.CONSTRUCTOR ).get();
 			}
 		}
+		return beanResolver.resolve( beanType, defaultName, BeanRetrieval.BUILTIN ).get();
+	}
 
-		return new DefaultScriptEvaluatorFactory( externalClassLoader );
+	static ScriptEvaluatorFactory determineScriptEvaluatorFactory(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties, BeanResolver beanResolver) {
+		return resolveBeanComponent( ScriptEvaluatorFactory.class, DefaultScriptEvaluatorFactory.NAME,
+				HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME,
+				hibernateSpecificConfig, AbstractConfigurationImpl::getScriptEvaluatorFactory,
+				properties, beanResolver );
 	}
 
 	static Duration determineTemporalValidationTolerance(ConfigurationState configurationState, Map<String, String> properties) {
@@ -277,6 +299,82 @@ final class ValidatorFactoryConfigurationHelper {
 		return configured.copy();
 	}
 
+	static BeanResolver initializeBeanResolver(ConfigurationState configurationState) {
+		List<BeanConfigurer> configurers = new ArrayList<>();
+		BeanProvider beanProvider = null;
+
+		ClassLoader classLoader = determineExternalClassLoader( configurationState );
+		if ( classLoader == null ) {
+			classLoader = Thread.currentThread().getContextClassLoader();
+			if ( classLoader == null ) {
+				classLoader = ValidatorFactoryConfigurationHelper.class.getClassLoader();
+			}
+		}
+
+		// 1. Built-in defaults (lowest priority)
+		configurers.add( new HibernateValidatorBuiltinBeanConfigurer() );
+
+		// 2. ServiceLoader-discovered configurers
+		configurers.addAll( GetInstancesFromServiceLoader.action( classLoader, BeanConfigurer.class ) );
+
+		// 3. User-provided configurers (highest priority)
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
+			configurers.addAll( hibernateSpecificConfig.getBeanConfigurers() );
+			beanProvider = hibernateSpecificConfig.getBeanProvider();
+		}
+
+		// 4. Default MessageInterpolator bean (captures config state, resolves LocaleResolver through beans)
+		final ClassLoader resolvedClassLoader = classLoader;
+		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
+			final Set<Locale> supportedLocales = hibernateSpecificConfig.getAllSupportedLocales();
+			final Locale defaultLocale = hibernateSpecificConfig.getDefaultLocale();
+			final boolean preload = hibernateSpecificConfig.preloadResourceBundles();
+			final Map<String, String> properties = hibernateSpecificConfig.getProperties();
+
+			configurers.add( context -> context.define( MessageInterpolator.class, "default",
+					resolver -> {
+						LocaleResolver localeResolver = resolveBeanComponent( LocaleResolver.class, DefaultLocaleResolver.NAME,
+								HibernateValidatorConfiguration.LOCALE_RESOLVER_CLASSNAME,
+								hibernateSpecificConfig, AbstractConfigurationImpl::getLocaleResolver,
+								properties, resolver );
+						PlatformResourceBundleLocator userResourceBundleLocator = new PlatformResourceBundleLocator(
+								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
+								preload ? supportedLocales : Collections.emptySet(),
+								resolvedClassLoader
+						);
+						PlatformResourceBundleLocator contributorResourceBundleLocator = new PlatformResourceBundleLocator(
+								ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
+								preload ? supportedLocales : Collections.emptySet(),
+								resolvedClassLoader,
+								true
+						);
+						return BeanHolder.of( new ResourceBundleMessageInterpolator(
+								userResourceBundleLocator,
+								contributorResourceBundleLocator,
+								supportedLocales,
+								defaultLocale,
+								localeResolver,
+								preload
+						) );
+					}
+			) );
+		}
+
+		return BeanResolverImpl.create( classLoader, configurers, beanProvider );
+	}
+
+	static MessageInterpolator determineMessageInterpolator(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			ConfigurationState configurationState, Map<String, String> properties, BeanResolver beanResolver) {
+		if ( hibernateSpecificConfig == null || hibernateSpecificConfig.isMessageInterpolatorExplicitlySet() ) {
+			return configurationState.getMessageInterpolator();
+		}
+		String prop = properties.get( HibernateValidatorConfiguration.MESSAGE_INTERPOLATOR );
+		if ( prop != null ) {
+			return beanResolver.resolve( MessageInterpolator.class, prop, BeanRetrieval.CONSTRUCTOR ).get();
+		}
+		return beanResolver.resolve( MessageInterpolator.class, "default", BeanRetrieval.BUILTIN ).get();
+	}
+
 	static ExpressionLanguageFeatureLevel determineConstraintExpressionLanguageFeatureLevel(AbstractConfigurationImpl<?> hibernateSpecificConfig,
 			Map<String, String> properties) {
 		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getConstraintExpressionLanguageFeatureLevel() != null ) {
@@ -321,68 +419,32 @@ final class ValidatorFactoryConfigurationHelper {
 		return ExpressionLanguageFeatureLevel.NONE;
 	}
 
-	static GetterPropertySelectionStrategy determineGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
-			ClassLoader externalClassLoader) {
-		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getGetterPropertySelectionStrategy() != null ) {
-			LOG.usingGetterPropertySelectionStrategy( hibernateSpecificConfig.getGetterPropertySelectionStrategy().getClass() );
-			return hibernateSpecificConfig.getGetterPropertySelectionStrategy();
-		}
-
-		String getterPropertySelectionStrategyFqcn = properties.get( HibernateValidatorConfiguration.GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME );
-		if ( getterPropertySelectionStrategyFqcn != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends GetterPropertySelectionStrategy> clazz =
-						(Class<? extends GetterPropertySelectionStrategy>) LoadClass.action( getterPropertySelectionStrategyFqcn, externalClassLoader );
-				GetterPropertySelectionStrategy getterPropertySelectionStrategy = NewInstance.action( clazz, "getter property selection strategy class" );
-				LOG.usingGetterPropertySelectionStrategy( clazz );
-
-				return getterPropertySelectionStrategy;
-			}
-			catch (Exception e) {
-				throw LOG.getUnableToInstantiateGetterPropertySelectionStrategyClassException( getterPropertySelectionStrategyFqcn, e );
-			}
-		}
-
-		return new DefaultGetterPropertySelectionStrategy();
+	static GetterPropertySelectionStrategy determineGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties, BeanResolver beanResolver) {
+		return resolveBeanComponent( GetterPropertySelectionStrategy.class, DefaultGetterPropertySelectionStrategy.NAME,
+				HibernateValidatorConfiguration.GETTER_PROPERTY_SELECTION_STRATEGY_CLASSNAME,
+				hibernateSpecificConfig, AbstractConfigurationImpl::getGetterPropertySelectionStrategy,
+				properties, beanResolver );
 	}
 
-	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig) {
-		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getBeanMetaDataClassNormalizer() != null ) {
-			return hibernateSpecificConfig.getBeanMetaDataClassNormalizer();
-		}
-
-		return new DefaultBeanMetaDataClassNormalizer();
+	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties, BeanResolver beanResolver) {
+		return resolveBeanComponent( BeanMetaDataClassNormalizer.class, DefaultBeanMetaDataClassNormalizer.NAME,
+				HibernateValidatorConfiguration.BEAN_META_DATA_CLASS_NORMALIZER,
+				hibernateSpecificConfig, AbstractConfigurationImpl::getBeanMetaDataClassNormalizer,
+				properties, beanResolver );
 	}
 
-	static PropertyNodeNameProvider determinePropertyNodeNameProvider(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
-			ClassLoader externalClassLoader) {
-		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getPropertyNodeNameProvider() != null ) {
-			LOG.usingPropertyNodeNameProvider( hibernateSpecificConfig.getPropertyNodeNameProvider().getClass() );
-
-			return hibernateSpecificConfig.getPropertyNodeNameProvider();
-		}
-
-		String propertyNodeNameProviderFqcn = properties.get( HibernateValidatorConfiguration.PROPERTY_NODE_NAME_PROVIDER_CLASSNAME );
-		if ( propertyNodeNameProviderFqcn != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends PropertyNodeNameProvider> clazz = (Class<? extends PropertyNodeNameProvider>) LoadClass.action( propertyNodeNameProviderFqcn, externalClassLoader );
-				PropertyNodeNameProvider propertyNodeNameProvider = NewInstance.action( clazz, "property node name provider class" );
-				LOG.usingPropertyNodeNameProvider( clazz );
-
-				return propertyNodeNameProvider;
-			}
-			catch (Exception e) {
-				throw LOG.getUnableToInstantiatePropertyNodeNameProviderClassException( propertyNodeNameProviderFqcn, e );
-			}
-		}
-
-		return new DefaultPropertyNodeNameProvider();
+	static PropertyNodeNameProvider determinePropertyNodeNameProvider(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties, BeanResolver beanResolver) {
+		return resolveBeanComponent( PropertyNodeNameProvider.class, DefaultPropertyNodeNameProvider.NAME,
+				HibernateValidatorConfiguration.PROPERTY_NODE_NAME_PROVIDER_CLASSNAME,
+				hibernateSpecificConfig, AbstractConfigurationImpl::getPropertyNodeNameProvider,
+				properties, beanResolver );
 	}
 
-	static LocaleResolver determineLocaleResolver(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
-			ClassLoader externalClassLoader) {
+	static LocaleResolver determineLocaleResolver(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties, ClassLoader externalClassLoader) {
 		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getLocaleResolver() != null ) {
 			LOG.usingLocaleResolver( hibernateSpecificConfig.getLocaleResolver().getClass() );
 

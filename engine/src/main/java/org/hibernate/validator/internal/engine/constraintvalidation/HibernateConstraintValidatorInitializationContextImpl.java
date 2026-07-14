@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import jakarta.validation.ClockProvider;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -26,15 +27,19 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 
 	private final HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager;
 
+	private final BeanResolver beanResolver;
+
 	private final int hashCode;
 
 	public HibernateConstraintValidatorInitializationContextImpl(ScriptEvaluatorFactory scriptEvaluatorFactory, ClockProvider clockProvider,
-			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager
+			Duration temporalValidationTolerance, HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
+			BeanResolver beanResolver
 	) {
 		this.scriptEvaluatorFactory = scriptEvaluatorFactory;
 		this.clockProvider = clockProvider;
 		this.temporalValidationTolerance = temporalValidationTolerance;
 		this.constraintValidatorInitializationSharedServiceManager = constraintValidatorInitializationSharedServiceManager;
+		this.beanResolver = beanResolver;
 		this.hashCode = createHashCode();
 	}
 
@@ -47,7 +52,8 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 			return defaultContext;
 		}
 
-		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager );
+		return new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider, temporalValidationTolerance,
+				constraintValidatorInitializationSharedServiceManager, defaultContext.beanResolver );
 	}
 
 	@Override
@@ -75,6 +81,11 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		return constraintValidatorInitializationSharedServiceManager.retrieve( type, createIfNotPresent );
 	}
 
+	@Override
+	public BeanResolver getBeanResolver() {
+		return beanResolver;
+	}
+
 	public HibernateConstraintValidatorInitializationSharedDataManager getConstraintValidatorInitializationSharedServiceManager() {
 		return constraintValidatorInitializationSharedServiceManager;
 	}
@@ -96,6 +107,9 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		if ( constraintValidatorInitializationSharedServiceManager != hibernateConstraintValidatorInitializationContextImpl.constraintValidatorInitializationSharedServiceManager ) {
 			return false;
 		}
+		if ( beanResolver != hibernateConstraintValidatorInitializationContextImpl.beanResolver ) {
+			return false;
+		}
 		if ( clockProvider != hibernateConstraintValidatorInitializationContextImpl.clockProvider ) {
 			return false;
 		}
@@ -115,6 +129,7 @@ public class HibernateConstraintValidatorInitializationContextImpl implements Hi
 		result = 31 * result + System.identityHashCode( clockProvider );
 		result = 31 * result + temporalValidationTolerance.hashCode();
 		result = 31 * result + System.identityHashCode( constraintValidatorInitializationSharedServiceManager );
+		result = 31 * result + System.identityHashCode( beanResolver );
 		return result;
 	}
 }

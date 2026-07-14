@@ -63,6 +63,7 @@ import org.hibernate.validator.internal.util.logging.formatter.ObjectArrayFormat
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
 import org.hibernate.validator.internal.xml.mapping.ContainerElementTypePath;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.spi.bean.BeanNotFoundException;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
@@ -965,4 +966,29 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 274, value = "Unsupported operation for the current constraint validator kind.")
 	AssertionError getUnexpectedConstraintValidatorContextCall();
+
+	@Message(id = 275, value = "No configured bean reference for type '%s'.")
+	BeanNotFoundException getNoConfiguredBeanReferenceForTypeException(String typeName);
+
+	@Message(id = 276, value = "No configured bean reference for type '%1$s' and name '%2$s'.")
+	BeanNotFoundException getNoConfiguredBeanReferenceForTypeAndNameException(String typeName, String name);
+
+	@Message(id = 277, value = "Unable to resolve class name '%1$s' to a class extending '%2$s'.")
+	BeanNotFoundException getUnableToResolveClassNameException(String nameReference, String typeName, @Cause RuntimeException e);
+
+	@Message(id = 278, value = "Unable to create bean using reflection for type '%s'.")
+	BeanNotFoundException getUnableToCreateBeanUsingReflectionException(String typeName, @Cause RuntimeException e);
+
+	@Message(id = 279, value = "No bean manager configured. Register a BeanProvider to enable bean manager lookups.")
+	BeanNotFoundException getNoBeanManagerConfiguredException();
+
+	@Message(id = 280, value = "Invalid bean retrieval in value '%1$s': '%2$s' is not a valid retrieval prefix.")
+	ValidationException getInvalidBeanRetrievalException(String value, String prefix);
+
+	@Message(id = 281, value = "Multiple configured bean references for type '%1$s': %2$s")
+	IllegalStateException getMultipleConfiguredBeanReferencesException(String typeName, String references);
+
+	@Message(id = 282, value = "Duplicate bean references for name '%1$s': %2$s, %3$s")
+	IllegalStateException getDuplicateBeanReferencesForNameException(String name, String existing, String duplicate);
+
 }

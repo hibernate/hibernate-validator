@@ -6,10 +6,13 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorFactory;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.Contracts;
@@ -20,6 +23,8 @@ import org.hibernate.validator.internal.util.Contracts;
  * @author Guillaume Smet
  */
 public class PredefinedScopeConstraintValidatorManagerImpl extends AbstractConstraintValidatorManagerImpl {
+
+	private final Set<HibernateConstraintValidator<?, ?>> createdValidators = ConcurrentHashMap.newKeySet();
 
 	/**
 	 * Creates a new {@code ConstraintValidatorManager}.
@@ -32,6 +37,11 @@ public class PredefinedScopeConstraintValidatorManagerImpl extends AbstractConst
 			HibernateConstraintValidatorInitializationContext defaultConstraintValidatorInitializationContext
 	) {
 		super( defaultConstraintValidatorFactory, defaultConstraintValidatorInitializationContext );
+	}
+
+	@Override
+	protected void onValidatorCreated(HibernateConstraintValidator<?, ?> validator) {
+		createdValidators.add( validator );
 	}
 
 	/**
@@ -65,5 +75,9 @@ public class PredefinedScopeConstraintValidatorManagerImpl extends AbstractConst
 
 	@Override
 	public void clear() {
+		for ( HibernateConstraintValidator<?, ?> validator : createdValidators ) {
+			closeValidator( validator );
+		}
+		createdValidators.clear();
 	}
 }

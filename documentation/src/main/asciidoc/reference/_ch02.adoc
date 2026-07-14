@@ -756,6 +756,15 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 `@BitcoinAddress(value=)`:: Checks that the annotated character sequence is a valid Bitcoin address. `null` values are considered valid. The option `value` allows to specify which types of Bitcoin addresses should be considered as valid. By default, all address types are considered as valid. See `BitcoinAddress.BitcoinAddressType` for a list of available address types.
         Supported data types::: `CharSequence`
         Hibernate metadata impact::: None
+`@NotCompromised`:: Checks that the annotated password has not been compromised in a data breach, as determined by a registered `CompromisedPasswordChecker`. `null` is considered valid. A `CompromisedPasswordChecker` must be registered as a bean before using this constraint (see <<section-bean-system>>). See <<section-password-validation-services>> for example implementations.
+        Supported data types::: `CharSequence`, `char[]`
+        Hibernate metadata impact::: None
+`@PasswordPolicy(value=)`:: Validates that the annotated password meets all rules defined by the referenced `PasswordPolicyDefinition`. Each failing rule produces its own constraint violation. `null` is considered valid. The `value` parameter specifies the `PasswordPolicyDefinition` class that configures the policy rules. See <<section-password-policy>> for details and examples.
+        Supported data types::: `CharSequence`, `char[]`
+        Hibernate metadata impact::: None
+`@PasswordStrength(min=)`:: Checks that the annotated password meets a minimum strength score as determined by a registered `PasswordStrengthEstimator`. `null` is considered valid. The `min` parameter is required and its scale depends on the estimator implementation. A `PasswordStrengthEstimator` must be registered as a bean before using this constraint (see <<section-bean-system>>). See <<section-password-validation-services>> for example implementations.
+        Supported data types::: `CharSequence`, `char[]`
+        Hibernate metadata impact::: None
 
 ===== Country specific constraints
 
