@@ -90,11 +90,29 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:IncubatingConstraintAnnotationsMustHaveIncubatingDefs">
+        <description>If a constraint annotation is marked @Incubating, its corresponding Def class must also be marked @Incubating.</description>
+        <cypher><![CDATA[
+            MATCH
+                (defClass)-[:EXTENDS_GENERIC]->(paramType)-[:OF_RAW_TYPE]->(rawType),
+                (paramType)-[:HAS_ACTUAL_TYPE_ARGUMENT {index: 1}]->(bound)-[:OF_RAW_TYPE]->(annotationType),
+                (annotationType)-[:ANNOTATED_BY]->()-[:OF_TYPE]->(incubatingType)
+            WHERE
+                rawType.fqn = "org.hibernate.validator.cfg.ConstraintDef"
+                AND incubatingType.fqn = "org.hibernate.validator.Incubating"
+                AND defClass.fqn =~ "^org\\.hibernate\\.validator\\.cfg\\.defs\\..*"
+                AND NOT (defClass)-[:ANNOTATED_BY]->()-[:OF_TYPE]->({fqn: "org.hibernate.validator.Incubating"})
+            RETURN
+                annotationType.fqn AS ConstraintAnnotation, defClass.fqn AS DefClass, "Def class missing @Incubating" AS Issue
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
         <includeConstraint refId="my-rules:PublicFieldsMayNotExposeInternalTypes" />
         <includeConstraint refId="my-rules:ConstraintAnnotationsMustBeDocumentedAndRepeatable" />
+        <includeConstraint refId="my-rules:IncubatingConstraintAnnotationsMustHaveIncubatingDefs" />
     </group>
 
 </jqa:jqassistant-rules>
