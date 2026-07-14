@@ -144,6 +144,10 @@ public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorM
 		ConstraintValidator<A, ?> cached = (ConstraintValidator<A, ?>) constraintValidatorCache.putIfAbsent( key,
 				constraintValidator != null ? constraintValidator : DUMMY_CONSTRAINT_VALIDATOR );
 
+		if ( cached != null && constraintValidator != null && cached != constraintValidator ) {
+			closeValidator( constraintValidator );
+		}
+
 		return cached != null ? cached : constraintValidator;
 	}
 
@@ -154,6 +158,7 @@ public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorM
 			Entry<CacheKey, ConstraintValidator<?, ?>> cacheEntry = cacheEntries.next();
 			if ( cacheEntry.getKey().getConstraintValidatorFactory() == constraintValidatorFactory
 					&& cacheEntry.getKey().getConstraintValidatorInitializationContext() == constraintValidatorInitializationContext ) {
+				closeValidator( cacheEntry.getValue() );
 				constraintValidatorFactory.releaseInstance( cacheEntry.getValue() );
 				cacheEntries.remove();
 			}
@@ -163,6 +168,7 @@ public class ConstraintValidatorManagerImpl extends AbstractConstraintValidatorM
 	@Override
 	public void clear() {
 		for ( Map.Entry<CacheKey, ConstraintValidator<?, ?>> entry : constraintValidatorCache.entrySet() ) {
+			closeValidator( entry.getValue() );
 			entry.getKey().getConstraintValidatorFactory().releaseInstance( entry.getValue() );
 		}
 		constraintValidatorCache.clear();
