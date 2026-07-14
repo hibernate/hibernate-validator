@@ -196,7 +196,7 @@
         <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.6.0</version.org.easymock>
-        <version.io.rest-assured>6.0.0</version.io.rest-assured>
+        <version.io.rest-assured>6.0.1</version.io.rest-assured>
         <version.org.apache.groovy>5.0.7</version.org.apache.groovy>
         <version.com.google.guava>33.6.0-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>7.0.8</version.org.springframework.spring-expression>
@@ -218,7 +218,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>13.7.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>13.8.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
