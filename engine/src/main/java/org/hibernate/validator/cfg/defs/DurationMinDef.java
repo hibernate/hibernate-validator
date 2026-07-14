@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.time.DurationMin;
 
@@ -12,6 +13,7 @@ import org.hibernate.validator.constraints.time.DurationMin;
  *
  * @author Marko Bekhta
  */
+@Incubating
 public class DurationMinDef extends ConstraintDef<DurationMinDef, DurationMin> {
 
 	public DurationMinDef() {
