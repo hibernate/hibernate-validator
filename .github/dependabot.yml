@@ -61,6 +61,7 @@ updates:
           - "io.rest-assured:*"
           - "net.bytebuddy:*"
           - "com.fasterxml.jackson.core:*"
+          - "tools.jackson:*"
           - "org.springframework:*"
           # only used for perf tests based on javax:
           - "org.glassfish:javax.el"
