@@ -12,5 +12,5 @@ permissions: { }
 
 jobs:
   report:
-    uses: hibernate/.github/.github/workflows/ci-reporting.yml@main
+    uses: hibernate/.github/.github/workflows/ci-reporting.yml@f95c7959b0b60c30a8c006cf506f25141d759575 # main
     secrets: inherit
