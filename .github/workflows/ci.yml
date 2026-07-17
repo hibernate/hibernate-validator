@@ -143,7 +143,7 @@ jobs:
             ./**/coverage/jacoco-*.exec
       - name: Upload docs preview
         if: ${{ matrix.os.reporting.docs-preview }}
-        uses: hibernate/.github/actions/build-docs-preview@main
+        uses: hibernate/.github/actions/build-docs-preview@f95c7959b0b60c30a8c006cf506f25141d759575 # main
         with:
           dist-path: 'documentation/target/dist'
           src-paths: |
