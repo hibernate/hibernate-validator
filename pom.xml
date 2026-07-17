@@ -1889,6 +1889,7 @@
                                 </goals>
                                 <configuration>
                                     <propertyName>surefire.jvm.args.jacoco</propertyName>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/coverage/jacoco-surefire.exec</destFile>
                                 </configuration>
                             </execution>
                             <execution>
@@ -1903,7 +1904,7 @@
                                 </goals>
                                 <configuration>
                                     <propertyName>failsafe.jvm.args.jacoco</propertyName>
-                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/coverage/jacoco.exec</destFile>
+                                    <destFile>${project.build.directory}/${jacoco.environment.sub-directory}/coverage/jacoco-failsafe.exec</destFile>
                                 </configuration>
                             </execution>
                         </executions>
