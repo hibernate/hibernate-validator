@@ -13,4 +13,8 @@ permissions: { }
 jobs:
   report:
     uses: hibernate/.github/.github/workflows/ci-reporting.yml@main
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
     secrets: inherit
