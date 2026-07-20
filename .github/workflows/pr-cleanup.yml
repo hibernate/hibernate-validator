@@ -11,5 +11,5 @@ permissions: { }
 
 jobs:
   cleanup:
-    uses: hibernate/.github/.github/workflows/pr-cleanup.yml@f95c7959b0b60c30a8c006cf506f25141d759575 # main
+    uses: hibernate/.github/.github/workflows/pr-cleanup.yml@main
     secrets: inherit
