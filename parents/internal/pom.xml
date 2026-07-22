@@ -85,7 +85,7 @@
                                     <groupId>org.wildfly</groupId>
                                     <artifactId>${wildfly.distribution.name}-dist</artifactId>
                                     <version>${version.wildfly}</version>
-                                    <type>tar.gz</type>
+                                    <type>zip</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
                                 </artifactItem>
