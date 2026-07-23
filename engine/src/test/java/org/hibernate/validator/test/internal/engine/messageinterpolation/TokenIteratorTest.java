@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -21,18 +22,22 @@ import org.testng.annotations.Test;
  */
 public class TokenIteratorTest {
 
-	@Test(expectedExceptions = IllegalStateException.class)
+	@Test
 	public void testGettingInterpolatedMessageWithoutCallingHasMoreInterpolationTerms() throws Exception {
-		TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
-		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
-		tokenIterator.getInterpolatedMessage();
+		assertThatThrownBy( () -> {
+			TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
+			TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
+			tokenIterator.getInterpolatedMessage();
+		} ).isInstanceOf( IllegalStateException.class );
 	}
 
-	@Test(expectedExceptions = IllegalStateException.class)
+	@Test
 	public void testNextInterpolationTermWithoutCallingHasMoreInterpolationTerms() throws Exception {
-		TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
-		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
-		tokenIterator.nextInterpolationTerm();
+		assertThatThrownBy( () -> {
+			TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
+			TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
+			tokenIterator.nextInterpolationTerm();
+		} ).isInstanceOf( IllegalStateException.class );
 	}
 
 	@Test

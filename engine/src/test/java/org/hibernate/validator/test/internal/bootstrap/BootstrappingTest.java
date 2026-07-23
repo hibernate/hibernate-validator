@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.bootstrap;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -96,12 +97,14 @@ public class BootstrappingTest {
 		assertNoViolations( constraintViolations );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	@TestForIssue(jiraKey = "HV-328")
 	public void testNullInputStream() {
-		Configuration<?> configuration = Validation.byDefaultProvider().configure();
-		configuration.addMapping( null );
-		configuration.buildValidatorFactory();
+		assertThatThrownBy( () -> {
+			Configuration<?> configuration = Validation.byDefaultProvider().configure();
+			configuration.addMapping( null );
+			configuration.buildValidatorFactory();
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

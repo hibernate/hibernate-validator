@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
@@ -134,7 +135,7 @@ public class CodePointLengthValidatorTest {
 		assertSame( emptyValue, CodePointLength.NormalizationStrategy.NFC.normalize( emptyValue ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeMinValue() {
 		descriptorBuilder.setAttribute( "min", -1 );
 		descriptorBuilder.setAttribute( "max", 1 );
@@ -142,10 +143,11 @@ public class CodePointLengthValidatorTest {
 		CodePointLength l = descriptorBuilder.build().getAnnotation();
 
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
-		constraint.initialize( l );
+		assertThatThrownBy( () -> constraint.initialize( l ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeMaxValue() {
 		descriptorBuilder.setAttribute( "min", 1 );
 		descriptorBuilder.setAttribute( "max", -1 );
@@ -153,10 +155,11 @@ public class CodePointLengthValidatorTest {
 		CodePointLength l = descriptorBuilder.build().getAnnotation();
 
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
-		constraint.initialize( l );
+		assertThatThrownBy( () -> constraint.initialize( l ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeLength() {
 		descriptorBuilder.setAttribute( "min", 5 );
 		descriptorBuilder.setAttribute( "max", 4 );
@@ -164,6 +167,7 @@ public class CodePointLengthValidatorTest {
 		CodePointLength l = descriptorBuilder.build().getAnnotation();
 
 		CodePointLengthValidator constraint = new CodePointLengthValidator();
-		constraint.initialize( l );
+		assertThatThrownBy( () -> constraint.initialize( l ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 }

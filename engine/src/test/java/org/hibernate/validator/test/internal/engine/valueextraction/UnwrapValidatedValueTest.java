@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
@@ -150,9 +151,11 @@ public class UnwrapValidatedValueTest {
 		);
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
+	@Test
 	public void shouldRaiseExceptionIfNoMatchingUnwrapperIsFound() {
-		validator.validate( new Order() );
+		assertThatThrownBy( () -> validator.validate( new Order() ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000198.*" );
 	}
 
 	@Test
@@ -175,34 +178,40 @@ public class UnwrapValidatedValueTest {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test
 	public void shouldTakeIntoAccountUnwrappingConfigurationConstraintOverrideOnProgrammaticConfiguration() {
-		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
-		ConstraintMapping mapping = configuration.createConstraintMapping();
-		mapping.type( OrderLine.class )
-				.field( "id" )
-				.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class ) );
+		assertThatThrownBy( () -> {
+			HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+			ConstraintMapping mapping = configuration.createConstraintMapping();
+			mapping.type( OrderLine.class )
+					.field( "id" )
+					.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class ) );
 
-		Validator validator = configuration.addMapping( mapping )
-				.addValueExtractor( new PropertyValueExtractor() )
-				.buildValidatorFactory()
-				.getValidator();
+			Validator validator = configuration.addMapping( mapping )
+					.addValueExtractor( new PropertyValueExtractor() )
+					.buildValidatorFactory()
+					.getValidator();
 
-		validator.validate( new OrderLine( 7L ) );
+			validator.validate( new OrderLine( 7L ) );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000030.*" );
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000205.*")
+	@Test
 	public void shouldThrowAnExceptionInCaseOfInvalidUnwrappingConfiguration() {
-		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
-		ConstraintMapping mapping = configuration.createConstraintMapping();
-		mapping.type( OrderLine.class )
-				.field( "id" )
-				.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class, Unwrapping.Unwrap.class ) );
+		assertThatThrownBy( () -> {
+			HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+			ConstraintMapping mapping = configuration.createConstraintMapping();
+			mapping.type( OrderLine.class )
+					.field( "id" )
+					.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class, Unwrapping.Unwrap.class ) );
 
-		validator = configuration.addMapping( mapping )
-				.addValueExtractor( new PropertyValueExtractor() )
-				.buildValidatorFactory()
-				.getValidator();
+			validator = configuration.addMapping( mapping )
+					.addValueExtractor( new PropertyValueExtractor() )
+					.buildValidatorFactory()
+					.getValidator();
+		} ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000205.*" );
 	}
 }

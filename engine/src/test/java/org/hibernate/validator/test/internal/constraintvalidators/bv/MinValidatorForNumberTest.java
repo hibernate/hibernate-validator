@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -91,15 +92,17 @@ public class MinValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		assertNoViolations( validator.validate( new Foo( BigDecimal.valueOf( 15.01 ) ) ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInitializeDecimalMinWithInvalidValue() {
-		ConstraintAnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMin.class );
-		descriptorBuilder.setAttribute( "value", "foobar" );
-		descriptorBuilder.setMessage( "{validator.min}" );
-		DecimalMin m = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			ConstraintAnnotationDescriptor.Builder<DecimalMin> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMin.class );
+			descriptorBuilder.setAttribute( "value", "foobar" );
+			descriptorBuilder.setMessage( "{validator.min}" );
+			DecimalMin m = descriptorBuilder.build().getAnnotation();
 
-		DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
-		constraint.initialize( m );
+			DecimalMinValidatorForNumber constraint = new DecimalMinValidatorForNumber();
+			constraint.initialize( m );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

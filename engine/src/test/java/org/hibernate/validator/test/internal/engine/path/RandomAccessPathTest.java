@@ -6,13 +6,13 @@ package org.hibernate.validator.test.internal.engine.path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import jakarta.validation.Path;
 
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.path.RandomAccessPath;
 
-import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 
 public class RandomAccessPathTest {
@@ -64,7 +64,7 @@ public class RandomAccessPathTest {
 			assertThat( path.toString() ).isEqualTo( property );
 		}
 		else {
-			Assertions.fail( "Path is not IndexedPath" );
+			fail( "Path is not IndexedPath" );
 		}
 	}
 }

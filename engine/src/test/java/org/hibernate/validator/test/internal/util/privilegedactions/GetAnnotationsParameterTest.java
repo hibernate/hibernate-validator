@@ -4,9 +4,8 @@
  */
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
 
@@ -58,20 +57,12 @@ public class GetAnnotationsParameterTest {
 		Class<?>[] group = GetAnnotationAttribute.action( testAnnotation, "groups", Class[].class );
 		assertEquals( group[0], Default.class, "Wrong group" );
 
-		try {
-			GetAnnotationAttribute.action( testAnnotation, "message", Integer.class );
-			fail();
-		}
-		catch (ValidationException e) {
-			assertThat( e.getMessage() ).as( "Wrong exception message" ).startsWith( "HV000082" );
-		}
+		assertThatThrownBy( () -> GetAnnotationAttribute.action( testAnnotation, "message", Integer.class ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageStartingWith( "HV000082" );
 
-		try {
-			GetAnnotationAttribute.action( testAnnotation, "foo", Integer.class );
-			fail();
-		}
-		catch (ValidationException e) {
-			assertThat( e.getMessage() ).as( "Wrong exception message" ).startsWith( "HV000083" );
-		}
+		assertThatThrownBy( () -> GetAnnotationAttribute.action( testAnnotation, "foo", Integer.class ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageStartingWith( "HV000083" );
 	}
 }

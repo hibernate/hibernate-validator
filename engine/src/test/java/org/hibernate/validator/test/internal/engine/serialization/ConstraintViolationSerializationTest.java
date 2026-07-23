@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.serialization;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -94,13 +95,14 @@ public class ConstraintViolationSerializationTest {
 	}
 
 	@TestForIssue(jiraKey = "HV-245")
-	@Test(expectedExceptions = NotSerializableException.class)
+	@Test
 	public void testUnSuccessfulSerialization() throws Exception {
 		Validator validator = ValidatorUtil.getValidator();
 		UnSerializableClass testInstance = new UnSerializableClass();
 		Set<ConstraintViolation<UnSerializableClass>> constraintViolations = validator.validate( testInstance );
 
-		serialize( constraintViolations );
+		assertThatThrownBy( () -> serialize( constraintViolations ) )
+				.isInstanceOf( NotSerializableException.class );
 	}
 
 	private byte[] serialize(Object o) throws Exception {

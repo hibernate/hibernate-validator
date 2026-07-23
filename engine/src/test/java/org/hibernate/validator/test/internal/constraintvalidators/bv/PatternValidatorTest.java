@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -68,7 +69,7 @@ public class PatternValidatorTest {
 		assertTrue( constraint.isValid( "a b c foo", null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidRegularExpression() {
 		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "(unbalanced parentheses" );
@@ -76,6 +77,7 @@ public class PatternValidatorTest {
 		ConstraintAnnotationDescriptor<Pattern> descriptor = descriptorBuilder.build();
 
 		PatternValidator constraint = new PatternValidator();
-		initialize( constraint, descriptor );
+		assertThatThrownBy( () -> initialize( constraint, descriptor ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 }

@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
@@ -27,9 +29,9 @@ public class UnknownVersionInValidationXmlTest {
 	/**
 	 * Tests requirement 8.1.4.c from the BV 1.1 spec.
 	 */
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000122.*")
+	@Test
 	public void testInvalidValidationXml() {
-		validationXmlTestHelper.runWithCustomValidationXml(
+		assertThatThrownBy( () -> validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-UnknownVersionInValidationXmlTest.xml", new Runnable() {
 
 					@Override
@@ -37,6 +39,7 @@ public class UnknownVersionInValidationXmlTest {
 						ValidatorUtil.getValidator();
 					}
 				}
-		);
+		) ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000122.*" );
 	}
 }

@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.fail;
 
 import java.util.Enumeration;
 import java.util.Locale;

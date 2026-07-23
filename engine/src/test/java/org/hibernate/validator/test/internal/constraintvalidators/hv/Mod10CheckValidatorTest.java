@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
@@ -34,32 +35,36 @@ import org.testng.annotations.Test;
  */
 public class Mod10CheckValidatorTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidStartIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( -1, Integer.MAX_VALUE, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidEndIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, -1, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testEndIndexLessThanStartIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 5, 0, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidCheckDigitIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, 10, 5, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

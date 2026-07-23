@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 
 import jakarta.validation.ConstraintViolationException;
@@ -19,12 +20,13 @@ import org.testng.annotations.Test;
  */
 public class ReturnValueValidationTest {
 
-	@Test(expectedExceptions = ConstraintViolationException.class)
+	@Test
 	@TestForIssue(jiraKey = "HV-656")
 	public void methodValidationYieldsConstraintViolation() {
 		ContactService serviceProxy = getValidatingProxy(
 				new ContactServiceImpl(), ValidatorUtil.getValidator(), Default.class
 		);
-		serviceProxy.validateValidBeanParamConstraint( new ContactBean() );
+		assertThatThrownBy( () -> serviceProxy.validateValidBeanParamConstraint( new ContactBean() ) )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 }

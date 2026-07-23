@@ -17,6 +17,7 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -310,14 +311,16 @@ public class TypeHelperTest {
 		assertAsymmetricallyAssignable( Serializable.class, int[].class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void isAssignableWithNullSupertype() {
-		assertAssignable( null, Integer.class );
+		assertThatThrownBy( () -> assertAssignable( null, Integer.class ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void isAssignableWithNullType() {
-		assertAssignable( Integer.class, null );
+		assertThatThrownBy( () -> assertAssignable( Integer.class, null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	/**
@@ -782,9 +785,10 @@ public class TypeHelperTest {
 		assertUnassignable( Integer.class, wildcardTypeLowerBounded( new Type[] { Number.class } ) );
 	}
 
-	@Test(expectedExceptions = NullPointerException.class)
+	@Test
 	public void isInstanceWithNullType() {
-		TypeHelper.isInstance( null, 123 );
+		assertThatThrownBy( () -> TypeHelper.isInstance( null, 123 ) )
+				.isInstanceOf( NullPointerException.class );
 	}
 
 	@Test

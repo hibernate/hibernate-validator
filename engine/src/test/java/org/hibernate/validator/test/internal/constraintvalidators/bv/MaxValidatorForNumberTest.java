@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -104,15 +105,17 @@ public class MaxValidatorForNumberTest extends BaseMinMaxValidatorForNumberTest 
 		assertFalse( constraint.isValid( Double.POSITIVE_INFINITY, null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInitializeDecimalMaxWithInvalidValue() {
-		ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
-		descriptorBuilder.setAttribute( "value", "foobar" );
-		descriptorBuilder.setMessage( "{validator.max}" );
-		DecimalMax m = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			ConstraintAnnotationDescriptor.Builder<DecimalMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DecimalMax.class );
+			descriptorBuilder.setAttribute( "value", "foobar" );
+			descriptorBuilder.setMessage( "{validator.max}" );
+			DecimalMax m = descriptorBuilder.build().getAnnotation();
 
-		DecimalMaxValidatorForNumber constraint = new DecimalMaxValidatorForNumber();
-		constraint.initialize( m );
+			DecimalMaxValidatorForNumber constraint = new DecimalMaxValidatorForNumber();
+			constraint.initialize( m );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

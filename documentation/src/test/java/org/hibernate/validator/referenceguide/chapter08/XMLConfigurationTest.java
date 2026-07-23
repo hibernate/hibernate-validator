@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter08;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +50,7 @@ public class XMLConfigurationTest {
 	public void testXMLConstraintsApplied() {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( RentalStation.class );
 
-		assertTrue( beanDescriptor.isBeanConstrained() );
+		assertThat( beanDescriptor.isBeanConstrained() ).isTrue();
 
 		ConstructorDescriptor constructorDescriptor = beanDescriptor.getConstraintsForConstructor();
 		ReturnValueDescriptor returnValueDescriptor = constructorDescriptor.getReturnValueDescriptor();

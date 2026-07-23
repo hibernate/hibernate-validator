@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.reflect.Method;
 
 import jakarta.validation.executable.ExecutableValidator;
@@ -30,33 +32,48 @@ public class WrongMethodOrParameterForMethodValidationTest {
 		customerRepository = new CustomerRepositoryImpl();
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000162.*")
+	@Test
 	public void testPassingNonMatchingMethodForParameterValidationThrowsException() throws Exception {
-		Method wrongMethod = WrongMethodOrParameterForMethodValidationTest.class.getMethod( "setUp" );
-		validator.validateParameters( customerRepository, wrongMethod, new Object[] { } );
+		assertThatThrownBy( () -> {
+			Method wrongMethod = WrongMethodOrParameterForMethodValidationTest.class.getMethod( "setUp" );
+			validator.validateParameters( customerRepository, wrongMethod, new Object[] { } );
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000162.*" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000162.*")
+	@Test
 	public void testPassingNonMatchingMethodForReturnValueValidationThrowsException() throws Exception {
-		Method wrongMethod = WrongMethodOrParameterForMethodValidationTest.class.getMethod( "setUp" );
-		validator.validateReturnValue( customerRepository, wrongMethod, new Object[] { } );
+		assertThatThrownBy( () -> {
+			Method wrongMethod = WrongMethodOrParameterForMethodValidationTest.class.getMethod( "setUp" );
+			validator.validateReturnValue( customerRepository, wrongMethod, new Object[] { } );
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000162.*" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000163.*")
+	@Test
 	public void testPassingNonMatchingMethodParametersThrowsException() throws Exception {
-		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		validator.validateParameters( customerRepository, method, new Object[] { new Customer() } );
+		assertThatThrownBy( () -> {
+			Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
+			validator.validateParameters( customerRepository, method, new Object[] { new Customer() } );
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000163.*" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000181.*")
+	@Test
 	public void testPassingTooManyParametersThrowsException() throws Exception {
-		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		validator.validateParameters( customerRepository, method, new Object[] { "foo", "bar" } );
+		assertThatThrownBy( () -> {
+			Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
+			validator.validateParameters( customerRepository, method, new Object[] { "foo", "bar" } );
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000181.*" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000181.*")
+	@Test
 	public void testPassingNoParametersThrowsException() throws Exception {
-		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
-		validator.validateParameters( customerRepository, method, new Object[] { } );
+		assertThatThrownBy( () -> {
+			Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
+			validator.validateParameters( customerRepository, method, new Object[] { } );
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000181.*" );
 	}
 }

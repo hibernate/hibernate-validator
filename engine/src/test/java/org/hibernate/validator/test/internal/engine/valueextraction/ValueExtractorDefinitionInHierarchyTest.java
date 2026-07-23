@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -69,14 +70,16 @@ public class ValueExtractorDefinitionInHierarchyTest {
 		);
 	}
 
-	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000218.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1290")
 	public void parallelValueExtractorDefinitionsCausesException() throws Exception {
-		Validation.byProvider( HibernateValidator.class )
+		assertThatThrownBy( () -> Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.addValueExtractor( new ValueExtractorWithParallelDefinitionsChild() )
 				.buildValidatorFactory()
-				.getValidator();
+				.getValidator() )
+				.isInstanceOf( ValueExtractorDefinitionException.class )
+				.hasMessageMatching( "HV000218.*" );
 	}
 
 	private class Entity {

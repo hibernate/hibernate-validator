@@ -4,12 +4,11 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.io.InputStream;
 import java.util.List;
@@ -90,13 +89,9 @@ public class MappingXmlParserTest {
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-2.xml" ) );
 
-		try {
-			xmlMappingParser.parse( mappingStreams );
-			fail( "Constraint definitions for a given constraint can only be overridden once" );
-		}
-		catch (ValidationException e) {
-			assertTrue( e.getMessage().startsWith( "HV000167" ) );
-		}
+		assertThatThrownBy( () -> xmlMappingParser.parse( mappingStreams ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageStartingWith( "HV000167" );
 	}
 
 	public static class DecimalMinValidatorForFoo implements ConstraintValidator<DecimalMin, Foo> {

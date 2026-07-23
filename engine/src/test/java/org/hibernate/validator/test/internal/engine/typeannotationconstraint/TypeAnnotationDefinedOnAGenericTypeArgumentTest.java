@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -34,51 +35,71 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
+	@Test(enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayFieldThrowsException() {
-		validator.validate( new GenericArrayEntity<>( new String[] { "Too long" } ) );
+		assertThatThrownBy( () -> validator.validate( new GenericArrayEntity<>( new String[] { "Too long" } ) ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
+	@Test(enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayGetterThrowsException() {
-		validator.validate( new GenericArrayWithGetterEntity<>( new String[] { "Too long" } ) );
+		assertThatThrownBy( () -> validator.validate( new GenericArrayWithGetterEntity<>( new String[] { "Too long" } ) ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
+	@Test(enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayParameterThrowsException() {
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test2( new String[] { "Too long" } );
+		assertThatThrownBy( () -> {
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			fishTank.test2( new String[] { "Too long" } );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*", enabled = false)
+	@Test(enabled = false)
 	public void constraintOnGenericTypeArgumentOfArrayReturnValueThrowsException() {
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test4( new String[] { "Too long" } );
+		assertThatThrownBy( () -> {
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			fishTank.test4( new String[] { "Too long" } );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@Test
 	public void constraintOnGenericTypeArgumentOfListFieldThrowsException() {
-		validator.validate( new GenericListEntity<>( Arrays.asList( "Too long" ) ) );
+		assertThatThrownBy( () -> validator.validate( new GenericListEntity<>( Arrays.asList( "Too long" ) ) ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@Test
 	public void constraintOnGenericTypeArgumentOfListGetterThrowsException() {
-		validator.validate( new GenericListWithGetterEntity<>( Arrays.asList( "Too long" ) ) );
+		assertThatThrownBy( () -> validator.validate( new GenericListWithGetterEntity<>( Arrays.asList( "Too long" ) ) ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@Test
 	public void constraintOnGenericTypeArgumentOfListParameterThrowsException() {
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test1( Arrays.asList( "Too long" ) );
+		assertThatThrownBy( () -> {
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			fishTank.test1( Arrays.asList( "Too long" ) );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@Test
 	public void constraintOnGenericTypeArgumentOfListReturnValueThrowsException() {
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test3( Arrays.asList( "Too long" ) );
+		assertThatThrownBy( () -> {
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			fishTank.test3( Arrays.asList( "Too long" ) );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
 	@SuppressWarnings("unused")

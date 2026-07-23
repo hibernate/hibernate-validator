@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,28 +44,27 @@ public class AnnotationBasedMethodValidationTest extends AbstractMethodValidatio
 		Customer customer = new Customer( null );
 		List<Customer> customers = Arrays.asList( null, customer );
 
-		try {
-			customerRepositoryValidatingProxy.iterableParameterWithCascadingTypeParameter( customers );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.iterableParameterWithCascadingTypeParameter( customers ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertEquals( e.getConstraintViolations().size(), 1 );
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "iterableParameterWithCascadingTypeParameter", List.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"iterableParameterWithCascadingTypeParameter.customer[1].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), customer );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "iterableParameterWithCascadingTypeParameter", List.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"iterableParameterWithCascadingTypeParameter.customer[1].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), customer );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 }

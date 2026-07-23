@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.crossparameter;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.ConstraintDefinitionException;
 import jakarta.validation.Validator;
@@ -17,22 +19,28 @@ import org.testng.annotations.Test;
  */
 public class CrossParameterValidationTest {
 
-	@Test(expectedExceptions = ConstraintDefinitionException.class, expectedExceptionsMessageRegExp = "HV000139.*")
+	@Test
 	public void testMultipleCrossParameterValidatorsForConstraintThrowException() {
 		Validator validator = ValidatorUtil.getValidator();
-		validator.getConstraintsForClass( Foo.class );
+		assertThatThrownBy( () -> validator.getConstraintsForClass( Foo.class ) )
+				.isInstanceOf( ConstraintDefinitionException.class )
+				.hasMessageMatching( "HV000139.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000143.*")
+	@Test
 	public void testCrossParameterConstraintOnType() {
 		Validator validator = ValidatorUtil.getValidator();
-		validator.getConstraintsForClass( Fubar.class );
+		assertThatThrownBy( () -> validator.getConstraintsForClass( Fubar.class ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000143.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000144.*")
+	@Test
 	public void testCrossParameterConstraintOnField() {
 		Validator validator = ValidatorUtil.getValidator();
-		validator.getConstraintsForClass( Snafu.class );
+		assertThatThrownBy( () -> validator.getConstraintsForClass( Snafu.class ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000144.*" );
 	}
 
 	public static class Foo {

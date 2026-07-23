@@ -10,6 +10,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -57,35 +58,46 @@ public class UnwrappingTest {
 				.getValidator();
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test
 	public void no_constraint_validator_for_wrapped_value_throws_exception() {
-		validatorWithoutValueExtractor.validate( new Foo() );
+		assertThatThrownBy( () -> validatorWithoutValueExtractor.validate( new Foo() ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test
 	public void no_constraint_validator_for_unwrapped_value_throws_exception() {
-		validatorWithValueExtractor.validate( new Fubar() );
+		assertThatThrownBy( () -> validatorWithValueExtractor.validate( new Fubar() ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
+	@Test
 	public void missing_value_extractor_throws_exception() {
-		validatorWithoutValueExtractor.validate( new Foobar() );
+		assertThatThrownBy( () -> validatorWithoutValueExtractor.validate( new Foobar() ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000198.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test
 	public void validation_exception_if_unwrapping_disabled_per_constraint() {
-		validatorWithValueExtractor.validate( new WrapperWithDisabledUnwrapping() );
+		assertThatThrownBy( () -> validatorWithValueExtractor.validate( new WrapperWithDisabledUnwrapping() ) )
+				.isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000223.*")
+	@Test
 	public void validate_wrapped_value_while_wrapper_has_two_type_parameters_but_two_value_extractors_raises_exception() {
-		Validator validator = ValidatorUtil.getConfiguration()
-				.addValueExtractor( new WrapperWithTwoTypeArgumentsFirstValueExtractor() )
-				.addValueExtractor( new WrapperWithTwoTypeArgumentsSecondValueExtractor() )
-				.buildValidatorFactory()
-				.getValidator();
+		assertThatThrownBy( () -> {
+			Validator validator = ValidatorUtil.getConfiguration()
+					.addValueExtractor( new WrapperWithTwoTypeArgumentsFirstValueExtractor() )
+					.addValueExtractor( new WrapperWithTwoTypeArgumentsSecondValueExtractor() )
+					.buildValidatorFactory()
+					.getValidator();
 
-		validator.validate( new BeanWithWrapperWithTwoTypeArguments() );
+			validator.validate( new BeanWithWrapperWithTwoTypeArguments() );
+		} ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000223.*" );
 	}
 
 	private class Foo {

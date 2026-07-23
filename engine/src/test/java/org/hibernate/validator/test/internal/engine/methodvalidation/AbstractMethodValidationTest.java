@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -11,7 +12,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.fail;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -69,138 +69,134 @@ public abstract class AbstractMethodValidationTest {
 
 	@Test
 	public void methodValidationYieldsConstraintViolation() {
-		try {
-			customerRepositoryValidatingProxy.findCustomerByName( null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.findCustomerByName( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
 
-			Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "findCustomerByName" )
-									.parameter( "name", 0 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+					Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "findCustomerByName" )
+											.parameter( "name", 0 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = constraintViolations.iterator().next();
+					ConstraintViolation<?> constraintViolation = constraintViolations.iterator().next();
 
-			assertMethod( constraintViolation, "findCustomerByName", String.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"findCustomerByName.name"
-			);
-			assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { null } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					assertMethod( constraintViolation, "findCustomerByName", String.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"findCustomerByName.name"
+					);
+					assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { null } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	@Test
 	public void validationOfMethodWithMultipleParameters() {
-		try {
-			customerRepositoryValidatingProxy.findCustomerByAgeAndName( 30, null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "findCustomerByAgeAndName" )
-									.parameter( "name", 1 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.findCustomerByAgeAndName( 30, null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "findCustomerByAgeAndName" )
+											.parameter( "name", 1 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "findCustomerByAgeAndName", Integer.class, String.class );
-			assertParameterIndex( constraintViolation, 1 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"findCustomerByAgeAndName.name"
-			);
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { 30, null } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "findCustomerByAgeAndName", Integer.class, String.class );
+					assertParameterIndex( constraintViolation, 1 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"findCustomerByAgeAndName.name"
+					);
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { 30, null } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	@Test
 	public void constraintViolationsAtMultipleParameters() {
-		try {
-			customerRepositoryValidatingProxy.findCustomerByAgeAndName( 1, null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "findCustomerByAgeAndName" )
-									.parameter( "name", 1 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null ),
-					violationOf( Min.class )
-							.withPropertyPath( pathWith()
-									.method( "findCustomerByAgeAndName" )
-									.parameter( "age", 0 )
-							)
-							.withMessage( messagePrefix() + "must be greater than or equal to 5" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( 1 )
-			);
-		}
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.findCustomerByAgeAndName( 1, null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "findCustomerByAgeAndName" )
+											.parameter( "name", 1 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null ),
+							violationOf( Min.class )
+									.withPropertyPath( pathWith()
+											.method( "findCustomerByAgeAndName" )
+											.parameter( "age", 0 )
+									)
+									.withMessage( messagePrefix() + "must be greater than or equal to 5" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( 1 )
+					);
+				} );
 	}
 
 	@Test
 	public void methodValidationWithCascadingParameter() {
 		Customer customer = new Customer( null, null );
-		try {
-			customerRepositoryValidatingProxy.persistCustomer( customer );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "persistCustomer" )
-									.parameter( "customer", 0 )
-									.property( "name" )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.persistCustomer( customer ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "persistCustomer" )
+											.parameter( "customer", 0 )
+											.property( "name" )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "persistCustomer", Customer.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(), "persistCustomer.customer.name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), customer );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "persistCustomer", Customer.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(), "persistCustomer.customer.name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), customer );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	@Test
@@ -208,40 +204,39 @@ public abstract class AbstractMethodValidationTest {
 		Address address = new Address( null );
 		Customer customer = new Customer( "Bob", address );
 
-		try {
-			customerRepositoryValidatingProxy.persistCustomer( customer );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "persistCustomer" )
-									.parameter( "customer", 0 )
-									.property( "address" )
-									.property( "city" )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.persistCustomer( customer ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "persistCustomer" )
+											.parameter( "customer", 0 )
+											.property( "address" )
+											.property( "city" )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "persistCustomer", Customer.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"persistCustomer.customer.address.city"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), address );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "persistCustomer", Customer.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"persistCustomer.customer.address.city"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), address );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	@Test
@@ -250,39 +245,38 @@ public abstract class AbstractMethodValidationTest {
 		Customer bob = new Customer( null );
 		customers.put( "Bob", bob );
 
-		try {
-			customerRepositoryValidatingProxy.cascadingMapParameter( customers );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingMapParameter" )
-									.parameter( "customer", 0 )
-									.property( "name", true, "Bob", null, Map.class, 1 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingMapParameter( customers ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingMapParameter" )
+											.parameter( "customer", 0 )
+											.property( "name", true, "Bob", null, Map.class, 1 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingMapParameter", Map.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingMapParameter.customer[Bob].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), bob );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingMapParameter", Map.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingMapParameter.customer[Bob].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), bob );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	@Test
@@ -290,39 +284,38 @@ public abstract class AbstractMethodValidationTest {
 		Customer customer = new Customer( null );
 		List<Customer> customers = Arrays.asList( null, customer );
 
-		try {
-			customerRepositoryValidatingProxy.cascadingIterableParameter( customers );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingIterableParameter" )
-									.parameter( "customer", 0 )
-									.property( "name", true, null, 1, List.class, 0 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingIterableParameter( customers ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingIterableParameter" )
+											.parameter( "customer", 0 )
+											.property( "name", true, null, 1, List.class, 0 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingIterableParameter", List.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingIterableParameter.customer[1].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), customer );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingIterableParameter", List.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingIterableParameter.customer[1].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), customer );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
@@ -330,125 +323,121 @@ public abstract class AbstractMethodValidationTest {
 	public void cascadingArrayParameter() {
 		Customer customer = new Customer( null );
 
-		try {
-			customerRepositoryValidatingProxy.cascadingArrayParameter( null, customer );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingArrayParameter" )
-									.parameter( "customer", 0 )
-									.property( "name", true, null, 1, Object[].class, null )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingArrayParameter( null, customer ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingArrayParameter" )
+											.parameter( "customer", 0 )
+											.property( "name", true, null, 1, Object[].class, null )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingArrayParameter", Customer[].class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingArrayParameter.customer[1].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), customer );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals(
-					constraintViolation.getExecutableParameters(),
-					new Object[] { new Object[] { null, customer } }
-			);
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingArrayParameter", Customer[].class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingArrayParameter.customer[1].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), customer );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals(
+							constraintViolation.getExecutableParameters(),
+							new Object[] { new Object[] { null, customer } }
+					);
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
+				} );
 	}
 
 	@Test
 	public void constraintsAtMethodFromBaseClassAreEvaluated() {
-		try {
-			customerRepositoryValidatingProxy.findById( null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "findById" )
-									.parameter( "id", 0 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.findById( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "findById" )
+											.parameter( "id", 0 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "findById", Long.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "findById", Long.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+				} );
 	}
 
 	@Test
 	public void constraintsAtOverriddenMethodAreEvaluated() {
-		try {
-			customerRepositoryValidatingProxy.foo( null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "foo" )
-									.parameter( "id", 0 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.foo( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "foo" )
+											.parameter( "id", 0 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "foo", Long.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "foo", Long.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+				} );
 	}
 
 	@Test
 	public void validFromOverriddenMethodIsEvaluated() {
-		try {
-			customerRepositoryValidatingProxy.bar( new Customer( null, null ) );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "bar" )
-									.parameter( "customer", 0 )
-									.property( "name" )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.bar( new Customer( null, null ) ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "bar" )
+											.parameter( "customer", 0 )
+											.property( "name" )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "bar", Customer.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getPropertyPath().toString(), "bar.customer.name" );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "bar", Customer.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getPropertyPath().toString(), "bar.customer.name" );
+				} );
 	}
 
 	@Test
@@ -458,273 +447,265 @@ public abstract class AbstractMethodValidationTest {
 
 	@Test
 	public void returnValueValidationYieldsConstraintViolation() {
-		try {
-			customerRepositoryValidatingProxy.baz();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Min.class )
-							.withPropertyPath( pathWith()
-									.method( "baz" )
-									.returnValue()
-							)
-							.withMessage( messagePrefix() + "must be greater than or equal to 10" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( 9 )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.baz() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( Min.class )
+									.withPropertyPath( pathWith()
+											.method( "baz" )
+											.returnValue()
+									)
+									.withMessage( messagePrefix() + "must be greater than or equal to 10" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( 9 )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must be greater than or equal to 10" );
-			assertMethod( constraintViolation, "baz" );
-			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getPropertyPath().toString(), "baz.<return value>" );
-			assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getInvalidValue(), 9 );
-			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), 9 );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must be greater than or equal to 10" );
+					assertMethod( constraintViolation, "baz" );
+					assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getPropertyPath().toString(), "baz.<return value>" );
+					assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getInvalidValue(), 9 );
+					assertEquals( constraintViolation.getExecutableParameters(), null );
+					assertEquals( constraintViolation.getExecutableReturnValue(), 9 );
+				} );
 	}
 
 	@Test
 	public void cascadingReturnValue() {
-		try {
-			customerRepositoryValidatingProxy.cascadingReturnValue();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingReturnValue" )
-									.returnValue()
-									.property( "name" )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingReturnValue() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingReturnValue" )
+											.returnValue()
+											.property( "name" )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingReturnValue" );
-			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingReturnValue.<return value>.name"
-			);
-			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), new Customer( null ) );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingReturnValue" );
+					assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingReturnValue.<return value>.name"
+					);
+					assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), null );
+					assertEquals( constraintViolation.getExecutableReturnValue(), new Customer( null ) );
+				} );
 	}
 
 	@Test
 	public void cascadingReturnValueFromSuperType() {
-		try {
-			customerRepositoryValidatingProxy.overriddenMethodWithCascadingReturnValue();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "overriddenMethodWithCascadingReturnValue" )
-									.returnValue()
-									.property( "name" )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.overriddenMethodWithCascadingReturnValue() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "overriddenMethodWithCascadingReturnValue" )
+											.returnValue()
+											.property( "name" )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "overriddenMethodWithCascadingReturnValue" );
-			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "overriddenMethodWithCascadingReturnValue" );
+					assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"overriddenMethodWithCascadingReturnValue.<return value>.name"
-			);
-			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), new Customer( null ) );
-		}
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"overriddenMethodWithCascadingReturnValue.<return value>.name"
+					);
+					assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), null );
+					assertEquals( constraintViolation.getExecutableReturnValue(), new Customer( null ) );
+				} );
 	}
 
 	@Test
 	public void cascadingIterableReturnValue() {
-		try {
-			customerRepositoryValidatingProxy.cascadingIterableReturnValue();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingIterableReturnValue" )
-									.returnValue()
-									.property( "name", true, null, 1, List.class, 0 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingIterableReturnValue() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingIterableReturnValue" )
+											.returnValue()
+											.property( "name", true, null, 1, List.class, 0 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingIterableReturnValue" );
-			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingIterableReturnValue.<return value>[1].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), Arrays.asList( null, new Customer( null ) ) );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingIterableReturnValue" );
+					assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingIterableReturnValue.<return value>[1].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), null );
+					assertEquals( constraintViolation.getExecutableReturnValue(), Arrays.asList( null, new Customer( null ) ) );
+				} );
 	}
 
 	@Test
 	public void cascadingMapReturnValue() {
-		try {
-			customerRepositoryValidatingProxy.cascadingMapReturnValue();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			Customer customer = new Customer( null );
-			Map<String, Customer> expectedReturnValue = newHashMap();
-			expectedReturnValue.put( "Bob", customer );
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingMapReturnValue() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					Customer customer = new Customer( null );
+					Map<String, Customer> expectedReturnValue = newHashMap();
+					expectedReturnValue.put( "Bob", customer );
 
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingMapReturnValue" )
-									.returnValue()
-									.property( "name", true, "Bob", null, Map.class, 1 )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingMapReturnValue" )
+											.returnValue()
+											.property( "name", true, "Bob", null, Map.class, 1 )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingMapReturnValue" );
-			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingMapReturnValue.<return value>[Bob].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), customer );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), expectedReturnValue );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingMapReturnValue" );
+					assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingMapReturnValue.<return value>[Bob].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), customer );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), null );
+					assertEquals( constraintViolation.getExecutableReturnValue(), expectedReturnValue );
+				} );
 	}
 
 	@Test
 	public void cascadingArrayReturnValue() {
-		try {
-			customerRepositoryValidatingProxy.cascadingArrayReturnValue();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withPropertyPath( pathWith()
-									.method( "cascadingArrayReturnValue" )
-									.returnValue()
-									.property( "name", true, null, 1, Object[].class, null )
-							)
-							.withMessage( messagePrefix() + "must not be null" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( null )
-			);
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.cascadingArrayReturnValue() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( NotNull.class )
+									.withPropertyPath( pathWith()
+											.method( "cascadingArrayReturnValue" )
+											.returnValue()
+											.property( "name", true, null, 1, Object[].class, null )
+									)
+									.withMessage( messagePrefix() + "must not be null" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( null )
+					);
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "cascadingArrayReturnValue" );
-			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"cascadingArrayReturnValue.<return value>[1].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), new Object[] { null, new Customer( null ) } );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
+					assertMethod( constraintViolation, "cascadingArrayReturnValue" );
+					assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
+					assertEquals(
+							constraintViolation.getPropertyPath().toString(),
+							"cascadingArrayReturnValue.<return value>[1].name"
+					);
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
+					assertEquals( constraintViolation.getInvalidValue(), null );
+					assertEquals( constraintViolation.getExecutableParameters(), null );
+					assertEquals( constraintViolation.getExecutableReturnValue(), new Object[] { null, new Customer( null ) } );
+				} );
 	}
 
 	@Test
 	public void overridingMethodStrengthensReturnValueConstraint() {
-		try {
-			customerRepositoryValidatingProxy.overriddenMethodWithReturnValueConstraint();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Min.class )
-							.withPropertyPath( pathWith()
-									.method( "overriddenMethodWithReturnValueConstraint" )
-									.returnValue()
-							)
-							.withMessage( messagePrefix() + "must be greater than or equal to 5" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( 3 ),
-					violationOf( Min.class )
-							.withPropertyPath( pathWith()
-									.method( "overriddenMethodWithReturnValueConstraint" )
-									.returnValue()
-							)
-							.withMessage( messagePrefix() + "must be greater than or equal to 10" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( 3 )
-			);
-		}
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.overriddenMethodWithReturnValueConstraint() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( Min.class )
+									.withPropertyPath( pathWith()
+											.method( "overriddenMethodWithReturnValueConstraint" )
+											.returnValue()
+									)
+									.withMessage( messagePrefix() + "must be greater than or equal to 5" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( 3 ),
+							violationOf( Min.class )
+									.withPropertyPath( pathWith()
+											.method( "overriddenMethodWithReturnValueConstraint" )
+											.returnValue()
+									)
+									.withMessage( messagePrefix() + "must be greater than or equal to 10" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( 3 )
+					);
+				} );
 	}
 
 	@Test
 	public void runtimeTypeDefinesConstraintsToApply() {
-		try {
-			repositoryBase.overriddenMethodWithReturnValueConstraint();
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Min.class )
-							.withPropertyPath( pathWith()
-									.method( "overriddenMethodWithReturnValueConstraint" )
-									.returnValue()
-							)
-							.withMessage( messagePrefix() + "must be greater than or equal to 5" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( 3 ),
-					violationOf( Min.class )
-							.withPropertyPath( pathWith()
-									.method( "overriddenMethodWithReturnValueConstraint" )
-									.returnValue()
-							)
-							.withMessage( messagePrefix() + "must be greater than or equal to 10" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-							.withInvalidValue( 3 )
-			);
-		}
+		assertThatThrownBy( () -> repositoryBase.overriddenMethodWithReturnValueConstraint() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( Min.class )
+									.withPropertyPath( pathWith()
+											.method( "overriddenMethodWithReturnValueConstraint" )
+											.returnValue()
+									)
+									.withMessage( messagePrefix() + "must be greater than or equal to 5" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( 3 ),
+							violationOf( Min.class )
+									.withPropertyPath( pathWith()
+											.method( "overriddenMethodWithReturnValueConstraint" )
+											.returnValue()
+									)
+									.withMessage( messagePrefix() + "must be greater than or equal to 10" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+									.withInvalidValue( 3 )
+					);
+				} );
 	}
 
 	@Test
@@ -732,25 +713,29 @@ public abstract class AbstractMethodValidationTest {
 		customerRepositoryValidatingProxy.parameterConstraintInGroup( null );
 	}
 
-	@Test(expectedExceptions = ConstraintViolationException.class)
+	@Test
 	public void methodValidationFailsAsConstraintOfValidatedGroupIsViolated() {
 		createProxy( CustomerRepository.ValidationGroup.class );
-		customerRepositoryValidatingProxy.parameterConstraintInGroup( null );
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.parameterConstraintInGroup( null ) )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000132.*")
+	@Test
 	public void voidMethodWithReturnValueConstraintCausesConstraintDeclarationException() {
 		CustomerRepositoryWithConstrainedVoidMethod customerRepository = getValidatingProxy(
 				new CustomerRepositoryWithConstrainedVoidMethodImpl(), validator
 		);
 
-		customerRepository.voidMethodWithIllegalReturnValueConstraint();
+		assertThatThrownBy( () -> customerRepository.voidMethodWithIllegalReturnValueConstraint() )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000132.*" );
 	}
 
 	@TestForIssue(jiraKey = "HV-601")
-	@Test(expectedExceptions = ConstraintViolationException.class)
+	@Test
 	public void shouldValidateGetterLikeNamedMethodWithParameter() {
-		customerRepositoryValidatingProxy.getFoo( "" );
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.getFoo( "" ) )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 
 	@Test
@@ -759,38 +744,37 @@ public abstract class AbstractMethodValidationTest {
 		LocalDate startDate = LocalDate.of( 2012, 11, 5 );
 		LocalDate endDate = LocalDate.of( 2012, 11, 4 );
 
-		try {
-			//when
-			customerRepositoryValidatingProxy.methodWithCrossParameterConstraint( startDate, endDate );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			//then
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( ConsistentDateParameters.class )
-							.withPropertyPath( pathWith()
-									.method( "methodWithCrossParameterConstraint" )
-									.crossParameter()
-							)
-							.withMessage( messagePrefix() + "{ConsistentDateParameters.message}" )
-							.withRootBeanClass( CustomerRepositoryImpl.class )
-			);
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), ConsistentDateParameters.class );
-			assertEquals( constraintViolation.getInvalidValue(), new Object[] { startDate, endDate } );
-			assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { startDate, endDate } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
+		//when
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.methodWithCrossParameterConstraint( startDate, endDate ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					//then
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( ConsistentDateParameters.class )
+									.withPropertyPath( pathWith()
+											.method( "methodWithCrossParameterConstraint" )
+											.crossParameter()
+									)
+									.withMessage( messagePrefix() + "{ConsistentDateParameters.message}" )
+									.withRootBeanClass( CustomerRepositoryImpl.class )
+					);
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType(), ConsistentDateParameters.class );
+					assertEquals( constraintViolation.getInvalidValue(), new Object[] { startDate, endDate } );
+					assertEquals( constraintViolation.getLeafBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
+					assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
+					assertEquals( constraintViolation.getExecutableParameters(), new Object[] { startDate, endDate } );
+					assertEquals( constraintViolation.getExecutableReturnValue(), null );
 
-			assertMethod(
-					constraintViolation,
-					"methodWithCrossParameterConstraint",
-					LocalDate.class,
-					LocalDate.class
-			);
-		}
+					assertMethod(
+							constraintViolation,
+							"methodWithCrossParameterConstraint",
+							LocalDate.class,
+							LocalDate.class
+					);
+				} );
 	}
 
 	@Test

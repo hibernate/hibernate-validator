@@ -4,12 +4,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.util.Date;
@@ -41,15 +41,11 @@ public class ParameterScriptAssertValidatorTest {
 		Date startDate = new GregorianCalendar( 2009, 8, 20 ).getTime();
 		Date endDate = new GregorianCalendar( 2009, 8, 21 ).getTime();
 
-		try {
-			calendar.createEvent( endDate, startDate );
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"start < end\" didn't evaluate to true" )
-			);
-		}
+		assertThatThrownBy( () -> calendar.createEvent( endDate, startDate ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"start < end\" didn't evaluate to true" )
+				) );
 	}
 
 	@Test
@@ -64,15 +60,11 @@ public class ParameterScriptAssertValidatorTest {
 		Date startDate = new GregorianCalendar( 2009, 8, 20 ).getTime();
 		Date endDate = new GregorianCalendar( 2009, 8, 21 ).getTime();
 
-		try {
-			calendar.createEvent( endDate, startDate, "Meeting" );
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"param0 < param1\" didn't evaluate to true" )
-			);
-		}
+		assertThatThrownBy( () -> calendar.createEvent( endDate, startDate, "Meeting" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( ParameterScriptAssert.class ).withMessage( "script expression \"param0 < param1\" didn't evaluate to true" )
+				) );
 	}
 
 	@Test

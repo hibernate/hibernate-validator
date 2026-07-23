@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
@@ -38,19 +38,15 @@ public class MultipleInterfaceInheritanceMethodValidationTest extends Arquillian
 
 	@Test
 	public void testExecutableValidationUsesSettingFromHighestMethodInHierarchy() throws Exception {
-		try {
-			shipmentService.getShipment();
-			fail( "Method invocation should have caused a ConstraintViolationException" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat(
-					e.getConstraintViolations()
-							.iterator()
-							.next()
-							.getConstraintDescriptor()
-							.getAnnotation()
-							.annotationType() )
-					.isEqualTo( NotNull.class );
-		}
+		assertThatThrownBy( () -> shipmentService.getShipment() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat(
+						( (ConstraintViolationException) e ).getConstraintViolations()
+								.iterator()
+								.next()
+								.getConstraintDescriptor()
+								.getAnnotation()
+								.annotationType() )
+						.isEqualTo( NotNull.class ) );
 	}
 }

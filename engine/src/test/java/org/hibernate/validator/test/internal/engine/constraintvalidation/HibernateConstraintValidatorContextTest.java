@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -60,11 +61,13 @@ public class HibernateConstraintValidatorContextTest {
 		);
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000028.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-701")
 	public void testSettingInvalidCustomMessageParameter() {
 		Validator validator = getValidator();
-		validator.validate( new MessageParameterFoo( "" ) );
+		assertThatThrownBy( () -> validator.validate( new MessageParameterFoo( "" ) ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000028.*" );
 	}
 
 	@Test
@@ -120,11 +123,13 @@ public class HibernateConstraintValidatorContextTest {
 		);
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000028.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-701")
 	public void testSettingInvalidCustomExpressionVariable() {
 		Validator validator = getValidator();
-		validator.validate( new ExpressionVariableFoo( "" ) );
+		assertThatThrownBy( () -> validator.validate( new ExpressionVariableFoo( "" ) ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000028.*" );
 	}
 
 	@Test

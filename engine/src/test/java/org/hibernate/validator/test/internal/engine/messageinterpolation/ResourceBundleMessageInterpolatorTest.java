@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
 
 import java.util.Collections;
@@ -260,11 +261,12 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 	}
 
-	@Test(expectedExceptions = RuntimeException.class,
-			expectedExceptionsMessageRegExp = "ReadOnceOnlyResourceBundle can only be accessed once!")
+	@Test
 	@TestForIssue(jiraKey = "HV-330")
 	public void testResourceBundleGetsAccessedMultipleTimesWhenCachingIsDisabled() {
-		runInterpolation( false );
+		assertThatThrownBy( () -> runInterpolation( false ) )
+				.isInstanceOf( RuntimeException.class )
+				.hasMessageMatching( "ReadOnceOnlyResourceBundle can only be accessed once!" );
 	}
 
 	@Test

@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 
 import java.util.Collections;
@@ -70,9 +71,11 @@ public class PropertyMetaDataTest {
 		assertThat( property.getCascadables().iterator().next().getCascadingMetaData().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	@Test
 	public void groupConversionInHierarchyWithSameFrom() {
-		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
+		assertThatThrownBy( () -> beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000124.*" );
 	}
 
 	public interface Complete extends Default {

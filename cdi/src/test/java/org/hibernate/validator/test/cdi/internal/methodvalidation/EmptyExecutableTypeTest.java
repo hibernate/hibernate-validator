@@ -5,10 +5,8 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
 
 import jakarta.inject.Inject;
-import jakarta.validation.ConstraintViolationException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.testng.Arquillian;
@@ -34,11 +32,6 @@ public class EmptyExecutableTypeTest extends Arquillian {
 
 	@Test
 	public void testEmptyExecutableTypeParameterIsTreatedAsExecutableTypeNone() throws Exception {
-		try {
-			assertThat( snafu.foo() ).isNull();
-		}
-		catch (ConstraintViolationException e) {
-			fail( "CDI method interceptor should not throw an exception" );
-		}
+		assertThat( snafu.foo() ).isNull();
 	}
 }

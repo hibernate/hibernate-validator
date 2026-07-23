@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validationordergenerator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
 
 import java.util.HashSet;
@@ -39,35 +40,40 @@ public class ValidationOrderGeneratorTest {
 		generator = new ValidationOrderGenerator();
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testValidationOrderForNonInterface() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( String.class );
-		generator.getValidationOrder( groups );
+		assertThatThrownBy( () -> generator.getValidationOrder( groups ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testValidationOrderForNull() {
-		generator.getValidationOrder( null );
+		assertThatThrownBy( () -> generator.getValidationOrder( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testValidationOrderForEmptySet() {
-		generator.getValidationOrder( new HashSet<Class<?>>() );
+		assertThatThrownBy( () -> generator.getValidationOrder( new HashSet<Class<?>>() ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testCyclicGroupSequences() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( CyclicGroupSequence1.class );
-		generator.getValidationOrder( groups );
+		assertThatThrownBy( () -> generator.getValidationOrder( groups ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testCyclicGroupSequence() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( CyclicGroupSequence.class );
-		generator.getValidationOrder( groups );
+		assertThatThrownBy( () -> generator.getValidationOrder( groups ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -96,18 +102,20 @@ public class ValidationOrderGeneratorTest {
 		assertEquals( count, 2, "Wrong number of groups" );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test
 	public void testGroupDefiningSequencePartOfGroupComposingSequence() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Sequence1.class );
-		generator.getValidationOrder( groups );
+		assertThatThrownBy( () -> generator.getValidationOrder( groups ) )
+				.isInstanceOf( GroupDefinitionException.class );
 	}
 
-	@Test(expectedExceptions = GroupDefinitionException.class)
+	@Test
 	public void testUnexpandableSequence() {
 		Set<Class<?>> groups = new HashSet<Class<?>>();
 		groups.add( Sequence3.class );
-		generator.getValidationOrder( groups );
+		assertThatThrownBy( () -> generator.getValidationOrder( groups ) )
+				.isInstanceOf( GroupDefinitionException.class );
 	}
 
 	@Test

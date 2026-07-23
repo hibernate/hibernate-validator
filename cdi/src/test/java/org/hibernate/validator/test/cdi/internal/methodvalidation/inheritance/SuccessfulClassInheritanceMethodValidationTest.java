@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
@@ -36,19 +36,15 @@ public class SuccessfulClassInheritanceMethodValidationTest extends Arquillian {
 
 	@Test
 	public void testOverriddenExecutionTypeIsConsidered() {
-		try {
-			mi6.whisper( null );
-			fail( "Method invocation should have caused a ConstraintViolationException" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat(
-					e.getConstraintViolations()
-							.iterator()
-							.next()
-							.getConstraintDescriptor()
-							.getAnnotation()
-							.annotationType() )
-					.isEqualTo( NotNull.class );
-		}
+		assertThatThrownBy( () -> mi6.whisper( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat(
+						( (ConstraintViolationException) e ).getConstraintViolations()
+								.iterator()
+								.next()
+								.getConstraintDescriptor()
+								.getAnnotation()
+								.annotationType() )
+						.isEqualTo( NotNull.class ) );
 	}
 }

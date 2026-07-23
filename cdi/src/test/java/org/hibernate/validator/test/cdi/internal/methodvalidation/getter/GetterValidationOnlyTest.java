@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
@@ -34,22 +34,12 @@ public class GetterValidationOnlyTest extends Arquillian {
 
 	@Test
 	public void testNonGetterValidationDoesNotOccur() throws Exception {
-		try {
-			assertThat( onlyGetterValidated.foo() ).isNull();
-		}
-		catch (ConstraintViolationException e) {
-			fail( "CDI method interceptor should not throw an exception" );
-		}
+		assertThat( onlyGetterValidated.foo() ).isNull();
 	}
 
 	@Test
 	public void testGetterValidationOccurs() throws Exception {
-		try {
-			onlyGetterValidated.getFoo();
-			fail( "CDI method interceptor should throw an exception" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> onlyGetterValidated.getFoo() )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 }

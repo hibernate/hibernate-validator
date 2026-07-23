@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
@@ -35,7 +36,7 @@ import org.testng.annotations.Test;
  */
 public class Mod11CheckValidatorTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidStartIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -47,10 +48,11 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidEndIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -62,10 +64,11 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testEndIndexLessThanStartIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -77,10 +80,11 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidcheckDigitIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -92,7 +96,8 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

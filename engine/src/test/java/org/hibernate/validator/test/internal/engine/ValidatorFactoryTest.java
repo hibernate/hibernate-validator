@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertSame;
 
 import jakarta.validation.Validation;
@@ -22,10 +23,11 @@ import org.testng.annotations.Test;
  */
 public class ValidatorFactoryTest {
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-		validatorFactory.unwrap( ValidatorFactoryImpl.class );
+		assertThatThrownBy( () -> validatorFactory.unwrap( ValidatorFactoryImpl.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
