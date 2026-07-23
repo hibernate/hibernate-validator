@@ -7,6 +7,8 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 import javax.money.MonetaryAmount;
 
 import jakarta.validation.ConstraintValidator;
@@ -15,7 +17,9 @@ import jakarta.validation.constraints.DecimalMax;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import org.javamoney.moneta.Money;
 
@@ -27,46 +31,36 @@ public class DecimalMaxValidatorForMonetaryAmountTest {
 
 	private final ConstraintValidator<DecimalMax, MonetaryAmount> unit = new DecimalMaxValidatorForMonetaryAmount();
 
-	@Test
-	public void nullIsValid() {
-		unit.initialize( decimalMax( "0", true ) );
+	@ParameterizedTest
+	@MethodSource("decimalMaxValidTestData")
+	public void testDecimalMaxValid(String value, boolean inclusive, MonetaryAmount amount) {
+		unit.initialize( decimalMax( value, inclusive ) );
 
-		assertTrue( unit.isValid( null, null ) );
+		assertTrue( unit.isValid( amount, null ) );
 	}
 
-	@Test
-	public void validIfLess() {
-		unit.initialize( decimalMax( "0", true ) );
-
-		assertTrue( unit.isValid( Money.of( -1, "EUR" ), null ) );
+	private static Stream<Arguments> decimalMaxValidTestData() {
+		return Stream.of(
+				Arguments.of( "0", true, null ),
+				Arguments.of( "0", true, Money.of( -1, "EUR" ) ),
+				Arguments.of( "0", true, Money.of( 0, "EUR" ) ),
+				Arguments.of( "0", false, Money.of( -1, "EUR" ) )
+		);
 	}
 
-	@Test
-	public void invalidIfGreater() {
-		unit.initialize( decimalMax( "0", true ) );
+	@ParameterizedTest
+	@MethodSource("decimalMaxInvalidTestData")
+	public void testDecimalMaxInvalid(String value, boolean inclusive, MonetaryAmount amount) {
+		unit.initialize( decimalMax( value, inclusive ) );
 
-		assertFalse( unit.isValid( Money.of( 1, "EUR" ), null ) );
+		assertFalse( unit.isValid( amount, null ) );
 	}
 
-	@Test
-	public void validIfInclude() {
-		unit.initialize( decimalMax( "0", true ) );
-
-		assertTrue( unit.isValid( Money.of( 0, "EUR" ), null ) );
-	}
-
-	@Test
-	public void invalidIfNotInclude() {
-		unit.initialize( decimalMax( "0", false ) );
-
-		assertFalse( unit.isValid( Money.of( 0, "EUR" ), null ) );
-	}
-
-	@Test
-	public void validIfLessAndNotIncluded() {
-		unit.initialize( decimalMax( "0", false ) );
-
-		assertTrue( unit.isValid( Money.of( -1, "EUR" ), null ) );
+	private static Stream<Arguments> decimalMaxInvalidTestData() {
+		return Stream.of(
+				Arguments.of( "0", true, Money.of( 1, "EUR" ) ),
+				Arguments.of( "0", false, Money.of( 0, "EUR" ) )
+		);
 	}
 
 	private DecimalMax decimalMax(final String value, final boolean inclusive) {

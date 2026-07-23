@@ -13,6 +13,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -31,6 +32,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Marko Bekhta
@@ -96,15 +100,9 @@ public class DurationMaxValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("testMessageData")
 	@TestForIssue(jiraKey = "HV-1232")
-	public void testMessage() {
-		testMessage( "must be shorter than or equal to 1 day 100 nanos", true, 1, 100, Duration.ofDays( 2 ) );
-		testMessage( "must be shorter than 1 day 100 nanos", false, 1, 100, Duration.ofDays( 2 ) );
-		testMessage( "must be shorter than or equal to 0", true, 0, 0, Duration.ofDays( 2 ) );
-		testMessage( "must be shorter than 0", false, 0, 0, Duration.ofDays( 2 ) );
-	}
-
 	public void testMessage(String message, boolean inclusive, int days, int nanos, Duration value) {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class, Locale.ENGLISH );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -122,6 +120,15 @@ public class DurationMaxValidatorTest {
 		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( DurationMax.class ).withMessage( message )
+		);
+	}
+
+	private static Stream<Arguments> testMessageData() {
+		return Stream.of(
+				Arguments.of( "must be shorter than or equal to 1 day 100 nanos", true, 1, 100, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be shorter than 1 day 100 nanos", false, 1, 100, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be shorter than or equal to 0", true, 0, 0, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be shorter than 0", false, 0, 0, Duration.ofDays( 2 ) )
 		);
 	}
 

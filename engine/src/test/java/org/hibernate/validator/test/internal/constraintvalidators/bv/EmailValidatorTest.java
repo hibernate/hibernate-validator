@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -31,6 +32,9 @@ import org.hibernate.validator.testutils.ValidatorUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Hardy Ferentschik
@@ -54,67 +58,81 @@ public class EmailValidatorTest {
 		isValidEmail( null );
 	}
 
-	@Test
-	public void testValidEmail() throws Exception {
-		isValidEmail( "emmanuel@hibernate.org" );
-		isValidEmail( "emmanuel@hibernate" );
-		isValidEmail( "emma-n_uel@hibernate" );
-		isValidEmail( "emma+nuel@hibernate.org" );
-		isValidEmail( "emma=nuel@hibernate.org" );
-		isValidEmail( "emmanuel@[123.12.2.11]" );
-		isValidEmail( "*@example.net" );
-		isValidEmail( "fred&barny@example.com" );
-		isValidEmail( "---@example.com" );
-		isValidEmail( "foo-bar@example.net" );
-		isValidEmail( "mailbox.sub1.sub2@this-domain" );
-		isValidEmail( "prettyandsimple@example.com" );
-		isValidEmail( "very.common@example.com" );
-		isValidEmail( "disposable.style.email.with+symbol@example.com" );
-		isValidEmail( "other.email-with-dash@example.com" );
-		isValidEmail( "x@example.com" );
-		isValidEmail( "\"much.more unusual\"@example.com" );
-		isValidEmail( "\"very.unusual.@.unusual.com\"@example.com" );
-		isValidEmail( "\"very.(),:;<>[]\\\".VERY.\\\"very@\\\\ \\\"very\\\".unusual\"@strange.example.com" );
-		isValidEmail( "\"some \".\" strange \".\" part*:; \"@strange.example.com" );
-		isValidEmail( "example-indeed@strange-example.com" );
-		isValidEmail( "admin@mailserver1" );
-		isValidEmail( "#!$%&'*+-/=?^_`{}|~@example.org" );
-		isValidEmail( "\"()<>[]:,;@\\\"!#$%&'-/=?^_`{}| ~.a\"@example.org" );
-		isValidEmail( "\" \"@example.org" );
-		isValidEmail( "example@localhost" );
-		isValidEmail( "example@s.solutions" );
-		isValidEmail( "user@localserver" );
-		isValidEmail( "user@tt" );
-		isValidEmail( "user@[IPv6:2001:DB8::1]" );
-		isValidEmail( "xn--80ahgue5b@xn--p-8sbkgc5ag7bhce.xn--ba-lmcq" );
-		isValidEmail( "nothing@xn--fken-gra.no" );
+	@ParameterizedTest
+	@MethodSource("testValidEmailData")
+	public void testValidEmail(String email) throws Exception {
+		isValidEmail( email );
 	}
 
-	@Test
-	public void testInValidEmail() throws Exception {
-		isInvalidEmail( "emmanuel.hibernate.org" );
-		isInvalidEmail( "emma nuel@hibernate.org" );
-		isInvalidEmail( "emma(nuel@hibernate.org" );
-		isInvalidEmail( "emmanuel@" );
-		isInvalidEmail( "emma\nnuel@hibernate.org" );
-		isInvalidEmail( "emma@nuel@hibernate.org" );
-		isInvalidEmail( "emma@nuel@.hibernate.org" );
-		isInvalidEmail( "Just a string" );
-		isInvalidEmail( "string" );
-		isInvalidEmail( "me@" );
-		isInvalidEmail( "@example.com" );
-		isInvalidEmail( "me.@example.com" );
-		isInvalidEmail( ".me@example.com" );
-		isInvalidEmail( "me@example..com" );
-		isInvalidEmail( "me\\@example.com" );
-		isInvalidEmail( "Abc.example.com" ); // (no @ character)
-		isInvalidEmail( "A@b@c@example.com" ); // (only one @ is allowed outside quotation marks)
-		isInvalidEmail( "a\"b(c)d,e:f;g<h>i[j\\k]l@example.com" ); // (none of the special characters in this local-part are allowed outside quotation marks)
-		isInvalidEmail( "just\"not\"right@example.com" ); // (quoted strings must be dot separated or the only element making up the local-part)
-		isInvalidEmail( "this is\"not\\allowed@example.com" ); // (spaces, quotes, and backslashes may only exist when within quoted strings and preceded by a backslash)
-		isInvalidEmail( "this\\ still\\\"not\\\\allowed@example.com" ); // (even if escaped (preceded by a backslash), spaces, quotes, and backslashes must still be contained by quotes)
-		isInvalidEmail( "john..doe@example.com" ); // (double dot before @) with caveat: Gmail lets this through, Email address#Local-part the dots altogether
-		isInvalidEmail( "john.doe@example..com" );
+	private static Stream<Arguments> testValidEmailData() {
+		return Stream.of(
+				Arguments.of( "emmanuel@hibernate.org" ),
+				Arguments.of( "emmanuel@hibernate" ),
+				Arguments.of( "emma-n_uel@hibernate" ),
+				Arguments.of( "emma+nuel@hibernate.org" ),
+				Arguments.of( "emma=nuel@hibernate.org" ),
+				Arguments.of( "emmanuel@[123.12.2.11]" ),
+				Arguments.of( "*@example.net" ),
+				Arguments.of( "fred&barny@example.com" ),
+				Arguments.of( "---@example.com" ),
+				Arguments.of( "foo-bar@example.net" ),
+				Arguments.of( "mailbox.sub1.sub2@this-domain" ),
+				Arguments.of( "prettyandsimple@example.com" ),
+				Arguments.of( "very.common@example.com" ),
+				Arguments.of( "disposable.style.email.with+symbol@example.com" ),
+				Arguments.of( "other.email-with-dash@example.com" ),
+				Arguments.of( "x@example.com" ),
+				Arguments.of( "\"much.more unusual\"@example.com" ),
+				Arguments.of( "\"very.unusual.@.unusual.com\"@example.com" ),
+				Arguments.of( "\"very.(),:;<>[]\\\".VERY.\\\"very@\\\\ \\\"very\\\".unusual\"@strange.example.com" ),
+				Arguments.of( "\"some \".\" strange \".\" part*:; \"@strange.example.com" ),
+				Arguments.of( "example-indeed@strange-example.com" ),
+				Arguments.of( "admin@mailserver1" ),
+				Arguments.of( "#!$%&'*+-/=?^_`{}|~@example.org" ),
+				Arguments.of( "\"()<>[]:,;@\\\"!#$%&'-/=?^_`{}| ~.a\"@example.org" ),
+				Arguments.of( "\" \"@example.org" ),
+				Arguments.of( "example@localhost" ),
+				Arguments.of( "example@s.solutions" ),
+				Arguments.of( "user@localserver" ),
+				Arguments.of( "user@tt" ),
+				Arguments.of( "user@[IPv6:2001:DB8::1]" ),
+				Arguments.of( "xn--80ahgue5b@xn--p-8sbkgc5ag7bhce.xn--ba-lmcq" ),
+				Arguments.of( "nothing@xn--fken-gra.no" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testInValidEmailData")
+	public void testInValidEmail(String email) throws Exception {
+		isInvalidEmail( email );
+	}
+
+	private static Stream<Arguments> testInValidEmailData() {
+		return Stream.of(
+				Arguments.of( "emmanuel.hibernate.org" ),
+				Arguments.of( "emma nuel@hibernate.org" ),
+				Arguments.of( "emma(nuel@hibernate.org" ),
+				Arguments.of( "emmanuel@" ),
+				Arguments.of( "emma\nnuel@hibernate.org" ),
+				Arguments.of( "emma@nuel@hibernate.org" ),
+				Arguments.of( "emma@nuel@.hibernate.org" ),
+				Arguments.of( "Just a string" ),
+				Arguments.of( "string" ),
+				Arguments.of( "me@" ),
+				Arguments.of( "@example.com" ),
+				Arguments.of( "me.@example.com" ),
+				Arguments.of( ".me@example.com" ),
+				Arguments.of( "me@example..com" ),
+				Arguments.of( "me\\@example.com" ),
+				Arguments.of( "Abc.example.com" ), // (no @ character)
+				Arguments.of( "A@b@c@example.com" ), // (only one @ is allowed outside quotation marks)
+				Arguments.of( "a\"b(c)d,e:f;g<h>i[j\\k]l@example.com" ), // (none of the special characters in this local-part are allowed outside quotation marks)
+				Arguments.of( "just\"not\"right@example.com" ), // (quoted strings must be dot separated or the only element making up the local-part)
+				Arguments.of( "this is\"not\\allowed@example.com" ), // (spaces, quotes, and backslashes may only exist when within quoted strings and preceded by a backslash)
+				Arguments.of( "this\\ still\\\"not\\\\allowed@example.com" ), // (even if escaped (preceded by a backslash), spaces, quotes, and backslashes must still be contained by quotes)
+				Arguments.of( "john..doe@example.com" ), // (double dot before @) with caveat: Gmail lets this through, Email address#Local-part the dots altogether
+				Arguments.of( "john.doe@example..com" )
+		);
 	}
 
 	@Test
@@ -178,12 +196,19 @@ public class EmailValidatorTest {
 		isValidEmail( "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@hibernate.org" );
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("testEMailWithTrailingAtData")
 	@TestForIssue(jiraKey = "HV-810")
-	public void testEMailWithTrailingAt() throws Exception {
-		isInvalidEmail( "validation@hibernate.com@" );
-		isInvalidEmail( "validation@hibernate.com@@" );
-		isInvalidEmail( "validation@hibernate.com@@@" );
+	public void testEMailWithTrailingAt(String email) throws Exception {
+		isInvalidEmail( email );
+	}
+
+	private static Stream<Arguments> testEMailWithTrailingAtData() {
+		return Stream.of(
+				Arguments.of( "validation@hibernate.com@" ),
+				Arguments.of( "validation@hibernate.com@@" ),
+				Arguments.of( "validation@hibernate.com@@@" )
+		);
 	}
 
 	@Test

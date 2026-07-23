@@ -8,11 +8,15 @@ import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for {@link KorRRN} constraint validator ({@link KorRRNValidator}),
@@ -33,78 +37,127 @@ public class KorRRNValidatorNeverAttrTest extends KorRRNValidatorTestHelper {
 	/**
 	 * The test succeeds even if check-digit is invalid.
 	 */
-	@Test
-	void testNeverAttr() {
-		assertValidRRN( "861224-2567481" );
-		assertValidRRN( "960223-2499371" );
-		assertValidRRN( "790707-1133361" );
-		assertValidRRN( "700901-2889651" );
-		assertValidRRN( "760609-2511101" );
-		assertValidRRN( "930831-1527511" );
-		assertValidRRN( "760314-2131702" );
-		assertValidRRN( "760307-1071851" );
-		assertValidRRN( "771118-1179991" );
-		assertValidRRN( "750519-1404601" );
+	@ParameterizedTest
+	@MethodSource("testNeverAttrData")
+	void testNeverAttr(String rrn) {
+		assertValidRRN( rrn );
 	}
 
-	@Test
-	void testNeverForeignerGenderDigits() {
-		assertValidRRN( "850101-5000000" );
-		assertValidRRN( "920202-6000000" );
-		assertValidRRN( "010101-7000000" );
-		assertValidRRN( "030303-8000000" );
+	private static Stream<Arguments> testNeverAttrData() {
+		return Stream.of(
+				Arguments.of( "861224-2567481" ),
+				Arguments.of( "960223-2499371" ),
+				Arguments.of( "790707-1133361" ),
+				Arguments.of( "700901-2889651" ),
+				Arguments.of( "760609-2511101" ),
+				Arguments.of( "930831-1527511" ),
+				Arguments.of( "760314-2131702" ),
+				Arguments.of( "760307-1071851" ),
+				Arguments.of( "771118-1179991" ),
+				Arguments.of( "750519-1404601" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testNeverForeignerGenderDigitsData")
+	void testNeverForeignerGenderDigits(String rrn) {
+		assertValidRRN( rrn );
+	}
+
+	private static Stream<Arguments> testNeverForeignerGenderDigitsData() {
+		return Stream.of(
+				Arguments.of( "850101-5000000" ),
+				Arguments.of( "920202-6000000" ),
+				Arguments.of( "010101-7000000" ),
+				Arguments.of( "030303-8000000" )
+		);
 	}
 
 	/**
 	 * The test succeeds without hyphen ('-')
 	 */
-	@Test
-	void testNeverAttrWithoutHyphen() {
-		assertValidRRN( "8612242567481" );
-		assertValidRRN( "9602232499371" );
-		assertValidRRN( "7907071133361" );
-		assertValidRRN( "7009012889651" );
-		assertValidRRN( "7606092511101" );
-		assertValidRRN( "9308311527511" );
-		assertValidRRN( "7603142131702" );
-		assertValidRRN( "7603071071851" );
-		assertValidRRN( "7711181179991" );
-		assertValidRRN( "7505191404601" );
+	@ParameterizedTest
+	@MethodSource("testNeverAttrWithoutHyphenData")
+	void testNeverAttrWithoutHyphen(String rrn) {
+		assertValidRRN( rrn );
+	}
+
+	private static Stream<Arguments> testNeverAttrWithoutHyphenData() {
+		return Stream.of(
+				Arguments.of( "8612242567481" ),
+				Arguments.of( "9602232499371" ),
+				Arguments.of( "7907071133361" ),
+				Arguments.of( "7009012889651" ),
+				Arguments.of( "7606092511101" ),
+				Arguments.of( "9308311527511" ),
+				Arguments.of( "7603142131702" ),
+				Arguments.of( "7603071071851" ),
+				Arguments.of( "7711181179991" ),
+				Arguments.of( "7505191404601" )
+		);
 	}
 
 
 	// Invalid RRN Date
-	@Test
-	void invalidDate() {
-		assertInvalidRRN( "861324-2567481" );
-		assertInvalidRRN( "960292-2499371" );
-		assertInvalidRRN( "000001-1234560" );
-		assertInvalidRRN( "000100-1234560" );
-		assertInvalidRRN( "000000-1234560" );
+	@ParameterizedTest
+	@MethodSource("invalidDateData")
+	void invalidDate(String rrn) {
+		assertInvalidRRN( rrn );
+	}
+
+	private static Stream<Arguments> invalidDateData() {
+		return Stream.of(
+				Arguments.of( "861324-2567481" ),
+				Arguments.of( "960292-2499371" ),
+				Arguments.of( "000001-1234560" ),
+				Arguments.of( "000100-1234560" ),
+				Arguments.of( "000000-1234560" )
+		);
 	}
 
 	// Invalid RRN Length
-	@Test
-	void invalidLength() {
-		assertInvalidRRN( "861024-25" );
-		assertInvalidRRN( "861024-256" );
-		assertInvalidRRN( "861024-256799999" );
+	@ParameterizedTest
+	@MethodSource("invalidLengthData")
+	void invalidLength(String rrn) {
+		assertInvalidRRN( rrn );
+	}
+
+	private static Stream<Arguments> invalidLengthData() {
+		return Stream.of(
+				Arguments.of( "861024-25" ),
+				Arguments.of( "861024-256" ),
+				Arguments.of( "861024-256799999" )
+		);
 	}
 
 	// Invalid RRN Sequence
-	@Test
-	void invalidSeq() {
-		assertInvalidRRN( "abcdefg-hijklmnop" );
-		assertInvalidRRN( "hello-world" );
-		assertInvalidRRN( "zzzzzzzzzzzzzzzzz" );
+	@ParameterizedTest
+	@MethodSource("invalidSeqData")
+	void invalidSeq(String rrn) {
+		assertInvalidRRN( rrn );
+	}
+
+	private static Stream<Arguments> invalidSeqData() {
+		return Stream.of(
+				Arguments.of( "abcdefg-hijklmnop" ),
+				Arguments.of( "hello-world" ),
+				Arguments.of( "zzzzzzzzzzzzzzzzz" )
+		);
 	}
 
 	// Invalid RRN Sequence
-	@Test
-	void invalidGen() {
-		assertInvalidRRN( "861224-9567484" );
-		assertInvalidRRN( "960223-9499378" );
-		assertInvalidRRN( "790707-9133360" );
+	@ParameterizedTest
+	@MethodSource("invalidGenData")
+	void invalidGen(String rrn) {
+		assertInvalidRRN( rrn );
+	}
+
+	private static Stream<Arguments> invalidGenData() {
+		return Stream.of(
+				Arguments.of( "861224-9567484" ),
+				Arguments.of( "960223-9499378" ),
+				Arguments.of( "790707-9133360" )
+		);
 	}
 
 	private void assertValidRRN(String rrn) {

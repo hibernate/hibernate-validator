@@ -9,6 +9,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
@@ -16,6 +18,9 @@ import org.hibernate.validator.testutil.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the {@link UUID} constraint.
@@ -101,18 +106,25 @@ public class UUIDValidatorTest {
 
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("invalidIfGroupLengthIsInvalidData")
 	@TestForIssue(jiraKey = "HV-1867")
-	public void invalidIfGroupLengthIsInvalid() {
+	public void invalidIfGroupLengthIsInvalid(String uuid) {
 
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
 
-		assertFalse( uuidValidator.isValid( "1e7fe6b0d-d28-48d9-bec2-7524574ed499", null ) );
-		assertFalse( uuidValidator.isValid( "1e7fe6b0-dd284-8d9-bec2-7524574ed499", null ) );
-		assertFalse( uuidValidator.isValid( "1e7fe6b0-dd28-48d9b-ec2-7524574ed499", null ) );
-		assertFalse( uuidValidator.isValid( "1e7fe6b0-dd28-48d9-bec27-524574ed499", null ) );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
 
+	}
+
+	private static Stream<Arguments> invalidIfGroupLengthIsInvalidData() {
+		return Stream.of(
+				Arguments.of( "1e7fe6b0d-d28-48d9-bec2-7524574ed499" ),
+				Arguments.of( "1e7fe6b0-dd284-8d9-bec2-7524574ed499" ),
+				Arguments.of( "1e7fe6b0-dd28-48d9b-ec2-7524574ed499" ),
+				Arguments.of( "1e7fe6b0-dd28-48d9-bec27-524574ed499" )
+		);
 	}
 
 	@Test
@@ -150,18 +162,25 @@ public class UUIDValidatorTest {
 
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("validIfCaseInsensitiveData")
 	@TestForIssue(jiraKey = "HV-1867")
-	public void validIfCaseInsensitive() {
+	public void validIfCaseInsensitive(String uuid) {
 
 		descriptorBuilder.setAttribute( "letterCase", UUID.LetterCase.INSENSITIVE );
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
 
-		assertTrue( uuidValidator.isValid( "62f07feb-7c36-4b2a-a832-cfd9b4b990c1", null ) );
-		assertTrue( uuidValidator.isValid( "62F07FEB-7C36-4B2A-A832-CFD9B4B990C1", null ) );
-		assertTrue( uuidValidator.isValid( "62F07FEB-7C36-4B2A-A832-CFD9B4B990c1", null ) );
+		assertTrue( uuidValidator.isValid( uuid, null ) );
 
+	}
+
+	private static Stream<Arguments> validIfCaseInsensitiveData() {
+		return Stream.of(
+				Arguments.of( "62f07feb-7c36-4b2a-a832-cfd9b4b990c1" ),
+				Arguments.of( "62F07FEB-7C36-4B2A-A832-CFD9B4B990C1" ),
+				Arguments.of( "62F07FEB-7C36-4B2A-A832-CFD9B4B990c1" )
+		);
 	}
 
 	@Test
@@ -189,98 +208,148 @@ public class UUIDValidatorTest {
 	}
 
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("validIfVersionsMatchData")
 	@TestForIssue(jiraKey = "HV-1867")
-	public void validIfVersionsMatch() {
+	public void validIfVersionsMatch(String uuid) {
 
 		descriptorBuilder.setAttribute( "version", new int[] { 4, 15, 13, 14, 11, 12, 9, 8, 7, 10, 6, 5 } );
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
 
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-47a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-57a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-67a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-77a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-87a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-97a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-a7a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-b7a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-c7a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-d7a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-e7a8-b49e-d758506a9bab", null ) );
-		assertTrue( uuidValidator.isValid( "2d5614ff-891e-f7a8-b49e-d758506a9bab", null ) );
+		assertTrue( uuidValidator.isValid( uuid, null ) );
 
 	}
 
-	@Test
+	private static Stream<Arguments> validIfVersionsMatchData() {
+		return Stream.of(
+				Arguments.of( "2d5614ff-891e-47a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-57a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-67a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-77a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-87a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-97a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-a7a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-b7a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-c7a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-d7a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-e7a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-f7a8-b49e-d758506a9bab" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("invalidIfVersionsDoNotMatchData")
 	@TestForIssue(jiraKey = "HV-1867")
-	public void invalidIfVersionsDoNotMatch() {
+	public void invalidIfVersionsDoNotMatch(String uuid) {
 
 		descriptorBuilder.setAttribute( "version", new int[] { 4, 15, 13, 14, 11, 12, 9, 8, 7, 10, 6, 5 } );
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
 
-		assertFalse( uuidValidator.isValid( "2d5614ff-891e-07a8-b49e-d758506a9bab", null ) );
-		assertFalse( uuidValidator.isValid( "2d5614ff-891e-17a8-b49e-d758506a9bab", null ) );
-		assertFalse( uuidValidator.isValid( "2d5614ff-891e-27a8-b49e-d758506a9bab", null ) );
-		assertFalse( uuidValidator.isValid( "2d5614ff-891e-37a8-b49e-d758506a9bab", null ) );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
 
 	}
 
-	@Test
-	@TestForIssue(jiraKey = "HV-1867")
-	public void validIfConfiguredVariantsMatch() {
+	private static Stream<Arguments> invalidIfVersionsDoNotMatchData() {
+		return Stream.of(
+				Arguments.of( "2d5614ff-891e-07a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-17a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-27a8-b49e-d758506a9bab" ),
+				Arguments.of( "2d5614ff-891e-37a8-b49e-d758506a9bab" )
+		);
+	}
 
+	@ParameterizedTest
+	@MethodSource("validIfConfiguredVariantsMatchData")
+	@TestForIssue(jiraKey = "HV-1867")
+	public void validIfConfiguredVariantsMatch(String uuid) {
 		descriptorBuilder.setAttribute( "variant", new int[] { 0, 1, 2 } );
-
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
-
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
-
+		assertTrue( uuidValidator.isValid( uuid, null ) );
 	}
 
-	@Test
+	private static Stream<Arguments> validIfConfiguredVariantsMatchData() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-0622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-1622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-2622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-3622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-4622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-5622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-6622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-7622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-8622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-9622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-a622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-b622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-c622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-d622-92adaaae229f" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("invalidIfConfiguredVariantsMatchData")
 	@TestForIssue(jiraKey = "HV-1867")
-	public void validOnlyIfConfiguredVariantMatches() {
-
-		descriptorBuilder.setAttribute( "variant", new int[] { 2 } );
-
+	public void invalidIfConfiguredVariantsMatch(String uuid) {
+		descriptorBuilder.setAttribute( "variant", new int[] { 0, 1, 2 } );
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
+	}
 
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+	private static Stream<Arguments> invalidIfConfiguredVariantsMatchData() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-e622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-f622-92adaaae229f" )
+		);
+	}
 
+	@ParameterizedTest
+	@MethodSource("validOnlyIfConfiguredVariantMatchesData")
+	@TestForIssue(jiraKey = "HV-1867")
+	public void validOnlyIfConfiguredVariantMatches(String uuid) {
+		descriptorBuilder.setAttribute( "variant", new int[] { 2 } );
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+		assertTrue( uuidValidator.isValid( uuid, null ) );
+	}
+
+	private static Stream<Arguments> validOnlyIfConfiguredVariantMatchesData() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-c622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-d622-92adaaae229f" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("invalidOnlyIfConfiguredVariantMatchesData")
+	@TestForIssue(jiraKey = "HV-1867")
+	public void invalidOnlyIfConfiguredVariantMatches(String uuid) {
+		descriptorBuilder.setAttribute( "variant", new int[] { 2 } );
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
+	}
+
+	private static Stream<Arguments> invalidOnlyIfConfiguredVariantMatchesData() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-0622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-1622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-2622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-3622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-4622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-5622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-6622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-7622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-8622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-9622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-a622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-b622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-e622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-f622-92adaaae229f" )
+		);
 	}
 
 	@Test
@@ -316,88 +385,143 @@ public class UUIDValidatorTest {
 		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
 	}
 
-	@Test
-	public void variantNotInTheAllowedList() {
-		// 0xxx 0 - 7    reserved (NCS backward compatible)
-		// 10xx 8 - b    DCE 1.1, ISO/IEC 11578:1996
-		// 110x c - d    reserved (Microsoft GUID)
-		// 1110 e        reserved (future use)
-		// 1111 f        unknown / invalid. Must end with "0"
-
+	// 0xxx 0 - 7    reserved (NCS backward compatible)
+	// 10xx 8 - b    DCE 1.1, ISO/IEC 11578:1996
+	// 110x c - d    reserved (Microsoft GUID)
+	// 1110 e        reserved (future use)
+	// 1111 f        unknown / invalid. Must end with "0"
+	// Variant 0: 0xxx (0-7) reserved (NCS backward compatible)
+	@ParameterizedTest
+	@MethodSource("validVariant0Data")
+	public void validVariant0(String uuid) {
 		descriptorBuilder.setAttribute( "variant", new int[] { 0 } );
-
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
+		assertTrue( uuidValidator.isValid( uuid, null ) );
+	}
 
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
-		// Next two variants are always invalid as they are currently "undefined":
-		// 1110	e
-		// 1111	f
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+	private static Stream<Arguments> validVariant0Data() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-0622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-1622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-2622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-3622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-4622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-5622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-6622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-7622-92adaaae229f" )
+		);
+	}
 
+	@ParameterizedTest
+	@MethodSource("invalidVariant0Data")
+	public void invalidVariant0(String uuid) {
+		descriptorBuilder.setAttribute( "variant", new int[] { 0 } );
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
+	}
+
+	private static Stream<Arguments> invalidVariant0Data() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-8622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-9622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-a622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-b622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-c622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-d622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-e622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-f622-92adaaae229f" )
+		);
+	}
+
+	// Variant 1: 10xx (8-b) DCE 1.1, ISO/IEC 11578:1996
+	@ParameterizedTest
+	@MethodSource("validVariant1Data")
+	public void validVariant1(String uuid) {
 		descriptorBuilder.setAttribute( "variant", new int[] { 1 } );
-
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
+		assertTrue( uuidValidator.isValid( uuid, null ) );
+	}
 
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
-		// Next two variants are always invalid as they are currently "undefined":
-		// 1110	e
-		// 1111	f
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+	private static Stream<Arguments> validVariant1Data() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-8622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-9622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-a622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-b622-92adaaae229f" )
+		);
+	}
 
+	@ParameterizedTest
+	@MethodSource("invalidVariant1Data")
+	public void invalidVariant1(String uuid) {
+		descriptorBuilder.setAttribute( "variant", new int[] { 1 } );
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
+	}
+
+	private static Stream<Arguments> invalidVariant1Data() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-0622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-1622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-2622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-3622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-4622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-5622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-6622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-7622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-c622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-d622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-e622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-f622-92adaaae229f" )
+		);
+	}
+
+	// Variant 2: 110x (c-d) reserved (Microsoft GUID)
+	@ParameterizedTest
+	@MethodSource("validVariant2Data")
+	public void validVariant2(String uuid) {
 		descriptorBuilder.setAttribute( "variant", new int[] { 2 } );
-
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 		uuidValidator.initialize( uuidAnnotation );
+		assertTrue( uuidValidator.isValid( uuid, null ) );
+	}
 
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-0622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-1622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-2622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-3622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-4622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-5622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-6622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-7622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-8622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-9622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-a622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-b622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-c622-92adaaae229f", null ) );
-		assertTrue( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-d622-92adaaae229f", null ) );
-		// Next two variants are always invalid as they are currently "undefined":
-		// 1110	e
-		// 1111	f
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-e622-92adaaae229f", null ) );
-		assertFalse( uuidValidator.isValid( "24e6abaa-b2a8-4a8e-f622-92adaaae229f", null ) );
+	private static Stream<Arguments> validVariant2Data() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-c622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-d622-92adaaae229f" )
+		);
+	}
 
+	@ParameterizedTest
+	@MethodSource("invalidVariant2Data")
+	public void invalidVariant2(String uuid) {
+		descriptorBuilder.setAttribute( "variant", new int[] { 2 } );
+		uuidAnnotation = descriptorBuilder.build().getAnnotation();
+		uuidValidator.initialize( uuidAnnotation );
+		assertFalse( uuidValidator.isValid( uuid, null ) );
+	}
+
+	private static Stream<Arguments> invalidVariant2Data() {
+		return Stream.of(
+				Arguments.of( "24e6abaa-b2a8-4a8e-0622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-1622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-2622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-3622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-4622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-5622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-6622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-7622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-8622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-9622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-a622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-b622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-e622-92adaaae229f" ),
+				Arguments.of( "24e6abaa-b2a8-4a8e-f622-92adaaae229f" )
+		);
 	}
 }

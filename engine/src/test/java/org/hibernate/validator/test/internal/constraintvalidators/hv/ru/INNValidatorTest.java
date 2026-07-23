@@ -7,12 +7,17 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv.ru;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.internal.constraintvalidators.hv.ru.INNValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * A set of tests for {@link INN} constraint validator ({@link INNValidator}),
@@ -30,72 +35,100 @@ public class INNValidatorTest {
 		validator = new INNValidator();
 	}
 
-	@Test
-	public void validIndividualTypeINN() {
+	@ParameterizedTest
+	@MethodSource("validIndividualTypeINNData")
+	public void validIndividualTypeINN(String inn) {
 		validator.initialize( initializeAnnotation( INN.Type.INDIVIDUAL ) );
 
-		assertValidINN( null );
-		assertValidINN( "246964567008" );
-		assertValidINN( "356393289962" );
-		assertValidINN( "279837166431" );
-		assertValidINN( "827175083460" );
-		assertValidINN( "789429596404" );
-		assertValidINN( "929603416330" );
-		assertValidINN( "086229647992" );
+		assertValidINN( inn );
 	}
 
-	@Test
-	public void invalidIndividualTypeINN() {
+	private static Stream<Arguments> validIndividualTypeINNData() {
+		return Stream.of(
+				Arguments.of( (String) null ),
+				Arguments.of( "246964567008" ),
+				Arguments.of( "356393289962" ),
+				Arguments.of( "279837166431" ),
+				Arguments.of( "827175083460" ),
+				Arguments.of( "789429596404" ),
+				Arguments.of( "929603416330" ),
+				Arguments.of( "086229647992" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("invalidIndividualTypeINNData")
+	public void invalidIndividualTypeINN(String inn) {
 		validator.initialize( initializeAnnotation( INN.Type.INDIVIDUAL ) );
 
-		//invalid checksum
-		assertInvalidINN( "012345678912" );
-		assertInvalidINN( "246964567009" );
-
-		//invalid symbols
-		assertInvalidINN( "a46964567008" );
-
-		//invalid length
-		assertInvalidINN( "" );
-		assertInvalidINN( "90660563173" );
-		assertInvalidINN( "9066056317378" );
-
-		//invalid type
-		assertInvalidINN( "4546366155" );
+		assertInvalidINN( inn );
 	}
 
-	@Test
-	public void validJuridicalTypeINN() {
-		validator.initialize( initializeAnnotation( INN.Type.JURIDICAL ) );
+	private static Stream<Arguments> invalidIndividualTypeINNData() {
+		return Stream.of(
+				//invalid checksum
+				Arguments.of( "012345678912" ),
+				Arguments.of( "246964567009" ),
 
-		assertValidINN( null );
-		assertValidINN( "0305773929" );
-		assertValidINN( "5496344268" );
-		assertValidINN( "0314580754" );
-		assertValidINN( "8652697156" );
-		assertValidINN( "3527694367" );
-		assertValidINN( "8771236130" );
-		assertValidINN( "9254906927" );
+				//invalid symbols
+				Arguments.of( "a46964567008" ),
+
+				//invalid length
+				Arguments.of( "" ),
+				Arguments.of( "90660563173" ),
+				Arguments.of( "9066056317378" ),
+
+				//invalid type
+				Arguments.of( "4546366155" )
+		);
 	}
 
-	@Test
-	public void invalidJuridicalTypeINN() {
+	@ParameterizedTest
+	@MethodSource("validJuridicalTypeINNData")
+	public void validJuridicalTypeINN(String inn) {
 		validator.initialize( initializeAnnotation( INN.Type.JURIDICAL ) );
 
-		//invalid checksum
-		assertInvalidINN( "0123456789" );
-		assertInvalidINN( "0305773928" );
+		assertValidINN( inn );
+	}
 
-		//invalid symbols
-		assertInvalidINN( "a305773929" );
+	private static Stream<Arguments> validJuridicalTypeINNData() {
+		return Stream.of(
+				Arguments.of( (String) null ),
+				Arguments.of( "0305773929" ),
+				Arguments.of( "5496344268" ),
+				Arguments.of( "0314580754" ),
+				Arguments.of( "8652697156" ),
+				Arguments.of( "3527694367" ),
+				Arguments.of( "8771236130" ),
+				Arguments.of( "9254906927" )
+		);
+	}
 
-		//invalid length
-		assertInvalidINN( "" );
-		assertInvalidINN( "906605631" );
-		assertInvalidINN( "90660563173" );
+	@ParameterizedTest
+	@MethodSource("invalidJuridicalTypeINNData")
+	public void invalidJuridicalTypeINN(String inn) {
+		validator.initialize( initializeAnnotation( INN.Type.JURIDICAL ) );
 
-		//invalid type
-		assertInvalidINN( "246964567008" );
+		assertInvalidINN( inn );
+	}
+
+	private static Stream<Arguments> invalidJuridicalTypeINNData() {
+		return Stream.of(
+				//invalid checksum
+				Arguments.of( "0123456789" ),
+				Arguments.of( "0305773928" ),
+
+				//invalid symbols
+				Arguments.of( "a305773929" ),
+
+				//invalid length
+				Arguments.of( "" ),
+				Arguments.of( "906605631" ),
+				Arguments.of( "90660563173" ),
+
+				//invalid type
+				Arguments.of( "246964567008" )
+		);
 	}
 
 	@Test

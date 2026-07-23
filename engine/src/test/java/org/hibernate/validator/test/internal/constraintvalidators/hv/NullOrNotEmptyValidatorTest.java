@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -29,6 +30,9 @@ import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyVa
 import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the {@link NullOrNotEmpty} constraint validators.
@@ -45,11 +49,18 @@ public class NullOrNotEmptyValidatorTest {
 		assertTrue( charSequenceValidator.isValid( null, null ) );
 	}
 
-	@Test
-	public void notEmptyCharSequenceIsValid() {
-		assertTrue( charSequenceValidator.isValid( "a", null ) );
-		assertTrue( charSequenceValidator.isValid( "foobar", null ) );
-		assertTrue( charSequenceValidator.isValid( " ", null ) );
+	@ParameterizedTest
+	@MethodSource("notEmptyCharSequenceIsValidData")
+	public void notEmptyCharSequenceIsValid(String value) {
+		assertTrue( charSequenceValidator.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> notEmptyCharSequenceIsValidData() {
+		return Stream.of(
+				Arguments.of( "a" ),
+				Arguments.of( "foobar" ),
+				Arguments.of( " " )
+		);
 	}
 
 	@Test
