@@ -5,8 +5,8 @@
 package org.hibernate.validator.test.internal.xml.exception;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.Configuration;
 import jakarta.validation.ValidationException;
@@ -14,7 +14,7 @@ import jakarta.validation.ValidationException;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -33,8 +33,8 @@ public class XmlConfigurationExceptionTest {
 					assertTrue( e.getMessage().startsWith( "HV000012" ) );
 					Throwable cause = e.getCause();
 					assertEquals(
-							cause.getMessage(),
 							"HV000085: No value provided for attribute 'regexp' of annotation @jakarta.validation.constraints.Pattern.",
+							cause.getMessage(),
 							"Wrong error message"
 					);
 				} );

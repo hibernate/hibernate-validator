@@ -17,7 +17,7 @@ import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Koen Aers

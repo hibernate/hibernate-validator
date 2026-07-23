@@ -11,7 +11,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class RUCValidatorTest extends AbstractConstrainedTest {
 

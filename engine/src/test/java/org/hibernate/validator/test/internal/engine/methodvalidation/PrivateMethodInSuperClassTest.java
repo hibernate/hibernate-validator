@@ -20,8 +20,9 @@ import jakarta.validation.executable.ExecutableValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Test for making sure a validated sub-type method can have different constraints than a private super-type method with
@@ -29,12 +30,13 @@ import org.testng.annotations.Test;
  *
  * @author Gunnar Morling
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PrivateMethodInSuperClassTest {
 
 	private Validator validator;
 	private ExecutableValidator executableValidator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		validator = ValidatorUtil.getValidator();
 		executableValidator = validator.forExecutables();

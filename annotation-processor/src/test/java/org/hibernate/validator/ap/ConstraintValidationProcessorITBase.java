@@ -10,8 +10,8 @@ import javax.tools.ToolProvider;
 
 import org.hibernate.validator.ap.testutil.CompilerTestHelper;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Base class providing common functionality for all tests for the constraint validation processor using the Java compiler
@@ -25,14 +25,14 @@ public abstract class ConstraintValidationProcessorITBase {
 
 	protected DiagnosticCollector<JavaFileObject> diagnostics;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpCompilerHelper() {
 
 		compilerHelper =
 				new CompilerTestHelper( ToolProvider.getSystemJavaCompiler() );
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpDiagnostics() {
 		diagnostics = new DiagnosticCollector<JavaFileObject>();
 	}

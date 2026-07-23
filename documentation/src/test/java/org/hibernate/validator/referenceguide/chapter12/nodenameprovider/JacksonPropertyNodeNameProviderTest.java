@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.nodenameprovider;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

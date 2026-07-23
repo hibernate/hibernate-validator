@@ -13,14 +13,14 @@ import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.executable.ExecutableValidator;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class CarTest {
 
 	private static ExecutableValidator executableValidator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		executableValidator = factory.getValidator().forExecutables();

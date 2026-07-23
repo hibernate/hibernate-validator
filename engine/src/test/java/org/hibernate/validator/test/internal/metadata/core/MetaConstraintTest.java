@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.internal.metadata.core;
 
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintValidatorInitializationContext;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -27,12 +27,14 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MetaConstraintTest {
 	private ConstraintHelper constraintHelper;
 	private TypeResolutionHelper typeResolutionHelper;
@@ -41,7 +43,7 @@ public class MetaConstraintTest {
 	private Method barMethod;
 	private ConstraintAnnotationDescriptor<NotNull> constraintAnnotationDescriptor;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() throws Exception {
 		constraintHelper = ConstraintHelper.forAllBuiltinConstraints();
 		typeResolutionHelper = new TypeResolutionHelper();
@@ -69,8 +71,8 @@ public class MetaConstraintTest {
 		MetaConstraint<NotNull> metaConstraint2 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintValidatorManager,
 				constraintDescriptor2, location2 );
 
-		assertEquals(
-				metaConstraint1, metaConstraint2, "Two MetaConstraint instances for the same constraint should be equal"
+		assertEquals( metaConstraint2,
+				metaConstraint1, "Two MetaConstraint instances for the same constraint should be equal"
 		);
 	}
 

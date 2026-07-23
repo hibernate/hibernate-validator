@@ -17,9 +17,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -53,7 +53,7 @@ import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -172,7 +172,7 @@ public class ValidatorTest {
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validate( new H() );
 
 		assertNoViolations( constraintViolations );
-		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 2 );
+		assertEquals( 2, CountValidationCallsValidator.getNumberOfValidationCall() );
 	}
 
 	@Test
@@ -182,7 +182,7 @@ public class ValidatorTest {
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateProperty( new H(), "foo" );
 
 		assertNoViolations( constraintViolations );
-		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
+		assertEquals( 1, CountValidationCallsValidator.getNumberOfValidationCall() );
 	}
 
 	@Test
@@ -192,7 +192,7 @@ public class ValidatorTest {
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateValue( H.class, "foo", null );
 
 		assertNoViolations( constraintViolations );
-		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
+		assertEquals( 1, CountValidationCallsValidator.getNumberOfValidationCall() );
 	}
 
 	@Test
@@ -251,10 +251,10 @@ public class ValidatorTest {
 		Validator validator = getValidator();
 
 		Validator asValidator = validator.unwrap( Validator.class );
-		assertSame( asValidator, validator );
+		assertSame( validator, asValidator );
 
 		Object asObject = validator.unwrap( Object.class );
-		assertSame( asObject, validator );
+		assertSame( validator, asObject );
 	}
 
 	@Test

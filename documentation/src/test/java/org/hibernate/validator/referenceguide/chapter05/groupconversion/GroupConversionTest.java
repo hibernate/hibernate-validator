@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter05.groupconversion;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -13,14 +13,14 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class GroupConversionTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
@@ -44,9 +44,9 @@ public class GroupConversionTest {
 		constraintViolations = validator.validate( car );
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals(
-				"The driver constraint should also be validated as part of the default group",
+				"You first have to pass the driving test",
 				constraintViolations.iterator().next().getMessage(),
-				"You first have to pass the driving test"
+				"The driver constraint should also be validated as part of the default group"
 		);
 		//end::validateDriverChecksTogetherWithCarChecks[]
 	}

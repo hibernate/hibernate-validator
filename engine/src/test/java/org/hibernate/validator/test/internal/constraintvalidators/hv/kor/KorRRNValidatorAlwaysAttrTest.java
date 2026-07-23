@@ -5,14 +5,14 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv.kor;
 
 import static org.hibernate.validator.constraints.kor.KorRRN.ValidateCheckDigit.ALWAYS;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link KorRRN} constraint validator ({@link KorRRNValidator}),
@@ -24,7 +24,7 @@ public class KorRRNValidatorAlwaysAttrTest extends KorRRNValidatorTestHelper {
 
 	private KorRRNValidator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	void setUp() {
 		validator = new KorRRNValidator();
 		validator.initialize( initAnnotation( ALWAYS ) );

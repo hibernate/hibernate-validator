@@ -21,12 +21,14 @@ import jakarta.validation.constraints.Min;
 
 import org.hibernate.validator.cdi.spi.InjectingConstraintValidatorFactory;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class InjectingConstraintValidatorFactoryTest {
 	private InjectingConstraintValidatorFactory constraintValidatorFactory;
 	private BeanManager beanManagerMock;
@@ -35,7 +37,7 @@ public class InjectingConstraintValidatorFactoryTest {
 	private InjectionTargetFactory<MyValidator> injectionTargetFactoryMock;
 	private CreationalContext<MyValidator> creationalContextMock;
 
-	@BeforeClass
+	@BeforeAll
 	@SuppressWarnings("unchecked")
 	public void setUp() {
 		beanManagerMock = createMock( BeanManager.class );

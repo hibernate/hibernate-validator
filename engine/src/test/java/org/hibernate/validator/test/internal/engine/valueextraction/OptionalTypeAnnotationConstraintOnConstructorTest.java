@@ -38,8 +38,9 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Test combination of {@link Optional} and {@code validateUnwrappedValue()} on constructors.
@@ -47,11 +48,12 @@ import org.testng.annotations.Test;
  * @author Davide D'Alto
  */
 @TestForIssue(jiraKey = "HV-976")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OptionalTypeAnnotationConstraintOnConstructorTest {
 
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setup() {
 		validator = getValidator();
 	}

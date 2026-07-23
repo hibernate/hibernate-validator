@@ -21,8 +21,8 @@ import org.hibernate.validator.test.constraintvalidator.MustMatch;
 import org.hibernate.validator.test.constraintvalidator.MustNotMatch;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test related to constraint validator discovery in the predefined scope case.
@@ -35,7 +35,7 @@ public class PredefinedScopeConstraintDefinitionContributorTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = getValidator();
 		Set<Class<?>> beanMetaDataToInitialize = new HashSet<>();

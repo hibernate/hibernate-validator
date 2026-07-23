@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import static org.testng.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import jakarta.validation.Configuration;
 import jakarta.validation.Validator;
@@ -14,8 +14,8 @@ import jakarta.validation.metadata.MethodDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -25,7 +25,7 @@ public class PrimitiveTypesConfiguredInXmlTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	protected void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

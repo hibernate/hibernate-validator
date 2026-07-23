@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -16,18 +16,20 @@ import org.hibernate.validator.internal.engine.resolver.JPATraversableResolver;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * See HV-305
  *
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JpaTraversableResolverTest {
 	private Validator validator;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.traversableResolver( new JPATraversableResolver() );

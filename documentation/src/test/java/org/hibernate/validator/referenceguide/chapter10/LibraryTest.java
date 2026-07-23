@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter10;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -18,14 +18,14 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import jakarta.validation.metadata.ContainerElementTypeDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class LibraryTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}

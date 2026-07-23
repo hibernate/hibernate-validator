@@ -7,8 +7,8 @@ package org.hibernate.validator.test.internal.xml;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.InputStream;
 import java.util.List;
@@ -27,8 +27,8 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.xml.mapping.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -38,7 +38,7 @@ public class MappingXmlParserTest {
 	private MappingXmlParser xmlMappingParser;
 	private ConstraintCreationContext constraintCreationContext;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupParserHelper() {
 		constraintCreationContext = getDummyConstraintCreationContext();
 		xmlMappingParser = new MappingXmlParser(
@@ -55,7 +55,7 @@ public class MappingXmlParserTest {
 		);
 
 		assertFalse( validatorDescriptors.isEmpty(), "Wrong number of default validators" );
-		assertEquals( getIndex( validatorDescriptors, DecimalMinValidatorForFoo.class ), -1, "The custom validator must be absent" );
+		assertEquals( -1, getIndex( validatorDescriptors, DecimalMinValidatorForFoo.class ), "The custom validator must be absent" );
 
 		Set<InputStream> mappingStreams = newHashSet();
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
@@ -64,7 +64,7 @@ public class MappingXmlParserTest {
 
 		validatorDescriptors = constraintCreationContext.getConstraintHelper().getAllValidatorDescriptors( DecimalMin.class );
 		assertFalse( validatorDescriptors.isEmpty(), "Wrong number of default validators" );
-		assertEquals( getIndex( validatorDescriptors, DecimalMinValidatorForFoo.class ), validatorDescriptors.size() - 1,
+		assertEquals( validatorDescriptors.size() - 1, getIndex( validatorDescriptors, DecimalMinValidatorForFoo.class ),
 				"The custom validator must be last" );
 	}
 

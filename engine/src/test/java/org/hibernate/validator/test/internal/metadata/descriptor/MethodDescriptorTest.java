@@ -8,9 +8,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.Cust
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -43,7 +43,7 @@ public class MethodDescriptorTest {
 				CustomerRepositoryExt.class,
 				"foo"
 		);
-		assertEquals( methodDescriptor.getName(), "foo" );
+		assertEquals( "foo", methodDescriptor.getName() );
 	}
 
 	@Test
@@ -88,11 +88,11 @@ public class MethodDescriptorTest {
 	public void testGetElementClass() {
 		//the return type as defined in the base type
 		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepository.class, "bar" );
-		assertEquals( methodDescriptor.getElementClass(), Customer.class );
+		assertEquals( Customer.class, methodDescriptor.getElementClass() );
 
 		//the return type is now the one as defined in the derived type (covariant return type)
 		methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "bar" );
-		assertEquals( methodDescriptor.getElementClass(), CustomerExtension.class );
+		assertEquals( CustomerExtension.class, methodDescriptor.getElementClass() );
 	}
 
 	@Test
@@ -141,16 +141,15 @@ public class MethodDescriptorTest {
 		Set<ConstraintDescriptor<?>> constraintDescriptors = parameterDescriptor.findConstraints()
 				.lookingAt( Scope.LOCAL_ELEMENT )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 0 );
+		assertEquals( 0, constraintDescriptors.size() );
 
 		constraintDescriptors = parameterDescriptor.findConstraints()
 				.lookingAt( Scope.HIERARCHY )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( 1, constraintDescriptors.size() );
 		assertEquals(
-				constraintDescriptors.iterator().next().getAnnotation().annotationType(),
-				NotNull.class
-		);
+				NotNull.class,
+				constraintDescriptors.iterator().next().getAnnotation().annotationType() );
 	}
 
 	@Test
@@ -169,14 +168,14 @@ public class MethodDescriptorTest {
 
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterDescriptors();
 		assertNotNull( parameterConstraints );
-		assertEquals( parameterConstraints.size(), 2 );
+		assertEquals( 2, parameterConstraints.size() );
 
 		ParameterDescriptor parameterDescriptor1 = parameterConstraints.get( 0 );
-		assertEquals( parameterDescriptor1.getElementClass(), CharSequence.class );
+		assertEquals( CharSequence.class, parameterDescriptor1.getElementClass() );
 		assertFalse( parameterDescriptor1.hasConstraints() );
 
 		ParameterDescriptor parameterDescriptor2 = parameterConstraints.get( 1 );
-		assertEquals( parameterDescriptor2.getElementClass(), String.class );
+		assertEquals( String.class, parameterDescriptor2.getElementClass() );
 		assertTrue( parameterDescriptor2.hasConstraints() );
 	}
 
@@ -189,7 +188,7 @@ public class MethodDescriptorTest {
 
 		List<ParameterDescriptor> parameterConstraints = methodDescriptor.getParameterDescriptors();
 		assertNotNull( parameterConstraints );
-		assertEquals( parameterConstraints.size(), 0 );
+		assertEquals( 0, parameterConstraints.size() );
 	}
 
 	@Test

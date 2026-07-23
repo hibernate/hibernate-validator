@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.internal.engine.groups.validationordergenerator;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,17 +25,19 @@ import org.hibernate.validator.test.internal.engine.groups.validationorder.First
 import org.hibernate.validator.test.internal.engine.groups.validationorder.Last;
 import org.hibernate.validator.test.internal.engine.groups.validationorder.Second;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ValidationOrderGeneratorTest {
 
 	ValidationOrderGenerator generator;
 
-	@BeforeTest
+	@BeforeAll
 	public void init() {
 		generator = new ValidationOrderGenerator();
 	}
@@ -84,14 +86,14 @@ public class ValidationOrderGeneratorTest {
 		groups.add( Last.class );
 		ValidationOrder chain = generator.getValidationOrder( groups );
 		int count = countGroups( chain );
-		assertEquals( count, 3, "Wrong number of groups" );
+		assertEquals( 3, count, "Wrong number of groups" );
 
 		groups.clear();
 		groups.add( First.class );
 		groups.add( First.class );
 		chain = generator.getValidationOrder( groups );
 		count = countGroups( chain );
-		assertEquals( count, 1, "Wrong number of groups" );
+		assertEquals( 1, count, "Wrong number of groups" );
 
 		groups.clear();
 		groups.add( First.class );
@@ -99,7 +101,7 @@ public class ValidationOrderGeneratorTest {
 		groups.add( First.class );
 		chain = generator.getValidationOrder( groups );
 		count = countGroups( chain );
-		assertEquals( count, 2, "Wrong number of groups" );
+		assertEquals( 2, count, "Wrong number of groups" );
 	}
 
 	@Test
@@ -133,8 +135,8 @@ public class ValidationOrderGeneratorTest {
 		Iterator<Sequence> sequences = chain.getSequenceIterator();
 		List<Group> sequence = sequences.next().getComposingGroups();
 
-		assertEquals( sequence.get( 0 ).getDefiningClass(), Default.class, "Wrong group" );
-		assertEquals( sequence.get( 1 ).getDefiningClass(), Address.HighLevelCoherence.class, "Wrong group" );
+		assertEquals( Default.class, sequence.get( 0 ).getDefiningClass(), "Wrong group" );
+		assertEquals( Address.HighLevelCoherence.class, sequence.get( 1 ).getDefiningClass(), "Wrong group" );
 	}
 
 	private int countGroups(ValidationOrder chain) {

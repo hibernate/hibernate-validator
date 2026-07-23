@@ -10,7 +10,7 @@ import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta

@@ -32,8 +32,8 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -42,7 +42,7 @@ public class PropertyMetaDataTest {
 
 	private BeanMetaDataManager beanMetaDataManager;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupBeanMetaDataManager() {
 		beanMetaDataManager = new BeanMetaDataManagerImpl(
 				getDummyConstraintCreationContext(),

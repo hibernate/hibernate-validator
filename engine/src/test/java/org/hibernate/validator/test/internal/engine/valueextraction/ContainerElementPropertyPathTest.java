@@ -34,15 +34,17 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutils.CandidateForTck;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 @CandidateForTck
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ContainerElementPropertyPathTest {
 
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setupValidator() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}

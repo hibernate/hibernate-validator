@@ -4,10 +4,11 @@
  */
 package org.hibernate.validator.test.internal.metadata.core;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -18,17 +19,19 @@ import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.test.internal.metadata.Engine;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ConstraintHelperTest {
 
 	private static ConstraintHelper constraintHelper;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		constraintHelper = ConstraintHelper.forAllBuiltinConstraints();
 	}
@@ -53,12 +56,12 @@ public class ConstraintHelperTest {
 		List<Annotation> multiValueConstraintAnnotations = constraintHelper.getConstraintsFromMultiValueConstraint(
 				annotation
 		);
-		assertTrue( multiValueConstraintAnnotations.size() == 2, "There should be two constraint annotations" );
+		assertEquals( 2, multiValueConstraintAnnotations.size(), "There should be two constraint annotations" );
 
-		assertTrue( multiValueConstraintAnnotations.get( 0 ) instanceof Pattern, "Wrong constraint annotation" );
-		assertEquals( ( (Pattern) multiValueConstraintAnnotations.get( 0 ) ).regexp(), "^[A-Z0-9-]+$" );
+		assertInstanceOf( Pattern.class, multiValueConstraintAnnotations.get( 0 ), "Wrong constraint annotation" );
+		assertEquals( "^[A-Z0-9-]+$", ( (Pattern) multiValueConstraintAnnotations.get( 0 ) ).regexp() );
 
-		assertTrue( multiValueConstraintAnnotations.get( 1 ) instanceof Pattern, "Wrong constraint annotation" );
-		assertEquals( ( (Pattern) multiValueConstraintAnnotations.get( 1 ) ).regexp(), "^....-....-....$" );
+		assertInstanceOf( Pattern.class, multiValueConstraintAnnotations.get( 1 ), "Wrong constraint annotation" );
+		assertEquals( "^....-....-....$", ( (Pattern) multiValueConstraintAnnotations.get( 1 ) ).regexp() );
 	}
 }

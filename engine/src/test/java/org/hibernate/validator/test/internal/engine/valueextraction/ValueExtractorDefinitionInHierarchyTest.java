@@ -22,7 +22,7 @@ import jakarta.validation.valueextraction.ValueExtractorDefinitionException;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Guillaume Smet

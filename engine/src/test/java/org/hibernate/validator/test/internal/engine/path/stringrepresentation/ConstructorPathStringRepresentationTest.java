@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta

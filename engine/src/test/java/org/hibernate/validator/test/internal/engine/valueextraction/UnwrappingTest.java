@@ -33,8 +33,9 @@ import jakarta.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Test the various scenarios for explicit and implicit unwrapping of values.
@@ -43,11 +44,12 @@ import org.testng.annotations.Test;
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-925")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UnwrappingTest {
 	private Validator validatorWithValueExtractor;
 	private Validator validatorWithoutValueExtractor;
 
-	@BeforeClass
+	@BeforeAll
 	public void setupValidator() {
 		validatorWithoutValueExtractor = ValidatorUtil.getValidator();
 

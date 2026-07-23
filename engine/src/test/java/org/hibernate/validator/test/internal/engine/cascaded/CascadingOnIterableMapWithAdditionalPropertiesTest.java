@@ -23,7 +23,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for cascaded validation of custom iterable and map types. For those, property-level and class-level constraints

@@ -19,7 +19,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.model.Custo
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling

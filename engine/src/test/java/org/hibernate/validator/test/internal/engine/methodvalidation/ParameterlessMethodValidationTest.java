@@ -19,12 +19,11 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta
  */
-@Test
 public class ParameterlessMethodValidationTest {
 
 	@Test

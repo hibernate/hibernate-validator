@@ -15,6 +15,11 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -27,8 +32,6 @@ import org.jboss.shrinkwrap.descriptor.api.validationConfiguration11.ValidationC
 import org.jboss.shrinkwrap.descriptor.api.validationMapping11.ValidationMappingDescriptor;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 
-import org.testng.annotations.Test;
-
 /**
  * Test for https://hibernate.atlassian.net/browse/HV-1280. To reproduce the issue, the deployment must be done twice
  * (it will only show up during the 2nd deploy), which is why the test is managing the deployment itself via client-side
@@ -36,6 +39,7 @@ import org.testng.annotations.Test;
  *
  * @author Gunnar Morling
  */
+@TestMethodOrder(OrderAnnotation.class)
 public class JaxpContainedInDeploymentIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = JaxpContainedInDeploymentIT.class.getSimpleName() + ".war";
@@ -82,33 +86,39 @@ public class JaxpContainedInDeploymentIT extends AbstractArquillianIT {
 
 	@Test
 	@RunAsClient
+	@Order(1)
 	public void deploy1() throws Exception {
 		deployer.deploy( "jaxpit" );
 	}
 
-	@Test(dependsOnMethods = "deploy1")
+	@Test
+	@Order(2)
 	public void test1() throws Exception {
 		doTest();
 	}
 
-	@Test(dependsOnMethods = "test1")
+	@Test
+	@Order(3)
 	@RunAsClient
 	public void undeploy1() throws Exception {
 		deployer.undeploy( "jaxpit" );
 	}
 
-	@Test(dependsOnMethods = "undeploy1")
+	@Test
+	@Order(4)
 	@RunAsClient
 	public void deploy2() throws Exception {
 		deployer.deploy( "jaxpit" );
 	}
 
-	@Test(dependsOnMethods = "deploy2")
+	@Test
+	@Order(5)
 	public void test2() throws Exception {
 		doTest();
 	}
 
-	@Test(dependsOnMethods = "test2")
+	@Test
+	@Order(6)
 	@RunAsClient
 	public void undeploy2() throws Exception {
 		deployer.undeploy( "jaxpit" );

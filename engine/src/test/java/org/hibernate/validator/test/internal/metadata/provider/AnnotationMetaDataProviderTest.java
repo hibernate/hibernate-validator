@@ -43,8 +43,8 @@ import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectio
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -55,7 +55,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	private AnnotationMetaDataProvider provider;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),

@@ -41,8 +41,8 @@ import org.hibernate.validator.test.internal.engine.valueextraction.model.PairRi
 import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta
@@ -52,7 +52,7 @@ public class MultipleContainersAtTheSameTimeTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		validator = ValidatorUtil.getConfiguration()
 				.addValueExtractor( new CustomContainerValueExtractor() )

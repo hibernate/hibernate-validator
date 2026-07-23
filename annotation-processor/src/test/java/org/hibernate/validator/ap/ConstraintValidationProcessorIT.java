@@ -5,9 +5,9 @@
 package org.hibernate.validator.ap;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.EnumSet;
@@ -90,7 +90,7 @@ import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
@@ -139,16 +139,16 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 431 )
 		);
 
-		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ),
-				"Method parameters do not respect the inheritance rules. "
-						+ "In subtypes, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. "
-						+ "Types that contain the overridden methods are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
+		assertEquals( "Method parameters do not respect the inheritance rules. "
+				+ "In subtypes, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. "
+				+ "Types that contain the overridden methods are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ].",
+				diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ) );
 
-		assertEquals( diagnostics.getDiagnostics().get( 11 ).getMessage( Locale.getDefault() ),
-				"Method parameters do not respect inheritance rules. "
-						+ "If a subtype overrides/implements a method originally defined in several parallel types of the hierarchy, "
-						+ "no parameter constraints may be declared for that method nor parameters be marked for cascaded validation. "
-						+ "Parallel method definitions are in: [ java.lang.Object, org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.Case15.SimpleService ]." );
+		assertEquals( "Method parameters do not respect inheritance rules. "
+				+ "If a subtype overrides/implements a method originally defined in several parallel types of the hierarchy, "
+				+ "no parameter constraints may be declared for that method nor parameters be marked for cascaded validation. "
+				+ "Parallel method definitions are in: [ java.lang.Object, org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.Case15.SimpleService ].",
+				diagnostics.getDiagnostics().get( 11 ).getMessage( Locale.getDefault() ) );
 	}
 
 	@Test

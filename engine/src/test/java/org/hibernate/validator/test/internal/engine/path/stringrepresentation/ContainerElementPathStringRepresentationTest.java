@@ -24,7 +24,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ContainerElementPathStringRepresentationTest extends AbstractPathStringRepresentationTest {
 
@@ -192,7 +193,8 @@ public class ContainerElementPathStringRepresentationTest extends AbstractPathSt
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void testArrayPath() throws Exception {
 		Set<ConstraintViolation<Region>> constraintViolations = validator.validate( new Region(
 				Arrays.asList( new Address( null, null ) ),

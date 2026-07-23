@@ -5,15 +5,15 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@code LuhnCheckValidator}.

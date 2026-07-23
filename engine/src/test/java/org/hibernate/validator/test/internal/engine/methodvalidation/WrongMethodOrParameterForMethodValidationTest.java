@@ -15,18 +15,19 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
-@Test
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WrongMethodOrParameterForMethodValidationTest {
 	protected CustomerRepository customerRepository;
 	protected ExecutableValidator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		validator = ValidatorUtil.getValidator().forExecutables();
 		customerRepository = new CustomerRepositoryImpl();

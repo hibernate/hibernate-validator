@@ -6,8 +6,8 @@ package org.hibernate.validator.test.cfg;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -27,8 +27,8 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link org.hibernate.validator.cfg.ConstraintMapping} et al.
@@ -38,7 +38,7 @@ import org.testng.annotations.Test;
 public class MultipleConstraintMappingsTest {
 	HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = getConfiguration( HibernateValidator.class );
 	}
@@ -63,16 +63,16 @@ public class MultipleConstraintMappingsTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Marathon.class );
 		assertTrue( beanDescriptor.isBeanConstrained(), "There should be constraints defined on the Marathon class" );
 		assertEquals(
-				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"name",
+				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"The property name should be constrained"
 		);
 
 		beanDescriptor = validator.getConstraintsForClass( Runner.class );
 		assertTrue( beanDescriptor.isBeanConstrained(), "There should be constraints defined on the Runner class" );
 		assertEquals(
-				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"name",
+				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"The property name should be constrained"
 		);
 	}

@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter06.custompath;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -14,14 +14,14 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class CarTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();

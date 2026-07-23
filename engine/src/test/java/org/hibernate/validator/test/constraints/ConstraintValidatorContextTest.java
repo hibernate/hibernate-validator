@@ -11,7 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -45,8 +45,8 @@ import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link jakarta.validation.ConstraintValidatorContext} API.
@@ -58,7 +58,7 @@ public class ConstraintValidatorContextTest {
 	private Validator validator;
 	private ExecutableValidator executableValidator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpValidators() {
 		validator = ValidatorUtil.getValidator();
 		executableValidator = validator.forExecutables();
@@ -529,12 +529,12 @@ public class ConstraintValidatorContextTest {
 				new java.lang.Object[] { new ValidatedRequest( "value" ) }
 		);
 
-		assertEquals( violations.size(), 1 );
+		assertEquals( 1, violations.size() );
 		ConstraintViolation<RequestService> violation = violations.iterator().next();
 		List<Path.Node> nodes = asList( violation.getPropertyPath().iterator() );
 		Path.Node paramNode = nodes.get( 1 );
-		assertEquals( paramNode.getKind(), ElementKind.PARAMETER );
-		assertEquals( ( (ParameterNode) paramNode ).getParameterIndex(), 0 );
+		assertEquals( ElementKind.PARAMETER, paramNode.getKind() );
+		assertEquals( 0, ( (ParameterNode) paramNode ).getParameterIndex() );
 	}
 
 	private static <T> List<T> asList(Iterator<T> i) {

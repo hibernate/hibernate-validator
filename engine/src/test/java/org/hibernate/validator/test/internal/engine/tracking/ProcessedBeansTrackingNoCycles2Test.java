@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is not a real test, just an illustration.

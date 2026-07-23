@@ -18,24 +18,28 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-1279")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setup() {
 		validator = getValidator();
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void constraintOnGenericTypeArgumentOfArrayFieldThrowsException() {
 		assertThatThrownBy( () -> validator.validate( new GenericArrayEntity<>( new String[] { "Too long" } ) ) )
 				.isInstanceOf( UnexpectedTypeException.class )
@@ -43,7 +47,8 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void constraintOnGenericTypeArgumentOfArrayGetterThrowsException() {
 		assertThatThrownBy( () -> validator.validate( new GenericArrayWithGetterEntity<>( new String[] { "Too long" } ) ) )
 				.isInstanceOf( UnexpectedTypeException.class )
@@ -51,7 +56,8 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void constraintOnGenericTypeArgumentOfArrayParameterThrowsException() {
 		assertThatThrownBy( () -> {
 			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
@@ -61,7 +67,8 @@ public class TypeAnnotationDefinedOnAGenericTypeArgumentTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void constraintOnGenericTypeArgumentOfArrayReturnValueThrowsException() {
 		assertThatThrownBy( () -> {
 			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );

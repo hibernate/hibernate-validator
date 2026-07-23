@@ -11,12 +11,12 @@ import java.util.Properties;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 
+import org.junit.jupiter.api.Test;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-
-import org.testng.annotations.Test;
 
 /**
  * Asserts that the current HV is used and not the one coming with WF by default.

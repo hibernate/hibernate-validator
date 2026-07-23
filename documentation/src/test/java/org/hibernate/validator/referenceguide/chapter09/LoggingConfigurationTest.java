@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter09;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Positive;
 
 import org.hibernate.validator.HibernateValidator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LoggingConfigurationTest {
 

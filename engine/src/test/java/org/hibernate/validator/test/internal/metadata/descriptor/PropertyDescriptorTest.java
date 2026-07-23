@@ -20,7 +20,7 @@ import org.hibernate.validator.test.internal.metadata.Customer.CustomerGetterCom
 import org.hibernate.validator.test.internal.metadata.Order.OrderBasic;
 import org.hibernate.validator.test.internal.metadata.Order.OrderComplex;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling

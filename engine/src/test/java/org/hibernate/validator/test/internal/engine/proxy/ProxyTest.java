@@ -6,7 +6,7 @@ package org.hibernate.validator.test.internal.engine.proxy;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -33,7 +33,7 @@ public class ProxyTest {
 		InvocationHandler handler = new CustomInvocationHandler( "some object" );
 
 		A a = (A) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { A.class }, handler );
-		assertEquals( Integer.valueOf( 0 ), a.getInteger() );
+		assertEquals( a.getInteger(), Integer.valueOf( 0 ) );
 
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<A>> violations = validator.validate( a );
@@ -48,7 +48,7 @@ public class ProxyTest {
 		InvocationHandler handler = new CustomInvocationHandler( "some object" );
 
 		B b = (B) Proxy.newProxyInstance( getClass().getClassLoader(), new Class<?>[] { B.class }, handler );
-		assertEquals( Integer.valueOf( 0 ), b.getInteger() );
+		assertEquals( b.getInteger(), Integer.valueOf( 0 ) );
 
 		Validator validator = ValidatorUtil.getValidator();
 		Set<ConstraintViolation<B>> violations = validator.validate( b );

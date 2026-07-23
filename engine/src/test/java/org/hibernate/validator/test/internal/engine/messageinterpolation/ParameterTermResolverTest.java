@@ -4,12 +4,13 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import jakarta.validation.MessageInterpolator;
 import jakarta.validation.metadata.ConstraintDescriptor;
@@ -18,9 +19,12 @@ import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTer
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import org.easymock.EasyMock;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 /**
  * Test for {@link org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver}
@@ -31,41 +35,40 @@ public class ParameterTermResolverTest {
 
 	private final ParameterTermResolver resolver = ParameterTermResolver.INSTANCE;
 
-	@DataProvider(name = "interpolateByNotArrayValueArgs")
-	public static Object[][] interpolateByNotArrayValueArgs() {
+	private static Stream<Arguments> interpolateByNotArrayValueArgs() {
 		// lines of (String variableName, Object variableValue, String expectedResolvedExpression)
-		return new Object[][] {
-				{ "value", null, "{value}" },
-				{ "value", true, "true" },
-				{ "value", false, "false" },
-				{ "value", 'a', "a" },
-				{ "value", (byte) 10, "10" },
-				{ "value", (short) 10, "10" },
-				{ "value", 10, "10" },
-				{ "value", 10L, "10" },
-				{ "value", 10.1, "10.1" },
-				{ "value", 10.1f, "10.1" },
-				{ "value", "string value", "string value" },
-		};
+		return Stream.of(
+				Arguments.of( "value", null, "{value}" ),
+				Arguments.of( "value", true, "true" ),
+				Arguments.of( "value", false, "false" ),
+				Arguments.of( "value", 'a', "a" ),
+				Arguments.of( "value", (byte) 10, "10" ),
+				Arguments.of( "value", (short) 10, "10" ),
+				Arguments.of( "value", 10, "10" ),
+				Arguments.of( "value", 10L, "10" ),
+				Arguments.of( "value", 10.1, "10.1" ),
+				Arguments.of( "value", 10.1f, "10.1" ),
+				Arguments.of( "value", "string value", "string value" )
+		);
 	}
 
-	@DataProvider(name = "interpolateByArrayValueArgs")
-	public static Object[][] interpolateByArrayValueArgs() {
+	private static Stream<Arguments> interpolateByArrayValueArgs() {
 		// lines of (String variableName, <Array as Object> variableValueArray, String expectedResolvedExpression)
-		return new Object[][] {
-				{ "value", new boolean[] { true, false }, Arrays.toString( new boolean[] { true, false } ) },
-				{ "value", new char[] { 'a', 'b' }, Arrays.toString( new char[] { 'a', 'b' } ) },
-				{ "value", new byte[] { 1, 2 }, Arrays.toString( new byte[] { 1, 2 } ) },
-				{ "value", new short[] { 1, 2 }, Arrays.toString( new short[] { 1, 2 } ) },
-				{ "value", new int[] { 1, 2 }, Arrays.toString( new int[] { 1, 2 } ) },
-				{ "value", new long[] { 1, 2 }, Arrays.toString( new long[] { 1, 2 } ) },
-				{ "value", new double[] { 1.2, 3.4 }, Arrays.toString( new double[] { 1.2, 3.4 } ) },
-				{ "value", new float[] { 1.2F, 3.4F }, Arrays.toString( new float[] { 1.2F, 3.4F } ) },
-				{ "value", new String[] { "one", "two" }, Arrays.toString( new String[] { "one", "two" } ) },
-		};
+		return Stream.of(
+				Arguments.of( "value", new boolean[] { true, false }, Arrays.toString( new boolean[] { true, false } ) ),
+				Arguments.of( "value", new char[] { 'a', 'b' }, Arrays.toString( new char[] { 'a', 'b' } ) ),
+				Arguments.of( "value", new byte[] { 1, 2 }, Arrays.toString( new byte[] { 1, 2 } ) ),
+				Arguments.of( "value", new short[] { 1, 2 }, Arrays.toString( new short[] { 1, 2 } ) ),
+				Arguments.of( "value", new int[] { 1, 2 }, Arrays.toString( new int[] { 1, 2 } ) ),
+				Arguments.of( "value", new long[] { 1, 2 }, Arrays.toString( new long[] { 1, 2 } ) ),
+				Arguments.of( "value", new double[] { 1.2, 3.4 }, Arrays.toString( new double[] { 1.2, 3.4 } ) ),
+				Arguments.of( "value", new float[] { 1.2F, 3.4F }, Arrays.toString( new float[] { 1.2F, 3.4F } ) ),
+				Arguments.of( "value", new String[] { "one", "two" }, Arrays.toString( new String[] { "one", "two" } ) )
+		);
 	}
 
-	@Test(dataProvider = "interpolateByNotArrayValueArgs")
+	@ParameterizedTest
+	@MethodSource("interpolateByNotArrayValueArgs")
 	public void testInterpolateShouldResolveExpressionByNotArrayValue(
 			String variableName,
 			Object variableValue,
@@ -77,10 +80,11 @@ public class ParameterTermResolverTest {
 		final String srcExpression = createVariableExpression( variableName );
 
 		final String actualResolvedExpression = resolver.interpolate( context, Locale.ROOT, srcExpression );
-		assertEquals( actualResolvedExpression, expectedResolvedExpression );
+		assertEquals( expectedResolvedExpression, actualResolvedExpression );
 	}
 
-	@Test(dataProvider = "interpolateByArrayValueArgs")
+	@ParameterizedTest
+	@MethodSource("interpolateByArrayValueArgs")
 	@TestForIssue(jiraKey = "HV-1761")
 	public void testInterpolateShouldResolveExpressionByArrayValue(
 			String variableName,
@@ -93,10 +97,11 @@ public class ParameterTermResolverTest {
 		final String srcExpression = createVariableExpression( variableName );
 
 		final String actualResolvedExpression = resolver.interpolate( context, Locale.ROOT, srcExpression );
-		assertEquals( actualResolvedExpression, expectedResolvedExpression );
+		assertEquals( expectedResolvedExpression, actualResolvedExpression );
 	}
 
-	@Test(dataProvider = "interpolateByNotArrayValueArgs")
+	@ParameterizedTest
+	@MethodSource("interpolateByNotArrayValueArgs")
 	public void testInterpolateShouldAllowUseNotHibernateContext(
 			String variableName,
 			Object variableValue,
@@ -108,7 +113,7 @@ public class ParameterTermResolverTest {
 		final String srcExpression = createVariableExpression( variableName );
 
 		final String actualResolvedExpression = resolver.interpolate( context, Locale.ROOT, srcExpression );
-		assertEquals( actualResolvedExpression, expectedResolvedExpression );
+		assertEquals( expectedResolvedExpression, actualResolvedExpression );
 	}
 
 	private static String createVariableExpression(String variableName) {

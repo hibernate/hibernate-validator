@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling

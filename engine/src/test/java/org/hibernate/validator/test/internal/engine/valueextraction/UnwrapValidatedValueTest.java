@@ -35,8 +35,8 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for unwrapping validated values via {@link Unwrapping.Unwrap}.
@@ -49,7 +49,7 @@ public class UnwrapValidatedValueTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		validator = ValidatorUtil.getConfiguration()
 				.addValueExtractor( new PropertyValueExtractor() )

@@ -6,8 +6,8 @@ package org.hibernate.validator.test.internal.util.privilegedactions;
 
 import static java.lang.Thread.currentThread;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Supplier;
 
@@ -15,7 +15,7 @@ import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.internal.util.actions.LoadClass;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>

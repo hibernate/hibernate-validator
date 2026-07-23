@@ -35,7 +35,7 @@ import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Guillaume Smet

@@ -8,9 +8,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -34,8 +34,8 @@ import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@code URL} constraint.
@@ -50,7 +50,7 @@ public class URLValidatorTest {
 
 	private ConstraintAnnotationDescriptor.Builder<URL> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<URL>( URL.class );
 		urlValidator = new URLValidator();
@@ -258,8 +258,8 @@ public class URLValidatorTest {
 
 		assertNoViolations( constraintViolations );
 		assertEquals(
-				constraintValidatorFactory.requestedConstraintValidators.size(),
 				2, // @URL is a composing constraint, a @Pattern validator impl will also be requested
+				constraintValidatorFactory.requestedConstraintValidators.size(),
 				"Wrong number of requested validator instances"
 		);
 		assertTrue(

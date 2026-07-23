@@ -38,8 +38,8 @@ import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the definition of constructor constraints with the programmatic API.
@@ -49,7 +49,7 @@ import org.testng.annotations.Test;
 public class ConstructorConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpTest() {
 		config = getConfiguration( HibernateValidator.class );
 	}

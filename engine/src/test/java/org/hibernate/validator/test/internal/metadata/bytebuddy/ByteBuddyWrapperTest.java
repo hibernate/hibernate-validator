@@ -15,6 +15,8 @@ import java.util.List;
 import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.internal.util.StringHelper;
 
+import org.junit.jupiter.api.Test;
+
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.description.type.TypeDescription;
@@ -31,7 +33,6 @@ import net.bytebuddy.jar.asm.MethodVisitor;
 import net.bytebuddy.jar.asm.Opcodes;
 import net.bytebuddy.jar.asm.Type;
 import net.bytebuddy.matcher.ElementMatchers;
-import org.testng.annotations.Test;
 
 /**
  * Note that this implementation is not complete and is only for testing purposes.

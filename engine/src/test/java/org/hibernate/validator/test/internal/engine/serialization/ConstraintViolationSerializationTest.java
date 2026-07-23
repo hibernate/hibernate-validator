@@ -8,8 +8,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +35,7 @@ import org.hibernate.validator.test.internal.engine.serialization.SerializableCl
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -128,22 +130,22 @@ public class ConstraintViolationSerializationTest {
 
 	private void checkSerializedViolation(ConstraintViolation<?> constraintViolation, SerializableClass testInstance, Object[] executableParameters,
 			Object executableReturnValue) {
-		assertEquals( constraintViolation.getLeafBean(), testInstance );
-		assertEquals( constraintViolation.getRootBean(), testInstance );
-		assertEquals( constraintViolation.getRootBeanClass(), SerializableClass.class );
-		assertEquals( constraintViolation.getMessage(), "size must be between 5 and 2147483647" );
-		assertEquals( constraintViolation.getMessageTemplate(), "{jakarta.validation.constraints.Size.message}" );
-		assertEquals( constraintViolation.getInvalidValue(), "s" );
-		assertEquals( constraintViolation.getExecutableParameters(), executableParameters );
-		assertEquals( constraintViolation.getExecutableReturnValue(), executableReturnValue );
+		assertEquals( testInstance, constraintViolation.getLeafBean() );
+		assertEquals( testInstance, constraintViolation.getRootBean() );
+		assertEquals( SerializableClass.class, constraintViolation.getRootBeanClass() );
+		assertEquals( "size must be between 5 and 2147483647", constraintViolation.getMessage() );
+		assertEquals( "{jakarta.validation.constraints.Size.message}", constraintViolation.getMessageTemplate() );
+		assertEquals( "s", constraintViolation.getInvalidValue() );
+		assertArrayEquals( executableParameters, constraintViolation.getExecutableParameters() );
+		assertEquals( executableReturnValue, constraintViolation.getExecutableReturnValue() );
 
 		ConstraintDescriptor<?> constraintDescriptor = constraintViolation.getConstraintDescriptor();
-		assertEquals( constraintDescriptor.getAnnotation().annotationType(), Size.class );
-		assertEquals( constraintDescriptor.getGroups(), CollectionHelper.asSet( Default.class ) );
-		assertEquals( constraintDescriptor.getMessageTemplate(), "{jakarta.validation.constraints.Size.message}" );
-		assertEquals( constraintDescriptor.getPayload(), CollectionHelper.asSet( TestPayload.class ) );
-		assertEquals( constraintDescriptor.getValidationAppliesTo(), null );
-		assertEquals( constraintDescriptor.getValueUnwrapping(), ValidateUnwrappedValue.DEFAULT );
+		assertEquals( Size.class, constraintDescriptor.getAnnotation().annotationType() );
+		assertEquals( CollectionHelper.asSet( Default.class ), constraintDescriptor.getGroups() );
+		assertEquals( "{jakarta.validation.constraints.Size.message}", constraintDescriptor.getMessageTemplate() );
+		assertEquals( CollectionHelper.asSet( TestPayload.class ), constraintDescriptor.getPayload() );
+		assertNull( constraintDescriptor.getValidationAppliesTo() );
+		assertEquals( ValidateUnwrappedValue.DEFAULT, constraintDescriptor.getValueUnwrapping() );
 		assertTrue( constraintDescriptor.getConstraintValidatorClasses().contains( SizeValidatorForCharSequence.class ) );
 	}
 }

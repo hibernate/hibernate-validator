@@ -36,8 +36,8 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -46,7 +46,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 
 	private HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = getConfiguration( HibernateValidator.class );
 	}

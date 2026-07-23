@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.engine.groups.DefaultValidationOrder;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik

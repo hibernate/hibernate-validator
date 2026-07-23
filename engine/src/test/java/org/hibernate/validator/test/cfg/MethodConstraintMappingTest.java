@@ -10,7 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWit
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Set;
 
@@ -31,25 +31,27 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Tests the definition of method constraints with the programmatic API.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MethodConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 	private GreetingService wrappedObject;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		wrappedObject = new GreetingServiceImpl();
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpTest() {
 		config = getConfiguration( HibernateValidator.class );
 	}

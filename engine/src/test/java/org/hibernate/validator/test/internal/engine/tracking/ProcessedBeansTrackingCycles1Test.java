@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,7 +18,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is not a real test, just an illustration.

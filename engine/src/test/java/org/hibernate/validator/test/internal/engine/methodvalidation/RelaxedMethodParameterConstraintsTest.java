@@ -21,7 +21,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} which tests that illegal method parameter constraints are properly allowed

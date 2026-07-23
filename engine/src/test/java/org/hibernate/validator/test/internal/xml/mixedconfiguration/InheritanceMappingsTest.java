@@ -23,7 +23,7 @@ import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.T
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * See HV-265

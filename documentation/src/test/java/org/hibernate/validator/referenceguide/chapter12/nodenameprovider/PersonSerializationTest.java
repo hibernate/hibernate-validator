@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.nodenameprovider;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;

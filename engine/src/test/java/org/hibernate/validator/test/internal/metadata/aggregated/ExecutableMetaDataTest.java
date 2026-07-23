@@ -6,9 +6,9 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -45,8 +45,8 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository.Validat
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests creation of {@link ExecutableMetaData} in {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
@@ -58,7 +58,7 @@ public class ExecutableMetaDataTest {
 	private BeanMetaDataManager beanMetaDataManager;
 	private BeanMetaData<CustomerRepositoryExt> beanMetaData;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupBeanMetaData() {
 		beanMetaDataManager = new BeanMetaDataManagerImpl(
 				getDummyConstraintCreationContext(),
@@ -230,14 +230,13 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.getParameterMetaData( 1 ).isCascading() );
 		assertThat( methodMetaData.getParameterMetaData( 1 ) ).hasSize( 1 );
 		assertEquals(
+				NotNull.class,
 				methodMetaData.getParameterMetaData( 1 )
 						.iterator()
 						.next()
 						.getDescriptor()
 						.getAnnotation()
-						.annotationType(),
-				NotNull.class
-		);
+						.annotationType() );
 
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
@@ -292,9 +291,8 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.isCascading() );
 		assertTrue( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).hasSize( 1 );
-		assertEquals(
-				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
-		);
+		assertEquals( NotNull.class,
+				methodMetaData.iterator().next().getDescriptor().getAnnotation().annotationType() );
 
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
 	}
@@ -310,7 +308,7 @@ public class ExecutableMetaDataTest {
 		ConstraintDescriptorImpl<? extends Annotation> descriptor = methodMetaData.iterator()
 				.next()
 				.getDescriptor();
-		assertEquals( descriptor.getAnnotation().annotationType(), NotNull.class );
+		assertEquals( NotNull.class, descriptor.getAnnotation().annotationType() );
 	}
 
 	@Test

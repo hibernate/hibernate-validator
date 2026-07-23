@@ -17,8 +17,8 @@ import jakarta.validation.executable.ExecutableValidator;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta
@@ -30,7 +30,7 @@ public class ParameterScriptAssertConstrainedTest extends AbstractConstrainedTes
 	private Method method;
 
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		executableValidator = validator.forExecutables();

@@ -79,8 +79,9 @@ import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 
+import org.junit.jupiter.api.Test;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * Test that all the messages of all the constraints are properly interpolated for all the supported locales.

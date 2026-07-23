@@ -43,7 +43,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.Min
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik

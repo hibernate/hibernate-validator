@@ -5,7 +5,7 @@
 package org.hibernate.validator.ap.record;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.File;
 import java.util.EnumSet;
@@ -17,7 +17,7 @@ import org.hibernate.validator.ap.ConstraintValidationProcessorITBase;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Jan Schatteman

@@ -2,4 +2,4 @@
 # Copyright Red Hat Inc. and Hibernate Authors
 #
 # This file for forbidden API signatures is empty and is used as a stub
-# to be used instead of `forbidden-junit.txt` where JUnit should be allowed.
+# to be used instead of `forbidden-legacy-test-frameworks.txt` where legacy test frameworks should be allowed.

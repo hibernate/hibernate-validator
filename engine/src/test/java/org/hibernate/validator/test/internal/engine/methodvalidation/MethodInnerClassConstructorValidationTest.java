@@ -29,15 +29,15 @@ import jakarta.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MethodInnerClassConstructorValidationTest {
 
 	protected ExecutableValidator executableValidator;
 	private final CustomerRepositoryImplMetamodel metamodel = new CustomerRepositoryImplMetamodel();
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		this.executableValidator = getValidator().forExecutables();
 	}

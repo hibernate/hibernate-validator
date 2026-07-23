@@ -10,9 +10,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -48,17 +48,19 @@ import org.hibernate.validator.path.PropertyNode;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MutableNodeTest {
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		validator = getValidator();
 	}
@@ -120,7 +122,7 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.BEAN, "unexpected node kind" );
+		assertEquals( ElementKind.BEAN, node.getKind(), "unexpected node kind" );
 	}
 
 	@Test
@@ -140,10 +142,10 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.BEAN, "unexpected node kind" );
+		assertEquals( ElementKind.BEAN, node.getKind(), "unexpected node kind" );
 	}
 
 	@Test
@@ -165,10 +167,10 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 	}
 
 	@Test
@@ -189,10 +191,10 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 	}
 
 	@Test
@@ -213,10 +215,10 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 	}
 
 	@Test
@@ -240,19 +242,19 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "apartments" );
-		assertEquals( node.as( PropertyNode.class ).getValue(), new Apartment( new Person( "Bob" ) ) );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "apartments", node.getName() );
+		assertEquals( new Apartment( new Person( "Bob" ) ), node.as( PropertyNode.class ).getValue() );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "resident" );
-		assertEquals( node.as( PropertyNode.class ).getValue(), new Person( "Bob" ) );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "resident", node.getName() );
+		assertEquals( new Person( "Bob" ), node.as( PropertyNode.class ).getValue() );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "name" );
-		assertEquals( node.as( PropertyNode.class ).getValue(), "Bob" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "name", node.getName() );
+		assertEquals( "Bob", node.as( PropertyNode.class ).getValue() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -278,15 +280,15 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "floors" );
-		assertSame( node.as( PropertyNode.class ).getValue(), building.floors.get( 2 ) );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "floors", node.getName() );
+		assertSame( building.floors.get( 2 ), node.as( PropertyNode.class ).getValue() );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "number" );
-		assertEquals( node.as( PropertyNode.class ).getValue(), 11 );
-		assertEquals( node.getIndex(), Integer.valueOf( 2 ) );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "number", node.getName() );
+		assertEquals( 11, node.as( PropertyNode.class ).getValue() );
+		assertEquals( Integer.valueOf( 2 ), node.getIndex() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -311,15 +313,15 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "managers" );
-		assertSame( node.as( PropertyNode.class ).getValue(), building.managers.get( "main" ) );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "managers", node.getName() );
+		assertSame( building.managers.get( "main" ), node.as( PropertyNode.class ).getValue() );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
-		assertEquals( node.getName(), "name" );
-		assertEquals( node.as( PropertyNode.class ).getValue(), "Ron" );
-		assertEquals( node.getKey(), "main" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
+		assertEquals( "name", node.getName() );
+		assertEquals( "Ron", node.as( PropertyNode.class ).getValue() );
+		assertEquals( "main", node.getKey() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -350,11 +352,11 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
-		assertEquals( node.as( ContainerElementNode.class ).getValue(), "A" );
+		assertEquals( ElementKind.CONTAINER_ELEMENT, node.getKind(), "unexpected node kind" );
+		assertEquals( "A", node.as( ContainerElementNode.class ).getValue() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -386,11 +388,11 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
-		assertEquals( node.as( ContainerElementNode.class ).getValue(), 11 );
+		assertEquals( ElementKind.CONTAINER_ELEMENT, node.getKind(), "unexpected node kind" );
+		assertEquals( 11, node.as( ContainerElementNode.class ).getValue() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -421,11 +423,11 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
-		assertEquals( node.as( ContainerElementNode.class ).getValue(), "Ron" );
+		assertEquals( ElementKind.CONTAINER_ELEMENT, node.getKind(), "unexpected node kind" );
+		assertEquals( "Ron", node.as( ContainerElementNode.class ).getValue() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -456,11 +458,11 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
-		assertEquals( node.as( ContainerElementNode.class ).getValue(), "Bo" );
+		assertEquals( ElementKind.CONTAINER_ELEMENT, node.getKind(), "unexpected node kind" );
+		assertEquals( "Bo", node.as( ContainerElementNode.class ).getValue() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -493,15 +495,15 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
-		assertEquals( node.as( ContainerElementNode.class ).getValue(), floor1Inhabitants );
+		assertEquals( ElementKind.CONTAINER_ELEMENT, node.getKind(), "unexpected node kind" );
+		assertEquals( floor1Inhabitants, node.as( ContainerElementNode.class ).getValue() );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.CONTAINER_ELEMENT, "unexpected node kind" );
-		assertEquals( node.as( ContainerElementNode.class ).getValue(), "Pa" );
+		assertEquals( ElementKind.CONTAINER_ELEMENT, node.getKind(), "unexpected node kind" );
+		assertEquals( "Pa", node.as( ContainerElementNode.class ).getValue() );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -559,10 +561,10 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 	}
 
 	private void assertConstraintViolationPropertyValidation(Set<ConstraintViolation<A>> constraintViolations) {
@@ -574,7 +576,7 @@ public class MutableNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
+		assertEquals( ElementKind.PROPERTY, node.getKind(), "unexpected node kind" );
 	}
 
 	private static class A {

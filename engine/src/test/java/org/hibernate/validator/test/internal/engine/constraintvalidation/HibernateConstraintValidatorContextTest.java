@@ -13,6 +13,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +31,8 @@ import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-import org.testng.collections.Lists;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -46,7 +46,7 @@ public class HibernateConstraintValidatorContextTest {
 	private static final String QUESTION_4 = "What keywords are not allowed?";
 	private static final String QUESTION_5 = "What is 1+1 and what is the answer to life? But I won't get the right answer as Expression Language is disabled";
 
-	private static final List<String> INVALID_KEYWORDS = Lists.newArrayList( "foo", "bar", "baz" );
+	private static final List<String> INVALID_KEYWORDS = Arrays.asList( "foo", "bar", "baz" );
 
 	// Message parameters
 
@@ -106,8 +106,8 @@ public class HibernateConstraintValidatorContextTest {
 		ConstraintViolationImpl<MessageParameterFoo> constraintViolation = (ConstraintViolationImpl<MessageParameterFoo>) constraintViolations.iterator()
 				.next();
 		Map<String, Object> messageParameters = constraintViolation.getMessageParameters();
-		Assert.assertEquals( messageParameters.size(), 1 );
-		Assert.assertEquals( messageParameters.get( "answer" ), 42 );
+		Assertions.assertEquals( 1, messageParameters.size() );
+		Assertions.assertEquals( 42, messageParameters.get( "answer" ) );
 	}
 
 	// Expression variables
@@ -168,8 +168,8 @@ public class HibernateConstraintValidatorContextTest {
 		ConstraintViolationImpl<ExpressionVariableFoo> constraintViolation = (ConstraintViolationImpl<ExpressionVariableFoo>) constraintViolations.iterator()
 				.next();
 		Map<String, Object> expressionVariables = constraintViolation.getExpressionVariables();
-		Assert.assertEquals( expressionVariables.size(), 1 );
-		Assert.assertEquals( expressionVariables.get( "answer" ), 42 );
+		Assertions.assertEquals( 1, expressionVariables.size() );
+		Assertions.assertEquals( 42, expressionVariables.get( "answer" ) );
 	}
 
 	// Dynamic payload
@@ -190,7 +190,7 @@ public class HibernateConstraintValidatorContextTest {
 				HibernateConstraintViolation.class
 		);
 
-		Assert.assertEquals( hibernateConstraintViolation.getDynamicPayload( List.class ), INVALID_KEYWORDS );
+		Assertions.assertEquals( INVALID_KEYWORDS, hibernateConstraintViolation.getDynamicPayload( List.class ) );
 	}
 
 	@Test
@@ -207,7 +207,7 @@ public class HibernateConstraintValidatorContextTest {
 		@SuppressWarnings("unchecked")
 		HibernateConstraintViolation<ExpressionVariableFoo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
 
-		Assert.assertNull( hibernateConstraintViolation.getDynamicPayload( String.class ) );
+		Assertions.assertNull( hibernateConstraintViolation.getDynamicPayload( String.class ) );
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class HibernateConstraintValidatorContextTest {
 		@SuppressWarnings("unchecked")
 		HibernateConstraintViolation<ExpressionVariableFoo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
 
-		Assert.assertNull( hibernateConstraintViolation.getDynamicPayload( Object.class ) );
+		Assertions.assertNull( hibernateConstraintViolation.getDynamicPayload( Object.class ) );
 	}
 
 	@Test

@@ -6,7 +6,7 @@ package org.hibernate.validator.integrationtest.java.module.test.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class JavaModulePathIT {
 

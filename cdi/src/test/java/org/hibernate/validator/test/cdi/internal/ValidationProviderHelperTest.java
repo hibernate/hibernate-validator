@@ -15,7 +15,7 @@ import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValidationProviderHelperTest {
 

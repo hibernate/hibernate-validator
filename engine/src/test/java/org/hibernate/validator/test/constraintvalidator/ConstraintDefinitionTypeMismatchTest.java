@@ -12,8 +12,8 @@ import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Guillaume Smet
@@ -23,7 +23,7 @@ public class ConstraintDefinitionTypeMismatchTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = getValidator();
 	}

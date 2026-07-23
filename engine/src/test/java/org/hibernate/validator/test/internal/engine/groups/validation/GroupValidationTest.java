@@ -29,8 +29,8 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -38,7 +38,7 @@ import org.testng.annotations.Test;
 public class GroupValidationTest {
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = getValidator();
 	}

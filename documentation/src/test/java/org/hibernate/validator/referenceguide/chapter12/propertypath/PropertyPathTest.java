@@ -18,7 +18,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.path.PropertyNode;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling

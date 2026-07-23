@@ -18,7 +18,7 @@ import jakarta.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class NullOrNotEmptyConstrainedTest extends AbstractConstrainedTest {
 

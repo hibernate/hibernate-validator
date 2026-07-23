@@ -49,7 +49,7 @@ import org.hibernate.validator.constraints.py.RUC;
 import org.hibernate.validator.constraints.ru.INN;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta

@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -55,7 +55,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Posi
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForShort;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta
@@ -241,88 +241,88 @@ public class SignValidatorForNumberTest {
 
 	private void testSignShort(ConstraintValidator<?, Number> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( (short) 0, null ), !strict );
-		assertEquals( validator.isValid( (short) 1, null ), positive );
-		assertEquals( validator.isValid( (short) -1, null ), !positive );
-		assertEquals( validator.isValid( (short) 10.0, null ), positive );
-		assertEquals( validator.isValid( (short) -10.0, null ), !positive );
+		assertEquals( !strict, validator.isValid( (short) 0, null ) );
+		assertEquals( positive, validator.isValid( (short) 1, null ) );
+		assertEquals( !positive, validator.isValid( (short) -1, null ) );
+		assertEquals( positive, validator.isValid( (short) 10.0, null ) );
+		assertEquals( !positive, validator.isValid( (short) -10.0, null ) );
 	}
 
 	private void testSignByte(ConstraintValidator<?, Number> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( (byte) 0, null ), !strict );
-		assertEquals( validator.isValid( (byte) 1, null ), positive );
-		assertEquals( validator.isValid( (byte) -1, null ), !positive );
-		assertEquals( validator.isValid( (byte) 10.0, null ), positive );
-		assertEquals( validator.isValid( (byte) -10.0, null ), !positive );
+		assertEquals( !strict, validator.isValid( (byte) 0, null ) );
+		assertEquals( positive, validator.isValid( (byte) 1, null ) );
+		assertEquals( !positive, validator.isValid( (byte) -1, null ) );
+		assertEquals( positive, validator.isValid( (byte) 10.0, null ) );
+		assertEquals( !positive, validator.isValid( (byte) -10.0, null ) );
 	}
 
 	private void testSignInteger(ConstraintValidator<?, Number> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( 0, null ), !strict );
-		assertEquals( validator.isValid( 1, null ), positive );
-		assertEquals( validator.isValid( -1, null ), !positive );
-		assertEquals( validator.isValid( 10, null ), positive );
-		assertEquals( validator.isValid( -10, null ), !positive );
+		assertEquals( !strict, validator.isValid( 0, null ) );
+		assertEquals( positive, validator.isValid( 1, null ) );
+		assertEquals( !positive, validator.isValid( -1, null ) );
+		assertEquals( positive, validator.isValid( 10, null ) );
+		assertEquals( !positive, validator.isValid( -10, null ) );
 	}
 
 	private void testSignNumber(ConstraintValidator<?, Number> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( 0, null ), !strict );
-		assertEquals( validator.isValid( 1, null ), positive );
-		assertEquals( validator.isValid( -1, null ), !positive );
-		assertEquals( validator.isValid( 10.0, null ), positive );
-		assertEquals( validator.isValid( -10.0, null ), !positive );
+		assertEquals( !strict, validator.isValid( 0, null ) );
+		assertEquals( positive, validator.isValid( 1, null ) );
+		assertEquals( !positive, validator.isValid( -1, null ) );
+		assertEquals( positive, validator.isValid( 10.0, null ) );
+		assertEquals( !positive, validator.isValid( -10.0, null ) );
 	}
 
 	private void testSignBigDecimal(ConstraintValidator<?, BigDecimal> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( BigDecimal.ZERO, null ), !strict );
-		assertEquals( validator.isValid( BigDecimal.ONE, null ), positive );
-		assertEquals( validator.isValid( BigDecimal.ONE.negate(), null ), !positive );
-		assertEquals( validator.isValid( BigDecimal.TEN, null ), positive );
-		assertEquals( validator.isValid( BigDecimal.TEN.negate(), null ), !positive );
+		assertEquals( !strict, validator.isValid( BigDecimal.ZERO, null ) );
+		assertEquals( positive, validator.isValid( BigDecimal.ONE, null ) );
+		assertEquals( !positive, validator.isValid( BigDecimal.ONE.negate(), null ) );
+		assertEquals( positive, validator.isValid( BigDecimal.TEN, null ) );
+		assertEquals( !positive, validator.isValid( BigDecimal.TEN.negate(), null ) );
 	}
 
 	private void testSignBigInteger(ConstraintValidator<?, BigInteger> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( BigInteger.ZERO, null ), !strict );
-		assertEquals( validator.isValid( BigInteger.ONE, null ), positive );
-		assertEquals( validator.isValid( BigInteger.ONE.negate(), null ), !positive );
-		assertEquals( validator.isValid( BigInteger.TEN, null ), positive );
-		assertEquals( validator.isValid( BigInteger.TEN.negate(), null ), !positive );
+		assertEquals( !strict, validator.isValid( BigInteger.ZERO, null ) );
+		assertEquals( positive, validator.isValid( BigInteger.ONE, null ) );
+		assertEquals( !positive, validator.isValid( BigInteger.ONE.negate(), null ) );
+		assertEquals( positive, validator.isValid( BigInteger.TEN, null ) );
+		assertEquals( !positive, validator.isValid( BigInteger.TEN.negate(), null ) );
 	}
 
 	private void testSignLong(ConstraintValidator<?, Long> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( 0L, null ), !strict );
-		assertEquals( validator.isValid( 1L, null ), positive );
-		assertEquals( validator.isValid( -1L, null ), !positive );
-		assertEquals( validator.isValid( 10L, null ), positive );
-		assertEquals( validator.isValid( -10L, null ), !positive );
+		assertEquals( !strict, validator.isValid( 0L, null ) );
+		assertEquals( positive, validator.isValid( 1L, null ) );
+		assertEquals( !positive, validator.isValid( -1L, null ) );
+		assertEquals( positive, validator.isValid( 10L, null ) );
+		assertEquals( !positive, validator.isValid( -10L, null ) );
 	}
 
 	private void testSignDouble(ConstraintValidator<?, Double> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( 0D, null ), !strict );
-		assertEquals( validator.isValid( 1D, null ), positive );
-		assertEquals( validator.isValid( -1D, null ), !positive );
-		assertEquals( validator.isValid( 10D, null ), positive );
-		assertEquals( validator.isValid( -10D, null ), !positive );
-		assertEquals( validator.isValid( Double.POSITIVE_INFINITY, null ), positive );
-		assertEquals( validator.isValid( Double.NEGATIVE_INFINITY, null ), !positive );
+		assertEquals( !strict, validator.isValid( 0D, null ) );
+		assertEquals( positive, validator.isValid( 1D, null ) );
+		assertEquals( !positive, validator.isValid( -1D, null ) );
+		assertEquals( positive, validator.isValid( 10D, null ) );
+		assertEquals( !positive, validator.isValid( -10D, null ) );
+		assertEquals( positive, validator.isValid( Double.POSITIVE_INFINITY, null ) );
+		assertEquals( !positive, validator.isValid( Double.NEGATIVE_INFINITY, null ) );
 		assertFalse( validator.isValid( Double.NaN, null ) );
 	}
 
 	private void testSignFloat(ConstraintValidator<?, Float> validator, boolean strict, boolean positive) {
 		assertTrue( validator.isValid( null, null ) );
-		assertEquals( validator.isValid( 0F, null ), !strict );
-		assertEquals( validator.isValid( 1F, null ), positive );
-		assertEquals( validator.isValid( -1F, null ), !positive );
-		assertEquals( validator.isValid( 10F, null ), positive );
-		assertEquals( validator.isValid( -10F, null ), !positive );
-		assertEquals( validator.isValid( Float.POSITIVE_INFINITY, null ), positive );
-		assertEquals( validator.isValid( Float.NEGATIVE_INFINITY, null ), !positive );
+		assertEquals( !strict, validator.isValid( 0F, null ) );
+		assertEquals( positive, validator.isValid( 1F, null ) );
+		assertEquals( !positive, validator.isValid( -1F, null ) );
+		assertEquals( positive, validator.isValid( 10F, null ) );
+		assertEquals( !positive, validator.isValid( -10F, null ) );
+		assertEquals( positive, validator.isValid( Float.POSITIVE_INFINITY, null ) );
+		assertEquals( !positive, validator.isValid( Float.NEGATIVE_INFINITY, null ) );
 		assertFalse( validator.isValid( Float.NaN, null ) );
 	}
 }

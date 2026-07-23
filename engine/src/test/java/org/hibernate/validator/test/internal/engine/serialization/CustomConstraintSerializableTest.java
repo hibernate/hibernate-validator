@@ -15,7 +15,7 @@ import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * A <b>sscce</b> (Short, Self Contained, Correct Example) showing that the

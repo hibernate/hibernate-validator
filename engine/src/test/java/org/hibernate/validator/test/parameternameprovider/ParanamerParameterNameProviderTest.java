@@ -26,9 +26,9 @@ import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvi
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import com.thoughtworks.paranamer.AnnotationParanamer;
+import org.junit.jupiter.api.Test;
 
-import org.testng.annotations.Test;
+import com.thoughtworks.paranamer.AnnotationParanamer;
 
 /**
  * Test for {@link ParanamerParameterNameProvider}.

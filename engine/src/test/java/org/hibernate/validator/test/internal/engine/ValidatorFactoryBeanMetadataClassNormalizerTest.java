@@ -25,7 +25,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link ValidatorFactoryImpl}.

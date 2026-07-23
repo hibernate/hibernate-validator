@@ -7,7 +7,7 @@ package org.hibernate.validator.test.internal.engine.messageinterpolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -19,12 +19,14 @@ import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ListAppender;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator}
@@ -32,13 +34,14 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HV-876")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParameterMessageInterpolatorTest {
 
 	Validator validator;
 
 	ListAppender listAppender;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
 		Logger logger = context.getLogger( ParameterMessageInterpolator.class.getName() );
@@ -52,7 +55,7 @@ public class ParameterMessageInterpolatorTest {
 				.getValidator();
 	}
 
-	@AfterTest
+	@AfterAll
 	public void tearDown() {
 		listAppender.clear();
 	}

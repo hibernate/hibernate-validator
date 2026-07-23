@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -22,20 +22,19 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithRedefinedDefaultGroupImpl;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for the group sequence processing during method-level validation.
  *
  * @author Gunnar Morling
  */
-@Test
 public class MethodLevelValidationGroupSequenceTest {
 
 	private CustomerRepositoryWithRedefinedDefaultGroup customerRepository;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpDefaultExecutableValidator() {
 		setUpValidatorForGroups();
 	}
@@ -66,9 +65,8 @@ public class MethodLevelValidationGroupSequenceTest {
 					);
 
 					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-					assertEquals(
-							constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
-					);
+					assertEquals( ValidationGroup1.class,
+							constraintViolation.getConstraintDescriptor().getGroups().iterator().next() );
 				} );
 	}
 
@@ -91,9 +89,8 @@ public class MethodLevelValidationGroupSequenceTest {
 					);
 
 					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-					assertEquals(
-							constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
-					);
+					assertEquals( ValidationGroup1.class,
+							constraintViolation.getConstraintDescriptor().getGroups().iterator().next() );
 				} );
 	}
 
@@ -136,9 +133,8 @@ public class MethodLevelValidationGroupSequenceTest {
 					);
 
 					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-					assertEquals(
-							constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
-					);
+					assertEquals( ValidationGroup2.class,
+							constraintViolation.getConstraintDescriptor().getGroups().iterator().next() );
 				} );
 	}
 
@@ -186,9 +182,8 @@ public class MethodLevelValidationGroupSequenceTest {
 					);
 
 					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-					assertEquals(
-							constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
-					);
+					assertEquals( ValidationGroup1.class,
+							constraintViolation.getConstraintDescriptor().getGroups().iterator().next() );
 				} );
 	}
 
@@ -210,9 +205,8 @@ public class MethodLevelValidationGroupSequenceTest {
 									.withRootBeanClass( CustomerRepositoryWithRedefinedDefaultGroupImpl.class )
 					);
 					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-					assertEquals(
-							constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
-					);
+					assertEquals( ValidationGroup1.class,
+							constraintViolation.getConstraintDescriptor().getGroups().iterator().next() );
 				} );
 	}
 
@@ -237,9 +231,8 @@ public class MethodLevelValidationGroupSequenceTest {
 					);
 
 					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-					assertEquals(
-							constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
-					);
+					assertEquals( ValidationGroup2.class,
+							constraintViolation.getConstraintDescriptor().getGroups().iterator().next() );
 				} );
 	}
 }

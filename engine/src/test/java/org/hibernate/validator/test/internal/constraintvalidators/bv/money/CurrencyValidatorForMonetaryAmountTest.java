@@ -6,8 +6,8 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -26,8 +26,9 @@ import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
+import org.junit.jupiter.api.Test;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet

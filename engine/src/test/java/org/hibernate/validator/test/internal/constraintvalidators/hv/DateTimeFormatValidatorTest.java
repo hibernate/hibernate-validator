@@ -9,8 +9,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -25,8 +25,8 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Sean Okafor
@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
 public class DateTimeFormatValidatorTest {
 	private DateTimeFormatValidator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = new DateTimeFormatValidator();
 	}

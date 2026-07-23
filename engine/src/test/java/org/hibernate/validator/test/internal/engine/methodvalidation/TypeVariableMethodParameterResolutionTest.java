@@ -16,7 +16,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class TypeVariableMethodParameterResolutionTest {
 

@@ -11,9 +11,10 @@ import org.hibernate.validator.internal.engine.messageinterpolation.parser.Messa
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
 
+import org.junit.jupiter.api.Test;
+
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
-import org.testng.annotations.Test;
 
 /**
  * Tests for {@code TokenCollector} in message parameter mode.

@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -37,18 +37,20 @@ import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ListAppender;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 /**
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-1816")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CustomViolationExpressionLanguageFeatureLevelTest {
 
 	private static ValidationXmlTestHelper validationXmlTestHelper;
@@ -56,12 +58,12 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 	private ListAppender constraintValidatorContextImplLoglistAppender;
 
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidationXmlTestHelper() {
 		validationXmlTestHelper = new ValidationXmlTestHelper( ConstraintExpressionLanguageFeatureLevelTest.class );
 	}
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
 		Logger logger = context.getLogger( ConstraintValidatorContextImpl.class.getName() );
@@ -70,7 +72,7 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 		constraintValidatorContextImplLoglistAppender.clear();
 	}
 
-	@AfterTest
+	@AfterAll
 	public void tearDown() {
 		constraintValidatorContextImplLoglistAppender.clear();
 	}

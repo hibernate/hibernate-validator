@@ -5,8 +5,8 @@
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.constraints.Digits;
 
@@ -15,19 +15,21 @@ import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDesc
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Alaa Nassef
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DigitsValidatorForCharSequenceTest {
 
 	private static DigitsValidatorForCharSequence constraint;
 	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setAttribute( "integer", 5 );
@@ -39,7 +41,7 @@ public class DigitsValidatorForCharSequenceTest {
 		constraint.initialize( p );
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 	}
