@@ -7,11 +7,15 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Alaa Nassef
@@ -26,12 +30,30 @@ public class AssertTrueValidatorTest {
 		constraint = new AssertTrueValidator();
 	}
 
-	@Test
-	public void testIsValid() {
-		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( true, null ) );
-		assertTrue( constraint.isValid( Boolean.TRUE, null ) );
-		assertFalse( constraint.isValid( false, null ) );
-		assertFalse( constraint.isValid( Boolean.FALSE, null ) );
+	@ParameterizedTest
+	@MethodSource("testValidData")
+	public void testValid(Boolean value) {
+		assertTrue( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testValidData() {
+		return Stream.of(
+				Arguments.of( (Boolean) null ),
+				Arguments.of( true ),
+				Arguments.of( Boolean.TRUE )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testInvalidData")
+	public void testInvalid(Boolean value) {
+		assertFalse( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testInvalidData() {
+		return Stream.of(
+				Arguments.of( false ),
+				Arguments.of( Boolean.FALSE )
+		);
 	}
 }

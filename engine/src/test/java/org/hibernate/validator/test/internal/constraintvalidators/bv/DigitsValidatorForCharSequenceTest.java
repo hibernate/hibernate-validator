@@ -8,6 +8,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
+
 import jakarta.validation.constraints.Digits;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
@@ -19,6 +21,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Alaa Nassef
@@ -46,17 +51,34 @@ public class DigitsValidatorForCharSequenceTest {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 	}
 
-	@Test
-	public void testIsValid() {
-		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( "0", null ) );
-		assertTrue( constraint.isValid( "500.2", null ) );
-		assertTrue( constraint.isValid( "-12456.22", null ) );
-		assertTrue( constraint.isValid( "-000000000.22", null ) );
-		//should throw number format exception
-		assertFalse( constraint.isValid( "", null ) );
-		assertFalse( constraint.isValid( "256874.0", null ) );
-		assertFalse( constraint.isValid( "12.0001", null ) );
+	@ParameterizedTest
+	@MethodSource("testValidData")
+	public void testValid(String value) {
+		assertTrue( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testValidData() {
+		return Stream.of(
+				Arguments.of( (String) null ),
+				Arguments.of( "0" ),
+				Arguments.of( "500.2" ),
+				Arguments.of( "-12456.22" ),
+				Arguments.of( "-000000000.22" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testInvalidData")
+	public void testInvalid(String value) {
+		assertFalse( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testInvalidData() {
+		return Stream.of(
+				Arguments.of( "" ),
+				Arguments.of( "256874.0" ),
+				Arguments.of( "12.0001" )
+		);
 	}
 
 	@Test

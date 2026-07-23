@@ -13,6 +13,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -31,6 +32,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Marko Bekhta
@@ -96,15 +100,9 @@ public class DurationMinValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("testMessageData")
 	@TestForIssue(jiraKey = "HV-1232")
-	public void testMessage() {
-		testMessage( "must be longer than or equal to 30 days 12 hours 50 minutes", true, 30, 12, 50, Duration.ofDays( 2 ) );
-		testMessage( "must be longer than 30 days 12 hours 50 minutes", false, 30, 12, 50, Duration.ofDays( 2 ) );
-		testMessage( "must be longer than or equal to 0", true, 0, 0, 0, Duration.ofDays( -2 ) );
-		testMessage( "must be longer than 0", false, 0, 0, 0, Duration.ofDays( -2 ) );
-	}
-
 	public void testMessage(String message, boolean inclusive, int days, int hours, int minutes, Duration value) {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class, Locale.ENGLISH );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -123,6 +121,15 @@ public class DurationMinValidatorTest {
 		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
 		assertThat( constraintViolations ).containsOnlyViolations(
 				violationOf( DurationMin.class ).withMessage( message )
+		);
+	}
+
+	private static Stream<Arguments> testMessageData() {
+		return Stream.of(
+				Arguments.of( "must be longer than or equal to 30 days 12 hours 50 minutes", true, 30, 12, 50, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be longer than 30 days 12 hours 50 minutes", false, 30, 12, 50, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be longer than or equal to 0", true, 0, 0, 0, Duration.ofDays( -2 ) ),
+				Arguments.of( "must be longer than 0", false, 0, 0, 0, Duration.ofDays( -2 ) )
 		);
 	}
 

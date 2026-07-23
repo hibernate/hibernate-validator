@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -25,6 +26,9 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the {@link NullOrNotBlankValidator} constraint validator.
@@ -41,11 +45,18 @@ public class NullOrNotBlankValidatorTest {
 		assertTrue( validator.isValid( null, null ) );
 	}
 
-	@Test
-	public void notBlankIsValid() {
-		assertTrue( validator.isValid( "a", null ) );
-		assertTrue( validator.isValid( "foobar", null ) );
-		assertTrue( validator.isValid( " a ", null ) );
+	@ParameterizedTest
+	@MethodSource("notBlankIsValidData")
+	public void notBlankIsValid(String value) {
+		assertTrue( validator.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> notBlankIsValidData() {
+		return Stream.of(
+				Arguments.of( "a" ),
+				Arguments.of( "foobar" ),
+				Arguments.of( " a " )
+		);
 	}
 
 	@Test
@@ -53,12 +64,19 @@ public class NullOrNotBlankValidatorTest {
 		assertFalse( validator.isValid( "", null ) );
 	}
 
-	@Test
-	public void blankIsInvalid() {
-		assertFalse( validator.isValid( " ", null ) );
-		assertFalse( validator.isValid( "\t", null ) );
-		assertFalse( validator.isValid( "\n", null ) );
-		assertFalse( validator.isValid( "   \t\n  ", null ) );
+	@ParameterizedTest
+	@MethodSource("blankIsInvalidData")
+	public void blankIsInvalid(String value) {
+		assertFalse( validator.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> blankIsInvalidData() {
+		return Stream.of(
+				Arguments.of( " " ),
+				Arguments.of( "\t" ),
+				Arguments.of( "\n" ),
+				Arguments.of( "   \t\n  " )
+		);
 	}
 
 	@Test
