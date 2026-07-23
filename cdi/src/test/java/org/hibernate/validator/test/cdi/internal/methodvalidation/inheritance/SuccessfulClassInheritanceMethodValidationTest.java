@@ -11,17 +11,19 @@ import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class SuccessfulClassInheritanceMethodValidationTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class SuccessfulClassInheritanceMethodValidationTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

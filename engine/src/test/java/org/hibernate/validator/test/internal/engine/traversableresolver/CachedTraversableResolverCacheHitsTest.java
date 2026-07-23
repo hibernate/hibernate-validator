@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HV-2151")
 public class CachedTraversableResolverCacheHitsTest {

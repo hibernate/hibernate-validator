@@ -11,7 +11,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractCon
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Tests for XML configured constructor validation.
@@ -21,7 +21,7 @@ import org.testng.annotations.BeforeMethod;
 @TestForIssue(jiraKey = "HV-373")
 public class XmlBasedConstructorValidationTest extends AbstractConstructorValidationTest {
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

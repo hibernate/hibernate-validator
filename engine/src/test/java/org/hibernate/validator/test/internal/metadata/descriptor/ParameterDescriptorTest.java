@@ -6,9 +6,9 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutils.ValidatorUtil.getParameterDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -26,8 +26,9 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtComplex;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -37,7 +38,7 @@ public class ParameterDescriptorTest {
 	private ParameterDescriptor createCustomerParameter2;
 	private ParameterDescriptor parameterWithConversions;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpDescriptors() {
 		createCustomerParameter1 = getParameterDescriptor(
 				CustomerRepositoryExt.class,
@@ -61,8 +62,8 @@ public class ParameterDescriptorTest {
 
 	@Test
 	public void testGetElementClass() {
-		assertEquals( createCustomerParameter1.getElementClass(), CharSequence.class );
-		assertEquals( createCustomerParameter2.getElementClass(), String.class );
+		assertEquals( CharSequence.class, createCustomerParameter1.getElementClass() );
+		assertEquals( String.class, createCustomerParameter2.getElementClass() );
 	}
 
 	@Test
@@ -75,18 +76,18 @@ public class ParameterDescriptorTest {
 	public void testGetConstraintDescriptors() {
 		assertTrue( createCustomerParameter1.getConstraintDescriptors().isEmpty() );
 
-		assertEquals( createCustomerParameter2.getConstraintDescriptors().size(), 1 );
+		assertEquals( 1, createCustomerParameter2.getConstraintDescriptors().size() );
 		assertEquals(
+				NotNull.class,
 				createCustomerParameter2.getConstraintDescriptors()
 						.iterator()
 						.next()
 						.getAnnotation()
-						.annotationType(),
-				NotNull.class
-		);
+						.annotationType() );
 	}
 
-	@Test(enabled = false, description = "Temporarily disabled due to HV-443")
+	@Disabled("Temporarily disabled due to HV-443")
+	@Test
 	public void testFindConstraintLookingAtLocalElement() {
 		Set<ConstraintDescriptor<?>> constraintDescriptors =
 				createCustomerParameter2.findConstraints()
@@ -94,8 +95,8 @@ public class ParameterDescriptorTest {
 						.getConstraintDescriptors();
 
 		assertEquals(
-				constraintDescriptors.size(),
 				0,
+				constraintDescriptors.size(),
 				"No local constraint for CustomerRepositoryExt#createCustomer(), arg1, expected."
 		);
 
@@ -112,8 +113,8 @@ public class ParameterDescriptorTest {
 						.getConstraintDescriptors();
 
 		assertEquals(
-				constraintDescriptors.size(),
 				1,
+				constraintDescriptors.size(),
 				"One local constraint for CustomerRepository#createCustomer(), arg1, expected."
 		);
 	}
@@ -126,22 +127,22 @@ public class ParameterDescriptorTest {
 						.getConstraintDescriptors();
 
 		assertEquals(
-				constraintDescriptors.size(),
 				1,
+				constraintDescriptors.size(),
 				"One hierarchy constraint for CustomerRepositoryExt#createCustomer(), arg1, expected."
 		);
 	}
 
 	@Test
 	public void testGetIndex() {
-		assertEquals( createCustomerParameter1.getIndex(), 0 );
-		assertEquals( createCustomerParameter2.getIndex(), 1 );
+		assertEquals( 0, createCustomerParameter1.getIndex() );
+		assertEquals( 1, createCustomerParameter2.getIndex() );
 	}
 
 	@Test
 	public void testGetName() {
-		assertEquals( createCustomerParameter1.getName(), "firstName" );
-		assertEquals( createCustomerParameter2.getName(), "lastName" );
+		assertEquals( "firstName", createCustomerParameter1.getName() );
+		assertEquals( "lastName", createCustomerParameter2.getName() );
 	}
 
 	@Test

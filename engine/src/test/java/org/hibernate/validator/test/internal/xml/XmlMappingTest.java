@@ -10,7 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -38,18 +38,20 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class XmlMappingTest {
 
 	private static ValidationXmlTestHelper validationXmlTestHelper;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidationXmlTestHelper() {
 		validationXmlTestHelper = new ValidationXmlTestHelper( XmlMappingTest.class );
 	}
@@ -220,11 +222,10 @@ public class XmlMappingTest {
 
 						//then
 						assertEquals(
-								bootstrapConfiguration.getParameterNameProviderClassName(),
-								CustomParameterNameProvider.class.getName()
-						);
+								CustomParameterNameProvider.class.getName(),
+								bootstrapConfiguration.getParameterNameProviderClassName() );
 
-						assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
+						assertEquals( "param0", methodDescriptor.getParameterDescriptors().get( 0 ).getName() );
 					}
 				}
 		);
@@ -241,9 +242,8 @@ public class XmlMappingTest {
 
 					//then
 					assertEquals(
-							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ),
-							CustomScriptEvaluatorFactory.class.getName()
-					);
+							CustomScriptEvaluatorFactory.class.getName(),
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ) );
 
 				}
 		);
@@ -260,9 +260,8 @@ public class XmlMappingTest {
 
 					//then
 					assertEquals(
-							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.TEMPORAL_VALIDATION_TOLERANCE ),
-							"123456"
-					);
+							"123456",
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.TEMPORAL_VALIDATION_TOLERANCE ) );
 
 				}
 		);
@@ -283,9 +282,8 @@ public class XmlMappingTest {
 						//when
 						//then
 						assertEquals(
-								bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
-								asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
-						);
+								asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS ),
+								bootstrapConfiguration.getDefaultValidatedExecutableTypes() );
 					}
 				}
 		);
@@ -301,9 +299,8 @@ public class XmlMappingTest {
 		//when
 		//then
 		assertEquals(
-				bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
-				asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
-		);
+				asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS ),
+				bootstrapConfiguration.getDefaultValidatedExecutableTypes() );
 	}
 
 	@Test
@@ -320,9 +317,8 @@ public class XmlMappingTest {
 						//when
 						//then
 						assertEquals(
-								bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ),
-								"failOnError"
-						);
+								"failOnError",
+								bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ) );
 					}
 				}
 		);

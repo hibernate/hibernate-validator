@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
@@ -34,24 +34,24 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( 10, null ), isMax );
-		assertEquals( constraint.isValid( b, null ), isMax );
-		assertEquals( constraint.isValid( 14.99, null ), isMax );
-		assertEquals( constraint.isValid( -14.99, null ), isMax );
-		assertEquals( constraint.isValid( 14.99F, null ), isMax );
-		assertEquals( constraint.isValid( -14.99F, null ), isMax );
-		assertEquals( constraint.isValid( 14, null ), isMax );
-		assertEquals( constraint.isValid( 16, null ), !isMax );
-		assertEquals( constraint.isValid( (short) 14, null ), isMax );
-		assertEquals( constraint.isValid( (short) 16, null ), !isMax );
-		assertEquals( constraint.isValid( BigInteger.valueOf( 14L ), null ), isMax );
-		assertEquals( constraint.isValid( BigInteger.valueOf( 16L ), null ), !isMax );
-		assertEquals( constraint.isValid( BigDecimal.valueOf( 14L ), null ), isMax );
-		assertEquals( constraint.isValid( BigDecimal.valueOf( 16L ), null ), !isMax );
-		assertEquals( constraint.isValid( new BigDecimal( "14.99" ), null ), isMax );
-		assertEquals( constraint.isValid( new BigDecimal( "15.001" ), null ), !isMax );
-		assertEquals( constraint.isValid( bWrapper, null ), !isMax );
-		assertEquals( constraint.isValid( 20, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( 10, null ) );
+		assertEquals( isMax, constraint.isValid( b, null ) );
+		assertEquals( isMax, constraint.isValid( 14.99, null ) );
+		assertEquals( isMax, constraint.isValid( -14.99, null ) );
+		assertEquals( isMax, constraint.isValid( 14.99F, null ) );
+		assertEquals( isMax, constraint.isValid( -14.99F, null ) );
+		assertEquals( isMax, constraint.isValid( 14, null ) );
+		assertEquals( !isMax, constraint.isValid( 16, null ) );
+		assertEquals( isMax, constraint.isValid( (short) 14, null ) );
+		assertEquals( !isMax, constraint.isValid( (short) 16, null ) );
+		assertEquals( isMax, constraint.isValid( BigInteger.valueOf( 14L ), null ) );
+		assertEquals( !isMax, constraint.isValid( BigInteger.valueOf( 16L ), null ) );
+		assertEquals( isMax, constraint.isValid( BigDecimal.valueOf( 14L ), null ) );
+		assertEquals( !isMax, constraint.isValid( BigDecimal.valueOf( 16L ), null ) );
+		assertEquals( isMax, constraint.isValid( new BigDecimal( "14.99" ), null ) );
+		assertEquals( !isMax, constraint.isValid( new BigDecimal( "15.001" ), null ) );
+		assertEquals( !isMax, constraint.isValid( bWrapper, null ) );
+		assertEquals( !isMax, constraint.isValid( 20, null ) );
 	}
 
 	protected void testValidatorBigDecimal(ConstraintValidator<?, BigDecimal> constraint, boolean inclusive, boolean isMax) {
@@ -67,8 +67,8 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( BigDecimal.valueOf( -156000000000.0 ), null ), isMax );
-		assertEquals( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ), !isMax );
+		assertEquals( isMax, constraint.isValid( BigDecimal.valueOf( -156000000000.0 ), null ) );
+		assertEquals( !isMax, constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
 	}
 
 	protected void testValidatorBigInteger(ConstraintValidator<?, BigInteger> constraint, boolean inclusive, boolean isMax) {
@@ -82,8 +82,8 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( BigInteger.valueOf( -1560000000 ), null ), isMax );
-		assertEquals( constraint.isValid( BigInteger.valueOf( 1560000000 ), null ), !isMax );
+		assertEquals( isMax, constraint.isValid( BigInteger.valueOf( -1560000000 ), null ) );
+		assertEquals( !isMax, constraint.isValid( BigInteger.valueOf( 1560000000 ), null ) );
 	}
 
 	protected void testValidatorByte(ConstraintValidator<?, Byte> constraint, boolean inclusive, boolean isMax) {
@@ -95,10 +95,10 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( (byte) 14, null ), isMax );
-		assertEquals( constraint.isValid( (byte) 16, null ), !isMax );
-		assertEquals( constraint.isValid( Byte.MIN_VALUE, null ), isMax );
-		assertEquals( constraint.isValid( Byte.MAX_VALUE, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( (byte) 14, null ) );
+		assertEquals( !isMax, constraint.isValid( (byte) 16, null ) );
+		assertEquals( isMax, constraint.isValid( Byte.MIN_VALUE, null ) );
+		assertEquals( !isMax, constraint.isValid( Byte.MAX_VALUE, null ) );
 	}
 
 	protected void testValidatorShort(ConstraintValidator<?, Short> constraint, boolean inclusive, boolean isMax) {
@@ -110,10 +110,10 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( (short) 14, null ), isMax );
-		assertEquals( constraint.isValid( (short) 16, null ), !isMax );
-		assertEquals( constraint.isValid( Short.MIN_VALUE, null ), isMax );
-		assertEquals( constraint.isValid( Short.MAX_VALUE, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( (short) 14, null ) );
+		assertEquals( !isMax, constraint.isValid( (short) 16, null ) );
+		assertEquals( isMax, constraint.isValid( Short.MIN_VALUE, null ) );
+		assertEquals( !isMax, constraint.isValid( Short.MAX_VALUE, null ) );
 	}
 
 	protected void testValidatorInteger(ConstraintValidator<?, Integer> constraint, boolean inclusive, boolean isMax) {
@@ -125,10 +125,10 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( 14, null ), isMax );
-		assertEquals( constraint.isValid( 16, null ), !isMax );
-		assertEquals( constraint.isValid( Integer.MIN_VALUE, null ), isMax );
-		assertEquals( constraint.isValid( Integer.MAX_VALUE, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( 14, null ) );
+		assertEquals( !isMax, constraint.isValid( 16, null ) );
+		assertEquals( isMax, constraint.isValid( Integer.MIN_VALUE, null ) );
+		assertEquals( !isMax, constraint.isValid( Integer.MAX_VALUE, null ) );
 	}
 
 	protected void testValidatorLong(ConstraintValidator<?, Long> constraint, boolean inclusive, boolean isMax) {
@@ -140,8 +140,8 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( -1560000000L, null ), isMax );
-		assertEquals( constraint.isValid( 1560000000L, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( -1560000000L, null ) );
+		assertEquals( !isMax, constraint.isValid( 1560000000L, null ) );
 	}
 
 	protected void testValidatorDouble(ConstraintValidator<?, Double> constraint, boolean inclusive, boolean isMax) {
@@ -153,14 +153,14 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( 14.99, null ), isMax );
-		assertEquals( constraint.isValid( 15.001, null ), !isMax );
-		assertEquals( constraint.isValid( -14.99, null ), isMax );
-		assertEquals( constraint.isValid( -1560000000D, null ), isMax );
-		assertEquals( constraint.isValid( Double.NEGATIVE_INFINITY, null ), isMax );
-		assertEquals( constraint.isValid( 1560000000D, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( 14.99, null ) );
+		assertEquals( !isMax, constraint.isValid( 15.001, null ) );
+		assertEquals( isMax, constraint.isValid( -14.99, null ) );
+		assertEquals( isMax, constraint.isValid( -1560000000D, null ) );
+		assertEquals( isMax, constraint.isValid( Double.NEGATIVE_INFINITY, null ) );
+		assertEquals( !isMax, constraint.isValid( 1560000000D, null ) );
 		assertFalse( constraint.isValid( Double.NaN, null ) );
-		assertEquals( constraint.isValid( Double.POSITIVE_INFINITY, null ), !isMax );
+		assertEquals( !isMax, constraint.isValid( Double.POSITIVE_INFINITY, null ) );
 	}
 
 	protected void testValidatorFloat(ConstraintValidator<?, Float> constraint, boolean inclusive, boolean isMax) {
@@ -172,10 +172,10 @@ public abstract class BaseMinMaxValidatorForNumberTest {
 		}
 
 		assertTrue( constraint.isValid( null, null ) );
-		assertEquals( constraint.isValid( -1560000000F, null ), isMax );
-		assertEquals( constraint.isValid( Float.NEGATIVE_INFINITY, null ), isMax );
-		assertEquals( constraint.isValid( 1560000000F, null ), !isMax );
+		assertEquals( isMax, constraint.isValid( -1560000000F, null ) );
+		assertEquals( isMax, constraint.isValid( Float.NEGATIVE_INFINITY, null ) );
+		assertEquals( !isMax, constraint.isValid( 1560000000F, null ) );
 		assertFalse( constraint.isValid( Float.NaN, null ) );
-		assertEquals( constraint.isValid( Float.POSITIVE_INFINITY, null ), !isMax );
+		assertEquals( !isMax, constraint.isValid( Float.POSITIVE_INFINITY, null ) );
 	}
 }

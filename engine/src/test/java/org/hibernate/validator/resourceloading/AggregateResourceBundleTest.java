@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.resourceloading;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@code AggregateResourceBundle}.
@@ -40,7 +40,7 @@ public class AggregateResourceBundleTest {
 		Set<String> actualKeys = getAsSet( aggregateBundle.getKeys() );
 		Set<String> expectedKeys = new HashSet<String>( Arrays.asList( "key_1", "key_2", "key_3" ) );
 
-		assertEquals( actualKeys, expectedKeys );
+		assertEquals( expectedKeys, actualKeys );
 	}
 
 	@Test
@@ -57,18 +57,18 @@ public class AggregateResourceBundleTest {
 		ResourceBundle aggregateBundle = new AggregateResourceBundle( Arrays.asList( bundle_1, bundle_2 ) );
 
 		assertEquals(
-				aggregateBundle.getString( "key_1" ),
 				"value 1 from bundle 1",
+				aggregateBundle.getString( "key_1" ),
 				"Value for key_1 should be retrieved from bundle 1"
 		);
 		assertEquals(
-				aggregateBundle.getString( "key_2" ),
 				"value 2 from bundle 1",
+				aggregateBundle.getString( "key_2" ),
 				"Value for key_2 should be retrieved from bundle 1"
 		);
 		assertEquals(
-				aggregateBundle.getString( "key_3" ),
 				"value 3 from bundle 2",
+				aggregateBundle.getString( "key_3" ),
 				"Value for key_3 should be retrieved from bundle 2"
 		);
 	}

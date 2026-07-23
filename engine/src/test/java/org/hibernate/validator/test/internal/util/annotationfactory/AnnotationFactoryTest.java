@@ -5,14 +5,14 @@
 package org.hibernate.validator.test.internal.util.annotationfactory;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -27,8 +27,8 @@ public class AnnotationFactoryTest {
 
 		Size size = descriptorBuilder.build().getAnnotation();
 
-		assertEquals( size.min(), 5, "Wrong parameter value" );
-		assertEquals( size.max(), 10, "Wrong parameter value" );
+		assertEquals( 5, size.min(), "Wrong parameter value" );
+		assertEquals( 10, size.max(), "Wrong parameter value" );
 	}
 
 	@Test
@@ -46,6 +46,6 @@ public class AnnotationFactoryTest {
 
 		Pattern pattern = descriptorBuilder.build().getAnnotation();
 
-		assertEquals( ".*", pattern.regexp(), "Wrong parameter value" );
+		assertEquals( pattern.regexp(), ".*", "Wrong parameter value" );
 	}
 }

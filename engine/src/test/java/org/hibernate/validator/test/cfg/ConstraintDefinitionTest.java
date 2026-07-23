@@ -36,8 +36,8 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link ConstraintMapping#constraintDefinition(Class)} et al.
@@ -50,7 +50,7 @@ public class ConstraintDefinitionTest {
 	private HibernateValidatorConfiguration config;
 	private DefaultConstraintMapping mapping;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		mapping = (DefaultConstraintMapping) config.createConstraintMapping();

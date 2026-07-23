@@ -6,7 +6,7 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Tests for annotation configured constructor validation.
@@ -15,7 +15,7 @@ import org.testng.annotations.BeforeMethod;
  */
 public class AnnotationBasedConstructorValidationTest extends AbstractConstructorValidationTest {
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		this.executableValidator = getValidator().forExecutables();
 	}

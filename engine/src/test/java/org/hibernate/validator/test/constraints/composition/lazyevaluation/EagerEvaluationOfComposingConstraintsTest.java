@@ -8,7 +8,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -22,7 +22,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -37,8 +37,8 @@ public class EagerEvaluationOfComposingConstraintsTest {
 		Foo foo = new Foo();
 		validator.validate( foo );
 		assertEquals(
-				InvocationCounter.getInvocationCount( foo ),
 				3,
+				InvocationCounter.getInvocationCount( foo ),
 				"Each constraint should be evaluated since w/o @ReportAsSingleViolation there might be several violations"
 		);
 	}

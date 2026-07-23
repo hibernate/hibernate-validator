@@ -28,19 +28,21 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Tests for retrieval of type annotation level constraints.
  *
  * @author Khalid Alqinyah
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProviderTestBase {
 
 	private AnnotationMetaDataProvider provider;
 
-	@BeforeClass
+	@BeforeAll
 	public void setup() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),

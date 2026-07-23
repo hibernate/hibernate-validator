@@ -8,8 +8,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -19,7 +19,7 @@ import jakarta.validation.constraints.NotBlank;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik

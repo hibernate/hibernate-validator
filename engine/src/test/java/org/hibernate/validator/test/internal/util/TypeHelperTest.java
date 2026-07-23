@@ -18,10 +18,10 @@
 package org.hibernate.validator.test.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.lang.reflect.GenericDeclaration;
@@ -46,8 +46,9 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Tests {@code TypeUtils}.
@@ -55,6 +56,7 @@ import org.testng.annotations.Test;
  * @author Mark Hobson
  * @see org.hibernate.validator.internal.util.TypeHelper
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TypeHelperTest {
 	private static final Type[] DEFAULT_UPPER_BOUNDS = new Type[] { Object.class };
 	private static final Type[] DEFAULT_LOWER_BOUNDS = new Type[0];
@@ -72,7 +74,7 @@ public class TypeHelperTest {
 		// simple subclass to fix generics
 	}
 
-	@BeforeClass
+	@BeforeAll
 	public void beforeClass() throws Exception {
 		declaration = getClass().getConstructor();
 	}
@@ -868,7 +870,7 @@ public class TypeHelperTest {
 		Map<Type, ConstraintValidatorDescriptor<Positive>> validatorsTypes = TypeHelper
 				.getValidatorTypes( Positive.class, validatorDescriptors );
 
-		assertEquals( validatorsTypes.get( Integer.class ).getValidatorClass(), PositiveConstraintValidator.class );
+		assertEquals( PositiveConstraintValidator.class , validatorsTypes.get( Integer.class ).getValidatorClass());
 		assertNull( validatorsTypes.get( String.class ) );
 	}
 

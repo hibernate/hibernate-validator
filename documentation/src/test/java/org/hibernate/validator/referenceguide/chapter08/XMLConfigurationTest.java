@@ -29,8 +29,8 @@ import jakarta.validation.metadata.MethodDescriptor;
 import jakarta.validation.metadata.ParameterDescriptor;
 import jakarta.validation.metadata.ReturnValueDescriptor;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -38,7 +38,7 @@ import org.junit.Test;
 public class XMLConfigurationTest {
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		Configuration<?> configuration = Validation.byDefaultProvider().configure();
 		configuration.addMapping( XMLConfigurationTest.class.getResourceAsStream( "rental-station-mapping.xml" ) );

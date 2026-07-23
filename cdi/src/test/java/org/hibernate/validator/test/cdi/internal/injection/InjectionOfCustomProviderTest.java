@@ -18,13 +18,14 @@ import org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider.
 import org.hibernate.validator.test.cdi.internal.injection.MyValidationProvider.MyValidatorFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * Tests the injection of validator and validator factory if the default provider is not Hibernate Validator.
@@ -32,7 +33,8 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  */
 @TestForIssue(jiraKey = "HV-858")
-public class InjectionOfCustomProviderTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class InjectionOfCustomProviderTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

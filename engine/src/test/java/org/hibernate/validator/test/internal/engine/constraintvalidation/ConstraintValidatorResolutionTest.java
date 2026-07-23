@@ -28,8 +28,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -41,7 +41,7 @@ public class ConstraintValidatorResolutionTest {
 
 	private ConstraintMapping constraintMapping;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupMapping() {
 
 		configuration = getConfiguration();

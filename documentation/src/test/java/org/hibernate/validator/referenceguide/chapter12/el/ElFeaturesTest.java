@@ -10,7 +10,7 @@ import jakarta.validation.ValidatorFactory;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ElFeaturesTest {
 

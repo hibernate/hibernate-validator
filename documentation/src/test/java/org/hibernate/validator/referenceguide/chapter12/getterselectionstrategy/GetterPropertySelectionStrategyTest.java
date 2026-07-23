@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.getterselectionstrategy;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -14,7 +14,7 @@ import jakarta.validation.Validator;
 
 import org.hibernate.validator.HibernateValidator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GetterPropertySelectionStrategyTest {
 

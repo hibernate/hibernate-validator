@@ -33,10 +33,11 @@ import org.hibernate.validator.cdi.internal.ValidationProviderHelper;
 import org.hibernate.validator.cdi.internal.ValidatorBean;
 import org.hibernate.validator.cdi.internal.ValidatorFactoryBean;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -50,7 +51,7 @@ public class ValidationExtensionTest {
 	private BeanManager beanManagerMock;
 
 	@SuppressWarnings("unchecked")
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		extension = new ValidationExtension();
 		afterBeanDiscoveryMock = createMock( AfterBeanDiscovery.class );

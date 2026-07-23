@@ -9,8 +9,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the Bean Validation bootstrapping.
@@ -132,7 +132,7 @@ public class BootstrappingTest {
 
 	private void assertDefaultBuilderAndFactory(Configuration<?> configuration) {
 		assertNotNull( configuration );
-		assertTrue( configuration instanceof ConfigurationImpl );
+		assertInstanceOf( ConfigurationImpl.class, configuration );
 
 		ValidatorFactory factory = configuration.buildValidatorFactory();
 		assertDefaultFactory( factory );
@@ -140,7 +140,7 @@ public class BootstrappingTest {
 
 	private void assertDefaultFactory(ValidatorFactory factory) {
 		assertNotNull( factory );
-		assertTrue( factory instanceof ValidatorFactoryImpl );
+		assertInstanceOf( ValidatorFactoryImpl.class, factory );
 	}
 
 	class BadlyBehavedNotEmptyValidatorForCharSequence extends NotEmptyValidatorForCharSequence {

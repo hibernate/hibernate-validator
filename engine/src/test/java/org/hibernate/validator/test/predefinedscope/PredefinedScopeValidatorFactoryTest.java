@@ -38,7 +38,7 @@ import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HV-1667")
 public class PredefinedScopeValidatorFactoryTest {

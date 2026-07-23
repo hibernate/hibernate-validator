@@ -16,8 +16,8 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for automatic determination of constraints with generic and cross-parameter validator when
@@ -29,7 +29,7 @@ public class ConstraintTargetDeterminationTest {
 
 	private OrderService orderService;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		Validator validator = ValidatorUtil.getConfiguration()
 				.addMapping( ConstraintTargetDeterminationTest.class.getResourceAsStream( "hv-769-mapping.xml" ) )

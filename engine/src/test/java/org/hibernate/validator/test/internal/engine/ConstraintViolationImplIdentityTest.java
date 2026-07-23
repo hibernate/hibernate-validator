@@ -20,8 +20,8 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test related to the identity of {@link org.hibernate.validator.internal.engine.ConstraintViolationImpl}s.
@@ -33,7 +33,7 @@ public class ConstraintViolationImplIdentityTest {
 
 	Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}

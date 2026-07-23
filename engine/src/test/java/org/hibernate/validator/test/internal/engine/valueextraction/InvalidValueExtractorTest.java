@@ -15,7 +15,7 @@ import jakarta.validation.valueextraction.ValueExtractorDefinitionException;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the exceptions thrown in case of an invalid {@link ValueExtractor}.

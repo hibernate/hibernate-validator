@@ -8,8 +8,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -25,8 +25,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * A set of tests for {@link ISBN} constraint validator ({@link ISBNValidator}), which
@@ -38,7 +38,7 @@ public class ISBNValidatorTest {
 
 	private ISBNValidator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		validator = new ISBNValidator();
 	}

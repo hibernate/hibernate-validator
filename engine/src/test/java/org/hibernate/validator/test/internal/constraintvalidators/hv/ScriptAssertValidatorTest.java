@@ -10,7 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.Date;
@@ -30,7 +30,7 @@ import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedT
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator}.

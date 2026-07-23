@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter03.validation;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -25,14 +25,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.executable.ExecutableValidator;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class CarTest {
 
 	private static ExecutableValidator executableValidator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		//tag::setUpValidator[]
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

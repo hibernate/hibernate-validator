@@ -5,8 +5,8 @@
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 
@@ -15,8 +15,8 @@ import jakarta.validation.constraints.Digits;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Alaa Nassef
@@ -26,7 +26,7 @@ public class DigitsValidatorForNumberTest {
 
 	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setMessage( "{validator.digits}" );

@@ -9,7 +9,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -27,18 +27,21 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ListAppender;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
 import org.apache.logging.log4j.core.LoggerContext;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1903")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class LogValidatedValueConfigurationTest {
 
 	ListAppender simpleAppender;
 	ListAppender composingAppender;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		LoggerContext context = LoggerContext.getContext( false );
 		simpleAppender = new ListAppender( "simple" );
@@ -52,7 +55,7 @@ public class LogValidatedValueConfigurationTest {
 		composingAppender.clear();
 	}
 
-	@AfterTest
+	@AfterAll
 	public void tearDown() {
 		simpleAppender.clear();
 		composingAppender.clear();

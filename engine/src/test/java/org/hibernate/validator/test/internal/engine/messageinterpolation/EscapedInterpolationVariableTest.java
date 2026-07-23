@@ -25,17 +25,19 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
 @TestForIssue(jiraKey = "HV-798")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EscapedInterpolationVariableTest {
 	private Validator validator;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		MessageInterpolator interpolator = new ResourceBundleMessageInterpolator(
 				new ResourceBundleLocator() {

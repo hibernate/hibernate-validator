@@ -9,8 +9,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -54,8 +54,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link ConstraintMapping} et al.
@@ -68,7 +68,7 @@ public class ConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 	private DefaultConstraintMapping mapping;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		mapping = (DefaultConstraintMapping) config.createConstraintMapping();
@@ -93,8 +93,8 @@ public class ConstraintMappingTest {
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
-		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 1 );
-		assertEquals( getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size(), 1 );
+		assertEquals( 1, getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size() );
+		assertEquals( 1, getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size() );
 	}
 
 	@Test
@@ -107,8 +107,8 @@ public class ConstraintMappingTest {
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
-		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 1 );
-		assertEquals( getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size(), 1 );
+		assertEquals( 1, getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size() );
+		assertEquals( 1, getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size() );
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class ConstraintMappingTest {
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
-		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 2 );
+		assertEquals( 2, getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size() );
 	}
 
 	@Test
@@ -163,7 +163,8 @@ public class ConstraintMappingTest {
 		);
 	}
 
-	@Test(description = "HV-404: Introducing ConstraintsForType#genericConstraint(Class) allows to set specific parameters on following specific constraints.")
+	// HV-404: Introducing ConstraintsForType#genericConstraint(Class) allows to set specific parameters on following specific constraints.
+	@Test
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
 		mapping.type( Marathon.class )
 				.constraint( new GenericConstraintDef<>( MarathonConstraint.class ).param( "minRunner", 1 ) )
@@ -456,7 +457,8 @@ public class ConstraintMappingTest {
 				.hasMessageMatching( "HV[0-9]*: The bean type must not be null when creating a constraint mapping." );
 	}
 
-	@Test(description = "HV-355 (parameter names of RangeDef wrong)")
+	// HV-355 (parameter names of RangeDef wrong)
+	@Test
 	public void testRangeDef() {
 		mapping.type( Runner.class )
 				.getter( "age" )
@@ -469,7 +471,8 @@ public class ConstraintMappingTest {
 		);
 	}
 
-	@Test(description = "HV-444")
+	// HV-444
+	@Test
 	public void testDefaultGroupSequenceDefinedOnClassWithNoConstraints() {
 		mapping.type( Marathon.class )
 				.getter( "name" )

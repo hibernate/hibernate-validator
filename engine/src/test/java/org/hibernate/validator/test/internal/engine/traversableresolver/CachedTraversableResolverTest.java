@@ -26,18 +26,20 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Emmanuel Bernard
  * @author Guillaume Smet
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CachedTraversableResolverTest {
 
 	private static ValidationXmlTestHelper validationXmlTestHelper;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidationXmlTestHelper() {
 		validationXmlTestHelper = new ValidationXmlTestHelper( CachedTraversableResolverTest.class );
 	}

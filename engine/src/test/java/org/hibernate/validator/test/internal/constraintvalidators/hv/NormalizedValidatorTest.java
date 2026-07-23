@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.Normalizer;
 
@@ -14,8 +14,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValida
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link Normalized} constraint.
@@ -26,7 +26,7 @@ public class NormalizedValidatorTest {
 
 	private ConstraintAnnotationDescriptor.Builder<Normalized> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Normalized.class );
 	}

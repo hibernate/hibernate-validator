@@ -9,11 +9,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link BeanDescriptor} and its creation.
@@ -52,7 +52,7 @@ public class BeanDescriptorTest {
 	@Test
 	public void testGetElementClass() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
-		assertEquals( descriptor.getElementClass(), CustomerRepository.class );
+		assertEquals( CustomerRepository.class, descriptor.getElementClass() );
 	}
 
 	@Test
@@ -198,11 +198,10 @@ public class BeanDescriptorTest {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = descriptor.getConstraintDescriptors();
 
-		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( 1, constraintDescriptors.size() );
 		assertEquals(
-				constraintDescriptors.iterator().next().getAnnotation().annotationType(),
-				ScriptAssert.class
-		);
+				ScriptAssert.class,
+				constraintDescriptors.iterator().next().getAnnotation().annotationType() );
 	}
 
 	@Test
@@ -210,7 +209,7 @@ public class BeanDescriptorTest {
 		BeanDescriptor beanDescriptor = getBeanDescriptor( CustomerRepository.class );
 
 		assertNotNull( beanDescriptor );
-		assertEquals( beanDescriptor.getElementClass(), CustomerRepository.class );
+		assertEquals( CustomerRepository.class, beanDescriptor.getElementClass() );
 	}
 
 	@Test
@@ -355,25 +354,25 @@ public class BeanDescriptorTest {
 		BeanDescriptor beanDescriptor = getBeanDescriptor( Mixed.class );
 
 		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.GETTER );
-		assertEquals( methodDescriptors.size(), 1, "There should be only one getter" );
+		assertEquals( 1, methodDescriptors.size(), "There should be only one getter" );
 		MethodDescriptor methodDescriptor = methodDescriptors.iterator().next();
-		assertEquals( methodDescriptor.getName(), "getFoo", "Unexpected method name" );
+		assertEquals( "getFoo", methodDescriptor.getName(), "Unexpected method name" );
 
 		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
-		assertEquals( methodDescriptors.size(), 1, "There should be only one non-getter" );
+		assertEquals( 1, methodDescriptors.size(), "There should be only one non-getter" );
 		methodDescriptor = methodDescriptors.iterator().next();
-		assertEquals( methodDescriptor.getName(), "foo", "Unexpected method name" );
+		assertEquals( "foo", methodDescriptor.getName(), "Unexpected method name" );
 
 		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER );
-		assertEquals( methodDescriptors.size(), 2, "There should  be two methods" );
+		assertEquals( 2, methodDescriptors.size(), "There should  be two methods" );
 
 		// passing null as main argument
 		methodDescriptors = beanDescriptor.getConstrainedMethods( null );
-		assertEquals( methodDescriptors.size(), 0, "There should be no match" );
+		assertEquals( 0, methodDescriptors.size(), "There should be no match" );
 
 		// passing null as vararg
 		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.GETTER, (MethodType) null );
-		assertEquals( methodDescriptors.size(), 1, "There should be only one getter" );
+		assertEquals( 1, methodDescriptors.size(), "There should be only one getter" );
 	}
 
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {

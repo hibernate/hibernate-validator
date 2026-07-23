@@ -24,7 +24,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator}.

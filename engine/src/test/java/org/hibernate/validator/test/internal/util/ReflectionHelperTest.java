@@ -5,10 +5,10 @@
 package org.hibernate.validator.test.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.TreeSet;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@code ReflectionHelper}.
@@ -117,7 +117,7 @@ public class ReflectionHelperTest {
 		map.put( key, testObject );
 
 		Object value = ReflectionHelper.getMappedValue( map, key );
-		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
+		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getMappedValue( map, "foo" );
 		assertNull( value, "A non existent index should return the null value" );
@@ -133,7 +133,7 @@ public class ReflectionHelperTest {
 		list.add( testObject );
 
 		Object value = ReflectionHelper.getIndexedValue( list, 0 );
-		assertEquals( value, testObject, "We should be able to retrieve the indexed object" );
+		assertEquals( testObject, value, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( list, 2 );
 		assertNull( value, "A non existent index should return the null value" );
@@ -160,10 +160,10 @@ public class ReflectionHelperTest {
 
 	private void doTestGetIndexedValueForArray(Object array, Object firstValue, Object secondValue) {
 		Object value = ReflectionHelper.getIndexedValue( array, 0 );
-		assertEquals( value, firstValue, "We should be able to retrieve the indexed object" );
+		assertEquals( firstValue, value, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( array, 1 );
-		assertEquals( value, secondValue, "We should be able to retrieve the indexed object" );
+		assertEquals( secondValue, value, "We should be able to retrieve the indexed object" );
 
 		value = ReflectionHelper.getIndexedValue( array, 2 );
 		assertNull( value, "A non existent index should return the null value" );

@@ -7,9 +7,9 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -28,20 +28,22 @@ import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EmailValidatorTest {
 	// http://stackoverflow.com/questions/406230/regular-expression-to-match-string-not-containing-a-word
 	private static final String noOrgEmailAddressRegexp = "^((?!\\.org).)*$";
 	private static EmailValidator validator;
 
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		validator = new EmailValidator();
 	}
@@ -224,7 +226,7 @@ public class EmailValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-1833")
 	public void testLongEmail() {
-		assertEquals( false, DomainNameUtil.isValidEmailDomainAddress( stringOfLength( 5000 ) + ".com" ) );
+		assertFalse( DomainNameUtil.isValidEmailDomainAddress( stringOfLength( 5000 ) + ".com" ) );
 	}
 
 	private String stringOfLength(int length) {
@@ -233,7 +235,7 @@ public class EmailValidatorTest {
 			builder.append( 'a' );
 		}
 		String s = builder.toString();
-		assertEquals( s.getBytes().length, length );
+		assertEquals( length, s.getBytes().length );
 		return s;
 	}
 
@@ -249,7 +251,7 @@ public class EmailValidatorTest {
 			}
 		}
 		String s = builder.toString();
-		assertEquals( s.getBytes().length, length );
+		assertEquals( length, s.getBytes().length );
 		return s;
 	}
 

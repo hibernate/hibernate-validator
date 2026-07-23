@@ -24,7 +24,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta

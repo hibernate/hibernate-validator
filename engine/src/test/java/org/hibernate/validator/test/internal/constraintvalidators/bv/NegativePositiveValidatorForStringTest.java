@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.constraints.Negative;
 import jakarta.validation.constraints.NegativeOrZero;
@@ -18,7 +18,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.Posi
 import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.PositiveValidatorForCharSequence;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Guillaume Smet

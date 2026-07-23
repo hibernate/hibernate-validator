@@ -5,8 +5,8 @@
 package org.hibernate.validator.ap;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
@@ -37,7 +37,7 @@ import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppli
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for {@link ConstraintValidationProcessor} testing the checking of constraint

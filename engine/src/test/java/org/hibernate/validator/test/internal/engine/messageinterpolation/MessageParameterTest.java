@@ -23,8 +23,8 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Gottfried
@@ -34,7 +34,7 @@ public class MessageParameterTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void init() {
 		this.validator = ValidatorUtil.getValidator();
 	}

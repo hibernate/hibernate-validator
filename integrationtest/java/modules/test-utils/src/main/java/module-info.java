@@ -10,6 +10,10 @@ module org.hibernate.validator.integrationtest.java.module.test.utils {
 	requires org.assertj.core;
 	requires org.glassfish.expressly;
 
-	opens org.hibernate.validator.integrationtest.java.module.test.utils to org.hibernate.validator;
+	// Because asserj requires junit in its moduleinfo things become a mess:
+	requires static org.junit.platform.commons;
+	requires static org.junit.platform.launcher;
+
+	opens org.hibernate.validator.integrationtest.java.module.test.utils to org.hibernate.validator, org.junit.platform.commons;
 
 }

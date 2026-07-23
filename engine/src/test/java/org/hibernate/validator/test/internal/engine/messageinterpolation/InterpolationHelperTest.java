@@ -7,7 +7,7 @@ package org.hibernate.validator.test.internal.engine.messageinterpolation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.escapeMessageParameter;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class InterpolationHelperTest {
 

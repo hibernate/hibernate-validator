@@ -11,8 +11,9 @@ import org.hibernate.validator.internal.engine.messageinterpolation.parser.Messa
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
 
+import org.junit.jupiter.api.Test;
+
 import org.assertj.core.api.Assertions;
-import org.testng.annotations.Test;
 
 /**
  * Abstract base for {@code TokenCollector} tests.

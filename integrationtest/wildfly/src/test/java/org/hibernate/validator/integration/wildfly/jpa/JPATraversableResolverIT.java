@@ -12,14 +12,14 @@ import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.internal.engine.resolver.JPATraversableResolver;
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 
+import org.junit.jupiter.api.Test;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-
-import org.testng.annotations.Test;
 
 /**
  * Tests that the default {@link TraversableResolver} for a Jakarta Persistence environment is {@code JPATraversableResolver}.

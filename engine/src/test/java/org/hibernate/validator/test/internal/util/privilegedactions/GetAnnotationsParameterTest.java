@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.annotation.Annotation;
 
@@ -16,7 +16,7 @@ import jakarta.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.actions.GetAnnotationAttribute;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link GetAnnotationAttribute}.
@@ -52,10 +52,10 @@ public class GetAnnotationsParameterTest {
 			}
 		};
 		String message = GetAnnotationAttribute.action( testAnnotation, "message", String.class );
-		assertEquals( "test", message, "Wrong message" );
+		assertEquals( message, "test", "Wrong message" );
 
 		Class<?>[] group = GetAnnotationAttribute.action( testAnnotation, "groups", Class[].class );
-		assertEquals( group[0], Default.class, "Wrong group" );
+		assertEquals( Default.class, group[0], "Wrong group" );
 
 		assertThatThrownBy( () -> GetAnnotationAttribute.action( testAnnotation, "message", Integer.class ) )
 				.isInstanceOf( ValidationException.class )

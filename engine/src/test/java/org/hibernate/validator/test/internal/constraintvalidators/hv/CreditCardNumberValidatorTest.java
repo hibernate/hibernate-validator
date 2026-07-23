@@ -18,16 +18,18 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreditCardNumberValidatorTest {
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		validator = getValidator();
 	}

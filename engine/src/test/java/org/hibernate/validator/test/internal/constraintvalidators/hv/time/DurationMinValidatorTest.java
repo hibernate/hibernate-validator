@@ -26,24 +26,26 @@ import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMin
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Marko Bekhta
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DurationMinValidatorTest {
 
 	private static Locale PREVIOUS_LOCALE;
 
-	@BeforeClass
+	@BeforeAll
 	public static void saveLocale() {
 		PREVIOUS_LOCALE = Locale.getDefault();
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void restoreLocale() {
 		Locale.setDefault( PREVIOUS_LOCALE );
 	}
@@ -133,11 +135,11 @@ public class DurationMinValidatorTest {
 		DurationMinValidator validator = new DurationMinValidator();
 		validator.initialize( annotation );
 
-		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( Duration.ofNanos( 1000L ), null ) );
-		Assert.assertEquals( validator.isValid( Duration.ofNanos( 100L ), null ), inclusive );
-		Assert.assertTrue( validator.isValid( Duration.ofSeconds( 100L ), null ) );
-		Assert.assertFalse( validator.isValid( Duration.ofNanos( 10L ), null ) );
+		Assertions.assertTrue( validator.isValid( null, null ) );
+		Assertions.assertTrue( validator.isValid( Duration.ofNanos( 1000L ), null ) );
+		Assertions.assertEquals( inclusive, validator.isValid( Duration.ofNanos( 100L ), null ) );
+		Assertions.assertTrue( validator.isValid( Duration.ofSeconds( 100L ), null ) );
+		Assertions.assertFalse( validator.isValid( Duration.ofNanos( 10L ), null ) );
 	}
 
 	private static class Task {

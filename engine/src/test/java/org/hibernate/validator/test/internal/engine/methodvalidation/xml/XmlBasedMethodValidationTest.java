@@ -9,7 +9,7 @@ import jakarta.validation.Configuration;
 import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractMethodValidationTest;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Hardy Ferentschik
@@ -17,7 +17,7 @@ import org.testng.annotations.BeforeMethod;
 public class XmlBasedMethodValidationTest extends AbstractMethodValidationTest {
 
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	protected void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

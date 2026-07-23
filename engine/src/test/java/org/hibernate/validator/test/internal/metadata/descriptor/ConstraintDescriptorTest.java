@@ -8,8 +8,8 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -32,7 +32,7 @@ import jakarta.validation.metadata.MethodDescriptor;
 import jakarta.validation.metadata.MethodType;
 import jakarta.validation.metadata.PropertyDescriptor;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -44,17 +44,17 @@ public class ConstraintDescriptorTest {
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "fubar" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = propertyDescriptor.getConstraintDescriptors();
 
-		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( 1, constraintDescriptors.size() );
 		ConstraintDescriptor<?> constraintDescriptor = constraintDescriptors.iterator().next();
-		assertEquals( constraintDescriptor.getMessageTemplate(), "bar", "Wrong message" );
+		assertEquals( "bar", constraintDescriptor.getMessageTemplate(), "Wrong message" );
 
 		Set<Class<?>> groups = newHashSet();
 		groups.add( SnafuGroup.class );
-		assertEquals( constraintDescriptor.getGroups(), groups, "Wrong groups" );
+		assertEquals( groups, constraintDescriptor.getGroups(), "Wrong groups" );
 
 		Set<Class<?>> payloads = newHashSet();
 		payloads.add( Payload22.class );
-		assertEquals( constraintDescriptor.getPayload(), payloads, "Wrong payload" );
+		assertEquals( payloads, constraintDescriptor.getPayload(), "Wrong payload" );
 
 		assertNull( constraintDescriptor.getValidationAppliesTo(), "There is no validationAppliedTo attribute" );
 	}
@@ -63,18 +63,18 @@ public class ConstraintDescriptorTest {
 	public void testValidationAppliesTo() {
 		BeanDescriptor beanDescriptor = getBeanDescriptor( Bar.class );
 		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
-		assertEquals( methodDescriptors.size(), 1 );
+		assertEquals( 1, methodDescriptors.size() );
 
 		CrossParameterDescriptor crossParameterDescriptor = methodDescriptors.iterator()
 				.next()
 				.getCrossParameterDescriptor();
 		Set<ConstraintDescriptor<?>> constraintDescriptors = crossParameterDescriptor.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( 1, constraintDescriptors.size() );
 
 		ConstraintDescriptor<?> constraintDescriptor = constraintDescriptors.iterator().next();
 		assertEquals(
-				constraintDescriptor.getValidationAppliesTo(),
 				ConstraintTarget.PARAMETERS,
+				constraintDescriptor.getValidationAppliesTo(),
 				"wrong constraint targets"
 		);
 	}

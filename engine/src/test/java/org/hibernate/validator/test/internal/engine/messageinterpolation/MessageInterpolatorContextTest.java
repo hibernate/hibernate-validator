@@ -13,9 +13,9 @@ import static org.easymock.EasyMock.verify;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Collections;
 import java.util.Enumeration;
@@ -49,19 +49,21 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MessageInterpolatorContextTest {
 
 	private static final String MESSAGE = "{foo}";
 
 	Validator validator;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		validator = getConfiguration()
 				.messageInterpolator( new PathResourceBundleMessageInterpolator( new TestResourceBundleLocator() ) )
@@ -83,7 +85,7 @@ public class MessageInterpolatorContextTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( TestBean.class );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( "test" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = propertyDescriptor.getConstraintDescriptors();
-		assertTrue( constraintDescriptors.size() == 1 );
+		assertEquals( 1, constraintDescriptors.size() );
 
 		// prepare the mock interpolator to expect the right interpolate call
 		String validatedValue = "value";
@@ -128,15 +130,15 @@ public class MessageInterpolatorContextTest {
 				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false, null );
 
 		MessageInterpolator.Context asMessageInterpolatorContext = context.unwrap( MessageInterpolator.Context.class );
-		assertSame( asMessageInterpolatorContext, context );
+		assertSame( context, asMessageInterpolatorContext );
 
 		HibernateMessageInterpolatorContext asHibernateMessageInterpolatorContext = context.unwrap(
 				HibernateMessageInterpolatorContext.class
 		);
-		assertSame( asHibernateMessageInterpolatorContext, context );
+		assertSame( context, asHibernateMessageInterpolatorContext );
 
 		Object asObject = context.unwrap( Object.class );
-		assertSame( asObject, context );
+		assertSame( context, asObject );
 	}
 
 	@Test
@@ -153,7 +155,7 @@ public class MessageInterpolatorContextTest {
 				false,
 				null );
 
-		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getRootBeanType(), rootBeanType );
+		assertSame( rootBeanType, context.unwrap( HibernateMessageInterpolatorContext.class ).getRootBeanType() );
 	}
 
 	@Test
@@ -171,7 +173,7 @@ public class MessageInterpolatorContextTest {
 				false,
 				null );
 
-		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getPropertyPath(), pathMock );
+		assertSame( pathMock, context.unwrap( HibernateMessageInterpolatorContext.class ).getPropertyPath() );
 	}
 
 	@Test
@@ -189,7 +191,7 @@ public class MessageInterpolatorContextTest {
 				false,
 				constraintValidatorPayload );
 
-		assertSame( context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( String.class ), constraintValidatorPayload );
+		assertSame( constraintValidatorPayload, context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( String.class ) );
 		assertNull( context.unwrap( HibernateMessageInterpolatorContext.class ).getConstraintValidatorPayload( Integer.class ) );
 	}
 

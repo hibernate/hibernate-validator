@@ -17,8 +17,9 @@ import jakarta.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
+import org.junit.jupiter.api.Test;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * @author Marko Bekhta

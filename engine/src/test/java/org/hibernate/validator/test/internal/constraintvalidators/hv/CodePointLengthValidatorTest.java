@@ -5,18 +5,18 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link CodePointLength} constraint.
@@ -27,7 +27,7 @@ public class CodePointLengthValidatorTest {
 
 	private ConstraintAnnotationDescriptor.Builder<CodePointLength> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( CodePointLength.class );
 	}
@@ -132,7 +132,7 @@ public class CodePointLengthValidatorTest {
 	public void testNormalizationStrategyValueIsNullOrEmpty() {
 		assertNull( CodePointLength.NormalizationStrategy.NFC.normalize( null ) );
 		String emptyValue = new String();
-		assertSame( emptyValue, CodePointLength.NormalizationStrategy.NFC.normalize( emptyValue ) );
+		assertSame( CodePointLength.NormalizationStrategy.NFC.normalize( emptyValue ), emptyValue );
 	}
 
 	@Test

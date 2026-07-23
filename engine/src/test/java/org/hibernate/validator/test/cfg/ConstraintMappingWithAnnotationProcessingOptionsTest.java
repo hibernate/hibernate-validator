@@ -10,10 +10,10 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -39,8 +39,8 @@ import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.test.constraints.Object;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link org.hibernate.validator.cfg.ConstraintMapping} et al.
@@ -48,11 +48,10 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@Test
 public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = getConfiguration( HibernateValidator.class );
 	}
@@ -71,8 +70,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		assertFalse( validator.getConstraintsForClass( Foo.class ).isBeanConstrained() );
 
-		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedConstructors().size(), 0 );
-		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedMethods( MethodType.NON_GETTER ).size(), 0 );
+		assertEquals( 0, validator.getConstraintsForClass( Doer.class ).getConstrainedConstructors().size() );
+		assertEquals( 0, validator.getConstraintsForClass( Doer.class ).getConstrainedMethods( MethodType.NON_GETTER ).size() );
 	}
 
 	@Test

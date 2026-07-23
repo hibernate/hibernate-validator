@@ -51,7 +51,6 @@ updates:
           - "org.slf4j:*"
           - "org.ow2.asm:*" # for Surefire/Failsafe plugins to support builds on latest JDKs
           - "junit:*"
-          - "org.testng:*"
           - "org.easymock:*"
           - "org.jboss.arquillian:*"
           - "org.jboss.arquillian.container:*"

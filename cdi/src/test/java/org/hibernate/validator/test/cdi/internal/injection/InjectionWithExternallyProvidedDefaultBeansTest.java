@@ -18,12 +18,13 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.HibernateValidator;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * Tests the case where {@code @Default}-scoped beans for validator and validator factory have already been registered
@@ -32,7 +33,8 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class InjectionWithExternallyProvidedDefaultBeansTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class InjectionWithExternallyProvidedDefaultBeansTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

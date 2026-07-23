@@ -22,7 +22,7 @@ import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolverContext;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HV-1749")
 public class LocaleResolverTest {

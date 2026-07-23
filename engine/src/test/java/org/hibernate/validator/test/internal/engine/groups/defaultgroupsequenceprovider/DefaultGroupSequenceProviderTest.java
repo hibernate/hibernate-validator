@@ -30,17 +30,19 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DefaultGroupSequenceProviderTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		validator = getValidator();
 	}

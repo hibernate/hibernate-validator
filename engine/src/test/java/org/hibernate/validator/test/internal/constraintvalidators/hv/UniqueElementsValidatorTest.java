@@ -7,7 +7,7 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +27,9 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
+import org.junit.jupiter.api.Test;
+
 import org.assertj.core.api.Assertions;
-import org.testng.annotations.Test;
 
 /**
  * Tests the {@link UniqueElements} constraint

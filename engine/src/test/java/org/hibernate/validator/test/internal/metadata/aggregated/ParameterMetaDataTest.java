@@ -6,9 +6,9 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -44,8 +44,8 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests creation of {@link org.hibernate.validator.internal.metadata.raw.ConstrainedParameter} in
@@ -57,7 +57,7 @@ public class ParameterMetaDataTest {
 
 	private BeanMetaData<CustomerRepository> beanMetaData;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupBeanMetaData() {
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManagerImpl(
 				getDummyConstraintCreationContext(),
@@ -83,12 +83,11 @@ public class ParameterMetaDataTest {
 
 		assertFalse( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
-		assertEquals( parameterMetaData.getIndex(), 1 );
-		assertEquals( parameterMetaData.getName(), "lastName" );
+		assertEquals( 1, parameterMetaData.getIndex() );
+		assertEquals( "lastName", parameterMetaData.getName() );
 		assertThat( parameterMetaData ).hasSize( 1 );
-		assertEquals(
-				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
-		);
+		assertEquals( NotNull.class,
+				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType() );
 	}
 
 	@Test
@@ -100,8 +99,8 @@ public class ParameterMetaDataTest {
 
 		assertTrue( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
-		assertEquals( parameterMetaData.getIndex(), 0 );
-		assertEquals( parameterMetaData.getName(), "customer" );
+		assertEquals( 0, parameterMetaData.getIndex() );
+		assertEquals( "customer", parameterMetaData.getName() );
 		assertThat( parameterMetaData ).isEmpty();
 	}
 
@@ -149,12 +148,11 @@ public class ParameterMetaDataTest {
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
-		assertEquals( parameterMetaData.getIndex(), 0 );
-		assertEquals( parameterMetaData.getName(), "good", "Parameter name from Service should be used, nor ServiceImpl" );
+		assertEquals( 0, parameterMetaData.getIndex() );
+		assertEquals( "good", parameterMetaData.getName(), "Parameter name from Service should be used, nor ServiceImpl" );
 		assertThat( parameterMetaData ).hasSize( 1 );
-		assertEquals(
-				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
-		);
+		assertEquals( NotNull.class,
+				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType() );
 	}
 
 	private interface Service {

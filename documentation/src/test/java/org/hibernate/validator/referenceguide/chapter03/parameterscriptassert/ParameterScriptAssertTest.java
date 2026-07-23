@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter03.parameterscriptassert;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -19,14 +19,14 @@ import jakarta.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class ParameterScriptAssertTest {
 
 	private static ExecutableValidator executableValidator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		executableValidator = factory.getValidator().forExecutables();

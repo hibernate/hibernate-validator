@@ -35,8 +35,9 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -49,7 +50,7 @@ public class BeanMetaDataManagerTest {
 
 	private BeanMetaDataManagerImpl metaDataManager;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpBeanMetaDataManager() {
 		metaDataManager = new BeanMetaDataManagerImpl(
 				getDummyConstraintCreationContext(),
@@ -64,7 +65,8 @@ public class BeanMetaDataManagerTest {
 		);
 	}
 
-	@Test(enabled = false, description = "Disabled as it shows false failures too often. Run on demand if required")
+	@Disabled("Disabled as it shows false failures too often. Run on demand if required")
+	@Test
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		Class<?> lastIterationsBean = null;
 		int totalCreatedMetaDataInstances = 0;

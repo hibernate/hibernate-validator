@@ -34,7 +34,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Used to print the assertions shown in table 6.1/6.2 of the spec.

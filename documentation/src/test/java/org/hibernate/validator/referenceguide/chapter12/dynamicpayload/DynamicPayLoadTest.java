@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.dynamicpayload;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -15,14 +15,14 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class DynamicPayLoadTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 		validator = validatorFactory.getValidator();

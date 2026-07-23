@@ -42,7 +42,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class XmlMappingMixedWithServiceLoaderAndProgrammaticDefinitionTest {
 

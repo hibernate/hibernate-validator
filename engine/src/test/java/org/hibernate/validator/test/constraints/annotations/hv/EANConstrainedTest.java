@@ -15,7 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta

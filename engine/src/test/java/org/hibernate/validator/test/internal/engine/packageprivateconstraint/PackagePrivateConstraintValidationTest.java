@@ -15,8 +15,8 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the validation of package-private constraints.
@@ -28,7 +28,7 @@ public class PackagePrivateConstraintValidationTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		validator = ValidatorUtil.getValidator();
 	}

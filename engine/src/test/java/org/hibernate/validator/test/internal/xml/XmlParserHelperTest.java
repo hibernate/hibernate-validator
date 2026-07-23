@@ -12,8 +12,8 @@ import javax.xml.stream.XMLEventReader;
 
 import org.hibernate.validator.internal.xml.XmlParserHelper;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link XmlParserHelper}.
@@ -24,7 +24,7 @@ public class XmlParserHelperTest {
 
 	private XmlParserHelper xmlParserHelper;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupParserHelper() {
 		xmlParserHelper = new XmlParserHelper();
 	}

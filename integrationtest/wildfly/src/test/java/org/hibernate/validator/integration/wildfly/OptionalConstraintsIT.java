@@ -19,12 +19,14 @@ import jakarta.validation.constraints.Future;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 
 import org.javamoney.moneta.Money;
 import org.joda.time.DateTime;
-import org.testng.annotations.Test;
 
 /**
  * Asserts that the constraints based on the JodaTime and Javax Money server modules can be used.
@@ -56,7 +58,8 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( Future.class );
 	}
 
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void canUseJavaMoneyBasedConstraint() {
 		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 1200.0, "EUR" ) ) );
 

@@ -25,9 +25,10 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Tests for correct message interpolation for messages from the default bundle.
@@ -35,15 +36,16 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MessageInterpolationWithDefaultBundleTest {
 	private Locale defaultLocale;
 
-	@BeforeClass
+	@BeforeAll
 	public void storeDefaultLocale() {
 		defaultLocale = Locale.getDefault();
 	}
 
-	@AfterClass
+	@AfterAll
 	public void restoreDefaultLocale() {
 		Locale.setDefault( defaultLocale );
 	}

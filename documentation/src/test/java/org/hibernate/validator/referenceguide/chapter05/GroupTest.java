@@ -5,7 +5,7 @@
 package org.hibernate.validator.referenceguide.chapter05;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -18,14 +18,14 @@ import jakarta.validation.groups.Default;
 import org.hibernate.validator.referenceguide.chapter05.groupinheritance.RaceCarChecks;
 import org.hibernate.validator.referenceguide.chapter05.groupinheritance.SuperCar;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class GroupTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
@@ -124,9 +124,9 @@ public class GroupTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals(
-				"Wrong message",
 				"The car is currently rented out",
-				constraintViolations.iterator().next().getMessage()
+				constraintViolations.iterator().next().getMessage(),
+				"Wrong message"
 		);
 
 		rentalCar.setRented( false );

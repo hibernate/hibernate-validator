@@ -6,9 +6,9 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.ElementType;
 import java.util.Set;
@@ -28,7 +28,7 @@ import org.hibernate.validator.test.internal.metadata.Order;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -40,13 +40,13 @@ public class ElementDescriptorTest {
 	public void testGetTypeForConstrainedBean() {
 		Validator validator = ValidatorUtil.getValidator();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Customer.class );
-		assertEquals( beanDescriptor.getElementClass(), Customer.class, "Wrong type." );
+		assertEquals( Customer.class, beanDescriptor.getElementClass(), "Wrong type." );
 	}
 
 	@Test
 	public void testGetTypeForConstrainedProperty() {
 		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
-		assertEquals( elementDescriptor.getElementClass(), Integer.class, "Wrong type." );
+		assertEquals( Integer.class, elementDescriptor.getElementClass(), "Wrong type." );
 	}
 
 	@Test
@@ -54,12 +54,12 @@ public class ElementDescriptorTest {
 		BeanDescriptor beanDescriptor = getValidator().getConstraintsForClass( CustomerRepository.class );
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = beanDescriptor.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 1, "Only the class-level @ScriptAssert is expected." );
+		assertEquals( 1, constraintDescriptors.size(), "Only the class-level @ScriptAssert is expected." );
 
 		constraintDescriptors = beanDescriptor.findConstraints()
 				.declaredOn( ElementType.PARAMETER )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 0 );
+		assertEquals( 0, constraintDescriptors.size() );
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class ElementDescriptorTest {
 	public void testElementDescriptorForProperty() {
 		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
-		assertTrue( constraintDescriptors.size() == 1, "There should be a descriptor" );
+		assertEquals( 1, constraintDescriptors.size(), "There should be a descriptor" );
 	}
 
 	@Test
@@ -122,6 +122,6 @@ public class ElementDescriptorTest {
 				ChildWithoutAtValid2.class,
 				"order"
 		);
-		assertEquals( propertyDescriptor.getPropertyName(), "order" );
+		assertEquals( "order", propertyDescriptor.getPropertyName() );
 	}
 }

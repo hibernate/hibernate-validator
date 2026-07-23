@@ -13,7 +13,7 @@ import jakarta.validation.Path;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.path.RandomAccessPath;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class RandomAccessPathTest {
 

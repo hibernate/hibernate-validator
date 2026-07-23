@@ -35,8 +35,9 @@ import jakarta.validation.constraints.PastOrPresent;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.Test;
+
 import org.joda.time.ReadableInstant;
-import org.testng.annotations.Test;
 
 /**
  * @author Marko Bekhta

@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter09;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -13,7 +13,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.ScriptAssert;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CustomScriptEvaluatorFactoryForSpringELTest {
 

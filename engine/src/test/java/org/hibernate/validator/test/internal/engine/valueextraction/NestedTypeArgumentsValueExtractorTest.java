@@ -28,20 +28,23 @@ import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.CandidateForTck;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1237")
 @SuppressWarnings("restriction")
 @CandidateForTck
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NestedTypeArgumentsValueExtractorTest {
 
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setup() {
 		validator = getValidator();
 	}
@@ -133,7 +136,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void validation_of_nested_type_arguments_works_with_array_of_optional_of_stringproperty() {
 		Set<ConstraintViolation<ArrayOfOptionalsWithAutomaticUnwrapping>> constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.valid() );
 		assertNoViolations( constraintViolations );
@@ -173,7 +177,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void validation_of_nested_type_arguments_works_on_nested_arrays() {
 		Set<ConstraintViolation<NestedArray>> constraintViolations = validator.validate( NestedArray.valid() );
 		assertNoViolations( constraintViolations );

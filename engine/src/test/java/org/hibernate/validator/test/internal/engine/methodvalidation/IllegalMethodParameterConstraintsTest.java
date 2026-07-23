@@ -16,7 +16,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} and
@@ -25,7 +25,6 @@ import org.testng.annotations.Test;
  *
  * @author Gunnar Morling
  */
-@Test
 public class IllegalMethodParameterConstraintsTest {
 
 	@Test

@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link ClassHierarchyHelper}.
