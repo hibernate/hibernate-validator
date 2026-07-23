@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.ap.testutil;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -210,7 +210,7 @@ public class CompilerTestHelper {
 	 * @param expectations The expectations to compare against.
 	 */
 	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpectation... expectations) {
-		assertEquals( asExpectations( diagnostics.getDiagnostics() ), CollectionHelper.asTreeSet( expectations ) );
+		assertThat( asExpectations( diagnostics.getDiagnostics() ) ).isEqualTo( CollectionHelper.asTreeSet( expectations ) );
 	}
 
 	private static Set<DiagnosticExpectation> asExpectations(Collection<Diagnostic<? extends JavaFileObject>> diagnosticsList) {

@@ -8,15 +8,14 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -158,18 +157,15 @@ public class ConstraintValidatorCachingTest {
 		}
 
 		public void assertKeyExists(Class<?> clazz) {
-			assertTrue(
-					instantiatedConstraintValidatorClasses.containsKey( clazz ),
-					"An constraint validator of type " + clazz.getName() + " should exist"
-			);
+			assertThat( instantiatedConstraintValidatorClasses.containsKey( clazz ) )
+					.as( "An constraint validator of type " + clazz.getName() + " should exist" )
+					.isTrue();
 		}
 
 		public void assertSize(int size) {
-			assertEquals(
-					instantiatedConstraintValidatorClasses.size(),
-					size,
-					"Wrong number of already cached constraint validator instances"
-			);
+			assertThat( instantiatedConstraintValidatorClasses.size() )
+					.as( "Wrong number of already cached constraint validator instances" )
+					.isEqualTo( size );
 		}
 
 		public void assertConstraintValidatorInstancesAreNotShared(OnceInstanceOnlyConstraintValidatorFactory otherFactory) {
@@ -181,10 +177,9 @@ public class ConstraintValidatorCachingTest {
 		}
 
 		public void assertAllConstraintValidatorInstancesReleased() {
-			assertTrue(
-					instantiatedConstraintValidatorClasses.isEmpty(),
-					"All validator instances should have been released"
-			);
+			assertThat( instantiatedConstraintValidatorClasses.isEmpty() )
+					.as( "All validator instances should have been released" )
+					.isTrue();
 		}
 
 		@Override

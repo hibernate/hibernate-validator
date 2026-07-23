@@ -4,9 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.propertypath;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -19,7 +18,6 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.path.PropertyNode;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -50,25 +48,25 @@ public class PropertyPathTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getName(), "apartments" );
-		assertSame( node.as( PropertyNode.class ).getValue(), bobsApartment );
+		assertThat( node.getName() ).isEqualTo( "apartments" );
+		assertThat( node.as( PropertyNode.class ).getValue() ).isSameAs( bobsApartment );
 
 		node = nodeIterator.next();
-		assertEquals( node.getName(), "resident" );
-		assertSame( node.as( PropertyNode.class ).getValue(), bob );
+		assertThat( node.getName() ).isEqualTo( "resident" );
+		assertThat( node.as( PropertyNode.class ).getValue() ).isSameAs( bob );
 
 		node = nodeIterator.next();
-		assertEquals( node.getName(), "name" );
-		assertEquals( node.as( PropertyNode.class ).getValue(), "Bob" );
+		assertThat( node.getName() ).isEqualTo( "name" );
+		assertThat( node.as( PropertyNode.class ).getValue() ).isEqualTo( "Bob" );
 		//end::include[]
 		if ( path instanceof org.hibernate.validator.path.Path hvPath ) {
-			assertEquals( hvPath.getLeafNode().getName(), "name" );
-			assertEquals( hvPath.getLeafNode().as( PropertyNode.class ).getValue(), "Bob" );
+			assertThat( hvPath.getLeafNode().getName() ).isEqualTo( "name" );
+			assertThat( hvPath.getLeafNode().as( PropertyNode.class ).getValue() ).isEqualTo( "Bob" );
 		}
 		else {
-			Assert.fail( "Unexpected path node type: " + path.getClass().getName() );
+			fail( "Unexpected path node type: " + path.getClass().getName() );
 		}
 
-		assertFalse( nodeIterator.hasNext() );
+		assertThat( nodeIterator.hasNext() ).isFalse();
 	}
 }

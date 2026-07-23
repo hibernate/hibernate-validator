@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validationorder;
 
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,35 +43,20 @@ public class ValidationOrderTest {
 		List<Class<?>> defaultSequence = new ArrayList<Class<?>>();
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupA.class );
-		try {
-			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
-			fail();
-		}
-		catch (GroupDefinitionException e) {
-			// success
-		}
+		assertThatThrownBy( () -> chain.assertDefaultGroupSequenceIsExpandable( defaultSequence ) )
+				.isInstanceOf( GroupDefinitionException.class );
 
 		defaultSequence.clear();
 		defaultSequence.add( GroupA.class );
 		defaultSequence.add( Default.class );
-		try {
-			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
-			fail();
-		}
-		catch (GroupDefinitionException e) {
-			// success
-		}
+		assertThatThrownBy( () -> chain.assertDefaultGroupSequenceIsExpandable( defaultSequence ) )
+				.isInstanceOf( GroupDefinitionException.class );
 
 		defaultSequence.clear();
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupC.class );
-		try {
-			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
-			fail();
-		}
-		catch (GroupDefinitionException e) {
-			// success
-		}
+		assertThatThrownBy( () -> chain.assertDefaultGroupSequenceIsExpandable( defaultSequence ) )
+				.isInstanceOf( GroupDefinitionException.class );
 
 		defaultSequence.clear();
 		defaultSequence.add( GroupC.class );
@@ -107,35 +92,20 @@ public class ValidationOrderTest {
 		defaultSequence.clear();
 		defaultSequence.add( GroupA.class );
 		defaultSequence.add( Default.class );
-		try {
-			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
-			fail();
-		}
-		catch (GroupDefinitionException e) {
-			// success
-		}
+		assertThatThrownBy( () -> chain.assertDefaultGroupSequenceIsExpandable( defaultSequence ) )
+				.isInstanceOf( GroupDefinitionException.class );
 
 		defaultSequence.clear();
 		defaultSequence.add( Default.class );
 		defaultSequence.add( GroupC.class );
-		try {
-			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
-			fail();
-		}
-		catch (GroupDefinitionException e) {
-			// success
-		}
+		assertThatThrownBy( () -> chain.assertDefaultGroupSequenceIsExpandable( defaultSequence ) )
+				.isInstanceOf( GroupDefinitionException.class );
 
 		defaultSequence.clear();
 		defaultSequence.add( GroupC.class );
 		defaultSequence.add( Default.class );
-		try {
-			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
-			fail();
-		}
-		catch (GroupDefinitionException e) {
-			// success
-		}
+		assertThatThrownBy( () -> chain.assertDefaultGroupSequenceIsExpandable( defaultSequence ) )
+				.isInstanceOf( GroupDefinitionException.class );
 	}
 }
 

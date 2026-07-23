@@ -4,10 +4,10 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.ElementType;
 import java.util.HashSet;

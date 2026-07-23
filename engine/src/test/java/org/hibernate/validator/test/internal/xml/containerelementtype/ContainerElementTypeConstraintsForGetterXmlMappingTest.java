@@ -5,6 +5,7 @@
 
 package org.hibernate.validator.test.internal.xml.containerelementtype;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
@@ -31,72 +32,91 @@ import org.testng.annotations.Test;
 public class ContainerElementTypeConstraintsForGetterXmlMappingTest {
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void canDeclareContainerElementTypeConstraintsForArrayTypeGetterWithXmlMapping() {
-		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForArrayType-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForArrayType-mapping.xml" );
 
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+			Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void canDeclareContainerElementTypeConstraintsForListContainingArrayTypeGetterWithXmlMapping() {
-		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForListContainingArrayType-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForListContainingArrayType-mapping.xml" );
 
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+			Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayTypeGetterWithXmlMapping() {
-		Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayType-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "getter-canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayType-mapping.xml" );
 
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+			Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000211.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void declaringContainerElementTypeConstraintOnNonGenericFieldCausesException() {
-		getValidator( "getter-declaringContainerElementTypeConstraintOnNonGenericFieldCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "getter-declaringContainerElementTypeConstraintOnNonGenericFieldCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000211.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void declaringContainerElementTypeConstraintForNonExistingTypeArgumentIndexOnFieldCausesException() {
-		getValidator( "getter-declaringContainerElementTypeConstraintForNonExistingTypeArgumentIndexOnFieldCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "getter-declaringContainerElementTypeConstraintForNonExistingTypeArgumentIndexOnFieldCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000212.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void declaringContainerElementTypeConstraintForNonExistingNestedTypeArgumentIndexOnFieldCausesException() {
-		getValidator( "getter-declaringContainerElementTypeConstraintForNonExistingNestedTypeArgumentIndexOnFieldCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "getter-declaringContainerElementTypeConstraintForNonExistingNestedTypeArgumentIndexOnFieldCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000212.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void omittingTypeArgumentForMultiTypeArgumentTypeOnFieldCausesException() {
-		getValidator( "getter-omittingTypeArgumentForMultiTypeArgumentTypeOnFieldCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "getter-omittingTypeArgumentForMultiTypeArgumentTypeOnFieldCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000213.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000217.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void configuringSameContainerElementTwiceCausesException() {
-		getValidator( "getter-configuringSameContainerElementTwiceCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "getter-configuringSameContainerElementTwiceCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000217.*" );
 	}
 
 	private Validator getValidator(String mappingFile) {

@@ -5,9 +5,7 @@
 
 package org.hibernate.validator.test.internal.xml.containerelementtype;
 
-import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,11 +15,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import jakarta.validation.Configuration;
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
-import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -35,118 +31,116 @@ import org.testng.annotations.Test;
 public class ContainerElementTypeConstraintsForParameterXmlMappingTest {
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void canDeclareContainerElementTypeConstraintsForArrayTypeParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForArrayType-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForArrayType-mapping.xml" );
 
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 
-		try {
 			fishTank.test5( new String[] { "Too Long" } );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-			);
-		}
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void canDeclareContainerElementTypeConstraintsForListContainingArrayTypeParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForListContainingArrayType-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForListContainingArrayType-mapping.xml" );
 
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 
-		try {
 			List<String[]> fishNamesByMonth = new ArrayList<>();
 			fishNamesByMonth.add( new String[] { "Too Long" } );
 
 			fishTank.test6( fishNamesByMonth );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-			);
-		}
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayTypeParameterWithXmlMapping() {
-		Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayType-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "parameter-canDeclareContainerElementTypeConstraintsForMultiDimensionalArrayType-mapping.xml" );
 
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
 
-		try {
 			String[][] fishNamesByMonthAsArray = new String[][] { new String[] { "Too Long" } };
 
 			fishTank.test7( fishNamesByMonthAsArray );
-
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-			);
-		}
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000211.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void declaringContainerElementTypeConstraintOnNonGenericParameterCausesException() {
-		getValidator( "parameter-declaringContainerElementTypeConstraintOnNonGenericParameterCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "parameter-declaringContainerElementTypeConstraintOnNonGenericParameterCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000211.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void declaringContainerElementTypeConstraintForNonExistingTypeArgumentIndexOnParameterCausesException() {
-		getValidator( "parameter-declaringContainerElementTypeConstraintForNonExistingTypeArgumentIndexOnParameterCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "parameter-declaringContainerElementTypeConstraintForNonExistingTypeArgumentIndexOnParameterCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000212.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void declaringContainerElementTypeConstraintForNonExistingNestedTypeArgumentIndexOnParameterCausesException() {
-		getValidator( "parameter-declaringContainerElementTypeConstraintForNonExistingNestedTypeArgumentIndexOnParameterCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "parameter-declaringContainerElementTypeConstraintForNonExistingNestedTypeArgumentIndexOnParameterCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000212.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void omittingTypeArgumentForMultiTypeArgumentTypeOnParameterCausesException() {
-		getValidator( "parameter-omittingTypeArgumentForMultiTypeArgumentTypeOnParameterCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "parameter-omittingTypeArgumentForMultiTypeArgumentTypeOnParameterCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000213.*" );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1279")
 	public void configuringConstraintsOnGenericTypeArgumentOfListThrowsException() {
-		Validator validator = getValidator( "parameter-configuringConstraintsOnGenericTypeArgumentOfListThrowsException-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "parameter-configuringConstraintsOnGenericTypeArgumentOfListThrowsException-mapping.xml" );
 
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test8( Arrays.asList( "Too long" ) );
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			fishTank.test8( Arrays.asList( "Too long" ) );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000030:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	//@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
 	@TestForIssue(jiraKey = "HV-1279")
 	public void configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException() {
-		Validator validator = getValidator( "parameter-configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException-mapping.xml" );
+		assertThatThrownBy( () -> {
+			Validator validator = getValidator( "parameter-configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException-mapping.xml" );
 
-		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
-		fishTank.test9( new String[] { "Too long" } );
+			IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+			fishTank.test9( new String[] { "Too long" } );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000217.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1291")
 	public void configuringSameContainerElementTwiceCausesException() {
-		getValidator( "parameter-configuringSameContainerElementTwiceCausesException-mapping.xml" );
+		assertThatThrownBy( () -> getValidator( "parameter-configuringSameContainerElementTwiceCausesException-mapping.xml" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000217.*" );
 	}
 
 	private Validator getValidator(String mappingFile) {

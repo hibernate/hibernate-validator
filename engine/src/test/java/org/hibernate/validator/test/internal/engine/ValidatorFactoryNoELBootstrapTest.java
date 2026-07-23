@@ -4,11 +4,9 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,17 +48,9 @@ public class ValidatorFactoryNoELBootstrapTest {
 	public static class BootstrapFailsWhenUsingDefaultInterpolatorWithoutExpressionFactory {
 
 		public void run() {
-			try {
-				Validation.buildDefaultValidatorFactory();
-				fail( "An exception should have been thrown" );
-			}
-			catch (Throwable e) {
-				assertThat( e ).isInstanceOf( ValidationException.class );
-				assertTrue(
-						e.getMessage().startsWith( "HV000183" ),
-						"Bootstrapping in Validation should throw an unexpected exception: " + e.getMessage()
-				);
-			}
+			assertThatThrownBy( () -> Validation.buildDefaultValidatorFactory() )
+					.isInstanceOf( ValidationException.class )
+					.hasMessageStartingWith( "HV000183" );
 		}
 	}
 
@@ -97,17 +87,9 @@ public class ValidatorFactoryNoELBootstrapTest {
 	public static class MissingImplementationThrowsValidationException {
 
 		public void run() {
-			try {
-				Validation.buildDefaultValidatorFactory();
-				fail( "An exception should have been thrown" );
-			}
-			catch (Throwable e) {
-				assertThat( e ).isInstanceOf( ValidationException.class );
-				assertTrue(
-						e.getMessage().startsWith( "HV000183" ),
-						"Bootstrapping in Validation should throw an unexpected exception: " + e.getMessage()
-				);
-			}
+			assertThatThrownBy( () -> Validation.buildDefaultValidatorFactory() )
+					.isInstanceOf( ValidationException.class )
+					.hasMessageStartingWith( "HV000183" );
 		}
 	}
 

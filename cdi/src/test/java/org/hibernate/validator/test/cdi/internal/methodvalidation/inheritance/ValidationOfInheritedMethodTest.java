@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
@@ -41,22 +41,12 @@ public class ValidationOfInheritedMethodTest extends Arquillian {
 
 	@Test
 	public void testInheritedMethodGetsValidated() throws Exception {
-		try {
-			greeter.greet( "how are you" );
-			fail( "CDI method interceptor should throw an exception" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> greeter.greet( "how are you" ) )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 
 	@Test
 	public void testInterfaceMethodWithExecutableTypeNoneDoesNotGetValidated() throws Exception {
-		try {
-			assertThat( encryptor.encrypt( "top secret" ) ).isNull();
-		}
-		catch (ConstraintViolationException e) {
-			fail( "Encryptor#encrypt should not be validated, because it is explicitly excluded from executable validation" );
-		}
+		assertThat( encryptor.encrypt( "top secret" ) ).isNull();
 	}
 }

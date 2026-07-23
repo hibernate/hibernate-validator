@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNotSame;
@@ -103,7 +104,7 @@ public class ConfigurationImplTest {
 		}
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000190.*")
+	@Test
 	// UnableToDetermineSchemaVersionException
 	@TestForIssue(jiraKey = "HV-563")
 	public void testReusableConfigurationWithClosedInputStream() throws Exception {
@@ -120,7 +121,9 @@ public class ConfigurationImplTest {
 			mappingStream.close();
 		}
 
-		configuration.buildValidatorFactory();
+		assertThatThrownBy( () -> configuration.buildValidatorFactory() )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000190.*" );
 	}
 
 	private static class TestTraversableResolver implements TraversableResolver {

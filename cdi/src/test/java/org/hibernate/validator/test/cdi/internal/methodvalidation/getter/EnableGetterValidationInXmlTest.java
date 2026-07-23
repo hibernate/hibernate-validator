@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
@@ -39,12 +39,7 @@ public class EnableGetterValidationInXmlTest extends Arquillian {
 
 	@Test
 	public void testGetterValidationOccursBecauseItIsEnabledInXml() throws Exception {
-		try {
-			foo.getFoo();
-			fail( "method validation should be enabled via validation.xml" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> foo.getFoo() )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 }

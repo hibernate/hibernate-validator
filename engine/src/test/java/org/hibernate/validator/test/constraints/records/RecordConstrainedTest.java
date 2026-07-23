@@ -6,6 +6,7 @@ package org.hibernate.validator.test.constraints.records;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -36,7 +37,6 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -108,88 +108,59 @@ public class RecordConstrainedTest extends AbstractConstrainedTest {
 
 	@Test
 	public void testExplicitConstructorRecord() {
-		try {
-			new ConstructorValidationRecord( "David", 15 );
-		}
-		catch (ConstraintViolationException e) {
-			Assert.fail( "No violations expected" );
-		}
+		new ConstructorValidationRecord( "David", 15 );
 
-		try {
-			new ConstructorValidationRecord( null, 15 );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
-		}
+		assertThatThrownBy( () -> new ConstructorValidationRecord( null, 15 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) ) );
 
-		try {
-			new ConstructorValidationRecord( "", 15 );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
-		}
+		assertThatThrownBy( () -> new ConstructorValidationRecord( "", 15 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) ) );
 
-		try {
-			new ConstructorValidationRecord( " ", 15 );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
-		}
+		assertThatThrownBy( () -> new ConstructorValidationRecord( " ", 15 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) ) );
 
-		try {
-			new ConstructorValidationRecord( "David", 0 );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( Positive.class ).withMessage( "Age has to be a strictly positive integer" ) );
-		}
+		assertThatThrownBy( () -> new ConstructorValidationRecord( "David", 0 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( Positive.class ).withMessage( "Age has to be a strictly positive integer" ) ) );
 
-		try {
-			new ConstructorValidationRecord( "David", -15 );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( Positive.class ).withMessage( "Age has to be a strictly positive integer" ) );
-		}
+		assertThatThrownBy( () -> new ConstructorValidationRecord( "David", -15 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( Positive.class ).withMessage( "Age has to be a strictly positive integer" ) ) );
 	}
 
 	@Test
 	public void testCompactConstructorRecord() {
-		try {
-			new CompactConstructorValidationRecord( "David" );
-		}
-		catch (ConstraintViolationException e) {
-			Assert.fail( "No violations expected" );
-		}
+		new CompactConstructorValidationRecord( "David" );
 
-		try {
-			new CompactConstructorValidationRecord( null );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
-		}
+		assertThatThrownBy( () -> new CompactConstructorValidationRecord( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) ) );
 
-		try {
-			new CompactConstructorValidationRecord( "" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
-		}
+		assertThatThrownBy( () -> new CompactConstructorValidationRecord( "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) ) );
 
-		try {
-			new CompactConstructorValidationRecord( " " );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) );
-		}
+		assertThatThrownBy( () -> new CompactConstructorValidationRecord( " " ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() )
+						.containsOnlyViolations( violationOf( NotBlank.class ).withMessage( "Name cannot be null or empty" ) ) );
 	}
 
 	@Test
 	public void testRecordMethodValidation() {
-		try {
-			new MethodValidationRecord( 50 );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations( violationOf( Positive.class ) );
-		}
+		assertThatThrownBy( () -> new MethodValidationRecord( 50 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations( violationOf( Positive.class ) ) );
 	}
 
 	private record PersonRecord(@NotBlank(message = "Name cannot be null or empty") String name, @Positive(message = "Age has to be a strictly positive integer") int age) {

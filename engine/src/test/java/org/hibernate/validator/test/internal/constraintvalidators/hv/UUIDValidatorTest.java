@@ -5,9 +5,9 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
@@ -50,13 +50,8 @@ public class UUIDValidatorTest {
 		descriptorBuilder.setAttribute( attributeName, new int[] { invalidValue } );
 		uuidAnnotation = descriptorBuilder.build().getAnnotation();
 
-		try {
-			uuidValidator.initialize( uuidAnnotation );
-			fail();
-		}
-		catch (IllegalArgumentException exception) {
-			// success
-		}
+		assertThatThrownBy( () -> uuidValidator.initialize( uuidAnnotation ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

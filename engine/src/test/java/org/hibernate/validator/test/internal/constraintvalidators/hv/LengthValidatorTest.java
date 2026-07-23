@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -52,7 +53,7 @@ public class LengthValidatorTest {
 		assertFalse( constraint.isValid( new MyCustomStringImpl( "foobar" ), null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeMinValue() {
 		ConstraintAnnotationDescriptor.Builder<Length> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Length.class );
 		descriptorBuilder.setAttribute( "min", -1 );
@@ -61,10 +62,11 @@ public class LengthValidatorTest {
 		Length p = descriptorBuilder.build().getAnnotation();
 
 		LengthValidator constraint = new LengthValidator();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeMaxValue() {
 		ConstraintAnnotationDescriptor.Builder<Length> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Length.class );
 		descriptorBuilder.setAttribute( "min", 1 );
@@ -73,10 +75,11 @@ public class LengthValidatorTest {
 		Length p = descriptorBuilder.build().getAnnotation();
 
 		LengthValidator constraint = new LengthValidator();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeLength() {
 		ConstraintAnnotationDescriptor.Builder<Length> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Length.class );
 		descriptorBuilder.setAttribute( "min", 5 );
@@ -85,6 +88,7 @@ public class LengthValidatorTest {
 		Length p = descriptorBuilder.build().getAnnotation();
 
 		LengthValidator constraint = new LengthValidator();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 }

@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
@@ -75,20 +75,18 @@ public class MostSpecificValueExtractorTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-		try {
-			validator.validate( new Entity2( null ) );
-			fail( "An exception should have been thrown" );
-		}
-		catch (ConstraintDeclarationException e) {
-			String message = e.getMessage();
-			assertThat( message ).startsWith( "HV000219" );
-			assertThat( message ).contains( Wrapper2.class.getName() );
-			assertThat( message ).contains( IWrapper21ValueExtractor.class.getName() );
-			assertThat( message ).doesNotContain( IWrapper211ValueExtractor.class.getName() );
-			assertThat( message ).doesNotContain( IWrapper212ValueExtractor.class.getName() );
-			assertThat( message ).contains( IWrapper22ValueExtractor.class.getName() );
-			assertThat( message ).doesNotContain( IWrapper221ValueExtractor.class.getName() );
-		}
+		assertThatThrownBy( () -> validator.validate( new Entity2( null ) ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.satisfies( e -> {
+					String message = e.getMessage();
+					assertThat( message ).startsWith( "HV000219" );
+					assertThat( message ).contains( Wrapper2.class.getName() );
+					assertThat( message ).contains( IWrapper21ValueExtractor.class.getName() );
+					assertThat( message ).doesNotContain( IWrapper211ValueExtractor.class.getName() );
+					assertThat( message ).doesNotContain( IWrapper212ValueExtractor.class.getName() );
+					assertThat( message ).contains( IWrapper22ValueExtractor.class.getName() );
+					assertThat( message ).doesNotContain( IWrapper221ValueExtractor.class.getName() );
+				} );
 	}
 
 	private static class IWrapper11ValueExtractor implements ValueExtractor<IWrapper11<@ExtractedValue ?>> {

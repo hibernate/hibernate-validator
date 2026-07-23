@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.cdi.internal;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.fail;
 
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.AnnotatedType;
@@ -48,13 +48,8 @@ public class InjectingConstraintValidatorFactoryTest {
 
 	@Test
 	public void testNullBeanManager() {
-		try {
-			new InjectingConstraintValidatorFactory( null );
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> new InjectingConstraintValidatorFactory( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

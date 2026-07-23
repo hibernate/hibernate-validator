@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
 import static org.testng.Assert.assertEquals;
@@ -152,10 +153,12 @@ public class MethodDescriptorTest {
 		);
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-683")
 	public void testGetMethodDescriptorForIllegalyConfiguredMethodCausesConstraintDeclarationException() {
-		getMethodDescriptor( IllegalCustomerRepositoryExt.class, "zap", int.class );
+		assertThatThrownBy( () -> getMethodDescriptor( IllegalCustomerRepositoryExt.class, "zap", int.class ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
 	@Test

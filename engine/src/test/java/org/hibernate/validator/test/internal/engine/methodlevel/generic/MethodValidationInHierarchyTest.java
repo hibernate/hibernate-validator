@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.internal.engine.methodlevel.generic;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -29,16 +29,15 @@ public class MethodValidationInHierarchyTest {
 				new SimpleServiceImpl(), interfaces, ValidatorUtil.getValidator()
 		);
 
-		try {
-			service.configure( null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+		assertThatThrownBy( () -> service.configure( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertEquals( e.getConstraintViolations().size(), 1 );
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "must not be null" );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), "must not be null" );
+				} );
 	}
 
 	@Test
@@ -49,15 +48,14 @@ public class MethodValidationInHierarchyTest {
 				new SimpleServiceImpl(), interfaces, ValidatorUtil.getValidator()
 		);
 
-		try {
-			service.doIt( null );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+		assertThatThrownBy( () -> service.doIt( null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertEquals( e.getConstraintViolations().size(), 1 );
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), "must not be null" );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( constraintViolation.getMessage(), "must not be null" );
+				} );
 	}
 }

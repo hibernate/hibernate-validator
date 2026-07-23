@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.constraints;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
@@ -204,15 +205,18 @@ public class ConstraintValidatorContextTest {
 		);
 	}
 
-	@Test(expectedExceptions = IllegalStateException.class, expectedExceptionsMessageRegExp = "HV000146.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-709")
 	public void testAddParameterNodeForFieldLevelConstraintCausesException() throws Throwable {
-		try {
-			validator.validate( new Bar() );
-		}
-		catch (ValidationException e) {
-			throw e.getCause();
-		}
+		assertThatThrownBy( () -> {
+			try {
+				validator.validate( new Bar() );
+			}
+			catch (ValidationException e) {
+				throw e.getCause();
+			}
+		} ).isInstanceOf( IllegalStateException.class )
+				.hasMessageMatching( "HV000146.*" );
 	}
 
 	@Test

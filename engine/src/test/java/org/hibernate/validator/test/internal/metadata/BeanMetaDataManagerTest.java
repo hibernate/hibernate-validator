@@ -4,11 +4,9 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -78,7 +76,7 @@ public class BeanMetaDataManagerTest {
 			for ( int i = 0; i < LOOP_COUNT; i++ ) {
 				Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
 				BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
-				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
+				assertThat( meta.getBeanClass() ).as( "The classes should differ in each iteration" ).isNotSameAs( lastIterationsBean );
 				lastIterationsBean = meta.getBeanClass();
 				totalCreatedMetaDataInstances++;
 				cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
@@ -108,18 +106,17 @@ public class BeanMetaDataManagerTest {
 	@Test
 	public void testGetMetaDataForConstrainedEntity() {
 		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
-		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
-		assertTrue( beanMetaData.hasConstraints() );
+		assertThat( beanMetaData ).isInstanceOf( BeanMetaDataImpl.class );
+		assertThat( beanMetaData.hasConstraints() ).isTrue();
 	}
 
 	@Test
 	public void testGetMetaDataForUnConstrainedEntity() {
 		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
-		assertTrue(
-				beanMetaData instanceof BeanMetaDataImpl,
-				"#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass()
-		);
-		assertFalse( beanMetaData.hasConstraints() );
+		assertThat( beanMetaData )
+				.as( "#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass() )
+				.isInstanceOf( BeanMetaDataImpl.class );
+		assertThat( beanMetaData.hasConstraints() ).isFalse();
 	}
 
 	public class CustomClassLoader extends ClassLoader {

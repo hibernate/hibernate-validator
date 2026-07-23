@@ -5,6 +5,7 @@
 
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -113,11 +114,12 @@ public class MessageInterpolatorContextTest {
 		verify( mock );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		Context context = new MessageInterpolatorContext( null, null, null, null, Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap(), ExpressionLanguageFeatureLevel.BEAN_METHODS, false, null );
-		context.unwrap( MessageInterpolatorContext.class );
+		assertThatThrownBy( () -> context.unwrap( MessageInterpolatorContext.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test

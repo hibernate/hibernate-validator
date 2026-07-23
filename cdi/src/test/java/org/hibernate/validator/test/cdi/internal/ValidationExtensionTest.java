@@ -4,13 +4,13 @@
  */
 package org.hibernate.validator.test.cdi.internal;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -62,35 +62,20 @@ public class ValidationExtensionTest {
 
 	@Test
 	public void testNullAfterBeanDiscovery() {
-		try {
-			extension.afterBeanDiscovery( afterBeanDiscoveryMock, null );
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> extension.afterBeanDiscovery( afterBeanDiscoveryMock, null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void testNullBeanManager() {
-		try {
-			extension.afterBeanDiscovery( null, beanManagerMock );
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> extension.afterBeanDiscovery( null, beanManagerMock ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void testNullParameters() {
-		try {
-			extension.afterBeanDiscovery( null, null );
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> extension.afterBeanDiscovery( null, null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -207,13 +192,8 @@ public class ValidationExtensionTest {
 
 	@Test
 	public void testProcessAnnotatedTypeNullParameter() {
-		try {
-			extension.processAnnotatedType( null );
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> extension.processAnnotatedType( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	private <T> ProcessBean<T> getProcessBeanEvent(final Bean<T> bean) {

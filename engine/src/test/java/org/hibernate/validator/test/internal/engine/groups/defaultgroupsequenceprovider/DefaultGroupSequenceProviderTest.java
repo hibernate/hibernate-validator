@@ -45,28 +45,25 @@ public class DefaultGroupSequenceProviderTest {
 		validator = getValidator();
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
-	)
+	@Test
 	public void testNullProviderDefaultGroupSequence() {
-		validator.validate( new A() );
+		assertThatThrownBy( () -> validator.validate( new A() ) )
+				.isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( ".* must be part of the redefined default group sequence." );
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
-	)
+	@Test
 	public void testNotValidProviderDefaultGroupSequenceDefinition() {
-		validator.validate( new B() );
+		assertThatThrownBy( () -> validator.validate( new B() ) )
+				.isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( ".* must be part of the redefined default group sequence." );
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The default group sequence provider defined for .* has the wrong type"
-	)
+	@Test
 	public void testDefinitionOfDefaultGroupSequenceProviderWithWrongType() {
-		validator.validate( new D() );
+		assertThatThrownBy( () -> validator.validate( new D() ) )
+				.isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( "HV[0-9]*: The default group sequence provider defined for .* has the wrong type" );
 	}
 
 	@Test

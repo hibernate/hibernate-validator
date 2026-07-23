@@ -5,9 +5,9 @@
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
 import static java.lang.Thread.currentThread;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.util.function.Supplier;
 
@@ -39,17 +39,15 @@ public class LoadClassTest {
 	}
 
 	private void runLoadClass(Supplier<?> action) {
-		try {
-			action.get();
-			fail( "Should have thrown jakarta.validation.ValidationException" );
-		}
-		catch (ValidationException e) {
-			String expectedMessageId = "HV000065";
-			assertTrue(
-					e.getMessage().startsWith( expectedMessageId ),
-					"Wrong error message. Expected " + expectedMessageId + " ,but got " + e.getMessage()
-			);
-			assertNotNull( e.getCause(), "HV-1026: exception cause should be set" );
-		}
+		String expectedMessageId = "HV000065";
+		assertThatThrownBy( () -> action.get() )
+				.isInstanceOf( ValidationException.class )
+				.satisfies( e -> {
+					assertTrue(
+							e.getMessage().startsWith( expectedMessageId ),
+							"Wrong error message. Expected " + expectedMessageId + " ,but got " + e.getMessage()
+					);
+					assertNotNull( e.getCause(), "HV-1026: exception cause should be set" );
+				} );
 	}
 }

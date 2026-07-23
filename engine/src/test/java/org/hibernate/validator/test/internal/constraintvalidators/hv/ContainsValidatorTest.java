@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -149,18 +150,20 @@ public class ContainsValidatorTest {
 		assertTrue( validator.isValid( new MyCustomStringImpl( "foobar" ), null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testMinRequiredExceedsValueCount() {
 		descriptorBuilder.setAttribute( "value", new String[] { "foo", "bar" } );
 		descriptorBuilder.setAttribute( "minRequired", 5 );
-		createValidator();
+		assertThatThrownBy( () -> createValidator() )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeMinRequired() {
 		descriptorBuilder.setAttribute( "value", new String[] { "foo" } );
 		descriptorBuilder.setAttribute( "minRequired", -2 );
-		createValidator();
+		assertThatThrownBy( () -> createValidator() )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	private ContainsValidator createValidator() {

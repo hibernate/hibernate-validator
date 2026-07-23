@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.ElementType;
 import java.util.Set;
@@ -76,20 +76,11 @@ public class ElementDescriptorTest {
 		ElementDescriptor elementDescriptor = ValidatorUtil.getPropertyDescriptor( Order.class, "orderNumber" );
 		Set<ConstraintDescriptor<?>> constraintDescriptors = elementDescriptor.getConstraintDescriptors();
 
-		try {
-			constraintDescriptors.add( null );
-			fail( "Set should be immutable" );
-		}
-		catch (UnsupportedOperationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> constraintDescriptors.add( null ) )
+				.isInstanceOf( UnsupportedOperationException.class );
 
-		try {
-			constraintDescriptors.remove( constraintDescriptors.iterator().next() );
-			fail( "Set should be immutable" );
-		}
-		catch (UnsupportedOperationException e) {
-		}
+		assertThatThrownBy( () -> constraintDescriptors.remove( constraintDescriptors.iterator().next() ) )
+				.isInstanceOf( UnsupportedOperationException.class );
 	}
 
 	@Test

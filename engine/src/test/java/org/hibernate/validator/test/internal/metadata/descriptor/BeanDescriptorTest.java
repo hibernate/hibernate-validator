@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
@@ -250,10 +251,12 @@ public class BeanDescriptorTest {
 		assertNull( descriptor.getConstraintsForMethod( "zap" ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testGetConstraintsFailsForNullMethod() throws Exception {
-		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
-		descriptor.getConstraintsForMethod( null );
+		assertThatThrownBy( () -> {
+			BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
+			descriptor.getConstraintsForMethod( null );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -296,10 +299,12 @@ public class BeanDescriptorTest {
 		);
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-683")
 	public void testGetConstrainedMethodsForTypeWithIllegalMethodCausesDeclarationException() {
-		getBeanDescriptor( IllegalCustomerRepositoryExt.class ).getConstrainedMethods( MethodType.NON_GETTER );
+		assertThatThrownBy( () -> getBeanDescriptor( IllegalCustomerRepositoryExt.class ).getConstrainedMethods( MethodType.NON_GETTER ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
 	@Test

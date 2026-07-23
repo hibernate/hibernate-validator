@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -56,24 +57,28 @@ public class DigitsValidatorForCharSequenceTest {
 		assertFalse( constraint.isValid( "12.0001", null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeIntegerLength() {
-		descriptorBuilder.setAttribute( "integer", -1 );
-		descriptorBuilder.setAttribute( "fraction", 1 );
-		Digits p = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			descriptorBuilder.setAttribute( "integer", -1 );
+			descriptorBuilder.setAttribute( "fraction", 1 );
+			Digits p = descriptorBuilder.build().getAnnotation();
 
-		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
-		constraint.initialize( p );
+			DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
+			constraint.initialize( p );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeFractionLength() {
-		descriptorBuilder.setAttribute( "integer", 1 );
-		descriptorBuilder.setAttribute( "fraction", -1 );
-		Digits p = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			descriptorBuilder.setAttribute( "integer", 1 );
+			descriptorBuilder.setAttribute( "fraction", -1 );
+			Digits p = descriptorBuilder.build().getAnnotation();
 
-		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
-		constraint.initialize( p );
+			DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
+			constraint.initialize( p );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

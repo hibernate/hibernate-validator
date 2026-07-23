@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -126,16 +126,12 @@ public class ProgrammaticConstraintDefinitionsTest {
 				validator
 		);
 
-		try {
-			bar.setSource( content );
-			if ( error ) {
-				fail( "Should throw an exception" );
-			}
+		if ( error ) {
+			assertThatThrownBy( () -> bar.setSource( content ) )
+					.isInstanceOf( ConstraintViolationException.class );
 		}
-		catch (ConstraintViolationException e) {
-			if ( !error ) {
-				fail( "Should not throw an exception" );
-			}
+		else {
+			bar.setSource( content );
 		}
 	}
 

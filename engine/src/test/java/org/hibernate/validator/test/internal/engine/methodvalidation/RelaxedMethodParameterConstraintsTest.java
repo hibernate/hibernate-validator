@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Set;
 
 import jakarta.validation.ConstraintDeclarationException;
@@ -53,20 +55,19 @@ public class RelaxedMethodParameterConstraintsTest {
 		configuration.allowOverridingMethodAlterParameterConstraint( false );
 	}
 
-	@Test(expectedExceptions = { ConstraintDeclarationException.class })
+	@Test
 	public void disallowStrengtheningInSubType() {
 		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 
 		ValidatorFactory factory = configuration.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		@SuppressWarnings("unused")
-		Set<ConstraintViolation<RealizationWithAdditionalMethodParameterConstraint>> violations = validator.forExecutables()
+		assertThatThrownBy( () -> validator.forExecutables()
 				.validateParameters(
 						new RealizationWithAdditionalMethodParameterConstraint(),
 						RealizationWithAdditionalMethodParameterConstraint.class.getDeclaredMethods()[0],
 						new Object[] { }
-				);
+				) ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 
 	@Test
@@ -90,18 +91,19 @@ public class RelaxedMethodParameterConstraintsTest {
 		configuration.allowOverridingMethodAlterParameterConstraint( false );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000131.*")
+	@Test
 	public void disallowValidAddedInSubType() {
 		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 
 		ValidatorFactory factory = configuration.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		validator.forExecutables().validateParameters(
+		assertThatThrownBy( () -> validator.forExecutables().validateParameters(
 				new SubRealizationWithValidConstraintOnMethodParameter(),
 				SubRealizationWithValidConstraintOnMethodParameter.class.getDeclaredMethods()[0],
 				new Object[] { }
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000131.*" );
 	}
 
 	@Test
@@ -122,18 +124,19 @@ public class RelaxedMethodParameterConstraintsTest {
 		configure.allowMultipleCascadedValidationOnReturnValues( false );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000152.*")
+	@Test
 	public void disallowParameterConstraintsInHierarchyWithMultipleRootMethods() {
 		HibernateValidatorConfiguration configure = Validation.byProvider( HibernateValidator.class ).configure();
 
 		ValidatorFactory factory = configure.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
-		validator.forExecutables().validateParameters(
+		assertThatThrownBy( () -> validator.forExecutables().validateParameters(
 				new RealizationOfTwoInterface(),
 				RealizationOfTwoInterface.class.getDeclaredMethods()[0],
 				new Object[] { }
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000152.*" );
 	}
 
 	@Test

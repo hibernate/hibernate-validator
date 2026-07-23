@@ -11,6 +11,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -231,16 +232,18 @@ public class ValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		Validator validator = getValidator();
-		validator.unwrap( ValidatorImpl.class );
+		assertThatThrownBy( () -> validator.unwrap( ValidatorImpl.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToExecutableValidatorCausesValidationException() {
 		Validator validator = getValidator();
-		validator.unwrap( ExecutableValidator.class );
+		assertThatThrownBy( () -> validator.unwrap( ExecutableValidator.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -324,20 +327,24 @@ public class ValidatorTest {
 		);
 	}
 
-	@Test(expectedExceptions = { ValidationException.class }, expectedExceptionsMessageRegExp = "^HV000195:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1002")
 	public void testValidatePropertyWithNestedPathAndNullPropertyInTheWay() {
 		Validator validator = getValidator();
 		X someX = new X();
-		validator.validateProperty( someX, "list[0].foo" );
+		assertThatThrownBy( () -> validator.validateProperty( someX, "list[0].foo" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "^HV000195:.*" );
 	}
 
-	@Test(expectedExceptions = { IllegalArgumentException.class }, expectedExceptionsMessageRegExp = "^HV000039:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1002")
 	public void testValidatePropertyWithNestedPathAndMissingValid() {
 		Validator validator = getValidator();
 		M someM = new M();
-		validator.validateProperty( someM, "foo.baz" );
+		assertThatThrownBy( () -> validator.validateProperty( someM, "foo.baz" ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "^HV000039:.*" );
 	}
 
 	@Test

@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -73,13 +74,13 @@ public class ConstraintMappingTest {
 		mapping = (DefaultConstraintMapping) config.createConstraintMapping();
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The parameter \"mapping\" must not be null."
-	)
+	@Test
 	public void testNullConstraintMapping() {
-		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
-		config.addMapping( (ConstraintMapping) null ).buildValidatorFactory();
+		assertThatThrownBy( () -> {
+			HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+			config.addMapping( (ConstraintMapping) null ).buildValidatorFactory();
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV[0-9]*: The parameter \"mapping\" must not be null." );
 	}
 
 	@Test
@@ -274,14 +275,14 @@ public class ConstraintMappingTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000013.*"
-	)
-	public void testSingleConstraintWrongAccessType() throws Throwable {
-		mapping.type( Marathon.class )
-				.getter( "numberOfHelpers" )
-				.constraint( new NotNullDef() );
+	@Test
+	public void testSingleConstraintWrongAccessType() {
+		assertThatThrownBy( () -> {
+			mapping.type( Marathon.class )
+					.getter( "numberOfHelpers" )
+					.constraint( new NotNullDef() );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000013.*" );
 	}
 
 	@Test
@@ -334,49 +335,49 @@ public class ConstraintMappingTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
-	)
+	@Test
 	public void testProgrammaticDefaultGroupSequenceAndDefaultGroupSequenceProviderDefinedOnSameClass() {
-		mapping.type( Marathon.class )
-				.defaultGroupSequence( Foo.class, Marathon.class )
-				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class )
-				.getter( "name" )
-				.constraint( new NotNullDef().groups( Foo.class ) )
-				.getter( "runners" )
-				.constraint( new NotEmptyDef() );
-		config.addMapping( mapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
-		validator.validate( new Marathon() );
+		assertThatThrownBy( () -> {
+			mapping.type( Marathon.class )
+					.defaultGroupSequence( Foo.class, Marathon.class )
+					.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class )
+					.getter( "name" )
+					.constraint( new NotNullDef().groups( Foo.class ) )
+					.getter( "runners" )
+					.constraint( new NotEmptyDef() );
+			config.addMapping( mapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
+			validator.validate( new Marathon() );
+		} ).isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time." );
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
-	)
+	@Test
 	public void testProgrammaticDefaultGroupSequenceDefinedOnClassWithGroupProviderAnnotation() {
-		mapping.type( B.class )
-				.defaultGroupSequence( Foo.class, B.class )
-				.field( "b" )
-				.constraint( new NotNullDef() );
-		config.addMapping( mapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
-		validator.validate( new B() );
+		assertThatThrownBy( () -> {
+			mapping.type( B.class )
+					.defaultGroupSequence( Foo.class, B.class )
+					.field( "b" )
+					.constraint( new NotNullDef() );
+			config.addMapping( mapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
+			validator.validate( new B() );
+		} ).isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time." );
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time."
-	)
+	@Test
 	public void testProgrammaticDefaultGroupSequenceProviderDefinedOnClassWithGroupSequenceAnnotation() {
-		mapping.type( A.class )
-				.defaultGroupSequenceProviderClass( ADefaultGroupSequenceProvider.class )
-				.field( "a" )
-				.constraint( new NotNullDef() );
-		config.addMapping( mapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
-		validator.validate( new A() );
+		assertThatThrownBy( () -> {
+			mapping.type( A.class )
+					.defaultGroupSequenceProviderClass( ADefaultGroupSequenceProvider.class )
+					.field( "a" )
+					.constraint( new NotNullDef() );
+			config.addMapping( mapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
+			validator.validate( new A() );
+		} ).isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( "HV[0-9]*: Default group sequence and default group sequence provider cannot be defined at the same time." );
 	}
 
 	@Test
@@ -408,15 +409,15 @@ public class ConstraintMappingTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000012.*"
-	)
+	@Test
 	public void testCustomConstraintTypeMissingParameter() {
-		mapping.type( Marathon.class )
-				.constraint( new GenericConstraintDef<>( MarathonConstraint.class ) );
-		config.addMapping( mapping );
-		config.buildValidatorFactory().getValidator();
+		assertThatThrownBy( () -> {
+			mapping.type( Marathon.class )
+					.constraint( new GenericConstraintDef<>( MarathonConstraint.class ) );
+			config.addMapping( mapping );
+			config.buildValidatorFactory().getValidator();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000012.*" );
 	}
 
 	@Test
@@ -445,14 +446,14 @@ public class ConstraintMappingTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The bean type must not be null when creating a constraint mapping."
-	)
+	@Test
 	public void testNullBean() {
-		mapping.type( null )
-				.constraint( new GenericConstraintDef<>( MarathonConstraint.class ) );
-		config.addMapping( mapping ).buildValidatorFactory();
+		assertThatThrownBy( () -> {
+			mapping.type( null )
+					.constraint( new GenericConstraintDef<>( MarathonConstraint.class ) );
+			config.addMapping( mapping ).buildValidatorFactory();
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV[0-9]*: The bean type must not be null when creating a constraint mapping." );
 	}
 
 	@Test(description = "HV-355 (parameter names of RangeDef wrong)")

@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -78,24 +79,26 @@ public class DigitsValidatorForMonetaryAmountTest {
 		assertFalse( constraint.isValid( Money.of( Double.valueOf( "500.2" ), currency ), null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeIntegerLength() {
 		descriptorBuilder.setAttribute( "integer", -1 );
 		descriptorBuilder.setAttribute( "fraction", 1 );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForMonetaryAmount constraint = new DigitsValidatorForMonetaryAmount();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeFractionLength() {
 		descriptorBuilder.setAttribute( "integer", 1 );
 		descriptorBuilder.setAttribute( "fraction", -1 );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForMonetaryAmount constraint = new DigitsValidatorForMonetaryAmount();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.constraintvalidator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import jakarta.validation.ConstraintDefinitionException;
@@ -27,9 +28,11 @@ public class ConstraintDefinitionTypeMismatchTest {
 		validator = getValidator();
 	}
 
-	@Test(expectedExceptions = ConstraintDefinitionException.class, expectedExceptionsMessageRegExp = "^HV000243:.*")
+	@Test
 	public void constraint_validator_constraint_type_mismatch_causes_exception() {
-		validator.validate( new TypeMismatchBean() );
+		assertThatThrownBy( () -> validator.validate( new TypeMismatchBean() ) )
+				.isInstanceOf( ConstraintDefinitionException.class )
+				.hasMessageMatching( "^HV000243:.*" );
 	}
 
 	public class TypeMismatchBean {

@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
@@ -28,9 +30,9 @@ public class InvalidXmlConfigurationTest {
 	/**
 	 * Tests requirement 8.a from the BV 1.1 spec.
 	 */
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000100.*")
+	@Test
 	public void testInvalidValidationXml() {
-		validationXmlTestHelper.runWithCustomValidationXml(
+		assertThatThrownBy( () -> validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-InvalidXmlConfigurationTest.xml", new Runnable() {
 
 					@Override
@@ -38,6 +40,7 @@ public class InvalidXmlConfigurationTest {
 						ValidatorUtil.getValidator();
 					}
 				}
-		);
+		) ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000100.*" );
 	}
 }

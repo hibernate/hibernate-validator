@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -33,8 +34,7 @@ import org.testng.annotations.Test;
  */
 public class ValidatorFactoryBeanMetadataClassNormalizerTest {
 
-	@Test(expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = ".*No validator could be found for constraint 'jakarta.validation.constraints.Email' validating type 'java.lang.Object'.*")
+	@Test
 	public void testBeanMetaDataClassNormalizerNoNormalizer() throws NoSuchMethodException {
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
 				.configure()
@@ -43,10 +43,11 @@ public class ValidatorFactoryBeanMetadataClassNormalizerTest {
 		Validator validator = validatorFactory.getValidator();
 
 		// As the proxy defines invalid constraints (see BeanProxy), we expect this to fail
-		validator.forExecutables().validateParameters(
+		assertThatThrownBy( () -> validator.forExecutables().validateParameters(
 				new BeanProxy(), BeanProxy.class.getMethod( "setEmails", List.class ),
 				new Object[] { Arrays.asList( "notAnEmail" ) }
-		);
+		) ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( ".*No validator could be found for constraint 'jakarta.validation.constraints.Email' validating type 'java.lang.Object'.*" );
 	}
 
 	@Test

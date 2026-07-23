@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
@@ -81,38 +82,38 @@ public class ConstraintValidatorManagerTest {
 		assertTrue( constraintValidator instanceof NotNullValidator, "Unexpected validator type" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullValidatedValueThrowsIllegalArgumentException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
-		constraintValidatorManager.getInitializedValidator(
+		assertThatThrownBy( () -> constraintValidatorManager.getInitializedValidator(
 				null,
 				constraintDescriptor,
 				constraintValidatorFactory,
 				getDummyConstraintValidatorInitializationContext()
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullDescriptorThrowsIllegalArgumentException() {
-		constraintValidatorManager.getInitializedValidator(
+		assertThatThrownBy( () -> constraintValidatorManager.getInitializedValidator(
 				String.class,
 				null,
 				constraintValidatorFactory,
 				getDummyConstraintValidatorInitializationContext()
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullFactoryThrowsIllegalArgumentException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
-		constraintValidatorManager.getInitializedValidator(
+		assertThatThrownBy( () -> constraintValidatorManager.getInitializedValidator(
 				String.class,
 				constraintDescriptor,
 				null,
 				getDummyConstraintValidatorInitializationContext()
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

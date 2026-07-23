@@ -4,10 +4,7 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation;
 
-import static org.testng.Assert.fail;
-
 import jakarta.inject.Inject;
-import jakarta.validation.ConstraintViolationException;
 
 import org.hibernate.validator.test.util.TestHelper;
 
@@ -39,11 +36,6 @@ public class DisableExecutableValidationInXmlTest extends Arquillian {
 
 	@Test
 	public void testExecutableValidationDisabled() throws Exception {
-		try {
-			repeater.reverse( null );
-		}
-		catch (ConstraintViolationException e) {
-			fail( "CDI method interception should be disabled" );
-		}
+		repeater.reverse( null );
 	}
 }

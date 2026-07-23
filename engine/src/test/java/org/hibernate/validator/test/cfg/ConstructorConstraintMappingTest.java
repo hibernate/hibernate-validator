@@ -6,6 +6,7 @@ package org.hibernate.validator.test.cfg;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -147,25 +148,25 @@ public class ConstructorConstraintMappingTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000133.*"
-	)
+	@Test
 	public void testCascadingDefinitionOnMissingMethod() {
-		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( GreetingService.class )
-				.constructor( Date.class );
+		assertThatThrownBy( () -> {
+			ConstraintMapping mapping = config.createConstraintMapping();
+			mapping.type( GreetingService.class )
+					.constructor( Date.class );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000133.*" );
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV000056.*"
-	)
+	@Test
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
-		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( GreetingService.class )
-				.constructor( User.class )
-				.parameter( 1 );
+		assertThatThrownBy( () -> {
+			ConstraintMapping mapping = config.createConstraintMapping();
+			mapping.type( GreetingService.class )
+					.constructor( User.class )
+					.parameter( 1 );
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000056.*" );
 	}
 
 	@Test

@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
@@ -94,55 +95,66 @@ public class ScriptAssertValidatorTest extends AbstractConstrainedTest {
 		);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void emptyLanguageNameRaisesException() throws Exception {
-		getInitializedValidator( "", "script" );
+		assertThatThrownBy( () -> getInitializedValidator( "", "script" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void emptyScriptRaisesException() throws Exception {
-		getInitializedValidator( "lang", "" );
+		assertThatThrownBy( () -> getInitializedValidator( "lang", "" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void emptyAliasRaisesException() throws Exception {
-		getInitializedValidator( "lang", "script", "" );
+		assertThatThrownBy( () -> getInitializedValidator( "lang", "script", "" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void unknownLanguageNameRaisesException() throws Exception {
-		@ScriptAssert(lang = "foo", script = "script")
-		class TmpType {
-		}
+		assertThatThrownBy( () -> {
+			@ScriptAssert(lang = "foo", script = "script")
+			class TmpType {
+			}
 
-		assertNoViolations( validator.validate( new TmpType() ) );
+			assertNoViolations( validator.validate( new TmpType() ) );
+		} ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void illegalScriptExpressionRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "foo")
-		class TmpType {
-		}
+		assertThatThrownBy( () -> {
+			@ScriptAssert(lang = "groovy", script = "foo")
+			class TmpType {
+			}
 
-		assertNoViolations( validator.validate( new TmpType() ) );
+			assertNoViolations( validator.validate( new TmpType() ) );
+		} ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void scriptExpressionReturningNullRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "null")
-		class TmpType {
-		}
+		assertThatThrownBy( () -> {
+			@ScriptAssert(lang = "groovy", script = "null")
+			class TmpType {
+			}
 
-		assertNoViolations( validator.validate( new TmpType() ) );
+			assertNoViolations( validator.validate( new TmpType() ) );
+		} ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void scriptExpressionReturningNoBooleanRaisesException() throws Exception {
-		@ScriptAssert(lang = "groovy", script = "11")
-		class TmpType {
-		}
+		assertThatThrownBy( () -> {
+			@ScriptAssert(lang = "groovy", script = "11")
+			class TmpType {
+			}
 
-		assertNoViolations( validator.validate( new TmpType() ) );
+			assertNoViolations( validator.validate( new TmpType() ) );
+		} ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 
 	@Test

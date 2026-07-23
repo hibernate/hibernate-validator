@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.valueextraction;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,44 +24,54 @@ import org.testng.annotations.Test;
  */
 public class InvalidValueExtractorTest {
 
-	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000204.*")
+	@Test
 	public void severalExtractedValuesThrowException() {
-		ValidatorUtil.getConfiguration()
+		assertThatThrownBy( () -> ValidatorUtil.getConfiguration()
 				.addValueExtractor( new SeveralExtractedValuesValueExtractor() )
 				.buildValidatorFactory()
-				.getValidator();
+				.getValidator() )
+				.isInstanceOf( ValueExtractorDefinitionException.class )
+				.hasMessageMatching( "HV000204.*" );
 	}
 
-	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000203.*")
+	@Test
 	public void noExtractedValueThrowsException() {
-		ValidatorUtil.getConfiguration()
+		assertThatThrownBy( () -> ValidatorUtil.getConfiguration()
 				.addValueExtractor( new NoExtractedValueValueExtractor() )
 				.buildValidatorFactory()
-				.getValidator();
+				.getValidator() )
+				.isInstanceOf( ValueExtractorDefinitionException.class )
+				.hasMessageMatching( "HV000203.*" );
 	}
 
-	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000225.*")
+	@Test
 	public void boundWilcardTypeArgument1ThrowsException() {
-		ValidatorUtil.getConfiguration()
+		assertThatThrownBy( () -> ValidatorUtil.getConfiguration()
 				.addValueExtractor( new BoundWildcardTypeArgumentValueExtractor1() )
 				.buildValidatorFactory()
-				.getValidator();
+				.getValidator() )
+				.isInstanceOf( ValueExtractorDefinitionException.class )
+				.hasMessageMatching( "HV000225.*" );
 	}
 
-	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000225.*")
+	@Test
 	public void boundWilcardTypeArgument2ThrowsException() {
-		ValidatorUtil.getConfiguration()
+		assertThatThrownBy( () -> ValidatorUtil.getConfiguration()
 				.addValueExtractor( new BoundWildcardTypeArgumentValueExtractor2() )
 				.buildValidatorFactory()
-				.getValidator();
+				.getValidator() )
+				.isInstanceOf( ValueExtractorDefinitionException.class )
+				.hasMessageMatching( "HV000225.*" );
 	}
 
-	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000225.*")
+	@Test
 	public void boundWilcardTypeArgument3ThrowsException() {
-		ValidatorUtil.getConfiguration()
+		assertThatThrownBy( () -> ValidatorUtil.getConfiguration()
 				.addValueExtractor( new BoundWildcardTypeArgumentValueExtractor3() )
 				.buildValidatorFactory()
-				.getValidator();
+				.getValidator() )
+				.isInstanceOf( ValueExtractorDefinitionException.class )
+				.hasMessageMatching( "HV000225.*" );
 	}
 
 	private class SeveralExtractedValuesValueExtractor implements ValueExtractor<Map<@ExtractedValue ?, @ExtractedValue ?>> {

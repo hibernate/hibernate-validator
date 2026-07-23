@@ -101,18 +101,20 @@ public class MultipleContainersAtTheSameTimeTest {
 	 * Test should fail as the constraint is declared on a {@link FooBarContainer} which accepts both
 	 * {@code ListValueExtractor} and {@code CustomContainerValueExtractor}.
 	 */
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void testMultipleContainersAtTheSameTimeShouldThrowException() throws Exception {
-		validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
+		assertThatThrownBy( () -> validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) ) )
+				.isInstanceOf( ConstraintDeclarationException.class );
 	}
 
 	/**
 	 * Test should fail as the constraint is declared on a {@link FooBarContainer} which accepts both
 	 * {@code ListValueExtractor} and {@code CustomContainerValueExtractor}.
 	 */
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void testMultipleContainersAtTheSameTimeWithTypeParameterSpecificShouldThrowException() throws Exception {
-		validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) );
+		assertThatThrownBy( () -> validator.validate( new FooBar( new FooBarContainer<String>().add( "" ) ) ) )
+				.isInstanceOf( ConstraintDeclarationException.class );
 	}
 
 	/**
@@ -169,7 +171,7 @@ public class MultipleContainersAtTheSameTimeTest {
 	 * When we have a case like {@code @Valid Container<T1, T2, ...Tn> container} and we have VE for more than one type variable
 	 * an exception should be thrown
 	 */
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test
 	public void testMultipleTypeVariablesWithGlobalValid() throws Exception {
 		class Foo {
 
@@ -181,7 +183,8 @@ public class MultipleContainersAtTheSameTimeTest {
 			}
 		}
 
-		validator.validate( new Foo( new Pair<>( Collections.singletonList( "" ), "" ) ) );
+		assertThatThrownBy( () -> validator.validate( new Foo( new Pair<>( Collections.singletonList( "" ), "" ) ) ) )
+				.isInstanceOf( ConstraintDeclarationException.class );
 	}
 
 	/**

@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -22,32 +23,36 @@ import org.testng.annotations.Test;
  */
 public class LuhnCheckValidatorTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidStartIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( -1, Integer.MAX_VALUE, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidEndIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 0, -1, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testEndIndexLessThanStartIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 5, 0, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidCheckDigitIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 0, 10, 5, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

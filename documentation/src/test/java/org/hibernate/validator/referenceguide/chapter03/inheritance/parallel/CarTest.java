@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.reflect.Method;
 
 import jakarta.validation.ConstraintDeclarationException;
@@ -24,15 +26,17 @@ public class CarTest {
 		executableValidator = factory.getValidator().forExecutables();
 	}
 
-	@Test(expected = ConstraintDeclarationException.class)
+	@Test
 	public void illegalParameterConstraintsInParallelTypes() throws Exception {
-		RacingCar object = new RacingCar();
-		Method method = Car.class.getMethod( "drive", int.class );
-		Object[] parameterValues = { };
-		executableValidator.validateParameters(
-				object,
-				method,
-				parameterValues
-		);
+		assertThatThrownBy( () -> {
+			RacingCar object = new RacingCar();
+			Method method = Car.class.getMethod( "drive", int.class );
+			Object[] parameterValues = { };
+			executableValidator.validateParameters(
+					object,
+					method,
+					parameterValues
+			);
+		} ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 }

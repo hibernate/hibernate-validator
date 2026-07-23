@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.util.annotationfactory;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.testng.Assert.assertEquals;
 
 import jakarta.validation.constraints.Pattern;
@@ -30,10 +31,12 @@ public class AnnotationFactoryTest {
 		assertEquals( size.max(), 10, "Wrong parameter value" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void createAnnotationProxyMissingRequiredParameter() {
-		AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
-		descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			AnnotationDescriptor.Builder<Pattern> descriptorBuilder = new AnnotationDescriptor.Builder<>( Pattern.class );
+			descriptorBuilder.build().getAnnotation();
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

@@ -7,10 +7,10 @@ package org.hibernate.validator.test.internal.engine.failfast;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -77,17 +77,14 @@ public class FailFastTest {
 	public void testFailFastMethodValidationDefaultBehaviour() {
 		TestService service = getValidatingProxy( new TestServiceImpl(), ValidatorUtil.getValidator() );
 
-		try {
-			service.testMethod( " ", null );
-			fail();
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Min.class ),
-					violationOf( NotBlank.class ),
-					violationOf( NotNull.class )
-			);
-		}
+		assertThatThrownBy( () -> service.testMethod( " ", null ) )
+				.isInstanceOfSatisfying( ConstraintViolationException.class, e -> {
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( Min.class ),
+							violationOf( NotBlank.class ),
+							violationOf( NotNull.class )
+					);
+				} );
 	}
 
 	@Test
@@ -113,15 +110,12 @@ public class FailFastTest {
 
 		TestService service = getValidatingProxy( new TestServiceImpl(), validator );
 
-		try {
-			service.testMethod( "a", null );
-			fail();
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Min.class )
-			);
-		}
+		assertThatThrownBy( () -> service.testMethod( "a", null ) )
+				.isInstanceOfSatisfying( ConstraintViolationException.class, e -> {
+					assertThat( e.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( Min.class )
+					);
+				} );
 	}
 
 	@Test
@@ -155,16 +149,13 @@ public class FailFastTest {
 
 		TestService service = getValidatingProxy( new TestServiceImpl(), validator );
 
-		try {
-			service.testMethod( " ", null );
-			fail();
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOneOfViolations(
-					violationOf( NotBlank.class ),
-					violationOf( Min.class )
-			);
-		}
+		assertThatThrownBy( () -> service.testMethod( " ", null ) )
+				.isInstanceOfSatisfying( ConstraintViolationException.class, e -> {
+					assertThat( e.getConstraintViolations() ).containsOneOfViolations(
+							violationOf( NotBlank.class ),
+							violationOf( Min.class )
+					);
+				} );
 	}
 
 	@Test
@@ -206,16 +197,13 @@ public class FailFastTest {
 
 		TestService service = getValidatingProxy( new TestServiceImpl(), validator );
 
-		try {
-			service.testMethod( " ", null );
-			fail();
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOneOfViolations(
-					violationOf( NotBlank.class ),
-					violationOf( Min.class )
-			);
-		}
+		assertThatThrownBy( () -> service.testMethod( " ", null ) )
+				.isInstanceOfSatisfying( ConstraintViolationException.class, e -> {
+					assertThat( e.getConstraintViolations() ).containsOneOfViolations(
+							violationOf( NotBlank.class ),
+							violationOf( Min.class )
+					);
+				} );
 	}
 
 	@Test
@@ -236,18 +224,20 @@ public class FailFastTest {
 		);
 	}
 
-	@Test(expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: Inconsistent fail fast configuration.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-381")
 	public void testFailFastSetWithInconsistentConfiguration() {
-		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		assertThatThrownBy( () -> {
+			final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
-		//Default fail fast property value is false
-		final ValidatorFactory factory = configuration.addProperty(
-				HibernateValidatorConfiguration.FAIL_FAST, "false"
-		).failFast( true ).buildValidatorFactory();
+			//Default fail fast property value is false
+			final ValidatorFactory factory = configuration.addProperty(
+					HibernateValidatorConfiguration.FAIL_FAST, "false"
+			).failFast( true ).buildValidatorFactory();
 
-		factory.getValidator();
+			factory.getValidator();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV[0-9]*: Inconsistent fail fast configuration.*" );
 	}
 
 	@Test

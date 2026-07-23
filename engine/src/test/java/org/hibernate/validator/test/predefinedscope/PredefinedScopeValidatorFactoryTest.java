@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.predefinedscope;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.ElementType;
 import java.util.AbstractCollection;
@@ -38,7 +38,6 @@ import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-1667")
@@ -184,37 +183,40 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000250:.*")
+	@Test
 	public void testUninitializedLocale() {
-		Locale defaultLocale = Locale.getDefault();
+		assertThatThrownBy( () -> {
+			Locale defaultLocale = Locale.getDefault();
 
-		try {
-			Locale.setDefault( Locale.FRANCE );
+			try {
+				Locale.setDefault( Locale.FRANCE );
 
-			ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocale( Locale.ENGLISH );
+				ValidatorFactory validatorFactory = getValidatorFactoryWithInitializedLocale( Locale.ENGLISH );
 
-			Validator validator = validatorFactory
-					.usingContext()
-					.messageInterpolator( new MessageInterpolator() {
+				Validator validator = validatorFactory
+						.usingContext()
+						.messageInterpolator( new MessageInterpolator() {
 
-						@Override
-						public String interpolate(String messageTemplate, Context context, Locale locale) {
-							return validatorFactory.getMessageInterpolator().interpolate( messageTemplate, context, locale );
-						}
+							@Override
+							public String interpolate(String messageTemplate, Context context, Locale locale) {
+								return validatorFactory.getMessageInterpolator().interpolate( messageTemplate, context, locale );
+							}
 
-						@Override
-						public String interpolate(String messageTemplate, Context context) {
-							return validatorFactory.getMessageInterpolator().interpolate( messageTemplate, context, Locale.GERMAN );
-						}
-					} ).getValidator();
+							@Override
+							public String interpolate(String messageTemplate, Context context) {
+								return validatorFactory.getMessageInterpolator().interpolate( messageTemplate, context, Locale.GERMAN );
+							}
+						} ).getValidator();
 
-			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
-			assertThat( violations ).containsOnlyViolations(
-					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ) );
-		}
-		finally {
-			Locale.setDefault( defaultLocale );
-		}
+				Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
+				assertThat( violations ).containsOnlyViolations(
+						violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ) );
+			}
+			finally {
+				Locale.setDefault( defaultLocale );
+			}
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000250:.*" );
 	}
 
 	@Test
@@ -272,15 +274,12 @@ public class PredefinedScopeValidatorFactoryTest {
 				.initializeBeanMetaData( beanMetaDataToInitialize )
 				.buildValidatorFactory();
 
-		try {
+		assertThatThrownBy( () -> {
 			Validator validator = validatorFactory.usingContext().traversableResolver( new ThrowExceptionTraversableResolver() )
 					.getValidator();
 			validator.validate( new Bean() );
-			fail();
-		}
-		catch (ValidationException e) {
-			Assertions.assertThat( e ).hasCauseExactlyInstanceOf( ValidatorSpecificTraversableResolverUsedException.class );
-		}
+		} ).isInstanceOf( ValidationException.class )
+				.hasCauseExactlyInstanceOf( ValidatorSpecificTraversableResolverUsedException.class );
 	}
 
 	@Test

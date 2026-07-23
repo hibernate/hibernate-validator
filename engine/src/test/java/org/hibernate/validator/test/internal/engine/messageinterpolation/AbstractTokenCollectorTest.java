@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
@@ -33,19 +35,25 @@ public abstract class AbstractTokenCollectorTest {
 				.returns( false, Token::isParameter );
 	}
 
-	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000169.*")
+	@Test
 	public void testNestedParametersThrowException() {
-		new TokenCollector( "#{foo  {}", getInterpolationTermType() );
+		assertThatThrownBy( () -> new TokenCollector( "#{foo  {}", getInterpolationTermType() ) )
+				.isInstanceOf( MessageDescriptorFormatException.class )
+				.hasMessageMatching( "HV000169.*" );
 	}
 
-	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
+	@Test
 	public void testClosingBraceWithoutOpeningBraceThrowsException() {
-		new TokenCollector( "foo}", getInterpolationTermType() );
+		assertThatThrownBy( () -> new TokenCollector( "foo}", getInterpolationTermType() ) )
+				.isInstanceOf( MessageDescriptorFormatException.class )
+				.hasMessageMatching( "HV000168.*" );
 	}
 
-	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
+	@Test
 	public void testOpeningBraceWithoutClosingBraceThrowsException() {
-		new TokenCollector( "{foo", getInterpolationTermType() );
+		assertThatThrownBy( () -> new TokenCollector( "{foo", getInterpolationTermType() ) )
+				.isInstanceOf( MessageDescriptorFormatException.class )
+				.hasMessageMatching( "HV000168.*" );
 	}
 
 	@Test
@@ -141,9 +149,11 @@ public abstract class AbstractTokenCollectorTest {
 				.returns( false, Token::isParameter );
 	}
 
-	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
+	@Test
 	public void testTrailingClosingBraceThrowsException() {
-		new TokenCollector( "this message contains a invalid parameter start token {", getInterpolationTermType() );
+		assertThatThrownBy( () -> new TokenCollector( "this message contains a invalid parameter start token {", getInterpolationTermType() ) )
+				.isInstanceOf( MessageDescriptorFormatException.class )
+				.hasMessageMatching( "HV000168.*" );
 	}
 
 	@Test

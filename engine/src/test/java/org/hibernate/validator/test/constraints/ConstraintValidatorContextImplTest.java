@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.constraints;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertPathEquals;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.testng.Assert.assertEquals;
@@ -169,10 +170,11 @@ public class ConstraintValidatorContextImplTest {
 		assertMessageAndPath( constraintViolationCreationContextList.get( 1 ), message2, pathWith().bean() );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		ConstraintValidatorContext context = createEmptyHibernateConstraintValidatorReusableContext();
-		context.unwrap( ConstraintValidatorContextImpl.class );
+		assertThatThrownBy( () -> context.unwrap( ConstraintValidatorContextImpl.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test

@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.test.internal.xml.mixedconfiguration;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -95,9 +95,9 @@ public class InheritanceMappingsTest {
 		for ( ConstraintViolation<IFixture> violation : violations ) {
 			if ( violation.getLeafBean() instanceof ICompetition
 					&& "detail.competition.name".equals( violation.getPropertyPath().toString() ) ) {
-				assertEquals( violation.getLeafBean(), fixture.getCompetition() );
+				assertThat( violation.getLeafBean() ).isEqualTo( fixture.getCompetition() );
 				Annotation annotation = violation.getConstraintDescriptor().getAnnotation();
-				assertEquals( annotation.annotationType(), NotNull.class );
+				assertThat( annotation.annotationType() ).isEqualTo( NotNull.class );
 				return;
 			}
 		}

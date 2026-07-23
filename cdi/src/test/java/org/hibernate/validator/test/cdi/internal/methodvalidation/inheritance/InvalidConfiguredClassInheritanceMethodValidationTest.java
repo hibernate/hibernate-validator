@@ -4,8 +4,7 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.enterprise.inject.spi.AnnotatedType;
 import jakarta.enterprise.inject.spi.BeanManager;
@@ -42,16 +41,9 @@ public class InvalidConfiguredClassInheritanceMethodValidationTest extends Arqui
 	public void testInvalidConfigurationThrowsException() {
 		ValidationExtension extension = beanManager.getExtension( ValidationExtension.class );
 		AnnotatedType<CIA> annotatedType = beanManager.createAnnotatedType( CIA.class );
-		try {
-			extension.processAnnotatedType( new ProcessAnnotatedTypeImpl<CIA>( annotatedType ) );
-			fail(
-					"ValidationExtension should throw an exception, because the validated method overrides another " +
-							"method and adds @ValidateOnExecution "
-			);
-		}
-		catch (ValidationException e) {
-			assertThat( e.getMessage() ).startsWith( "HV000166" );
-		}
+		assertThatThrownBy( () -> extension.processAnnotatedType( new ProcessAnnotatedTypeImpl<CIA>( annotatedType ) ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageStartingWith( "HV000166" );
 	}
 
 	public static class ProcessAnnotatedTypeImpl<T> implements ProcessAnnotatedType<T> {

@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.lang.reflect.Method;
 
 import jakarta.validation.ConstraintDeclarationException;
@@ -24,15 +26,17 @@ public class CarTest {
 		executableValidator = factory.getValidator().forExecutables();
 	}
 
-	@Test(expected = ConstraintDeclarationException.class)
+	@Test
 	public void illegalParameterConstraints() throws Exception {
-		Car object = new Car();
-		Method method = Car.class.getMethod( "drive", int.class );
-		Object[] parameterValues = { };
-		executableValidator.validateParameters(
-				object,
-				method,
-				parameterValues
-		);
+		assertThatThrownBy( () -> {
+			Car object = new Car();
+			Method method = Car.class.getMethod( "drive", int.class );
+			Object[] parameterValues = { };
+			executableValidator.validateParameters(
+					object,
+					method,
+					parameterValues
+			);
+		} ).isInstanceOf( ConstraintDeclarationException.class );
 	}
 }
