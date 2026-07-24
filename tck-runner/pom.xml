@@ -58,6 +58,10 @@
             <artifactId>junit-platform-launcher</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>validation-tck-tests</artifactId>
             <version>${version.jakarta.validation.validation-tck}</version>
