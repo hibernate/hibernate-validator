@@ -1,5 +1,13 @@
 # Hibernate Validator Changelog
 
+## 9.1.3.Final (2026-07-26)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40065)
+
+
+### Bug
+* [HV-2231](https://hibernate.atlassian.net/browse/HV-2231) - RegexpURLValidator throws NPE when URL has no authority component
+
 ## 9.1.2.Final (2026-07-06)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/39824)
