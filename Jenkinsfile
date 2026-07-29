@@ -129,6 +129,9 @@ stage('Configure') {
 							condition: TestCondition.AFTER_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '27', testCompilerTool: 'OpenJDK 27 Latest',
 							testLauncherArgs: '--enable-preview',
+							condition: TestCondition.AFTER_MERGE),
+					new JdkBuildEnvironment(testJavaVersion: '28', testCompilerTool: 'OpenJDK 28 Latest',
+							testLauncherArgs: '--enable-preview',
 							condition: TestCondition.AFTER_MERGE)
 			],
 			wildflyTck: [
