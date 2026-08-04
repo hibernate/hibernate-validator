@@ -272,5 +272,17 @@
                 <skip.failsafe.execution>true</skip.failsafe.execution>
             </properties>
         </profile>
+        <profile>
+            <id>testWithJdk28</id>
+            <activation>
+                <property>
+                    <name>java-version.test.release</name>
+                    <value>28</value>
+                </property>
+            </activation>
+            <properties>
+                <skip.failsafe.execution>true</skip.failsafe.execution>
+            </properties>
+        </profile>
     </profiles>
 </project>
