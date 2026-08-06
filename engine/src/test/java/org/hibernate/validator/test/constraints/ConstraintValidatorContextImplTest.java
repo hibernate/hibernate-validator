@@ -7,6 +7,8 @@ package org.hibernate.validator.test.constraints;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertPathEquals;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
@@ -220,6 +222,20 @@ public class ConstraintValidatorContextImplTest {
 				.property( "bar", true, "test", null, Map.class, 0 )
 				.containerElement( "<map value>", true, "key", null, Map.class, 1 )
 				.containerElement( "<list element>", true, null, 3, List.class, 0 ) );
+	}
+
+	@Test
+	public void testCustomizingTheFirstNodeDoesNotAlterPathsCreatedLater() {
+		ConstraintValidatorContextImpl context = createEmptyHibernateConstraintValidatorReusableContext();
+		context.buildConstraintViolationWithTemplate( message )
+				.addPropertyNode( "foo" ).inIterable().atIndex( 3 )
+				.addConstraintViolation();
+
+		MutablePath path = MutablePath.createRootPath();
+		path.addPropertyNode( "bar" );
+
+		assertFalse( path.getLeafNode().isInIterable() );
+		assertNull( path.getLeafNode().getIndex() );
 	}
 
 	private ConstraintValidatorContextImpl createEmptyHibernateConstraintValidatorReusableContext() {
