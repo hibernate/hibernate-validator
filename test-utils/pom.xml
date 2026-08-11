@@ -147,6 +147,28 @@
                                     <goal>jar</goal>
                                 </goals>
                                 <phase>${javadoc.generate.jar.phase}</phase>
+                                <!--
+                                    Reduce the size of per-module javadoc jars published to Maven Central.
+                                    These options are intentionally NOT in the shared pluginManagement configuration,
+                                    so that the aggregated javadoc published to docs.hibernate.org is unaffected.
+                                 -->
+                                <configuration>
+                                    <!--
+                                        Use a separate output directory so that the reduced javadoc
+                                        does not get mixed with the full javadoc from the generate-javadoc execution.
+                                     -->
+                                    <outputDirectory>${project.build.directory}/javadoc-jar</outputDirectory>
+                                    <additionalOptions>
+                                        <additionalOption>-html5</additionalOption>
+                                        <additionalOption>-Xdoclint:all,-missing</additionalOption>
+                                        <!-- Don't repeat inherited method docs; link to the declaring type instead -->
+                                        <additionalOption>--override-methods summary</additionalOption>
+                                    </additionalOptions>
+                                    <!-- class-use pages add significant size; IDEs provide better "find usages" -->
+                                    <use>false</use>
+                                    <!-- Class hierarchy tree adds bulk; IDEs show this better -->
+                                    <notree>true</notree>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
