@@ -55,6 +55,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CONTAINS( "org.hibernate.validator.constraints.Contains" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY( "org.hibernate.validator.constraints.Currency" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_DATE_TIME_FORMAT( "org.hibernate.validator.constraints.DateTimeFormat" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IBAN( "org.hibernate.validator.constraints.IBAN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS( "org.hibernate.validator.constraints.IpAddress" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN( "org.hibernate.validator.constraints.ISBN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH( "org.hibernate.validator.constraints.Length" ),

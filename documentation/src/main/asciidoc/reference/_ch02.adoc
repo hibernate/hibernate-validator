@@ -689,6 +689,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@IBAN`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/International_Bank_Account_Number[IBAN] (International Bank Account Number). The country-specific length and the ISO 7064 MOD 97-10 check digits are both verified. Spaces are ignored during validation.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@IpAddress`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/IP_address[IP address]. `type` determines the version of IP address.
 The default is `ANY`, which means both IPv4 and IPv6 addresses are considered valid.
 	Supported data types::: `CharSequence`

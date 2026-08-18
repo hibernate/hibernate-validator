@@ -51,6 +51,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
@@ -158,6 +159,7 @@ public class MessagePropertiesTest {
 							violationOf( Currency.class ),
 							violationOf( DateTimeFormat.class ),
 							violationOf( EAN.class ),
+							violationOf( IBAN.class ),
 							violationOf( ISBN.class ),
 							violationOf( Length.class ),
 							violationOf( CodePointLength.class ),
@@ -297,6 +299,9 @@ public class MessagePropertiesTest {
 
 		@EAN
 		private String ean = "invalid";
+
+		@IBAN
+		private String iban = "invalid";
 
 		@ISBN
 		private String isbn = "invalid";

@@ -50,6 +50,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
@@ -116,6 +117,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CreditCardNumber.class, new CreditCardNumberBean() );
 		testConstraint( Currency.class, new CurrencyBean() );
 		testConstraint( EAN.class, new EANBean() );
+		testConstraint( IBAN.class, new IBANBean() );
 		testConstraint( ISBN.class, new ISBNBean() );
 		testConstraint( Length.class, new LengthBean() );
 		testConstraint( CodePointLength.class, new CodePointLengthBean() );
@@ -320,6 +322,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@EAN
 		private String ean = "invalid";
+	}
+
+	private static class IBANBean {
+
+		@IBAN
+		private String iban = "invalid";
 	}
 
 	private static class ISBNBean {
