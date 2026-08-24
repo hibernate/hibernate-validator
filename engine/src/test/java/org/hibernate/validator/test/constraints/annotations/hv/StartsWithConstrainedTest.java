@@ -14,12 +14,14 @@ import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
 
 /**
  * @author Koen Aers
  */
+@TestForIssue(jiraKey = "HV-2245")
 public class StartsWithConstrainedTest extends AbstractConstrainedTest {
 
 	@Test
