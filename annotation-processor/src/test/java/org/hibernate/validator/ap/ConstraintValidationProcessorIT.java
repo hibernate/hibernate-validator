@@ -32,6 +32,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithKorRRNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
@@ -795,6 +796,25 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 16 ),
 				new DiagnosticExpectation( Kind.ERROR, 19 ),
 				new DiagnosticExpectation( Kind.ERROR, 22 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2245")
+	public void startsWithConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithStartsWithConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 15 ),
+				new DiagnosticExpectation( Kind.ERROR, 18 ),
+				new DiagnosticExpectation( Kind.ERROR, 21 )
 		);
 	}
 
