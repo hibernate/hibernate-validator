@@ -6,9 +6,11 @@ package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.reflect.Type;
 
+import jakarta.validation.ValidationException;
+
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.PropertyAccessor;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -26,7 +28,7 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	private final boolean isDeclaredOnInterface;
 
-	private final PropertyAccessor propertyAccessor;
+	private final HibernateAccessorValueReader<?> propertyAccessor;
 
 	AbstractPropertyConstraintLocation(T property) {
 		this.property = property;
@@ -70,7 +72,12 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	@Override
 	public Object getValue(Object parent) {
-		return propertyAccessor.getValueFrom( parent );
+		try {
+			return propertyAccessor.get( parent );
+		}
+		catch (Throwable e) {
+			throw new ValidationException( e.getMessage(), e );
+		}
 	}
 
 	@Override

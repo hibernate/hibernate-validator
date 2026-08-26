@@ -525,6 +525,114 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 ----
 ====
 
+[[section-accessor-factory]]
+==== Configuring the `AccessorFactory`
+
+Hibernate Validator uses the `HibernateAccessorFactory` from Hibernate Accessor library to access bean property
+values during validation. By default, a reflection-based factory is used which accesses properties via the
+standard Java Reflection API.
+
+For improved performance in throughput-sensitive scenarios, Hibernate Validator supports switching to
+bytecode-generating accessor factories that produce optimized accessors at startup time, avoiding the overhead
+of reflective calls at validation time.
+Two such factories are available as separate artifacts:
+
+* *ASM-based*: provided by `org.hibernate.accessor:hibernate-accessor-asm`
+* *ByteBuddy-based*: provided by `org.hibernate.accessor:hibernate-accessor-bytebuddy`
+
+To use one of these, add the corresponding dependency to your project:
+
+[source, xml, subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.accessor</groupId>
+    <artifactId>hibernate-accessor-bytebuddy</artifactId>
+    <!-- use the same version as hibernate-accessor -->
+</dependency>
+----
+
+or
+
+[source, xml, subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.accessor</groupId>
+    <artifactId>hibernate-accessor-asm</artifactId>
+    <!-- use the same version as hibernate-accessor -->
+</dependency>
+----
+
+===== Programmatic configuration
+
+To configure the accessor factory programmatically, use `HibernateValidatorConfiguration#accessorFactory()`.
+
+[[example-accessor-factory-bytebuddy-programmatically]]
+.Configuring the ByteBuddy-based `AccessorFactory`
+====
+[source, java, indent=0]
+----
+ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+        .configure()
+        .accessorFactory( HibernateAccessorByteBuddyFactory.factory( MethodHandles.lookup() ) )
+        .buildValidatorFactory();
+----
+====
+
+Or for the ASM-based factory:
+
+[[example-accessor-factory-asm-programmatically]]
+.Configuring the ASM-based `AccessorFactory`
+====
+[source, java, indent=0]
+----
+ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+        .configure()
+        .accessorFactory( HibernateAccessorAsmFactory.factory( MethodHandles.lookup() ) )
+        .buildValidatorFactory();
+----
+====
+
+[NOTE]
+====
+`MethodHandles.lookup()` must be called from a context that has access to the classes whose
+properties will be validated. Typically, this means calling it from within the same module as
+your domain objects, or module to which these domain objects are opened to, so that the generated
+accessors can access package-private or module-private members.
+====
+
+===== XML configuration
+
+To select the accessor factory via XML, set the `hibernate.validator.accessor_factory` property
+in `META-INF/validation.xml` to the fully-qualified class name of the factory implementation.
+The specified class must have a no-arg constructor.
+
+[[example-accessor-factory-xml]]
+.Defining the `AccessorFactory` via XML
+====
+[source, xml, indent=0]
+----
+<validation-config
+        xmlns="https://jakarta.ee/xml/ns/validation/configuration"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/validation/configuration
+            https://jakarta.ee/xml/ns/validation/validation-configuration-3.1.xsd"
+        version="3.1">
+
+    <property name="hibernate.validator.accessor_factory">
+        com.example.MyCustomAccessorFactory
+    </property>
+
+</validation-config>
+----
+====
+
+[NOTE]
+====
+The built-in bytecode-based factories (`HibernateAccessorAsmFactory`, `HibernateAccessorByteBuddyFactory`)
+require a `MethodHandles.Lookup` argument and therefore cannot be used via XML configuration.
+Programmatic configuration is the recommended approach for these factories.
+====
+
 ==== Logging of values under validation
 
 In some cases it might be useful to inspect logs produced by Hibernate Validator.
