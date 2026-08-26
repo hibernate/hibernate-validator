@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAccessorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowMultipleCascadedValidationOnReturnValues;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowOverridingMethodAlterParameterConstraint;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineAllowParallelMethodsDefineParameterConstraints;
@@ -42,6 +43,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.spi.ConfigurationState;
 
+import org.hibernate.accessor.HibernateAccessorFactory;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
@@ -99,6 +101,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 
+	private final HibernateAccessorFactory accessorFactory;
+
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
 	private final ValidationOrderGenerator validationOrderGenerator;
@@ -154,6 +158,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		this.validationOrderGenerator = new ValidationOrderGenerator();
 
 		this.getterPropertySelectionStrategy = ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, externalClassLoader );
+		this.accessorFactory = determineAccessorFactory( hibernateSpecificConfig, properties, externalClassLoader );
 		this.propertyNodeNameProvider = ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, externalClassLoader );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
@@ -169,7 +174,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		);
 
 		ExecutableHelper executableHelper = new ExecutableHelper( typeResolutionHelper );
-		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy, propertyNodeNameProvider );
+		JavaBeanHelper javaBeanHelper = new JavaBeanHelper( getterPropertySelectionStrategy, propertyNodeNameProvider, accessorFactory );
 
 		// first we want to register any validators coming from a service loader. Since they are just loaded and there's
 		// no control over them (include/exclude the ones that already exists from any other sources etc.)
@@ -301,6 +306,11 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	@Override
 	public GetterPropertySelectionStrategy getGetterPropertySelectionStrategy() {
 		return getterPropertySelectionStrategy;
+	}
+
+	@Override
+	public HibernateAccessorFactory getAccessorFactory() {
+		return accessorFactory;
 	}
 
 	@Override
