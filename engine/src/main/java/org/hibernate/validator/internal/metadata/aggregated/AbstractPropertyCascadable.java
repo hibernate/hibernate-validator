@@ -6,13 +6,15 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.Type;
 
+import jakarta.validation.ValidationException;
+
+import org.hibernate.accessor.HibernateAccessorValueReader;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.properties.Field;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.properties.Property;
-import org.hibernate.validator.internal.properties.PropertyAccessor;
 
 /**
  * A {@link Cascadable} backed by a property of a Java bean.
@@ -23,7 +25,7 @@ import org.hibernate.validator.internal.properties.PropertyAccessor;
 public abstract class AbstractPropertyCascadable<T extends Property> implements Cascadable {
 
 	private final T property;
-	private final PropertyAccessor propertyAccessor;
+	private final HibernateAccessorValueReader<?> propertyAccessor;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 
@@ -41,7 +43,20 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 
 	@Override
 	public Object getValue(Object parent) {
-		return propertyAccessor.getValueFrom( parent );
+		try {
+			return propertyAccessor.get( parent );
+		}
+		catch (Error e) {
+			// never wrap fatal/VM errors
+			throw e;
+		}
+		catch (Throwable t) {
+			if ( t instanceof InterruptedException ie ) {
+				Thread.currentThread().interrupt();
+				throw sneakyThrow( ie );
+			}
+			throw new ValidationException( t.getMessage(), t );
+		}
 	}
 
 	@Override
@@ -88,5 +103,10 @@ public abstract class AbstractPropertyCascadable<T extends Property> implements 
 			}
 			throw new IllegalStateException( "It should be either a field or a getter." );
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <E extends Throwable> RuntimeException sneakyThrow(Throwable t) throws E {
+		throw (E) t;
 	}
 }
