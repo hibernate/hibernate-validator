@@ -22,6 +22,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.IBANDef;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.internal.constraintvalidators.hv.IBANValidator;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -92,6 +93,36 @@ public class IBANValidatorTest {
 	}
 
 	@Test
+	public void lowercaseIsInvalidByDefault() throws Exception {
+		// By default lowercase letters are rejected.
+		assertInvalidIBAN( "gb82west12345698765432" );
+		assertInvalidIBAN( "GB82west12345698765432" );
+	}
+
+	@Test
+	public void lowercaseIsValidWhenAllowed() throws Exception {
+		validator.initialize( createIBANAnnotation( true ) );
+
+		assertValidIBAN( null );
+		assertValidIBAN( "gb82west12345698765432" );
+		assertValidIBAN( "GB82west12345698765432" );
+		assertValidIBAN( "de89370400440532013000" );
+		// Uppercase and spaces keep working when lowercase is allowed.
+		assertValidIBAN( "GB82WEST12345698765432" );
+		assertValidIBAN( "gb82 west 1234 5698 7654 32" );
+	}
+
+	@Test
+	public void allowLowercaseStillRejectsInvalidIBAN() throws Exception {
+		validator.initialize( createIBANAnnotation( true ) );
+
+		// Wrong check digits are still rejected regardless of case.
+		assertInvalidIBAN( "gb94west12345698765432" );
+		// Unknown country is still rejected regardless of case.
+		assertInvalidIBAN( "zz82west12345698765432" );
+	}
+
+	@Test
 	public void testProgrammaticDefinition() throws Exception {
 		HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -116,6 +147,13 @@ public class IBANValidatorTest {
 
 	private void assertInvalidIBAN(String iban) {
 		assertFalse( validator.isValid( iban, null ), iban + " should be an invalid IBAN" );
+	}
+
+	private IBAN createIBANAnnotation(boolean allowLowercase) {
+		ConstraintAnnotationDescriptor.Builder<IBAN> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( IBAN.class );
+		descriptorBuilder.setAttribute( "allowLowercase", allowLowercase );
+
+		return descriptorBuilder.build().getAnnotation();
 	}
 
 	private static class Account {
