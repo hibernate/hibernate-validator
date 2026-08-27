@@ -37,10 +37,21 @@ public class IBANValidator implements ConstraintValidator<IBAN, CharSequence> {
 	 */
 	private static final Map<String, Integer> IBAN_COUNTRY_LENGTHS = buildCountryLengths();
 
+	private boolean allowLowercase;
+
+	@Override
+	public void initialize(IBAN parameters) {
+		allowLowercase = parameters.allowLowercase();
+	}
+
 	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null ) {
 			return true;
+		}
+
+		if ( !allowLowercase && !isUpperCase( value ) ) {
+			return false;
 		}
 
 		// Spaces are used to group characters when printing an IBAN, they are not part of the actual number.
@@ -83,6 +94,16 @@ public class IBANValidator implements ConstraintValidator<IBAN, CharSequence> {
 			}
 		}
 		return mod == 1;
+	}
+
+	private boolean isUpperCase(CharSequence value) {
+		for ( int i = 0; i < value.length(); i++ ) {
+			char c = value.charAt( i );
+			if ( Character.isLetter( c ) && !Character.isUpperCase( c ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private static Map<String, Integer> buildCountryLengths() {

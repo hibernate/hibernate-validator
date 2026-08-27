@@ -20,6 +20,7 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.IBAN.List;
 
 /**
@@ -42,6 +43,7 @@ import org.hibernate.validator.constraints.IBAN.List;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
+@Incubating
 public @interface IBAN {
 
 	String message() default "{org.hibernate.validator.constraints.IBAN.message}";
@@ -50,13 +52,15 @@ public @interface IBAN {
 
 	Class<? extends Payload>[] payload() default { };
 
+	boolean allowLowercase() default false;
+
 	/**
 	 * Defines several {@code @IBAN} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
 	@Documented
-	public @interface List {
+	@interface List {
 
 		IBAN[] value();
 	}

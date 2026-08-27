@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.cfg.defs;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.IBAN;
 
@@ -13,6 +14,7 @@ import org.hibernate.validator.constraints.IBAN;
  * @author Andrea Boriero
  * @since 9.2
  */
+@Incubating
 public class IBANDef extends ConstraintDef<IBANDef, IBAN> {
 
 	public IBANDef() {
