@@ -263,7 +263,7 @@
         <version.sisu-maven-plugin>1.1.0</version.sisu-maven-plugin>
         <version.versions.plugin>2.21.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>3.10.0</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>3.10.1</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.15</version.jacoco.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
