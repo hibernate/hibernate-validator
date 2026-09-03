@@ -45,6 +45,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.constraints.BIC;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.Contains;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -164,6 +165,7 @@ public class MessagePropertiesTest {
 							violationOf( Currency.class ),
 							violationOf( DateTimeFormat.class ),
 							violationOf( EAN.class ),
+							violationOf( BIC.class ),
 							violationOf( IBAN.class ),
 							violationOf( ISBN.class ),
 							violationOf( Length.class ),
@@ -309,6 +311,9 @@ public class MessagePropertiesTest {
 
 		@EAN
 		private String ean = "invalid";
+
+		@BIC
+		private String bic = "invalid";
 
 		@IBAN
 		private String iban = "invalid";
