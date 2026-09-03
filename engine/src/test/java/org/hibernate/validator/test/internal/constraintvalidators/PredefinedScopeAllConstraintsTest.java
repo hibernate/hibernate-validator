@@ -44,6 +44,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
+import org.hibernate.validator.constraints.BIC;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.Contains;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -117,6 +118,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CreditCardNumber.class, new CreditCardNumberBean() );
 		testConstraint( Currency.class, new CurrencyBean() );
 		testConstraint( EAN.class, new EANBean() );
+		testConstraint( BIC.class, new BICBean() );
 		testConstraint( IBAN.class, new IBANBean() );
 		testConstraint( ISBN.class, new ISBNBean() );
 		testConstraint( Length.class, new LengthBean() );
@@ -322,6 +324,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@EAN
 		private String ean = "invalid";
+	}
+
+	private static class BICBean {
+
+		@BIC
+		private String bic = "invalid";
 	}
 
 	private static class IBANBean {

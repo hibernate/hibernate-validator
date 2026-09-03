@@ -689,6 +689,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@BIC`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/ISO_9362[BIC] (Bank Identifier Code / SWIFT code) per ISO 9362. The structural format is validated: proper length (8 or 11 characters), valid character sets per position, and valid ISO 3166-1 alpha-2 country code. Optional filtering by country codes (`countryCodes`) and bank codes (`bankCodes`) is supported.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@IBAN`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/International_Bank_Account_Number[IBAN] (International Bank Account Number). The country-specific length and the ISO 7064 MOD 97-10 check digits are both verified. Spaces are ignored during validation.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
