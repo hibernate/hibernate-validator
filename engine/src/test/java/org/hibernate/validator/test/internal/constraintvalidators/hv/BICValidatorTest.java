@@ -9,6 +9,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
@@ -206,6 +207,31 @@ public class BICValidatorTest {
 		// Test BICs (position 8 = '0') are valid
 		assertValidBIC( "DEUTDE0F" );
 		assertValidBIC( "DEUTDE0FXXX" );
+	}
+
+	@Test
+	public void testInvalidCountryCodeInAttribute() throws Exception {
+		// Invalid country codes in the countryCodes attribute should throw IllegalArgumentException
+		assertThrows( IllegalArgumentException.class, () -> {
+			validator.initialize( createBICAnnotation( false, new String[] { "ZZ" }, new String[0] ) );
+		} );
+
+		assertThrows( IllegalArgumentException.class, () -> {
+			validator.initialize( createBICAnnotation( false, new String[] { "DE", "INVALID" }, new String[0] ) );
+		} );
+
+		assertThrows( IllegalArgumentException.class, () -> {
+			validator.initialize( createBICAnnotation( false, new String[] { "XX" }, new String[0] ) );
+		} );
+	}
+
+	@Test
+	public void testValidCountryCodeInAttribute() throws Exception {
+		// Valid country codes including Kosovo (XK) should not throw
+		validator.initialize( createBICAnnotation( false, new String[] { "DE", "FR", "XK" }, new String[0] ) );
+		assertValidBIC( "DEUTDEFF" );
+		assertValidBIC( "SOGEFRPP" );
+		assertValidBIC( "RBKOXKPR" );
 	}
 
 	@Test
