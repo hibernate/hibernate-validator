@@ -665,7 +665,7 @@ message, groups and payload. This is a requirement of the Jakarta Validation spe
 In addition to the constraints defined by the Jakarta Validation API, Hibernate Validator provides several useful custom constraints which are listed below.
 With one exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-level constraint.
 
-`@BIC`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/ISO_9362[BIC] (Bank Identifier Code / SWIFT code) per ISO 9362. The structural format is validated: proper length (8 or 11 characters), valid character sets per position, and valid ISO 3166-1 alpha-2 country code. Optional filtering by country codes (`countryCodes`) and bank codes (`bankCodes`) is supported.
+`@BIC`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/ISO_9362[BIC] (Bank Identifier Code / SWIFT code) per ISO 9362. The structural format is validated: proper length (8 or 11 characters), ASCII letters and digits with an alphanumeric institution prefix, and valid ISO 3166-1 alpha-2 country code. Optional filtering by country codes (`countryCodes`) and bank codes (`bankCodes`) is supported.
     Supported data types::: `CharSequence`
     Hibernate metadata impact::: None
 

@@ -9,6 +9,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.BICValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -72,10 +74,57 @@ public class BICValidatorTest {
 
 	@Test
 	public void invalidBankCode() throws Exception {
-		// Bank code (positions 1-4) must be letters only
-		assertInvalidBIC( "D3UTDEFF" );
-		assertInvalidBIC( "DEU1DEFF" );
+		// Bank code (positions 1-4) must be ASCII alphanumeric
+		assertInvalidBIC( "D-UTDEFF" );
+		assertInvalidBIC( "DEU DEFF" );
 		assertInvalidBIC( "deuTDEFF" );
+	}
+
+	@DataProvider
+	public Object[][] lowercaseModes() {
+		return new Object[][] { { false }, { true } };
+	}
+
+	@Test(dataProvider = "lowercaseModes")
+	public void alphanumericBankCodes(boolean allowLowercase) {
+		validator.initialize( createBICAnnotation( allowLowercase, new String[0], new String[0] ) );
+		assertValidBIC( "D3UTDEFF" );
+		assertValidBIC( "DEU1DEFF500" );
+		assertValidBIC( "1234DEFF" );
+
+		validator.initialize( createBICAnnotation( allowLowercase, new String[] { "DE" }, new String[] { "d3ut" } ) );
+		assertValidBIC( "D3UTDEFF" );
+		assertValidBIC( "D3UTDEFF500" );
+		assertInvalidBIC( "DEU1DEFF" );
+		if ( allowLowercase ) {
+			assertValidBIC( "d3utdeff" );
+		}
+		else {
+			assertInvalidBIC( "d3utdeff" );
+		}
+	}
+
+	@Test(dataProvider = "lowercaseModes")
+	public void nonAsciiCharactersAreInvalid(boolean allowLowercase) {
+		validator.initialize( createBICAnnotation( allowLowercase, new String[0], new String[0] ) );
+		// Greek/fullwidth letters, Arabic/fullwidth digits and uncased letters.
+		assertInvalidBIC( "D\u0395UTDEFF" );
+		assertInvalidBIC( "\uFF24EUTDEFF" );
+		assertInvalidBIC( "D\u0661UTDEFF" );
+		assertInvalidBIC( "DEUT\uFF24EFF" );
+		assertInvalidBIC( "DEUTDE\u0395F" );
+		assertInvalidBIC( "DEUTDE\u0661F" );
+		assertInvalidBIC( "DEUTDEFF\u0395XX" );
+		assertInvalidBIC( "DEUTDEFF\uFF11XX" );
+		assertInvalidBIC( "DEUTDEFF\u4E2D\u4E2D\u4E2D" );
+
+		// Reject non-ASCII letters before uppercase conversion can match an allowlist.
+		validator.initialize( createBICAnnotation( allowLowercase, new String[] { "IS" }, new String[] { "DEUT" } ) );
+		assertInvalidBIC( "DEUT\u0131SFF" );
+		assertValidBIC( "DEUTISFF" );
+		validator.initialize( createBICAnnotation( allowLowercase, new String[] { "DE" }, new String[] { "DIUT" } ) );
+		assertInvalidBIC( "D\u0131UTDEFF" );
+		assertValidBIC( "DIUTDEFF" );
 	}
 
 	@Test
@@ -206,6 +255,31 @@ public class BICValidatorTest {
 		// Test BICs (position 8 = '0') are valid
 		assertValidBIC( "DEUTDE0F" );
 		assertValidBIC( "DEUTDE0FXXX" );
+	}
+
+	@Test
+	public void testInvalidCountryCodeInAttribute() throws Exception {
+		// Invalid country codes in the countryCodes attribute should throw IllegalArgumentException
+		assertThrows( IllegalArgumentException.class, () -> {
+			validator.initialize( createBICAnnotation( false, new String[] { "ZZ" }, new String[0] ) );
+		} );
+
+		assertThrows( IllegalArgumentException.class, () -> {
+			validator.initialize( createBICAnnotation( false, new String[] { "DE", "INVALID" }, new String[0] ) );
+		} );
+
+		assertThrows( IllegalArgumentException.class, () -> {
+			validator.initialize( createBICAnnotation( false, new String[] { "XX" }, new String[0] ) );
+		} );
+	}
+
+	@Test
+	public void testValidCountryCodeInAttribute() throws Exception {
+		// Valid country codes including Kosovo (XK) should not throw
+		validator.initialize( createBICAnnotation( false, new String[] { "DE", "FR", "XK" }, new String[0] ) );
+		assertValidBIC( "DEUTDEFF" );
+		assertValidBIC( "SOGEFRPP" );
+		assertValidBIC( "RBKOXKPR" );
 	}
 
 	@Test

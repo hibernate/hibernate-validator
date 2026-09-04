@@ -28,10 +28,10 @@ import org.hibernate.validator.constraints.BIC.List;
  * <a href="https://en.wikipedia.org/wiki/ISO_9362">BIC</a>
  * (Bank Identifier Code, also known as SWIFT code).
  * <p>
- * The constraint validates the structure per ISO 9362:
+ * The constraint validates the structure per ISO 9362 using ASCII letters and digits:
  * <ul>
  *     <li>Length must be exactly 8 or 11 characters</li>
- *     <li>Positions 1-4: Institution (bank) code - 4 letters</li>
+ *     <li>Positions 1-4: Institution (bank) code - 4 alphanumeric characters</li>
  *     <li>Positions 5-6: Country code - 2 letters (ISO 3166-1 alpha-2, including 'XK' for Kosovo)</li>
  *     <li>Positions 7-8: Location code - 2 alphanumeric characters</li>
  *     <li>Positions 9-11: Branch code - 3 alphanumeric characters (optional)</li>
@@ -75,7 +75,7 @@ public @interface BIC {
 	String[] countryCodes() default { };
 
 	/**
-	 * @return the allowed 4-letter institution (bank) codes (positions 1-4 of the BIC).
+	 * @return the allowed 4-character alphanumeric institution (bank) codes (positions 1-4 of the BIC).
 	 * An empty array (default) means all bank codes are accepted.
 	 * When specified, only BICs with the listed bank codes will be considered valid.
 	 * Bank codes are matched case-insensitively.
