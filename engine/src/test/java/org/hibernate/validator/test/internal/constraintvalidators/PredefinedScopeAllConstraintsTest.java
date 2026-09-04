@@ -66,6 +66,7 @@ import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.StartsWith;
+import org.hibernate.validator.constraints.Trimmed;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -134,6 +135,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( NullOrNotEmpty.class, new NullOrNotEmptyBean() );
 		testConstraint( Port.class, new PortBean() );
 		testConstraint( Range.class, new RangeBean() );
+		testConstraint( Trimmed.class, new TrimmedBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( LowerCase.class, new LowerCaseBean() );
 		testConstraint( UpperCase.class, new UpperCaseBean() );
@@ -423,6 +425,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
+	}
+
+	private static class TrimmedBean {
+
+		@Trimmed
+		private String trimmed = " foo ";
 	}
 
 	private static class UniqueElementsBean {

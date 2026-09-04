@@ -98,6 +98,7 @@ public class TypeNames {
 		public static final String NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotEmpty";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
 		public static final String STARTS_WITH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".StartsWith";
+		public static final String TRIMMED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Trimmed";
 		public static final String UNIQUE_ELEMENTS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UniqueElements";
 		public static final String LOWERCASE = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LowerCase";
 		public static final String UPPERCASE = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UpperCase";
