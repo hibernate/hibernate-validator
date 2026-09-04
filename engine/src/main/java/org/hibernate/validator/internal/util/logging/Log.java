@@ -974,4 +974,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 277, value = "Unable to instantiate accessor factory class %s.")
 	ValidationException getUnableToInstantiateAccessorFactoryClassException(String accessorFactoryClassName, @Cause Exception e);
+
+	@Message(id = 278, value = "The prefix must not start with %1$s.")
+	IllegalArgumentException getPrefixCannotStartWithException(char c);
+
+	@Message(id = 279, value = "The prefix must not end with %1$s.")
+	IllegalArgumentException getPrefixCannotEndWithException(char c);
 }
