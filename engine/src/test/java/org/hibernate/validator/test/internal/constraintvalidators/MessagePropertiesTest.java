@@ -67,6 +67,7 @@ import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.StartsWith;
+import org.hibernate.validator.constraints.Trimmed;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -176,6 +177,7 @@ public class MessagePropertiesTest {
 							violationOf( NullOrNotEmpty.class ),
 							violationOf( Port.class ),
 							violationOf( Range.class ),
+							violationOf( Trimmed.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( LowerCase.class ),
 							violationOf( UpperCase.class ),
@@ -346,6 +348,9 @@ public class MessagePropertiesTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
+
+		@Trimmed
+		private String trimmed = " foo ";
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );

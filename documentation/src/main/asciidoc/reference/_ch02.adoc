@@ -689,6 +689,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@EndsWith(value=, ignoreCase=)`:: Validates that the annotated character sequence ends with at least one of the specified suffixes. When `ignoreCase` is set to `true`, the comparison is case-insensitive using `Locale.ROOT`.
+    Supported data types::: `CharSequence`
+    Hibernate metadata impact::: None
+
 `@IBAN`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/International_Bank_Account_Number[IBAN] (International Bank Account Number). The country-specific length and the ISO 7064 MOD 97-10 check digits are both verified. Spaces are ignored during validation.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
@@ -751,10 +755,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Hibernate metadata impact::: None
 
 `@StartsWith(value=, ignoreCase=)`:: Validates that the annotated character sequence starts with at least one of the specified prefixes. When `ignoreCase` is set to `true`, the comparison is case-insensitive using `Locale.ROOT`.
-	Supported data types::: `CharSequence`
-	Hibernate metadata impact::: None
+    Supported data types::: `CharSequence`
+    Hibernate metadata impact::: None
 
-`@EndsWith(value=, ignoreCase=)`:: Validates that the annotated character sequence ends with at least one of the specified suffixes. When `ignoreCase` is set to `true`, the comparison is case-insensitive using `Locale.ROOT`.
+`@Trimmed`:: Checks that the annotated character sequence has no leading or trailing whitespace. A character is considered whitespace according to `Character.isWhitespace(int)`, matching `String.strip()` semantics. `null` and empty sequences are considered valid.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
