@@ -52,6 +52,7 @@ import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
@@ -158,6 +159,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( StartsWith.class, new StartsWithBean() );
 		testConstraint( EndsWith.class, new EndsWithBean() );
 		testConstraint( UUID.class, new UUIDBean() );
+		testConstraint( Hexadecimal.class, new HexadecimalBean() );
 		testConstraint( DateTimeFormat.class, new DateTimeFormatBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
@@ -563,6 +565,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@DateTimeFormat(pattern = "dd-MM-yyyy")
 		private String dateTimeFormat = "invalid";
+	}
+
+	private static class HexadecimalBean {
+
+		@Hexadecimal
+		private String hexadecimal = "invalid-hex-!";
 	}
 
 }

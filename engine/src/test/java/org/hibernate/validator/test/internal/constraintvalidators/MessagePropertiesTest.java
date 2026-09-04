@@ -53,6 +53,7 @@ import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
@@ -167,6 +168,7 @@ public class MessagePropertiesTest {
 							violationOf( EAN.class ),
 							violationOf( BIC.class ),
 							violationOf( IBAN.class ),
+							violationOf( Hexadecimal.class ),
 							violationOf( ISBN.class ),
 							violationOf( Length.class ),
 							violationOf( CodePointLength.class ),
@@ -317,6 +319,9 @@ public class MessagePropertiesTest {
 
 		@IBAN
 		private String iban = "invalid";
+
+		@Hexadecimal
+		private String hexadecimal = "invalid-hex-!";
 
 		@ISBN
 		private String isbn = "invalid";
