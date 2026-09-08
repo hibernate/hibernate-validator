@@ -157,7 +157,7 @@
         -->
         <version.com.fasterxml.classmate>1.7.3</version.com.fasterxml.classmate>
         <version.joda-time>2.14.3</version.joda-time>
-        <version.org.slf4j>2.0.18</version.org.slf4j>
+        <version.org.slf4j>2.0.19</version.org.slf4j>
         <version.org.apache.logging.log4j>2.26.1</version.org.apache.logging.log4j>
 
         <!--
@@ -197,12 +197,12 @@
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.7.0</version.org.easymock>
         <version.io.rest-assured>6.0.1</version.io.rest-assured>
-        <version.org.apache.groovy>5.1.1</version.org.apache.groovy>
+        <version.org.apache.groovy>5.1.2</version.org.apache.groovy>
         <version.com.google.guava>33.7.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>7.0.9</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.tools.jackson.core.jackson-bom>3.2.2</version.tools.jackson.core.jackson-bom>
-        <version.net.bytebuddy.byte-buddy>1.18.12</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.18.13</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -218,7 +218,7 @@
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
-        <puppycrawl.checkstyle.version>14.0.0</puppycrawl.checkstyle.version>
+        <puppycrawl.checkstyle.version>14.1.0</puppycrawl.checkstyle.version>
 
         <!-- Asciidoctor -->
 
@@ -233,10 +233,10 @@
         <version.antrun.plugin>3.2.0</version.antrun.plugin>
         <version.assembly.plugin>3.8.0</version.assembly.plugin>
         <version.buildhelper.plugin>3.6.1</version.buildhelper.plugin>
-        <version.bundle.plugin>6.1.0</version.bundle.plugin>
+        <version.bundle.plugin>6.1.2</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
         <version.clean.plugin>3.5.0</version.clean.plugin>
-        <version.compiler.plugin>3.15.0</version.compiler.plugin>
+        <version.compiler.plugin>3.16.0</version.compiler.plugin>
         <version.copy.plugin>1.0.0</version.copy.plugin>
         <version.dependency.plugin>3.8.1</version.dependency.plugin>
         <version.depends.plugin>1.5.0</version.depends.plugin>
@@ -246,7 +246,7 @@
         <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>5.1.0</version.gmavenplus.plugin>
         <version.install.plugin>3.1.4</version.install.plugin>
-        <version.japicmp.plugin>0.26.1</version.japicmp.plugin>
+        <version.japicmp.plugin>0.26.2</version.japicmp.plugin>
         <version.jar.plugin>3.5.1</version.jar.plugin>
         <version.jqassistant.plugin>2.9.1</version.jqassistant.plugin>
         <version.javadoc.plugin>3.12.0</version.javadoc.plugin>
@@ -255,7 +255,7 @@
         <version.shade.plugin>3.6.2</version.shade.plugin>
         <version.sigtest.plugin>2.7</version.sigtest.plugin>
         <version.source.plugin>3.4.0</version.source.plugin>
-        <version.surefire.plugin>3.5.6</version.surefire.plugin>
+        <version.surefire.plugin>3.6.0</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.10.1</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.flatten-maven-plugin>1.8.0</version.flatten-maven-plugin>
@@ -263,7 +263,7 @@
         <version.sisu-maven-plugin>1.1.0</version.sisu-maven-plugin>
         <version.versions.plugin>2.21.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>3.10.1</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>3.10.2</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.15</version.jacoco.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
