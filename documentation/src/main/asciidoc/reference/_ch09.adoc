@@ -528,7 +528,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 [[section-accessor-factory]]
 ==== Configuring the `AccessorFactory`
 
-Hibernate Validator uses the `HibernateAccessorFactory` from Hibernate Accessor library to access bean property
+Hibernate Validator uses the `AccessorFactory` from Hibernate Accessor library to access bean property
 values during validation. By default, a reflection-based factory is used which accesses properties via the
 standard Java Reflection API.
 
@@ -573,7 +573,7 @@ To configure the accessor factory programmatically, use `HibernateValidatorConfi
 ----
 ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
         .configure()
-        .accessorFactory( HibernateAccessorByteBuddyFactory.factory( MethodHandles.lookup() ) )
+        .accessorFactory( ByteBuddyAccessorFactory.factory( MethodHandles.lookup() ) )
         .buildValidatorFactory();
 ----
 ====
@@ -587,7 +587,7 @@ Or for the ASM-based factory:
 ----
 ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
         .configure()
-        .accessorFactory( HibernateAccessorAsmFactory.factory( MethodHandles.lookup() ) )
+        .accessorFactory( AsmAccessorFactory.factory( MethodHandles.lookup() ) )
         .buildValidatorFactory();
 ----
 ====
@@ -628,7 +628,7 @@ The specified class must have a no-arg constructor.
 
 [NOTE]
 ====
-The built-in bytecode-based factories (`HibernateAccessorAsmFactory`, `HibernateAccessorByteBuddyFactory`)
+The built-in bytecode-based factories (`AsmAccessorFactory`, `ByteBuddyAccessorFactory`)
 require a `MethodHandles.Lookup` argument and therefore cannot be used via XML configuration.
 Programmatic configuration is the recommended approach for these factories.
 ====

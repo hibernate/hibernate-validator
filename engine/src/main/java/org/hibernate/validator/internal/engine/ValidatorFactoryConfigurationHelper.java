@@ -17,7 +17,7 @@ import java.util.Set;
 
 import jakarta.validation.spi.ConfigurationState;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
@@ -348,7 +348,7 @@ final class ValidatorFactoryConfigurationHelper {
 		return new DefaultGetterPropertySelectionStrategy();
 	}
 
-	static HibernateAccessorFactory determineAccessorFactory(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
+	static AccessorFactory determineAccessorFactory(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
 			ClassLoader externalClassLoader) {
 		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getAccessorFactory() != null ) {
 			LOG.usingAccessorFactory( hibernateSpecificConfig.getAccessorFactory().getClass() );
@@ -359,9 +359,9 @@ final class ValidatorFactoryConfigurationHelper {
 		if ( accessorFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<? extends HibernateAccessorFactory> clazz =
-						(Class<? extends HibernateAccessorFactory>) LoadClass.action( accessorFactoryFqcn, externalClassLoader );
-				HibernateAccessorFactory accessorFactory = NewInstance.action( clazz, "accessor factory class" );
+				Class<? extends AccessorFactory> clazz =
+						(Class<? extends AccessorFactory>) LoadClass.action( accessorFactoryFqcn, externalClassLoader );
+				AccessorFactory accessorFactory = NewInstance.action( clazz, "accessor factory class" );
 				LOG.usingAccessorFactory( clazz );
 
 				return accessorFactory;
@@ -371,7 +371,7 @@ final class ValidatorFactoryConfigurationHelper {
 			}
 		}
 
-		return HibernateAccessorFactory.reflection();
+		return AccessorFactory.reflection();
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig) {

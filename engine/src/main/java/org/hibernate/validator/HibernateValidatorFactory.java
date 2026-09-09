@@ -9,7 +9,7 @@ import java.time.Duration;
 
 import jakarta.validation.ValidatorFactory;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -66,7 +66,7 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 * @since 9.2.0
 	 */
 	@Incubating
-	HibernateAccessorFactory getAccessorFactory();
+	AccessorFactory getAccessorFactory();
 
 	/**
 	 * Returns the property node name provider used to resolve the name of a property node when creating the property path.

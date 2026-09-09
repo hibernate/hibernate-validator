@@ -44,7 +44,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.spi.ConfigurationState;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
@@ -299,7 +299,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	@Override
-	public HibernateAccessorFactory getAccessorFactory() {
+	public AccessorFactory getAccessorFactory() {
 		return javaBeanHelper.getAccessorFactory();
 	}
 

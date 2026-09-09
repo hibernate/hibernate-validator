@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 
 import jakarta.validation.ValidationException;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.properties.Property;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -28,7 +28,7 @@ public abstract class AbstractPropertyConstraintLocation<T extends Property> imp
 
 	private final boolean isDeclaredOnInterface;
 
-	private final HibernateAccessorValueReader<?> propertyAccessor;
+	private final ValueReader<?> propertyAccessor;
 
 	AbstractPropertyConstraintLocation(T property) {
 		this.property = property;

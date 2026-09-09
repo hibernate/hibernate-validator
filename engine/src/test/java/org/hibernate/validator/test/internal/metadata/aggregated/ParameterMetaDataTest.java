@@ -22,7 +22,7 @@ import jakarta.validation.executable.ExecutableType;
 import jakarta.validation.executable.ValidateOnExecution;
 import jakarta.validation.groups.Default;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
@@ -64,7 +64,7 @@ public class ParameterMetaDataTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), HibernateAccessorFactory.reflection() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ),
 				new DefaultBeanMetaDataClassNormalizer(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
@@ -136,7 +136,7 @@ public class ParameterMetaDataTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), HibernateAccessorFactory.reflection() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ),
 				new DefaultBeanMetaDataClassNormalizer(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),

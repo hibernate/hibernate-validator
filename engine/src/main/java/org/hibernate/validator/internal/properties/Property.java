@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.internal.properties;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 
 /**
  * @author Marko Bekhta
@@ -15,5 +15,5 @@ public interface Property extends Constrainable {
 
 	String getResolvedPropertyName();
 
-	HibernateAccessorValueReader<?> createAccessor();
+	ValueReader<?> createAccessor();
 }
