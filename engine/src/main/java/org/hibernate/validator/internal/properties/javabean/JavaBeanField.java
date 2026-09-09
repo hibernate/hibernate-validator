@@ -10,8 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -23,9 +23,9 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	private final String resolvedPropertyName;
 	private final Type typeForValidatorResolution;
 	private final Type type;
-	private final HibernateAccessorFactory accessorFactory;
+	private final AccessorFactory accessorFactory;
 
-	public JavaBeanField(Field field, String resolvedPropertyName, HibernateAccessorFactory accessorFactory) {
+	public JavaBeanField(Field field, String resolvedPropertyName, AccessorFactory accessorFactory) {
 		this.field = field;
 		this.type = ReflectionHelper.typeOf( field );
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( this.type );
@@ -89,7 +89,7 @@ public class JavaBeanField implements org.hibernate.validator.internal.propertie
 	}
 
 	@Override
-	public HibernateAccessorValueReader<?> createAccessor() {
+	public ValueReader<?> createAccessor() {
 		return accessorFactory.valueReader( field );
 	}
 

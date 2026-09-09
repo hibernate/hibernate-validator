@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.actions.GetDeclaredConstructor;
@@ -35,10 +35,10 @@ public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
-	private final HibernateAccessorFactory accessorFactory;
+	private final AccessorFactory accessorFactory;
 
 	public JavaBeanHelper(GetterPropertySelectionStrategy getterPropertySelectionStrategy, PropertyNodeNameProvider propertyNodeNameProvider,
-			HibernateAccessorFactory accessorFactory) {
+			AccessorFactory accessorFactory) {
 		this.getterPropertySelectionStrategy = getterPropertySelectionStrategy;
 		this.propertyNodeNameProvider = propertyNodeNameProvider;
 		this.accessorFactory = accessorFactory;
@@ -53,7 +53,7 @@ public class JavaBeanHelper implements PropertyNodeNameProviderContext {
 		return propertyNodeNameProvider;
 	}
 
-	public HibernateAccessorFactory getAccessorFactory() {
+	public AccessorFactory getAccessorFactory() {
 		return accessorFactory;
 	}
 

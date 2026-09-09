@@ -20,7 +20,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.DecimalMin;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
@@ -45,7 +45,7 @@ public class MappingXmlParserTest {
 		constraintCreationContext = getDummyConstraintCreationContext();
 		xmlMappingParser = new MappingXmlParser(
 				constraintCreationContext,
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), HibernateAccessorFactory.reflection() ), null
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ), null
 		);
 	}
 

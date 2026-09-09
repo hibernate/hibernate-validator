@@ -43,7 +43,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.spi.ConfigurationState;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
@@ -101,7 +101,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 	private final GetterPropertySelectionStrategy getterPropertySelectionStrategy;
 
-	private final HibernateAccessorFactory accessorFactory;
+	private final AccessorFactory accessorFactory;
 
 	private final PropertyNodeNameProvider propertyNodeNameProvider;
 
@@ -309,7 +309,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	}
 
 	@Override
-	public HibernateAccessorFactory getAccessorFactory() {
+	public AccessorFactory getAccessorFactory() {
 		return accessorFactory;
 	}
 
