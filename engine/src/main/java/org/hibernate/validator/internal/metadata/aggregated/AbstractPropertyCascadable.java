@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 
 import jakarta.validation.ValidationException;
 
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -25,7 +25,7 @@ import org.hibernate.validator.internal.properties.Property;
 public abstract class AbstractPropertyCascadable<T extends Property> implements Cascadable {
 
 	private final T property;
-	private final HibernateAccessorValueReader<?> propertyAccessor;
+	private final ValueReader<?> propertyAccessor;
 	private final Type cascadableType;
 	private final CascadingMetaData cascadingMetaData;
 

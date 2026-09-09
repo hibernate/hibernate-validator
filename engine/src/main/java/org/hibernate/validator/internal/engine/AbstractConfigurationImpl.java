@@ -33,7 +33,7 @@ import jakarta.validation.spi.ConfigurationState;
 import jakarta.validation.spi.ValidationProvider;
 import jakarta.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
@@ -127,7 +127,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
 	private GetterPropertySelectionStrategy getterPropertySelectionStrategy;
-	private HibernateAccessorFactory accessorFactory;
+	private AccessorFactory accessorFactory;
 	private Set<Locale> locales = Collections.emptySet();
 	private Locale defaultLocale = Locale.getDefault();
 	private LocaleResolver localeResolver;
@@ -383,7 +383,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	}
 
 	@Override
-	public T accessorFactory(HibernateAccessorFactory accessorFactory) {
+	public T accessorFactory(AccessorFactory accessorFactory) {
 		Contracts.assertNotNull( accessorFactory, MESSAGES.parameterMustNotBeNull( "accessorFactory" ) );
 
 		this.accessorFactory = accessorFactory;
@@ -419,7 +419,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return new DefaultConstraintMapping( new JavaBeanHelper(
 				getterPropertySelectionStrategy == null ? new DefaultGetterPropertySelectionStrategy() : getterPropertySelectionStrategy,
 				validationBootstrapParameters.getPropertyNodeNameProvider() == null ? defaultPropertyNodeNameProvider : validationBootstrapParameters.getPropertyNodeNameProvider(),
-				accessorFactory == null ? HibernateAccessorFactory.reflection() : accessorFactory
+				accessorFactory == null ? AccessorFactory.reflection() : accessorFactory
 		) );
 	}
 
@@ -587,7 +587,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return getterPropertySelectionStrategy;
 	}
 
-	public HibernateAccessorFactory getAccessorFactory() {
+	public AccessorFactory getAccessorFactory() {
 		return accessorFactory;
 	}
 

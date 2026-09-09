@@ -6,8 +6,8 @@ package org.hibernate.validator.internal.properties.javabean;
 
 import java.lang.reflect.Method;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
-import org.hibernate.accessor.HibernateAccessorValueReader;
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.ValueReader;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.properties.Getter;
 import org.hibernate.validator.internal.util.Contracts;
@@ -29,10 +29,10 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	 */
 	private final Class<?> declaringClass;
 
-	private final HibernateAccessorFactory accessorFactory;
+	private final AccessorFactory accessorFactory;
 
 	public JavaBeanGetter(Class<?> declaringClass, Method method, String propertyName, String resolvedPropertyName,
-			HibernateAccessorFactory accessorFactory) {
+			AccessorFactory accessorFactory) {
 		super( method );
 		Contracts.assertNotNull( propertyName, "Property name cannot be null." );
 
@@ -80,7 +80,7 @@ public class JavaBeanGetter extends JavaBeanMethod implements Getter {
 	}
 
 	@Override
-	public HibernateAccessorValueReader<?> createAccessor() {
+	public ValueReader<?> createAccessor() {
 		return accessorFactory.valueReader( executable );
 	}
 

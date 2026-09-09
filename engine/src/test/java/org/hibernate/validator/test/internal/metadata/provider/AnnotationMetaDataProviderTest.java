@@ -26,7 +26,7 @@ import jakarta.validation.groups.ConvertGroup;
 import jakarta.validation.groups.Default;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.accessor.HibernateAccessorFactory;
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -59,7 +59,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), HibernateAccessorFactory.reflection() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}
@@ -101,7 +101,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
 
 		assertThat( createEvent.getCallable() ).isEqualTo(
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), HibernateAccessorFactory.reflection() )
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() )
 						.findDeclaredMethod( Calendar.class, "createEvent", LocalDate.class, LocalDate.class )
 						.get()
 		);
