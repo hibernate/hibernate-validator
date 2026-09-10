@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * @author Hardy Ferentschik
@@ -43,6 +44,7 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 	private final ClockProvider clockProvider;
 	private final ExpressionLanguageFeatureLevel defaultConstraintExpressionLanguageFeatureLevel;
 	private final ExpressionLanguageFeatureLevel defaultCustomViolationExpressionLanguageFeatureLevel;
+	private final MessageParameterEscaping messageParameterEscaping;
 	private final Object constraintValidatorPayload;
 
 	private Map<String, Object> messageParameters;
@@ -61,10 +63,12 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 			ClockProvider clockProvider,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel defaultConstraintExpressionLanguageFeatureLevel,
-			ExpressionLanguageFeatureLevel defaultCustomViolationExpressionLanguageFeatureLevel) {
+			ExpressionLanguageFeatureLevel defaultCustomViolationExpressionLanguageFeatureLevel,
+			MessageParameterEscaping messageParameterEscaping) {
 		this.clockProvider = clockProvider;
 		this.defaultConstraintExpressionLanguageFeatureLevel = defaultConstraintExpressionLanguageFeatureLevel;
 		this.defaultCustomViolationExpressionLanguageFeatureLevel = defaultCustomViolationExpressionLanguageFeatureLevel;
+		this.messageParameterEscaping = messageParameterEscaping;
 		this.constraintValidatorPayload = constraintValidatorPayload;
 	}
 
@@ -117,13 +121,19 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 
 	@Override
 	public HibernateConstraintValidatorContext addMessageParameter(String name, Object value) {
+		return addMessageParameter( name, value, messageParameterEscaping );
+	}
+
+	@Override
+	public HibernateConstraintValidatorContext addMessageParameter(String name, Object value, MessageParameterEscaping escaping) {
 		Contracts.assertNotNull( name, "null is not a valid value for a parameter name" );
 
 		if ( messageParameters == null ) {
 			messageParameters = new HashMap<>();
 		}
 
-		this.messageParameters.put( name, value );
+		this.messageParameters.put( name, escaping.apply( value ) );
+
 		return this;
 	}
 

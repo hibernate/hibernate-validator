@@ -37,6 +37,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutil.ValidationInvocationHandler;
 
@@ -263,7 +264,7 @@ public final class ValidatorUtil {
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext(MutablePath propertyPath) {
 		ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl( DefaultClockProvider.INSTANCE, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
-				ExpressionLanguageFeatureLevel.NONE
+				ExpressionLanguageFeatureLevel.NONE, MessageParameterEscaping.ESCAPE
 		);
 		constraintValidatorContext.resetAsRegularContext( propertyPath, null );
 		return constraintValidatorContext;

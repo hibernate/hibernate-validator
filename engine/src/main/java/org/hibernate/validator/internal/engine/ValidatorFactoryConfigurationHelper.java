@@ -48,6 +48,7 @@ import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -462,6 +463,25 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 		LOG.usingAccessorFactory( accessorFactory.getClass() );
 		return accessorFactory;
+	}
+
+	static MessageParameterEscaping determineMessageParameterEscaping(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getMessageParameterEscaping() != null ) {
+			return hibernateSpecificConfig.getMessageParameterEscaping();
+		}
+
+		String messageParameterEscapingName = properties.get( HibernateValidatorConfiguration.MESSAGE_PARAMETER_ESCAPING );
+		if ( messageParameterEscapingName != null ) {
+			try {
+				return MessageParameterEscaping.of( messageParameterEscapingName );
+			}
+			catch (IllegalArgumentException e) {
+				throw LOG.invalidMessageParameterEscapingValue( messageParameterEscapingName, e );
+			}
+		}
+
+		return MessageParameterEscaping.ESCAPE;
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig,

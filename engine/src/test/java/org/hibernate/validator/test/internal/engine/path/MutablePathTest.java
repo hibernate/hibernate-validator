@@ -73,7 +73,7 @@ public class MutablePathTest {
 	public void testRootNodeMutationIsRejected(Consumer<MutablePath> mutation) {
 		MutablePath path = MutablePath.createRootPath();
 		IllegalStateException exception = expectThrows( IllegalStateException.class, () -> mutation.accept( path ) );
-		assertTrue( exception.getMessage().startsWith( "HV000289:" ) );
+		assertTrue( exception.getMessage().startsWith( "HV000290:" ) );
 
 		MutablePath otherPath = MutablePath.createRootPath();
 		otherPath.addPropertyNode( "other" );

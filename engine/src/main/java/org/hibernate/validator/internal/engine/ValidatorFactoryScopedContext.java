@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.HibernateCon
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 public class ValidatorFactoryScopedContext {
@@ -85,6 +86,11 @@ public class ValidatorFactoryScopedContext {
 	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
 	/**
+	 * The default message parameter escaping behavior.
+	 */
+	private final MessageParameterEscaping messageParameterEscaping;
+
+	/**
 	 * The bean resolver.
 	 */
 	private final BeanResolver beanResolver;
@@ -113,10 +119,12 @@ public class ValidatorFactoryScopedContext {
 			HibernateConstraintValidatorInitializationSharedDataManager constraintValidatorInitializationSharedServiceManager,
 			BeanResolver beanResolver,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
-			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			MessageParameterEscaping messageParameterEscaping) {
 		this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
 				failFastOnPropertyViolation, traversableResolverResultCacheEnabled, showValidatedValuesInTraceLogs, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
-				customViolationExpressionLanguageFeatureLevel, beanResolver,
+				customViolationExpressionLanguageFeatureLevel,
+				messageParameterEscaping, beanResolver,
 				new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 						temporalValidationTolerance, constraintValidatorInitializationSharedServiceManager, beanResolver
 				) );
@@ -135,6 +143,7 @@ public class ValidatorFactoryScopedContext {
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
 			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			MessageParameterEscaping messageParameterEscaping,
 			BeanResolver beanResolver,
 			HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 		this.messageInterpolator = messageInterpolator;
@@ -149,6 +158,7 @@ public class ValidatorFactoryScopedContext {
 		this.constraintValidatorPayload = constraintValidatorPayload;
 		this.constraintExpressionLanguageFeatureLevel = constraintExpressionLanguageFeatureLevel;
 		this.customViolationExpressionLanguageFeatureLevel = customViolationExpressionLanguageFeatureLevel;
+		this.messageParameterEscaping = messageParameterEscaping;
 		this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
 		this.beanResolver = beanResolver;
 		this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
@@ -210,6 +220,10 @@ public class ValidatorFactoryScopedContext {
 		return this.customViolationExpressionLanguageFeatureLevel;
 	}
 
+	public MessageParameterEscaping getMessageParameterEscaping() {
+		return this.messageParameterEscaping;
+	}
+
 	public boolean isShowValidatedValuesInTraceLogs() {
 		return showValidatedValuesInTraceLogs;
 	}
@@ -229,6 +243,7 @@ public class ValidatorFactoryScopedContext {
 		private Object constraintValidatorPayload;
 		private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 		private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
+		private MessageParameterEscaping messageParameterEscaping;
 		private boolean showValidatedValuesInTraceLogs;
 		private final BeanResolver beanResolver;
 		private final HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext;
@@ -249,6 +264,7 @@ public class ValidatorFactoryScopedContext {
 			this.constraintValidatorPayload = defaultContext.constraintValidatorPayload;
 			this.constraintExpressionLanguageFeatureLevel = defaultContext.constraintExpressionLanguageFeatureLevel;
 			this.customViolationExpressionLanguageFeatureLevel = defaultContext.customViolationExpressionLanguageFeatureLevel;
+			this.messageParameterEscaping = defaultContext.messageParameterEscaping;
 			this.showValidatedValuesInTraceLogs = defaultContext.showValidatedValuesInTraceLogs;
 			this.beanResolver = defaultContext.beanResolver;
 			this.constraintValidatorInitializationContext = defaultContext.constraintValidatorInitializationContext;
@@ -342,6 +358,12 @@ public class ValidatorFactoryScopedContext {
 			return this;
 		}
 
+		public ValidatorFactoryScopedContext.Builder setMessageParameterEscaping(
+				MessageParameterEscaping messageParameterEscaping) {
+			this.messageParameterEscaping = messageParameterEscaping;
+			return this;
+		}
+
 		public ValidatorFactoryScopedContext.Builder setShowValidatedValuesInTraceLogs(
 				boolean showValidatedValuesInTraceLogs) {
 			this.showValidatedValuesInTraceLogs = showValidatedValuesInTraceLogs;
@@ -362,6 +384,7 @@ public class ValidatorFactoryScopedContext {
 					showValidatedValuesInTraceLogs, constraintValidatorPayload,
 					constraintExpressionLanguageFeatureLevel,
 					customViolationExpressionLanguageFeatureLevel,
+					messageParameterEscaping,
 					beanResolver,
 					HibernateConstraintValidatorInitializationContextImpl.of(
 							constraintValidatorInitializationContext,
