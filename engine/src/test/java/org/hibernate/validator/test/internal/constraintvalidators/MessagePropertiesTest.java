@@ -56,6 +56,7 @@ import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
+import org.hibernate.validator.constraints.ISSN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LowerCase;
 import org.hibernate.validator.constraints.LuhnCheck;
@@ -170,6 +171,7 @@ public class MessagePropertiesTest {
 							violationOf( IBAN.class ),
 							violationOf( Hexadecimal.class ),
 							violationOf( ISBN.class ),
+							violationOf( ISSN.class ),
 							violationOf( Length.class ),
 							violationOf( CodePointLength.class ),
 							violationOf( Contains.class ),
@@ -325,6 +327,9 @@ public class MessagePropertiesTest {
 
 		@ISBN
 		private String isbn = "invalid";
+
+		@ISSN
+		private String issn = "invalid";
 
 		@Length(min = 2, max = 4)
 		private String length = "666666";
