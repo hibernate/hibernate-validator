@@ -936,4 +936,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 267, value = "'%c' is neither a digit nor an upper case ASCII letter.")
 	IllegalArgumentException getCharacterIsNotDigitOrUpperCaseLetterException(char c);
+
+	@Message(id = 276, value = "Unable to find a message parameter escaping value for '%s'.")
+	ValidationException invalidMessageParameterEscapingValue(String messageParameterEscapingName, @Cause IllegalArgumentException e);
 }
