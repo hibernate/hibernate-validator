@@ -24,6 +24,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -178,6 +179,20 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	String FAIL_FAST_ON_PROPERTY_VIOLATION = "hibernate.validator.fail_fast_on_property_violation";
+
+	/**
+	 * Property for configuring the default message parameter escaping behavior.
+	 * <p>
+	 * When set to {@code escape} (the default), message parameter values are automatically escaped
+	 * to prevent injection into message interpolation expressions.
+	 * When set to {@code none}, values are stored as-is.
+	 *
+	 * @see MessageParameterEscaping
+	 * @see #messageParameterEscaping(MessageParameterEscaping)
+	 * @since 9.1
+	 */
+	@Incubating
+	String MESSAGE_PARAMETER_ESCAPING = "hibernate.validator.message_parameter_escaping";
 
 	/**
 	 * <p>
@@ -522,4 +537,18 @@ public interface BaseHibernateValidatorConfiguration<S extends BaseHibernateVali
 	 */
 	@Incubating
 	S processedBeansTrackingVoter(ProcessedBeansTrackingVoter processedBeanTrackingVoter);
+
+	/**
+	 * Allows setting the default message parameter escaping behavior.
+	 * <p>
+	 * When set to {@link MessageParameterEscaping#ESCAPE} (the default), message parameter values
+	 * added via {@link org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext#addMessageParameter(String, Object)}
+	 * are automatically escaped to prevent injection into message interpolation expressions.
+	 *
+	 * @param messageParameterEscaping the {@link MessageParameterEscaping} to be used
+	 * @return {@code this} following the chaining method pattern
+	 * @since 9.1
+	 */
+	@Incubating
+	S messageParameterEscaping(MessageParameterEscaping messageParameterEscaping);
 }
