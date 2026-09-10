@@ -104,7 +104,8 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 					constraintDescriptor,
 					validatorScopedContext.getConstraintValidatorPayload(),
 					validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
-					validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
+					validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel(),
+					validatorScopedContext.getMessageParameterEscaping()
 			);
 		}
 
@@ -114,7 +115,8 @@ public class ParameterExecutableValidationContext<T> extends AbstractValidationC
 				constraintDescriptor,
 				validatorScopedContext.getConstraintValidatorPayload(),
 				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
-				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
+				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel(),
+				validatorScopedContext.getMessageParameterEscaping()
 		);
 	}
 

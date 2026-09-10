@@ -22,6 +22,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConstraintValidatorContext;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * Validator for the {@link ParameterScriptAssert} constraint annotation.
@@ -47,7 +48,7 @@ public class ParameterScriptAssertValidator extends AbstractScriptAssertValidato
 			HibernateCrossParameterConstraintValidatorContext crossParameterConstraintValidatorContext = constraintValidatorContext
 					.unwrap( HibernateCrossParameterConstraintValidatorContext.class );
 
-			crossParameterConstraintValidatorContext.addMessageParameter( "script", escapedScript );
+			crossParameterConstraintValidatorContext.addMessageParameter( "script", escapedScript, MessageParameterEscaping.NONE );
 
 			bindings = getBindings( arguments, crossParameterConstraintValidatorContext.getMethodParameterNames() );
 		}
