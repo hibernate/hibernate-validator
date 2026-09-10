@@ -58,6 +58,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IBAN( "org.hibernate.validator.constraints.IBAN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS( "org.hibernate.validator.constraints.IpAddress" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN( "org.hibernate.validator.constraints.ISBN" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISSN( "org.hibernate.validator.constraints.ISSN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH( "org.hibernate.validator.constraints.Length" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK( "org.hibernate.validator.constraints.LuhnCheck" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER( "org.hibernate.validator.constraints.CreditCardNumber",

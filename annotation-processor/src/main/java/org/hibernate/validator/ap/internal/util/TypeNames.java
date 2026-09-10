@@ -74,6 +74,7 @@ public class TypeNames {
 		public static final String IBAN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".IBAN";
 		public static final String IP_ADDRESS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".IpAddress";
 		public static final String ISBN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ISBN";
+		public static final String ISSN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ISSN";
 		public static final String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
 		public static final String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
 		public static final String LUHN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LuhnCheck";

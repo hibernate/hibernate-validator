@@ -52,6 +52,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
+import org.hibernate.validator.constraints.ISSN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
@@ -119,6 +120,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( EAN.class, new EANBean() );
 		testConstraint( IBAN.class, new IBANBean() );
 		testConstraint( ISBN.class, new ISBNBean() );
+		testConstraint( ISSN.class, new ISSNBean() );
 		testConstraint( Length.class, new LengthBean() );
 		testConstraint( CodePointLength.class, new CodePointLengthBean() );
 		testConstraint( Contains.class, new ContainsBean() );
@@ -334,6 +336,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@ISBN
 		private String isbn = "invalid";
+	}
+
+	private static class ISSNBean {
+
+		@ISSN
+		private String issn = "invalid";
 	}
 
 	private static class LengthBean {
