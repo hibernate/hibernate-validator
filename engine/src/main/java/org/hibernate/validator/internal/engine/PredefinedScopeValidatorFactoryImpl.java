@@ -18,6 +18,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageInterpolator;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageParameterEscaping;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
@@ -154,6 +155,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
 				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				determineMessageParameterEscaping( hibernateSpecificConfig, properties ),
 				beanResolver,
 				constraintValidatorInitializationContext
 		);

@@ -969,51 +969,54 @@ public interface Log extends BasicLogger {
 	@Message(id = 275, value = "The minRequired parameter (%1$d) cannot exceed the number of values (%2$d).")
 	IllegalArgumentException getMinRequiredCannotExceedNumberOfValuesException(int minRequired, int valuesLength);
 
+	@Message(id = 276, value = "Unable to find a message parameter escaping value for '%s'.")
+	ValidationException invalidMessageParameterEscapingValue(String messageParameterEscapingName, @Cause IllegalArgumentException e);
+
 	@LogMessage(level = DEBUG)
-	@Message(id = 276, value = "Using %s as accessor factory.")
+	@Message(id = 277, value = "Using %s as accessor factory.")
 	void usingAccessorFactory(@FormatWith(ClassObjectFormatter.class) Class<?> accessorFactoryClass);
 
-	@Message(id = 277, value = "Unable to instantiate accessor factory class %s.")
+	@Message(id = 278, value = "Unable to instantiate accessor factory class %s.")
 	ValidationException getUnableToInstantiateAccessorFactoryClassException(String accessorFactoryClassName, @Cause Exception e);
 
-	@Message(id = 278, value = "The prefix must not start with %1$s.")
+	@Message(id = 279, value = "The prefix must not start with %1$s.")
 	IllegalArgumentException getPrefixCannotStartWithException(char c);
 
-	@Message(id = 279, value = "The prefix must not end with %1$s.")
+	@Message(id = 280, value = "The prefix must not end with %1$s.")
 	IllegalArgumentException getPrefixCannotEndWithException(char c);
 
-	@Message(id = 280, value = "No PasswordStrengthEstimator has been registered as a validation service. "
+	@Message(id = 281, value = "No PasswordStrengthEstimator has been registered as a validation service. "
 			+ "Register one via HibernateValidatorConfiguration.addValidationService(PasswordStrengthEstimator.class, estimatorInstance).")
 	ValidationException getNoPasswordStrengthEstimatorException();
 
-	@Message(id = 281, value = "No configured bean reference for type '%s'.")
+	@Message(id = 282, value = "No configured bean reference for type '%s'.")
 	BeanNotFoundException getNoConfiguredBeanReferenceForTypeException(String typeName);
 
-	@Message(id = 282, value = "No configured bean reference for type '%1$s' and name '%2$s'.")
+	@Message(id = 283, value = "No configured bean reference for type '%1$s' and name '%2$s'.")
 	BeanNotFoundException getNoConfiguredBeanReferenceForTypeAndNameException(String typeName, String name);
 
-	@Message(id = 283, value = "Unable to resolve class name '%1$s' to a class extending '%2$s'.")
+	@Message(id = 284, value = "Unable to resolve class name '%1$s' to a class extending '%2$s'.")
 	BeanNotFoundException getUnableToResolveClassNameException(String nameReference, String typeName, @Cause RuntimeException e);
 
-	@Message(id = 284, value = "Unable to create bean using reflection for type '%s'.")
+	@Message(id = 285, value = "Unable to create bean using reflection for type '%s'.")
 	BeanNotFoundException getUnableToCreateBeanUsingReflectionException(String typeName, @Cause RuntimeException e);
 
-	@Message(id = 285, value = "No bean manager configured. Register a BeanProvider to enable bean manager lookups.")
+	@Message(id = 286, value = "No bean manager configured. Register a BeanProvider to enable bean manager lookups.")
 	BeanNotFoundException getNoBeanManagerConfiguredException();
 
-	@Message(id = 286, value = "Invalid bean retrieval in value '%1$s': '%2$s' is not a valid retrieval prefix.")
+	@Message(id = 287, value = "Invalid bean retrieval in value '%1$s': '%2$s' is not a valid retrieval prefix.")
 	ValidationException getInvalidBeanRetrievalException(String value, String prefix);
 
-	@Message(id = 287, value = "Multiple configured bean references for type '%1$s': %2$s")
+	@Message(id = 288, value = "Multiple configured bean references for type '%1$s': %2$s")
 	IllegalStateException getMultipleConfiguredBeanReferencesException(String typeName, String references);
 
-	@Message(id = 288, value = "Duplicate bean references for name '%1$s': %2$s, %3$s")
+	@Message(id = 289, value = "Duplicate bean references for name '%1$s': %2$s, %3$s")
 	IllegalStateException getDuplicateBeanReferencesForNameException(String name, String existing, String duplicate);
 
-	@Message(id = 289, value = "Cannot modify the root path node. Add the container property before customizing its element.")
+	@Message(id = 290, value = "Cannot modify the root path node. Add the container property before customizing its element.")
 	IllegalStateException getUnableToModifyRootPathNodeException();
 
-	@Message(id = 290, value = "Message template cannot be null.")
+	@Message(id = 291, value = "Message template cannot be null.")
 	IllegalArgumentException getMessageTemplateCannotBeNullException();
 
 }

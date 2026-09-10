@@ -13,6 +13,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.internal.engine.ValidatorFactoryScopedContext;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
@@ -80,6 +81,8 @@ public class ValidatorScopedContext {
 	 */
 	private final ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 
+	private final MessageParameterEscaping messageParameterEscaping;
+
 	private final boolean showValidatedValuesInTraceLogs;
 
 	public ValidatorScopedContext(ValidatorFactoryScopedContext validatorFactoryScopedContext) {
@@ -94,6 +97,7 @@ public class ValidatorScopedContext {
 		this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 		this.constraintExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getConstraintExpressionLanguageFeatureLevel();
 		this.customViolationExpressionLanguageFeatureLevel = validatorFactoryScopedContext.getCustomViolationExpressionLanguageFeatureLevel();
+		this.messageParameterEscaping = validatorFactoryScopedContext.getMessageParameterEscaping();
 		this.showValidatedValuesInTraceLogs = validatorFactoryScopedContext.isShowValidatedValuesInTraceLogs();
 	}
 
@@ -139,6 +143,10 @@ public class ValidatorScopedContext {
 
 	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
 		return customViolationExpressionLanguageFeatureLevel;
+	}
+
+	public MessageParameterEscaping getMessageParameterEscaping() {
+		return messageParameterEscaping;
 	}
 
 	public boolean isShowValidatedValuesInTraceLogs() {

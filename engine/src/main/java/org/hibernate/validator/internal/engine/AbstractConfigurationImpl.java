@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -140,6 +141,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 	private ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel;
 	private ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel;
 	private ProcessedBeansTrackingVoter processedBeansTrackingVoter;
+	private MessageParameterEscaping messageParameterEscaping;
 	private boolean showValidatedValuesInTraceLogs;
 
 	protected AbstractConfigurationImpl(BootstrapState state) {
@@ -736,6 +738,21 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	public ExpressionLanguageFeatureLevel getCustomViolationExpressionLanguageFeatureLevel() {
 		return customViolationExpressionLanguageFeatureLevel;
+	}
+
+	@Override
+	public T messageParameterEscaping(MessageParameterEscaping messageParameterEscaping) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( messageParameterEscaping != null ) {
+				LOG.debug( "Setting MessageParameterEscaping to " + messageParameterEscaping.name() );
+			}
+		}
+		this.messageParameterEscaping = messageParameterEscaping;
+		return thisAsT();
+	}
+
+	public MessageParameterEscaping getMessageParameterEscaping() {
+		return messageParameterEscaping;
 	}
 
 	@Override

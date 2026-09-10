@@ -130,7 +130,8 @@ abstract class AbstractValidationContext<T> implements BaseBeanValidationContext
 				validatorScopedContext.getClockProvider(),
 				validatorScopedContext.getConstraintValidatorPayload(),
 				validatorScopedContext.getConstraintExpressionLanguageFeatureLevel(),
-				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel()
+				validatorScopedContext.getCustomViolationExpressionLanguageFeatureLevel(),
+				validatorScopedContext.getMessageParameterEscaping()
 		);
 	}
 

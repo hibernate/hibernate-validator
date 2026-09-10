@@ -104,7 +104,7 @@ public class AccessorFactoryConfigurationTest {
 				.addProperty( HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME, "missing.AccessorFactory" )
 				.buildValidatorFactory() )
 				.isInstanceOf( ValidationException.class )
-				.hasMessageStartingWith( "HV000277" );
+				.hasMessageStartingWith( "HV000278" );
 	}
 
 	private BaseHibernateValidatorConfiguration<?> configuration(boolean predefinedScope) {
