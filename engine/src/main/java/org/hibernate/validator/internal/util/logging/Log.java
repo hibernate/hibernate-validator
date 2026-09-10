@@ -946,4 +946,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = DEBUG)
 	@Message(id = 269, value = "Unable to enable secure XML feature processing when loading %1$s: %2$s")
 	void unableToEnableSecureFeatureProcessingSchemaXml(String fileName, String message);
+
+	@Message(id = 276, value = "Unable to find a message parameter escaping value for '%s'.")
+	ValidationException invalidMessageParameterEscapingValue(String messageParameterEscapingName, @Cause IllegalArgumentException e);
 }
