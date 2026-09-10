@@ -17,6 +17,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * @author Hardy Ferentschik
@@ -53,7 +54,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 		}
 
 		if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
-			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "regexp", escapedRegexp );
+			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "regexp", escapedRegexp, MessageParameterEscaping.NONE );
 		}
 
 		Matcher m = pattern.matcher( value );

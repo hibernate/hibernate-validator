@@ -16,6 +16,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineConstraintValidatorPayload;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageParameterEscaping;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTemporalValidationTolerance;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineTraversableResolverResultCacheEnabled;
@@ -126,7 +127,8 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 				determineTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				determineMessageParameterEscaping( hibernateSpecificConfig, properties )
 		);
 
 		this.constraintValidatorManager = new PredefinedScopeConstraintValidatorManagerImpl(

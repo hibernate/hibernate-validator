@@ -120,6 +120,56 @@ public class UniqueElementsValidatorTest {
 		assertTrue( violations.stream().anyMatch( cv -> cv.getMessage().contains( duplicate ) ) );
 	}
 
+	@Test
+	public void testDuplicatesAreEscapedAndNotInterpolated() {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+
+		MessageInterpolator messageInterpolator = new ResourceBundleMessageInterpolator(
+				new AggregateResourceBundleLocator(
+						Arrays.asList( "org/hibernate/validator/test/internal/constraintvalidators/hv/UniqueElementsMessages" ),
+						configuration.getDefaultResourceBundleLocator(),
+						getClass().getClassLoader()
+				)
+		);
+
+		Validator validator = configuration
+				.messageInterpolator( messageInterpolator )
+				.buildValidatorFactory().getValidator();
+
+		List<Object> fails = Arrays.asList( "${1+1}", "${1+1}", "{unknown}", "{unknown}" );
+		Set<ConstraintViolation<AnnotationContainer>> violations = validator.validate( new AnnotationContainer( fails ) );
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( UniqueElements.class )
+						.withMessage( "must only contain unique elements but contains duplicate elements: ${1+1}, {unknown}" )
+		);
+	}
+
+	@Test
+	public void testDuplicatesAreEscapedAndNotInterpolatedForObjects() {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+
+		MessageInterpolator messageInterpolator = new ResourceBundleMessageInterpolator(
+				new AggregateResourceBundleLocator(
+						Arrays.asList( "org/hibernate/validator/test/internal/constraintvalidators/hv/UniqueElementsMessages" ),
+						configuration.getDefaultResourceBundleLocator(),
+						getClass().getClassLoader()
+				)
+		);
+
+		Validator validator = configuration
+				.messageInterpolator( messageInterpolator )
+				.buildValidatorFactory().getValidator();
+
+		List<Object> fails = Arrays.asList( new TestObjectToString( 1 ), new TestObjectToString( 1 ), new TestObjectToString( 2 ), new TestObjectToString( 2 ) );
+		Set<ConstraintViolation<AnnotationContainer>> violations = validator.validate( new AnnotationContainer( fails ) );
+
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( UniqueElements.class )
+						.withMessage( "must only contain unique elements but contains duplicate elements: ${1+1}, ${2+2}" )
+		);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDymanicPayloadContainsDuplicatedValue() {
@@ -175,6 +225,37 @@ public class UniqueElementsValidatorTest {
 		@Override
 		public int hashCode() {
 			return Objects.hash( super.hashCode() );
+		}
+	}
+
+	private static class TestObjectToString {
+
+		private final int value;
+
+		private TestObjectToString(Integer value) {
+			this.value = value;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( !( o instanceof TestObjectToString ) ) {
+				return false;
+			}
+			TestObjectToString that = (TestObjectToString) o;
+			return value == that.value;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( value );
+		}
+
+		@Override
+		public String toString() {
+			return "${" + value + "+" + value + "}";
 		}
 	}
 }
