@@ -15,6 +15,7 @@ import org.hibernate.validator.constraintvalidation.HibernateCrossParameterConst
 import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * @author Marko Bekhta
@@ -29,9 +30,10 @@ public class CrossParameterConstraintValidatorContextImpl extends ConstraintVali
 			ConstraintDescriptor<?> constraintDescriptor,
 			Object constraintValidatorPayload,
 			ExpressionLanguageFeatureLevel constraintExpressionLanguageFeatureLevel,
-			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel) {
+			ExpressionLanguageFeatureLevel customViolationExpressionLanguageFeatureLevel,
+			MessageParameterEscaping messageParameterEscaping) {
 		super( clockProvider, propertyPath, constraintDescriptor, constraintValidatorPayload, constraintExpressionLanguageFeatureLevel,
-				customViolationExpressionLanguageFeatureLevel );
+				customViolationExpressionLanguageFeatureLevel, messageParameterEscaping );
 		Contracts.assertTrue( propertyPath.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER, "Context can only be used for cross parameter validation" );
 		this.methodParameterNames = methodParameterNames;
 	}

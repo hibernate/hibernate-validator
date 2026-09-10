@@ -15,6 +15,7 @@ import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurat
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineExternalClassLoader;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFast;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineFailFastOnPropertyViolation;
+import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineMessageParameterEscaping;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineScriptEvaluatorFactory;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineServiceLoadedConstraintMappings;
 import static org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper.determineShowValidatedValuesInTraceLogs;
@@ -171,7 +172,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				determineConstraintValidatorPayload( hibernateSpecificConfig ),
 				initializeConstraintValidatorInitializationShareDataManager( hibernateSpecificConfig ),
 				determineConstraintExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
-				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties )
+				determineCustomViolationExpressionLanguageFeatureLevel( hibernateSpecificConfig, properties ),
+				determineMessageParameterEscaping( hibernateSpecificConfig, properties )
 		);
 
 		ConstraintValidatorManager constraintValidatorManager = new ConstraintValidatorManagerImpl(
