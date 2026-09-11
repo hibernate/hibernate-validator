@@ -197,11 +197,14 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			// Instead of running this:
 			// SetContextClassLoader.action( ExpressionFactoryImpl.class.getClassLoader() );
 			// we do some reflection "magic" to not have a dependency on an implementation of the expression language:
-			SetContextClassLoader.action( classLoaderForExpressionFactory( originalContextClassLoader ) );
-			if ( canLoadExpressionFactory() ) {
-				ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
-				LOG.debug( "Loaded expression factory via com.sun.el classloader" );
-				return expressionFactory;
+			final ClassLoader classLoader = classLoaderForExpressionFactory( originalContextClassLoader );
+			if ( classLoader != null ) {
+				SetContextClassLoader.action( classLoader );
+				if ( canLoadExpressionFactory() ) {
+					ExpressionFactory expressionFactory = ELManager.getExpressionFactory();
+					LOG.debug( "Loaded expression factory via com.sun.el classloader" );
+					return expressionFactory;
+				}
 			}
 		}
 		catch (Throwable e) {
@@ -224,23 +227,33 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	 * We rely on reflection here as we do not have a dependency on OSGi in the engine module, and we do not want to add it!
 	 */
 	private static ClassLoader classLoaderForExpressionFactory(ClassLoader cl) throws Exception {
-		Class<?> fu = cl.loadClass( "org.osgi.framework.FrameworkUtil" );
-		Method getBundle = fu.getMethod( "getBundle", Class.class );
-		Object currentBundle = getBundle.invoke( null, ResourceBundleMessageInterpolator.class );
-		if ( currentBundle != null ) {
-			Object context = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "getBundleContext" ).invoke( currentBundle );
-			Object bundles = cl.loadClass( "org.osgi.framework.BundleContext" ).getMethod( "getBundles" ).invoke( context );
-			Method loadClass = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "loadClass", String.class );
-			int n = Array.getLength( bundles );
-			for ( int i = 0; i < n; i++ ) {
-				try {
-					Object bundle = Array.get( bundles, i );
-					return ( (Class<?>) loadClass.invoke( bundle, "com.sun.el.ExpressionFactoryImpl" ) ).getClassLoader();
-				}
-				catch (Exception e) {
-					//
+		// May throw a ClassNotFoundException if OSGi is not on the class path
+		try {
+			Class<?> fu = cl.loadClass( "org.osgi.framework.FrameworkUtil" );
+			Method getBundle = fu.getMethod( "getBundle", Class.class );
+			Object currentBundle = getBundle.invoke( null, ResourceBundleMessageInterpolator.class );
+			if ( currentBundle != null ) {
+				Object context = cl.loadClass( "org.osgi.framework.Bundle" )
+						.getMethod( "getBundleContext" )
+						.invoke( currentBundle );
+				Object bundles = cl.loadClass( "org.osgi.framework.BundleContext" )
+						.getMethod( "getBundles" )
+						.invoke( context );
+				Method loadClass = cl.loadClass( "org.osgi.framework.Bundle" ).getMethod( "loadClass", String.class );
+				int n = Array.getLength( bundles );
+				for ( int i = 0; i < n; i++ ) {
+					try {
+						Object bundle = Array.get( bundles, i );
+						return ( (Class<?>) loadClass.invoke( bundle, "com.sun.el.ExpressionFactoryImpl" ) ).getClassLoader();
+					}
+					catch (Exception e) {
+						//
+					}
 				}
 			}
+		}
+		catch (ClassNotFoundException e) {
+			LOG.trace( "Failed to discover OSGi class loader", e );
 		}
 		return null;
 	}
