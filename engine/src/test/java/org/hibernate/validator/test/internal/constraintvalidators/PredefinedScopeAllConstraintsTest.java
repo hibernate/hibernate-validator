@@ -63,6 +63,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -129,6 +130,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( NullOrNotBlank.class, new NullOrNotBlankBean() );
 		testConstraint( NullOrNotEmpty.class, new NullOrNotEmptyBean() );
 		testConstraint( Port.class, new PortBean() );
+		testConstraint( StartsWith.class, new StartsWithBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
 		testConstraint( URL.class, new URLBean() );
@@ -397,6 +399,13 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Port
 		private int port = 70000;
+	}
+
+	private static class StartsWithBean {
+
+		@StartsWith("foo")
+		private String startsWith = "barfoo";
+
 	}
 
 	private static class RangeBean {
