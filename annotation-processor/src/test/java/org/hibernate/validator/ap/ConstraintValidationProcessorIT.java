@@ -23,6 +23,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithContainsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithHexadecimalConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithIpAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
@@ -816,6 +817,26 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 31 ),
 				new DiagnosticExpectation( Kind.ERROR, 34 ),
 				new DiagnosticExpectation( Kind.ERROR, 37 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2250")
+	public void hexadecimalConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithHexadecimalConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 21 ),
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 )
 		);
 	}
 
