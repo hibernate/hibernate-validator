@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.engine.HibernateValidatorEnhancedBean;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -875,26 +874,6 @@ public class TypeHelperTest {
 		ParameterizedType childEntityType = TypeHelper.parameterizedType( ChildEntity.class, ChildEntity.class.getTypeParameters() );
 
 		assertTrue( TypeHelper.isAssignable( parentEntityType, childEntityType ) );
-	}
-
-	@SuppressWarnings("removal")
-	@Test
-	public void testIsHibernateValidatorEnhancedBean() {
-		class Foo {
-		}
-		class Bar implements HibernateValidatorEnhancedBean {
-			@Override
-			public Object $$_hibernateValidator_getFieldValue(String name) {
-				return null;
-			}
-
-			@Override
-			public Object $$_hibernateValidator_getGetterValue(String name) {
-				return null;
-			}
-		}
-		assertTrue( TypeHelper.isHibernateValidatorEnhancedBean( Bar.class ) );
-		assertFalse( TypeHelper.isHibernateValidatorEnhancedBean( Foo.class ) );
 	}
 
 	private static void assertAsymmetricallyAssignable(Type supertype, Type type) {

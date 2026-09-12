@@ -21,6 +21,10 @@ def removeDependency(File file, String dependencyToRemove) {
     file.write( file.text.replaceAll( /<module name="${dependencyToRemove}"[^\/]*\/>/, '' ) )
 }
 
+def appendResourceRoot(File file, String resourcePath) {
+    file.write( file.text.replaceAll( /<\/resources>/, '  <resource-root path="' + resourcePath + '"/>\n  </resources>' ) )
+}
+
 // Jakarta Validation API
 bvModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/jakarta/validation/api/main/module.xml' )
 def bvArtifactName = 'jakarta.validation-api-' + project.properties['version.jakarta.validation-api'] + '.jar';
@@ -47,6 +51,11 @@ appendDependency( hvModuleXml, "javax.money.api", true )
 appendDependency( hvModuleXml, "javafx.api", true )
 
 deleteFiles( new FileNameByRegexFinder().getFileNames( wildflyPatchedTargetDir + '/modules/system/layers/base/org/hibernate/validator/main', 'hibernate-validator-.*\\.jar' ) )
+
+// Hibernate Accessor
+def haArtifactName = 'hibernate-accessor-' + hibernateAccessorVersion + '.jar';
+println "[INFO] Using Hibernate Accessor version " + haArtifactName;
+appendResourceRoot( hvModuleXml, haArtifactName )
 
 // HV CDI
 hvCdiModuleXml = new File( wildflyPatchedTargetDir, 'modules/system/layers/base/org/hibernate/validator/cdi/main/module.xml' )
