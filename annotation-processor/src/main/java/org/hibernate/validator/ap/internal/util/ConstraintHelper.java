@@ -318,6 +318,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NULL_OR_NOT_BLANK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NULL_OR_NOT_EMPTY, TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.TRIMMED, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.UNIQUE_ELEMENTS, Collection.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.URL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.UUID, CharSequence.class );
