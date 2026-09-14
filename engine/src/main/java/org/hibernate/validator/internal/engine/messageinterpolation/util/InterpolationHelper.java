@@ -5,8 +5,6 @@
 package org.hibernate.validator.internal.engine.messageinterpolation.util;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Utilities used for message interpolation.
@@ -24,8 +22,6 @@ public class InterpolationHelper {
 	public static final char EL_DESIGNATOR = '$';
 	public static final char ESCAPE_CHARACTER = '\\';
 
-	private static final Pattern ESCAPE_MESSAGE_PARAMETER_PATTERN = Pattern.compile( "([\\" + ESCAPE_CHARACTER + BEGIN_TERM + END_TERM + EL_DESIGNATOR + "])" );
-
 	private InterpolationHelper() {
 	}
 
@@ -41,16 +37,36 @@ public class InterpolationHelper {
 	 * @return the escaped value, or {@code null} if {@code messageParameter} was {@code null}
 	 */
 	public static String escapeMessageParameter(String messageParameter) {
+		// deliberately not using patterns to try and save a bit on perf side
 		if ( messageParameter == null ) {
 			return null;
 		}
-		return ESCAPE_MESSAGE_PARAMETER_PATTERN.matcher( messageParameter ).replaceAll( Matcher.quoteReplacement( String.valueOf( ESCAPE_CHARACTER ) ) + "$1" );
-	}
 
-	private static final Pattern LEFT_BRACE = Pattern.compile( "\\{", Pattern.LITERAL );
-	private static final Pattern RIGHT_BRACE = Pattern.compile( "\\}", Pattern.LITERAL );
-	private static final Pattern SLASH = Pattern.compile( "\\\\", Pattern.LITERAL );
-	private static final Pattern DOLLAR = Pattern.compile( "\\$", Pattern.LITERAL );
+		int firstSpecial = -1;
+		for ( int i = 0; i < messageParameter.length(); i++ ) {
+			if ( isEscapeableChar( messageParameter.charAt( i ) ) ) {
+				firstSpecial = i;
+				break;
+			}
+		}
+
+		if ( firstSpecial < 0 ) {
+			return messageParameter;
+		}
+
+		StringBuilder sb = new StringBuilder( messageParameter.length() + 8 );
+		sb.append( messageParameter, 0, firstSpecial );
+
+		for ( int i = firstSpecial; i < messageParameter.length(); i++ ) {
+			char c = messageParameter.charAt( i );
+			if ( isEscapeableChar( c ) ) {
+				sb.append( ESCAPE_CHARACTER );
+			}
+			sb.append( c );
+		}
+
+		return sb.toString();
+	}
 
 	/**
 	 * Reverses {@link #escapeMessageParameter(String)} by removing the escape character that precedes a
@@ -70,13 +86,30 @@ public class InterpolationHelper {
 	 * @throws NullPointerException if {@code message} is {@code null}
 	 */
 	public static String unescapeMessageParameter(String message) {
-		if ( message.indexOf( '\\' ) > -1 ) {
-			message = LEFT_BRACE.matcher( message ).replaceAll( "{" );
-			message = RIGHT_BRACE.matcher( message ).replaceAll( "}" );
-			message = SLASH.matcher( message ).replaceAll( Matcher.quoteReplacement( "\\" ) );
-			message = DOLLAR.matcher( message ).replaceAll( Matcher.quoteReplacement( "$" ) );
+		int backslashIndex = message.indexOf( ESCAPE_CHARACTER );
+		if ( backslashIndex < 0 ) {
+			return message;
 		}
-		return message;
+
+		StringBuilder sb = new StringBuilder( message.length() );
+		sb.append( message, 0, backslashIndex );
+
+		// CHECKSTYLE:OFF: ModifiedControlVariable
+		for ( int i = backslashIndex; i < message.length(); i++ ) {
+			char c = message.charAt( i );
+			if ( c == ESCAPE_CHARACTER && i + 1 < message.length() ) {
+				char next = message.charAt( i + 1 );
+				if ( isEscapeableChar( next ) ) {
+					sb.append( next );
+					i++;
+					continue;
+				}
+			}
+			sb.append( c );
+		}
+		// CHECKSTYLE:ON: ModifiedControlVariable
+
+		return sb.toString();
 	}
 
 	/**
@@ -105,39 +138,35 @@ public class InterpolationHelper {
 	 * @throws NullPointerException if {@code value} is {@code null}
 	 */
 	public static String resolveToString(Object value) {
-		final String resolvedExpression;
 		if ( value.getClass().isArray() ) {
-			if ( value.getClass() == boolean[].class ) {
-				resolvedExpression = Arrays.toString( (boolean[]) value );
+			if ( value instanceof boolean[] booleans ) {
+				return Arrays.toString( booleans );
 			}
-			else if ( value.getClass() == char[].class ) {
-				resolvedExpression = Arrays.toString( (char[]) value );
+			else if ( value instanceof char[] chars ) {
+				return Arrays.toString( chars );
 			}
-			else if ( value.getClass() == byte[].class ) {
-				resolvedExpression = Arrays.toString( (byte[]) value );
+			else if ( value instanceof byte[] bytes ) {
+				return Arrays.toString( bytes );
 			}
-			else if ( value.getClass() == short[].class ) {
-				resolvedExpression = Arrays.toString( (short[]) value );
+			else if ( value instanceof short[] shorts ) {
+				return Arrays.toString( shorts );
 			}
-			else if ( value.getClass() == int[].class ) {
-				resolvedExpression = Arrays.toString( (int[]) value );
+			else if ( value instanceof int[] ints ) {
+				return Arrays.toString( ints );
 			}
-			else if ( value.getClass() == long[].class ) {
-				resolvedExpression = Arrays.toString( (long[]) value );
+			else if ( value instanceof long[] longs ) {
+				return Arrays.toString( longs );
 			}
-			else if ( value.getClass() == float[].class ) {
-				resolvedExpression = Arrays.toString( (float[]) value );
+			else if ( value instanceof float[] floats ) {
+				return Arrays.toString( floats );
 			}
-			else if ( value.getClass() == double[].class ) {
-				resolvedExpression = Arrays.toString( (double[]) value );
+			else if ( value instanceof double[] doubles ) {
+				return Arrays.toString( doubles );
 			}
 			else {
-				resolvedExpression = Arrays.deepToString( (Object[]) value );
+				return Arrays.deepToString( (Object[]) value );
 			}
 		}
-		else {
-			resolvedExpression = value.toString();
-		}
-		return resolvedExpression;
+		return value.toString();
 	}
 }
