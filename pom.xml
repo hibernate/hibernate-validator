@@ -207,7 +207,7 @@
 
         <version.antrun.plugin>1.8</version.antrun.plugin>
         <version.assembly.plugin>3.4.2</version.assembly.plugin>
-        <version.buildhelper.plugin>3.6.1</version.buildhelper.plugin>
+        <version.buildhelper.plugin>3.6.2</version.buildhelper.plugin>
         <version.bundle.plugin>3.5.1</version.bundle.plugin>
         <version.checkstyle.plugin>3.1.2</version.checkstyle.plugin>
         <version.clean.plugin>3.0.0</version.clean.plugin>
