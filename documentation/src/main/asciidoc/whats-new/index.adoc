@@ -179,3 +179,15 @@ private String address;
 where both `IPv4` and `IPv6` address types are considered valid.
 <2> Applying the `@IpAddress` constraint, where only the `IPv6` addresses are considered valid.
 ====
+
+== Message parameter escaping
+
+Message parameters added via `HibernateConstraintValidatorContext#addMessageParameter()` are now escaped by default.
+Characters that have special meaning in message interpolation (`\`, `{`, `}`, `$`) are automatically escaped.
+
+This behavior is controlled by the new `MessageParameterEscaping` enum (`ESCAPE`, `NONE`)
+and can be configured globally via the `hibernate.validator.message_parameter_escaping` property
+or the programmatic API on `BaseHibernateValidatorConfiguration`.
+
+A new overload `addMessageParameter(String name, Object value, MessageParameterEscaping escaping)` is also available
+on `HibernateConstraintValidatorContext` for per-call control over escaping behavior.
