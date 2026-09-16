@@ -99,6 +99,20 @@ unformatted sequence of 11 digits, with valid check digits in either case.
 Partially formatted values, including values with only a dash before the check digits,
 are rejected. Normalize such input to one of the supported representations before validation.
 
+=== Message parameter escaping enabled by default
+
+Message parameters added via `HibernateConstraintValidatorContext#addMessageParameter()` are now escaped by default.
+Characters with special meaning in message interpolation (`\`, `{`, `}`, `$`) are automatically escaped to prevent
+injection into message interpolation expressions.
+
+If your custom constraint validators rely on message parameters containing unescaped interpolation expressions
+(e.g. nested `{paramName}` references or `$\{expression\}` EL expressions), you can either:
+
+* Use the new overload `addMessageParameter(String name, Object value, MessageParameterEscaping.NONE)` to disable escaping per call.
+This is a recommended alternative, *but* only for the parameter values that you trust.
+* Set the `hibernate.validator.message_parameter_escaping` property to `none` to restore the previous behavior globally.
+Only consider this option if none of the validators add user input as parameters.
+
 === Startup logging
 
 The Hibernate Validator version banner (`HV000001`) is now logged at `DEBUG` instead of `INFO`.
