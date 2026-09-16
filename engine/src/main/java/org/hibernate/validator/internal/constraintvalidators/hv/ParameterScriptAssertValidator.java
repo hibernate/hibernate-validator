@@ -22,6 +22,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * Validator for the {@link ParameterScriptAssert} constraint annotation.
@@ -43,7 +44,7 @@ public class ParameterScriptAssertValidator extends AbstractScriptAssertValidato
 	@Override
 	public boolean isValid(Object[] arguments, ConstraintValidatorContext constraintValidatorContext) {
 		if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
-			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript );
+			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript, MessageParameterEscaping.NONE );
 		}
 
 		List<String> parameterNames = ( (ConstraintValidatorContextImpl) constraintValidatorContext )

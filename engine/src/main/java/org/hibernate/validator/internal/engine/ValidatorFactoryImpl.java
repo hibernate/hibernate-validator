@@ -61,6 +61,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
@@ -197,6 +198,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				getFailFast( hibernateSpecificConfig, properties ),
 				getTraversableResolverResultCacheEnabled( hibernateSpecificConfig, properties ),
 				getExpressionLanguageEnabled(),
+				determineMessageParameterEscaping( hibernateSpecificConfig, properties ),
 				getConstraintValidatorPayload( hibernateSpecificConfig )
 		);
 
@@ -490,6 +492,25 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return "true".equalsIgnoreCase( enable );
 	}
 
+	private static MessageParameterEscaping determineMessageParameterEscaping(ConfigurationImpl hibernateSpecificConfig,
+																	  Map<String, String> properties) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getMessageParameterEscaping() != null ) {
+			return hibernateSpecificConfig.getMessageParameterEscaping();
+		}
+
+		String messageParameterEscapingName = properties.get( HibernateValidatorConfiguration.MESSAGE_PARAMETER_ESCAPING );
+		if ( messageParameterEscapingName != null ) {
+			try {
+				return MessageParameterEscaping.of( messageParameterEscapingName );
+			}
+			catch (IllegalArgumentException e) {
+				throw LOG.invalidMessageParameterEscapingValue( messageParameterEscapingName, e );
+			}
+		}
+
+		return MessageParameterEscaping.ESCAPE;
+	}
+
 	private static boolean getFailFast(ConfigurationImpl configuration, Map<String, String> properties) {
 		// check whether fail fast is programmatically enabled
 		boolean tmpFailFast = configuration != null ? configuration.getFailFast() : false;
@@ -735,6 +756,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		 */
 		private final boolean expressionLanguageEnabled;
 
+		private final MessageParameterEscaping messageParameterEscaping;
+
 		/**
 		 * The constraint validator payload.
 		 */
@@ -754,9 +777,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				boolean failFast,
 				boolean traversableResolverResultCacheEnabled,
 				boolean expressionLanguageEnabled,
+				MessageParameterEscaping messageParameterEscaping,
 				Object constraintValidatorPayload) {
 			this( messageInterpolator, traversableResolver, parameterNameProvider, clockProvider, temporalValidationTolerance, scriptEvaluatorFactory, failFast,
-					traversableResolverResultCacheEnabled, expressionLanguageEnabled, constraintValidatorPayload,
+					traversableResolverResultCacheEnabled, expressionLanguageEnabled, messageParameterEscaping, constraintValidatorPayload,
 					new HibernateConstraintValidatorInitializationContextImpl( scriptEvaluatorFactory, clockProvider,
 							temporalValidationTolerance ) );
 		}
@@ -770,6 +794,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				boolean failFast,
 				boolean traversableResolverResultCacheEnabled,
 				boolean expressionLanguageEnabled,
+				MessageParameterEscaping messageParameterEscaping,
 				Object constraintValidatorPayload,
 				HibernateConstraintValidatorInitializationContextImpl constraintValidatorInitializationContext) {
 			this.messageInterpolator = messageInterpolator;
@@ -781,6 +806,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			this.failFast = failFast;
 			this.traversableResolverResultCacheEnabled = traversableResolverResultCacheEnabled;
 			this.expressionLanguageEnabled = expressionLanguageEnabled;
+			this.messageParameterEscaping = messageParameterEscaping;
 			this.constraintValidatorPayload = constraintValidatorPayload;
 			this.constraintValidatorInitializationContext = constraintValidatorInitializationContext;
 		}
@@ -819,6 +845,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		public boolean isExpressionLanguageEnabled() {
 			return expressionLanguageEnabled;
+		}
+
+		public MessageParameterEscaping getMessageParameterEscaping() {
+			return messageParameterEscaping;
 		}
 
 		public Object getConstraintValidatorPayload() {
@@ -941,6 +971,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						failFast,
 						traversableResolverResultCacheEnabled,
 						defaultContext.expressionLanguageEnabled,
+						defaultContext.messageParameterEscaping,
 						constraintValidatorPayload,
 						HibernateConstraintValidatorInitializationContextImpl.of(
 								constraintValidatorInitializationContext,

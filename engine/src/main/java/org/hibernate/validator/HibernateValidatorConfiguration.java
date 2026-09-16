@@ -20,6 +20,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
@@ -107,6 +108,20 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	String TEMPORAL_VALIDATION_TOLERANCE = "hibernate.validator.temporal_validation_tolerance";
+
+	/**
+	 * Property for configuring the default message parameter escaping behavior.
+	 * <p>
+	 * When set to {@code escape} (the default), message parameter values are automatically escaped
+	 * to prevent injection into message interpolation expressions.
+	 * When set to {@code none}, values are stored as-is.
+	 *
+	 * @see MessageParameterEscaping
+	 * @see #messageParameterEscaping(MessageParameterEscaping)
+	 * @since 6.0.23.SP3
+	 */
+	@Incubating
+	String MESSAGE_PARAMETER_ESCAPING = "hibernate.validator.message_parameter_escaping";
 
 	/**
 	 * <p>
@@ -324,4 +339,18 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	@Incubating
 	HibernateValidatorConfiguration beanMetaDataClassNormalizer(BeanMetaDataClassNormalizer beanMetaDataClassNormalizer);
+
+	/**
+	 * Allows setting the default message parameter escaping behavior.
+	 * <p>
+	 * When set to {@link MessageParameterEscaping#ESCAPE} (the default), message parameter values
+	 * added via {@link org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext#addMessageParameter(String, Object)}
+	 * are automatically escaped to prevent injection into message interpolation expressions.
+	 *
+	 * @param messageParameterEscaping the {@link MessageParameterEscaping} to be used
+	 * @return {@code this} following the chaining method pattern
+	 * @since 6.0.23.SP3
+	 */
+	@Incubating
+	HibernateValidatorConfiguration messageParameterEscaping(MessageParameterEscaping messageParameterEscaping);
 }

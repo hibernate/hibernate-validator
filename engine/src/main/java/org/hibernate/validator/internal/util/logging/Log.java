@@ -867,4 +867,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 258, value = "Expression Language interpolation features are not explicitly enabled/disabled. Use '%1$s' environment variable, or '%2$s' system property to define the behavior. Defaulting to expression language features being disabled.")
 	void expressionLanguageFeaturesNoExplicitSetting(String expressionLanguageEnabledEnv, String expressionLanguageEnabledSystem);
+
+	@Message(id = 276, value = "Unable to find a message parameter escaping value for '%s'.")
+	ValidationException invalidMessageParameterEscapingValue(String messageParameterEscapingName, @Cause IllegalArgumentException e);
 }

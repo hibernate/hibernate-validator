@@ -10,6 +10,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for
@@ -22,9 +23,14 @@ import org.hibernate.validator.Incubating;
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
 	/**
-	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message. The
-	 * variable will be available for interpolation for all constraint violations generated for this constraint.
+	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message.
+	 * The variable will be available for interpolation for all constraint violations generated for this constraint.
 	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
+	 * <p>
+	 * Message parameters added via this method are subject to the default parameter escaping
+	 * configured for the current validation factory (see {@link MessageParameterEscaping} and
+	 * {@link org.hibernate.validator.HibernateValidatorConfiguration#MESSAGE_PARAMETER_ESCAPING}).
+	 * <p>
 	 * To create multiple constraint violations with different variable values, this method can be called
 	 * between successive calls to {@link ConstraintViolationBuilder#addConstraintViolation()}.
 	 * <p>
@@ -58,6 +64,29 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @since 5.4.1
 	 */
 	HibernateConstraintValidatorContext addMessageParameter(String name, Object value);
+
+	/**
+	 * Allows to set an additional named parameter with explicit control over escaping behavior.
+	 * <p>
+	 * Same as {@link #addMessageParameter(String, Object)}, but allows explicitly specifying the message parameter
+	 * escaping option.
+	 * <p>
+	 * When {@link MessageParameterEscaping#ESCAPE} is specified, non-{@link Number} values are escaped to prevent
+	 * injection into message interpolation expressions. When {@link MessageParameterEscaping#NONE} is specified, the
+	 * value is stored as-is.
+	 *
+	 * @param name the name under which to bind the parameter, cannot be {@code null}
+	 * @param value the value to be bound to the specified name
+	 * @param escaping the escaping behavior to use for this parameter
+	 *
+	 * @return a reference to itself to allow method chaining
+	 *
+	 * @throws IllegalArgumentException in case the provided name is {@code null}
+	 *
+	 * @since 6.0.23.SP3
+	 */
+	@Incubating
+	HibernateConstraintValidatorContext addMessageParameter(String name, Object value, MessageParameterEscaping escaping);
 
 	/**
 	 * Allows to set an additional expression variable which will be available as an EL variable during interpolation. The

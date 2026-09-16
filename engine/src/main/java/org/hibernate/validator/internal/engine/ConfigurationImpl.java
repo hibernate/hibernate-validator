@@ -51,6 +51,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetInstancesFromS
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.config.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.config.ValidationXmlParser;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
@@ -105,6 +106,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private Duration temporalValidationTolerance;
 	private Object constraintValidatorPayload;
 	private BeanMetaDataClassNormalizer beanMetaDataClassNormalizer;
+	private MessageParameterEscaping messageParameterEscaping;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -525,6 +527,21 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public Set<ValueExtractor<?>> getDefaultValueExtractors() {
 		return ValueExtractorManager.getDefaultValueExtractors();
+	}
+
+	@Override
+	public HibernateValidatorConfiguration messageParameterEscaping(MessageParameterEscaping messageParameterEscaping) {
+		if ( LOG.isDebugEnabled() ) {
+			if ( messageParameterEscaping != null ) {
+				LOG.debug( "Setting MessageParameterEscaping to " + messageParameterEscaping.name() );
+			}
+		}
+		this.messageParameterEscaping = messageParameterEscaping;
+		return this;
+	}
+
+	public MessageParameterEscaping getMessageParameterEscaping() {
+		return messageParameterEscaping;
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
