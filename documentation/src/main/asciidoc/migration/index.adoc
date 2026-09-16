@@ -77,3 +77,16 @@ Keep in mind that the internal representation of the `Path` and `Node` became mu
 so do not rely on these being immutable in your traversable resolvers.
 The `Path` and `Node` representations within the `ConstraintViolation` remains immutable.
 
+=== Message parameter escaping enabled by default
+
+Message parameters added via `HibernateConstraintValidatorContext#addMessageParameter()` are now escaped by default.
+Characters with special meaning in message interpolation (`\`, `{`, `}`, `$`) are automatically escaped to prevent
+injection into message interpolation expressions.
+
+If your custom constraint validators rely on message parameters containing unescaped interpolation expressions
+(e.g. nested `{paramName}` references or `$\{expression\}` EL expressions), you can either:
+
+* Use the new overload `addMessageParameter(String name, Object value, MessageParameterEscaping.NONE)` to disable escaping per call.
+This is a recommended alternative, *but* only for the parameter values that you trust.
+* Set the `hibernate.validator.message_parameter_escaping` property to `none` to restore the previous behavior globally.
+Only consider this option if none of the validators add user input as parameters.
