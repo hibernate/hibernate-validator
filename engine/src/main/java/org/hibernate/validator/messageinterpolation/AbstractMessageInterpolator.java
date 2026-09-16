@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.unescapeMessageParameter;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 import java.lang.invoke.MethodHandles;
@@ -14,8 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.validation.MessageInterpolator;
 import javax.validation.ValidationException;
@@ -120,10 +119,6 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 */
 	private final boolean cachingEnabled;
 
-	private static final Pattern LEFT_BRACE = Pattern.compile( "\\{", Pattern.LITERAL );
-	private static final Pattern RIGHT_BRACE = Pattern.compile( "\\}", Pattern.LITERAL );
-	private static final Pattern SLASH = Pattern.compile( "\\\\", Pattern.LITERAL );
-	private static final Pattern DOLLAR = Pattern.compile( "\\$", Pattern.LITERAL );
 
 	public AbstractMessageInterpolator() {
 		this( null );
@@ -255,7 +250,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		// if the message does not contain any message parameter, we can ignore the next steps and just return
 		// the unescaped message. It avoids storing the message in the cache and a cache lookup.
 		if ( message.indexOf( '{' ) < 0 ) {
-			return replaceEscapedLiterals( message );
+			return unescapeMessageParameter( message );
 		}
 
 		String resolvedMessage = null;
@@ -292,7 +287,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		}
 
 		// last but not least we have to take care of escaped literals
-		resolvedMessage = replaceEscapedLiterals( resolvedMessage );
+		resolvedMessage = unescapeMessageParameter( resolvedMessage );
 
 		return resolvedMessage;
 	}
@@ -352,16 +347,6 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			evaluatedDefaultBundleOnce = true;
 		} while ( true );
 
-		return resolvedMessage;
-	}
-
-	private String replaceEscapedLiterals(String resolvedMessage) {
-		if ( resolvedMessage.indexOf( '\\' ) > -1 ) {
-			resolvedMessage = LEFT_BRACE.matcher( resolvedMessage ).replaceAll( "{" );
-			resolvedMessage = RIGHT_BRACE.matcher( resolvedMessage ).replaceAll( "}" );
-			resolvedMessage = SLASH.matcher( resolvedMessage ).replaceAll( Matcher.quoteReplacement( "\\" ) );
-			resolvedMessage = DOLLAR.matcher( resolvedMessage ).replaceAll( Matcher.quoteReplacement( "$" ) );
-		}
 		return resolvedMessage;
 	}
 

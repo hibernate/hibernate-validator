@@ -44,6 +44,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
 /**
@@ -410,6 +411,10 @@ public class ValidationContext<T> {
 
 	public boolean isExpressionLanguageEnabled() {
 		return validatorScopedContext.isExpressionLanguageEnabled();
+	}
+
+	public MessageParameterEscaping getMessageParameterEscaping() {
+		return validatorScopedContext.getMessageParameterEscaping();
 	}
 
 	@Override
@@ -798,6 +803,8 @@ public class ValidationContext<T> {
 		 */
 		private final boolean expressionLanguageEnabled;
 
+		private final MessageParameterEscaping messageParameterEscaping;
+
 		/**
 		 * Hibernate Validator specific payload passed to the constraint validators.
 		 */
@@ -812,6 +819,7 @@ public class ValidationContext<T> {
 			this.failFast = validatorFactoryScopedContext.isFailFast();
 			this.traversableResolverResultCacheEnabled = validatorFactoryScopedContext.isTraversableResolverResultCacheEnabled();
 			this.expressionLanguageEnabled = validatorFactoryScopedContext.isExpressionLanguageEnabled();
+			this.messageParameterEscaping = validatorFactoryScopedContext.getMessageParameterEscaping();
 			this.constraintValidatorPayload = validatorFactoryScopedContext.getConstraintValidatorPayload();
 		}
 
@@ -845,6 +853,10 @@ public class ValidationContext<T> {
 
 		public boolean isExpressionLanguageEnabled() {
 			return expressionLanguageEnabled;
+		}
+
+		public MessageParameterEscaping getMessageParameterEscaping() {
+			return messageParameterEscaping;
 		}
 
 		public Object getConstraintValidatorPayload() {

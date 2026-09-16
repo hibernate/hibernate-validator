@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
-import java.util.Arrays;
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.resolveToString;
 
 import javax.validation.MessageInterpolator.Context;
 
@@ -27,7 +27,7 @@ public class ParameterTermResolver implements TermResolver {
 		String resolvedExpression;
 		Object variable = getVariable( context, removeCurlyBraces( expression ) );
 		if ( variable != null ) {
-			resolvedExpression = resolveExpression( variable );
+			resolvedExpression = resolveToString( variable );
 		}
 		else {
 			resolvedExpression = expression;
@@ -47,42 +47,5 @@ public class ParameterTermResolver implements TermResolver {
 
 	private String removeCurlyBraces(String parameter) {
 		return parameter.substring( 1, parameter.length() - 1 );
-	}
-
-	private String resolveExpression(Object variable) {
-		final String resolvedExpression;
-		if ( variable.getClass().isArray() ) {
-			if ( variable.getClass() == boolean[].class ) {
-				resolvedExpression = Arrays.toString( (boolean[]) variable );
-			}
-			else if ( variable.getClass() == char[].class ) {
-				resolvedExpression = Arrays.toString( (char[]) variable );
-			}
-			else if ( variable.getClass() == byte[].class ) {
-				resolvedExpression = Arrays.toString( (byte[]) variable );
-			}
-			else if ( variable.getClass() == short[].class ) {
-				resolvedExpression = Arrays.toString( (short[]) variable );
-			}
-			else if ( variable.getClass() == int[].class ) {
-				resolvedExpression = Arrays.toString( (int[]) variable );
-			}
-			else if ( variable.getClass() == long[].class ) {
-				resolvedExpression = Arrays.toString( (long[]) variable );
-			}
-			else if ( variable.getClass() == float[].class ) {
-				resolvedExpression = Arrays.toString( (float[]) variable );
-			}
-			else if ( variable.getClass() == double[].class ) {
-				resolvedExpression = Arrays.toString( (double[]) variable );
-			}
-			else {
-				resolvedExpression = Arrays.toString( (Object[]) variable );
-			}
-		}
-		else {
-			resolvedExpression = variable.toString();
-		}
-		return resolvedExpression;
 	}
 }

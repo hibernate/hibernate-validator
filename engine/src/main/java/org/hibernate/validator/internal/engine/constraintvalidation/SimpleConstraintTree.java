@@ -61,7 +61,8 @@ class SimpleConstraintTree<B extends Annotation> extends ConstraintTree<B> {
 				valueContext.getPropertyPath(),
 				descriptor,
 				validationContext.getConstraintValidatorPayload(),
-				validationContext.isExpressionLanguageEnabled()
+				validationContext.isExpressionLanguageEnabled(),
+				validationContext.getMessageParameterEscaping()
 		);
 
 		// validate
