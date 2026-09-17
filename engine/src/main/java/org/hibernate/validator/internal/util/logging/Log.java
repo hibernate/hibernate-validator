@@ -6,7 +6,6 @@ package org.hibernate.validator.internal.util.logging;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
-import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.lang.annotation.Annotation;
@@ -90,7 +89,7 @@ import org.jboss.logging.annotations.MessageLogger;
 @MessageLogger(projectCode = "HV")
 public interface Log extends BasicLogger {
 
-	@LogMessage(level = INFO)
+	@LogMessage(level = DEBUG)
 	@Message(id = 1, value = "Hibernate Validator %s")
 	void version(String version);
 
