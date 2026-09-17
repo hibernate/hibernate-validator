@@ -15,6 +15,7 @@ jobs:
     uses: hibernate/.github/.github/workflows/ci-reporting.yml@main
     permissions:
       actions: read
+      checks: write
       contents: read
       pull-requests: write
     secrets: inherit
