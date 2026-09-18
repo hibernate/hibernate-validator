@@ -286,6 +286,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.SIZE, TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 
 		//register HV-specific constraints
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.BIC, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.BITCOIN_ADDRESS, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CODE_POINT_LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CONTAINS, CharSequence.class );
