@@ -157,14 +157,17 @@ public final class MutablePath implements Path, Serializable {
 	}
 
 	public void makeLeafNodeIterable() {
+		detachSharedRootNode();
 		currentLeafNode.makeIterable();
 	}
 
 	public void makeLeafNodeIterableAndSetIndex(Integer index) {
+		detachSharedRootNode();
 		currentLeafNode.makeIterableAndSetIndex( index );
 	}
 
 	public void makeLeafNodeIterableAndSetMapKey(Object key) {
+		detachSharedRootNode();
 		currentLeafNode.makeIterableAndSetMapKey( key );
 	}
 
@@ -176,7 +179,20 @@ public final class MutablePath implements Path, Serializable {
 	}
 
 	public void setLeafNodeTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
+		detachSharedRootNode();
 		currentLeafNode.setTypeParameter( containerClass, typeArgumentIndex );
+	}
+
+	/**
+	 * The root node is a singleton shared by every path, so it has to be replaced with a private copy before any
+	 * of the mutators above writes container information to it. Otherwise that write stays there for the lifetime
+	 * of the JVM and every path created later reports it on its first node. The current leaf node is the root node
+	 * for violations built from a class-level constraint, where the leaf bean node is dropped.
+	 */
+	private void detachSharedRootNode() {
+		if ( currentLeafNode == MutableNode.ROOT_NODE ) {
+			currentLeafNode = MutableNode.createRootNode();
+		}
 	}
 
 	public void removeLeafNode() {
