@@ -968,4 +968,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 275, value = "The minRequired parameter (%1$d) cannot exceed the number of values (%2$d).")
 	IllegalArgumentException getMinRequiredCannotExceedNumberOfValuesException(int minRequired, int valuesLength);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 276, value = "Using %s as accessor factory.")
+	void usingAccessorFactory(@FormatWith(ClassObjectFormatter.class) Class<?> accessorFactoryClass);
+
+	@Message(id = 277, value = "Unable to instantiate accessor factory class %s.")
+	ValidationException getUnableToInstantiateAccessorFactoryClassException(String accessorFactoryClassName, @Cause Exception e);
 }
