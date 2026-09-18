@@ -968,4 +968,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 275, value = "The minRequired parameter (%1$d) cannot exceed the number of values (%2$d).")
 	IllegalArgumentException getMinRequiredCannotExceedNumberOfValuesException(int minRequired, int valuesLength);
+
+	@Message(id = 276, value = "The prefix must not start with %1$s.")
+	IllegalArgumentException getPrefixCannotStartWithException(char c);
+
+	@Message(id = 277, value = "The prefix must not end with %1$s.")
+	IllegalArgumentException getPrefixCannotEndWithException(char c);
 }
