@@ -1,5 +1,20 @@
 # Hibernate Validator Changelog
 
+## 9.1.4.Final (2026-09-20)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40268)
+
+
+### Bug
+* [HV-2253](https://hibernate.atlassian.net/browse/HV-2253) - ClassNotFoundException thrown when an EL implementation and OSGi are not on the class path
+
+### Improvement
+* [HV-2243](https://hibernate.atlassian.net/browse/HV-2243) - Bump joda-time to 2.14.3
+* [HV-2242](https://hibernate.atlassian.net/browse/HV-2242) - Update to OpenJFX to 17.0.20
+
+### Task
+* [HV-2244](https://hibernate.atlassian.net/browse/HV-2244) - Tune the content of javadoc jars to reduce the size of files published to Maven Central
+
 ## 9.1.3.Final (2026-07-26)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40065)
