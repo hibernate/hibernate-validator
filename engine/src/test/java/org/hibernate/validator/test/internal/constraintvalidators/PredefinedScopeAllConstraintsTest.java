@@ -63,6 +63,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URI;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -145,6 +146,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( DurationMax.class, new DurationMaxBean() );
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
+		testConstraint( URI.class, new URIBean() );
 		testConstraint( UUID.class, new UUIDBean() );
 		testConstraint( DateTimeFormat.class, new DateTimeFormatBean() );
 
@@ -502,6 +504,13 @@ public class PredefinedScopeAllConstraintsTest {
 		public boolean doTest(boolean test) {
 			return test;
 		}
+	}
+
+	private static class URIBean {
+
+		@URI
+		private String uri = "ht tp://invalid uri";
+
 	}
 
 	private static class UUIDBean {

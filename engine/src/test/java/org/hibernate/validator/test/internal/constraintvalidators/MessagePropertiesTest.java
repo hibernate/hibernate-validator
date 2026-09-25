@@ -64,6 +64,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URI;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -187,6 +188,7 @@ public class MessagePropertiesTest {
 							violationOf( DurationMax.class ),
 							violationOf( DurationMin.class ),
 							violationOf( ScriptAssert.class ),
+							violationOf( URI.class ),
 							violationOf( UUID.class )
 					);
 
@@ -380,6 +382,9 @@ public class MessagePropertiesTest {
 
 		@DurationMin(days = 4, hours = 4, minutes = 4, millis = 4, nanos = 4)
 		private Duration durationMin = Duration.ofDays( 2 );
+
+		@URI
+		private String uri = "ht tp://invalid uri";
 
 		@UUID
 		private String uuid = "invalid";

@@ -61,6 +61,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URI;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
@@ -132,6 +133,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URI;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -381,6 +383,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorFor
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.URIValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
@@ -908,6 +911,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS ) ) {
 			putBuiltinConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URI ) ) {
+			putBuiltinConstraint( tmpConstraints, URI.class, URIValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL ) ) {
 			putBuiltinConstraint( tmpConstraints, URL.class, URLValidator.class );
