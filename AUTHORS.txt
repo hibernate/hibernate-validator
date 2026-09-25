@@ -4,6 +4,7 @@
 
 # Corporate contributors
 
+International Business Machines Corp.
 Red Hat, Inc.
 
 # Individual contributors
