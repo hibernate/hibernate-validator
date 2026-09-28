@@ -6,6 +6,7 @@ package org.hibernate.validator.test.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
+import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -20,7 +21,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.DecimalMin;
 
-import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
@@ -45,7 +45,7 @@ public class MappingXmlParserTest {
 		constraintCreationContext = getDummyConstraintCreationContext();
 		xmlMappingParser = new MappingXmlParser(
 				constraintCreationContext,
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ), null
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), getAccessorFactory() ), null
 		);
 	}
 

@@ -6,6 +6,7 @@ package org.hibernate.validator.test.internal.metadata.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
+import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
@@ -17,7 +18,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -45,7 +45,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 	public void setup() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), getAccessorFactory() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}
