@@ -9,6 +9,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
+import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
@@ -26,7 +27,6 @@ import jakarta.validation.groups.ConvertGroup;
 import jakarta.validation.groups.Default;
 import jakarta.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -59,7 +59,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), getAccessorFactory() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}
@@ -101,7 +101,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
 
 		assertThat( createEvent.getCallable() ).isEqualTo(
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() )
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), getAccessorFactory() )
 						.findDeclaredMethod( Calendar.class, "createEvent", LocalDate.class, LocalDate.class )
 						.get()
 		);

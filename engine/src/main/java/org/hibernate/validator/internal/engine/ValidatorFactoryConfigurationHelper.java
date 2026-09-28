@@ -371,7 +371,7 @@ final class ValidatorFactoryConfigurationHelper {
 			}
 		}
 
-		return AccessorFactory.reflection();
+		return AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() );
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig) {

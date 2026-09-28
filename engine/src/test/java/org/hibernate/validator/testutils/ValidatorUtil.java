@@ -6,9 +6,12 @@ package org.hibernate.validator.testutils;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.validation.Configuration;
@@ -22,6 +25,9 @@ import jakarta.validation.metadata.PropertyDescriptor;
 import jakarta.validation.metadata.ReturnValueDescriptor;
 import jakarta.validation.spi.ValidationProvider;
 
+import org.hibernate.accessor.AccessorFactory;
+import org.hibernate.accessor.spi.AccessContext;
+import org.hibernate.accessor.spi.AccessorConfiguration;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
@@ -261,5 +267,37 @@ public final class ValidatorUtil {
 		);
 		constraintValidatorContext.resetAsRegularContext( propertyPath, null );
 		return constraintValidatorContext;
+	}
+
+	public static AccessorFactory getAccessorFactory() {
+		return AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() );
+	}
+
+	private static final class HibernateValidatorAccessContext implements AccessContext {
+
+		static AccessorConfiguration configuration() {
+			return new AccessorConfiguration( new HibernateValidatorAccessContext(), Map.of() );
+		}
+
+		private final MethodHandles.Lookup lookup;
+
+		private HibernateValidatorAccessContext() {
+			this.lookup = MethodHandles.lookup();
+		}
+
+		@Override
+		public MethodHandles.Lookup lookup() {
+			return lookup;
+		}
+
+		@Override
+		public void ensureReads(Module target) {
+			lookup.lookupClass().getModule().addReads( target );
+		}
+
+		@Override
+		public void makeAccessible(AccessibleObject member) {
+			member.setAccessible( true );
+		}
 	}
 }
