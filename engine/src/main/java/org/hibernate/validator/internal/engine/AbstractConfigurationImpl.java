@@ -419,7 +419,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 		return new DefaultConstraintMapping( new JavaBeanHelper(
 				getterPropertySelectionStrategy == null ? new DefaultGetterPropertySelectionStrategy() : getterPropertySelectionStrategy,
 				validationBootstrapParameters.getPropertyNodeNameProvider() == null ? defaultPropertyNodeNameProvider : validationBootstrapParameters.getPropertyNodeNameProvider(),
-				accessorFactory == null ? AccessorFactory.reflection() : accessorFactory
+				accessorFactory == null ? AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() ) : accessorFactory
 		) );
 	}
 

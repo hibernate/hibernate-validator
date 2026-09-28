@@ -8,6 +8,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
+import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
@@ -27,7 +28,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 
-import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
@@ -242,7 +242,7 @@ public class MutablePathTest {
 				getDummyConstraintCreationContext(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), AccessorFactory.reflection() ),
+				new JavaBeanHelper( new DefaultGetterPropertySelectionStrategy(), new DefaultPropertyNodeNameProvider(), getAccessorFactory() ),
 				new DefaultBeanMetaDataClassNormalizer(),
 				new ValidationOrderGenerator(),
 				Collections.<MetaDataProvider>emptyList(),
