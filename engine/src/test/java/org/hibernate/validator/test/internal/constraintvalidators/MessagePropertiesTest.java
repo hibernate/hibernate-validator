@@ -67,6 +67,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.UpperCase;
 import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
@@ -173,6 +174,7 @@ public class MessagePropertiesTest {
 							violationOf( Port.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
+							violationOf( UpperCase.class ),
 							violationOf( URL.class ),
 							violationOf( CUIL.class ),
 							violationOf( CUIT.class ),
@@ -341,6 +343,9 @@ public class MessagePropertiesTest {
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );
+
+		@UpperCase
+		private String uppercase = "lowercase";
 
 		@URL
 		private String url = "invalid";

@@ -66,6 +66,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.UpperCase;
 import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
@@ -131,6 +132,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Port.class, new PortBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
+		testConstraint( UpperCase.class, new UpperCaseBean() );
 		testConstraint( URL.class, new URLBean() );
 		testConstraint( CUIL.class, new CUILBean() );
 		testConstraint( CUIT.class, new CUITBean() );
@@ -409,6 +411,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );
+	}
+
+	private static class UpperCaseBean {
+
+		@UpperCase
+		private String uppercase = "lowercase";
 	}
 
 	private static class URLBean {

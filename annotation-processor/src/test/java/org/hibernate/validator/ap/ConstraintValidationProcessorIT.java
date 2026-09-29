@@ -34,6 +34,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithUpperCaseConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
@@ -766,6 +767,25 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void nullOrNotBlankConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithNullOrNotBlankConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 15 ),
+				new DiagnosticExpectation( Kind.ERROR, 18 ),
+				new DiagnosticExpectation( Kind.ERROR, 21 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2258")
+	public void uppercaseConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithUpperCaseConstraints.class )
 		};
 
 		boolean compilationResult =
