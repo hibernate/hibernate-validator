@@ -157,7 +157,7 @@
         -->
         <version.com.fasterxml.classmate>1.7.3</version.com.fasterxml.classmate>
         <version.joda-time>2.14.3</version.joda-time>
-        <version.org.slf4j>2.0.19</version.org.slf4j>
+        <version.org.slf4j>2.0.20</version.org.slf4j>
         <version.org.apache.logging.log4j>2.26.1</version.org.apache.logging.log4j>
 
         <!--
@@ -201,7 +201,7 @@
         <version.com.google.guava>33.7.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>7.0.9</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.tools.jackson.core.jackson-bom>3.2.2</version.tools.jackson.core.jackson-bom>
+        <version.tools.jackson.core.jackson-bom>3.2.3</version.tools.jackson.core.jackson-bom>
         <version.net.bytebuddy.byte-buddy>1.18.14</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
@@ -243,7 +243,7 @@
         <version.deploy.plugin>3.2.0</version.deploy.plugin>
         <version.enforcer.plugin>3.6.3</version.enforcer.plugin>
         <!-- Note: when updating this version, consider reviewing the list of JDKs the forbidden API plugin is targeting. -->
-        <version.forbiddenapis.plugin>3.10</version.forbiddenapis.plugin>
+        <version.forbiddenapis.plugin>3.11</version.forbiddenapis.plugin>
         <version.gmavenplus.plugin>5.1.0</version.gmavenplus.plugin>
         <version.install.plugin>3.2.0</version.install.plugin>
         <version.japicmp.plugin>0.26.2</version.japicmp.plugin>
@@ -263,7 +263,7 @@
         <version.sisu-maven-plugin>1.1.0</version.sisu-maven-plugin>
         <version.versions.plugin>2.22.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
-        <version.spotless-maven-plugin>3.10.2</version.spotless-maven-plugin>
+        <version.spotless-maven-plugin>3.10.3</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.15</version.jacoco.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
