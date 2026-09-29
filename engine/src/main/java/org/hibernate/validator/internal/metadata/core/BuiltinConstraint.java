@@ -78,6 +78,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL( "org.hibernate.validator.constraints.URL",
 			Arrays.asList( JAKARTA_VALIDATION_CONSTRAINTS_PATTERN ) ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS( "org.hibernate.validator.constraints.UniqueElements" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UPPERCASE( "org.hibernate.validator.constraints.UpperCase" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_AR_CUIL( "org.hibernate.validator.constraints.ar.CUIL" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_AR_CUIT( "org.hibernate.validator.constraints.ar.CUIT" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ( "org.hibernate.validator.constraints.br.CNPJ",
