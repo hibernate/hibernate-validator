@@ -63,6 +63,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UPPERCASE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
@@ -139,6 +140,7 @@ import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.hibernate.validator.constraints.UpperCase;
 import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
@@ -390,6 +392,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.StartsWithValida
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UUIDValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.UniqueElementsValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.UpperCaseValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUILValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUITValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
@@ -920,6 +923,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS ) ) {
 			putBuiltinConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UPPERCASE ) ) {
+			putBuiltinConstraint( tmpConstraints, UpperCase.class, UpperCaseValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_URL ) ) {
 			putBuiltinConstraint( tmpConstraints, URL.class, URLValidator.class );
