@@ -762,6 +762,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `Collection`
 	Hibernate metadata impact::: None
 
+`@LowerCase`:: Checks that all letter characters in the annotated character sequence are lowercase. Non-letter characters (digits, punctuation, whitespace, etc.) are ignored. `null` values and empty character sequences are considered valid.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@UpperCase`:: Checks that all letter characters in the annotated character sequence are uppercase. Non-letter characters (digits, punctuation, whitespace, etc.) are ignored. `null` values and empty character sequences are considered valid.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None

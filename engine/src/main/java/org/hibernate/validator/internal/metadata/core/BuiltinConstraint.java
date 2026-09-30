@@ -60,6 +60,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS( "org.hibernate.validator.constraints.IpAddress" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN( "org.hibernate.validator.constraints.ISBN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH( "org.hibernate.validator.constraints.Length" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LOWERCASE( "org.hibernate.validator.constraints.LowerCase" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK( "org.hibernate.validator.constraints.LuhnCheck" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER( "org.hibernate.validator.constraints.CreditCardNumber",
 			Arrays.asList( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK ) ),
