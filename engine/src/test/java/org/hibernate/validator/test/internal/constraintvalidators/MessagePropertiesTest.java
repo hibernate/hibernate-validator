@@ -54,6 +54,7 @@ import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.LowerCase;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
@@ -174,6 +175,7 @@ public class MessagePropertiesTest {
 							violationOf( Port.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
+							violationOf( LowerCase.class ),
 							violationOf( UpperCase.class ),
 							violationOf( URL.class ),
 							violationOf( CUIL.class ),
@@ -343,6 +345,9 @@ public class MessagePropertiesTest {
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );
+
+		@LowerCase
+		private String lowercase = "UPPERCASE";
 
 		@UpperCase
 		private String uppercase = "lowercase";

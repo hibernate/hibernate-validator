@@ -53,6 +53,7 @@ import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.LowerCase;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
@@ -132,6 +133,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Port.class, new PortBean() );
 		testConstraint( Range.class, new RangeBean() );
 		testConstraint( UniqueElements.class, new UniqueElementsBean() );
+		testConstraint( LowerCase.class, new LowerCaseBean() );
 		testConstraint( UpperCase.class, new UpperCaseBean() );
 		testConstraint( URL.class, new URLBean() );
 		testConstraint( CUIL.class, new CUILBean() );
@@ -411,6 +413,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@UniqueElements
 		private List<String> uniqueElements = Arrays.asList( "a", "a" );
+	}
+
+	private static class LowerCaseBean {
+
+		@LowerCase
+		private String lowercase = "UPPERCASE";
 	}
 
 	private static class UpperCaseBean {

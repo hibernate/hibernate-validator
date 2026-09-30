@@ -29,6 +29,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithKorRRNConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithLowerCaseConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
@@ -778,6 +779,24 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 15 ),
 				new DiagnosticExpectation( Kind.ERROR, 18 ),
 				new DiagnosticExpectation( Kind.ERROR, 21 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2258")
+	public void lowercaseConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithLowerCaseConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 17 ),
+				new DiagnosticExpectation( Kind.ERROR, 20 )
 		);
 	}
 
