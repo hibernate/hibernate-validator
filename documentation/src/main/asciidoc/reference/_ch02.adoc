@@ -754,6 +754,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `Collection`
 	Hibernate metadata impact::: None
 
+`@URI(type=, schemes=, authority=, host=, allowOpaque=, regexp=, flags=)`:: Checks if the annotated character sequence is a valid URI according to RFC 3986 using `java.net.URI`. Accepts all URI forms including absolute URIs (e.g., `http://example.com`), relative references (e.g., `../path`), and opaque URIs (e.g., `mailto:user@host`, `urn:isbn:123`). `null` and empty string are considered valid. The optional parameter `type` controls whether absolute, relative, or any URI is accepted. `schemes` restricts allowed URI schemes (case-insensitive). `authority` controls the presence of the authority component (`//host:port`). `host` restricts the host format (domain, IPv4, IPv6). `allowOpaque` controls acceptance of opaque URIs. The optional parameters `regexp` and `flags` allow additional regex validation.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@URL(protocol=, host=, port=, regexp=, flags=)`:: Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters `protocol`, `host` or `port` are specified, the corresponding URL fragments must match the specified values. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the URL must match. Per default this constraint used the `java.net.URL` constructor to verify whether a given string represents a valid URL. A regular expression based version is also available - `RegexpURLValidator` - which can be configured via XML (see <<section-mapping-xml-constraints>>) or the programmatic API (see <<section-programmatic-constraint-definition>>).
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
