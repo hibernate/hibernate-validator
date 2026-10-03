@@ -750,6 +750,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: Any type
 	Hibernate metadata impact::: None
 
+`@Trimmed`:: Checks that the annotated character sequence has no leading or trailing whitespace. A character is considered whitespace according to `Character.isWhitespace(int)`, matching `String.strip()` semantics. `null` and empty sequences are considered valid.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@UniqueElements`:: Checks that the annotated collection only contains unique elements. The equality is determined using the `equals()` method. The default message does not include the list of duplicate elements but you can include it by overriding the message and using the `{duplicates}` message parameter. The list of duplicate elements is also included in the dynamic payload of the constraint violation.
 	Supported data types::: `Collection`
 	Hibernate metadata impact::: None
