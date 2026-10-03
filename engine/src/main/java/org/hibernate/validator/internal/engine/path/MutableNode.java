@@ -102,6 +102,10 @@ public class MutableNode
 		this.typeArgumentIndex = typeArgumentIndex;
 	}
 
+	static MutableNode createRootNode() {
+		return createBeanNode( null );
+	}
+
 	public static MutableNode createNode(MutableNode parent) {
 		return new MutableNode(
 				null,
