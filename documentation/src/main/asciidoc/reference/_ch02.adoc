@@ -714,6 +714,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@Hexadecimal(letterCase=, strictness=, allowEmpty=, prefix=)`:: Validates that the annotated character sequence contains only hexadecimal characters (`0-9`, `a-f`, `A-F`). `null` is always valid. `letterCase` accepts `LOWER_CASE` (only `0-9a-f`), `UPPER_CASE` (only `0-9A-F`) or `INSENSITIVE` (default, any mix of cases). `strictness` accepts `STRICT` (default, ASCII characters only) or `LENIENT` (additionally accepts the fullwidth forms `０-９`, `ａ-ｆ`, `Ａ-Ｆ`). An empty character sequence is invalid by default; set `allowEmpty` to allow it. `prefix` is a leading marker that must be present when non-empty; the well-known prefixes `0x` and `#` are matched exactly, while any other value is treated as a regular expression anchored to the start of the value. The `letterCase` and `strictness` attributes only apply to the characters following the prefix.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@LuhnCheck(startIndex= , endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`:: Checks that the digits within the annotated character sequence pass the Luhn checksum algorithm (see also http://en.wikipedia.org/wiki/Luhn_algorithm[Luhn algorithm]). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
