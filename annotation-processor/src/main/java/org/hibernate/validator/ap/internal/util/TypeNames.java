@@ -64,6 +64,7 @@ public class TypeNames {
 
 		private static final String ORG_HIBERNATE_VALIDATOR_CONSTRAINTS = "org.hibernate.validator.constraints";
 
+		public static final String BIC = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".BIC";
 		public static final String BITCOIN_ADDRESS = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".BitcoinAddress";
 
 		public static final String CODE_POINT_LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".CodePointLength";

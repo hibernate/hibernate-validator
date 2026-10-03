@@ -28,6 +28,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.J
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.JAKARTA_VALIDATION_CONSTRAINTS_SIZE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_AR_CUIL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_AR_CUIT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BIC;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF;
@@ -110,6 +111,7 @@ import jakarta.validation.constraints.Size;
 import jakarta.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.constraints.BIC;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -343,6 +345,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorprese
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.PastOrPresentValidatorForZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.hv.BICValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ContainsValidator;
@@ -914,6 +917,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UUID ) ) {
 			putBuiltinConstraint( tmpConstraints, UUID.class, UUIDValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BIC ) ) {
+			putBuiltinConstraint( tmpConstraints, BIC.class, BICValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS ) ) {
 			putBuiltinConstraint( tmpConstraints, BitcoinAddress.class, BitcoinAddressValidator.class );
