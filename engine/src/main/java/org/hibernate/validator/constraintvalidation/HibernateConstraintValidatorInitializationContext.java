@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import jakarta.validation.ClockProvider;
 
 import org.hibernate.validator.Incubating;
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.spi.scripting.ScriptEvaluator;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorNotFoundException;
@@ -88,4 +89,17 @@ public interface HibernateConstraintValidatorInitializationContext {
 	 */
 	@Incubating
 	<C, V extends C> C getSharedData(Class<C> type, Supplier<V> createIfNotPresent);
+
+	/**
+	 * Returns the {@link BeanResolver} for resolving beans registered via
+	 * {@link org.hibernate.validator.BaseHibernateValidatorConfiguration#addBeanConfigurer(org.hibernate.validator.spi.bean.BeanConfigurer)}
+	 * or discovered via {@link java.util.ServiceLoader}.
+	 *
+	 * @return the bean resolver
+	 *
+	 * @since 9.2.0
+	 */
+	@Incubating
+	BeanResolver getBeanResolver();
+
 }

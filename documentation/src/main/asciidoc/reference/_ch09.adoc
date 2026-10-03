@@ -430,6 +430,103 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Bootstrapp
 Refer to <<section-fail-fast>> and <<section-programmatic-api>> to learn more about the fail fast
 mode and the constraint declaration API.
 
+[[section-bean-system]]
+==== Bean resolution and pluggable components
+
+Hibernate Validator uses a bean resolution system to manage its pluggable components.
+
+===== Registering beans programmatically
+
+Use `addBeanConfigurer()` on the Hibernate Validator configuration to register custom implementations:
+
+====
+[source, java, indent=0]
+----
+Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.addBeanConfigurer( context -> {
+			context.define( PasswordStrengthEstimator.class,
+					BeanReference.ofInstance( new MyPasswordStrengthEstimator() ) );
+			context.define( CompromisedPasswordChecker.class,
+					BeanReference.ofInstance( new MyCompromisedPasswordChecker() ) );
+		} )
+		.buildValidatorFactory()
+		.getValidator();
+----
+====
+
+Each `define()` call associates an implementation with a type (and optionally a name).
+
+===== CDI integration
+
+In CDI environments, when using the `hibernate-validator-cdi` extension,
+Hibernate Validator automatically discovers a `BeanProvider`
+backed by the CDI `BeanManager`. Any bean available in the CDI container can be
+resolved -- no explicit registration is needed.
+
+For other DI frameworks, set a custom `BeanProvider` via the configuration:
+
+====
+[source, java, indent=0]
+----
+Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.beanProvider( myCustomBeanProvider )
+		.buildValidatorFactory();
+----
+====
+
+===== ServiceLoader discovery
+
+`BeanConfigurer` implementations discovered via `java.util.ServiceLoader` are applied
+automatically at bootstrap. Create a file named
+`META-INF/services/org.hibernate.validator.spi.bean.BeanConfigurer` containing
+the fully-qualified class names of your configurers.
+
+===== Pluggable components
+
+The following components can be configured through the bean system.
+
+====== Components with builtin defaults
+
+These components have a builtin default implementation. To override the default, you must
+either use the programmatic setter on the configuration object or set the corresponding
+configuration property.
+
+The resolution order is: explicit programmatic setter > configuration property > builtin default.
+
+The following components are required at factory construction time and have a simpler resolution.
+When configured through a property, the property value is treated as a fully-qualified class name
+and the component is instantiated via its no-arg constructor.
+
+[cols="2,3,2", options="header"]
+|===
+| Component | Description | Property
+
+| `ScriptEvaluatorFactory` | Controls how script engines are initialized for `@ScriptAssert` and `@ParameterScriptAssert` | `hibernate.validator.script_evaluator_factory`
+| `GetterPropertySelectionStrategy` | Determines which methods are considered property getters | `hibernate.validator.getter_property_selection_strategy`
+| `PropertyNodeNameProvider` | Resolves property names in constraint violation paths | `hibernate.validator.property_node_name_provider`
+| `LocaleResolver` | Resolves the locale for message interpolation | `hibernate.validator.locale_resolver`
+| `BeanMetaDataClassNormalizer` | Normalizes bean classes (e.g. for proxy unwrapping) | `hibernate.validator.bean_meta_data_class_normalizer`
+| `MessageInterpolator` | Interpolates constraint violation messages | `hibernate.validator.message_interpolator`
+|===
+
+====== Components without defaults
+
+These components have no builtin default. Registering a single implementation is
+sufficient -- the validator will auto-discover it. When multiple implementations
+are registered, you would need to resolve the ambiguity. For example, in case of
+password-related constraints, use the bean reference in the constraint annotation
+attribute to select which one to use (e.g. `@PasswordStrength(estimator = "myEstimator")`).
+
+[cols="2,3", options="header"]
+|===
+| Component | Description
+
+| `PasswordStrengthEstimator` | Estimates password strength for `@PasswordStrength`
+| `CompromisedPasswordChecker` | Checks for compromised passwords for `@NotCompromised`
+|===
+
 [[section-script-evaluator-factory]]
 ==== Configuring the `ScriptEvaluatorFactory`
 
@@ -524,6 +621,247 @@ constraints:
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScriptEvaluatorFactoryForSpringELTest.java[tags=include]
 ----
 ====
+
+[[section-password-validation-services]]
+==== Configuring password validation beans
+
+[WARNING]
+====
+The security of password validation depends entirely on your implementations of
+`PasswordStrengthEstimator`, `CompromisedPasswordChecker`, and any custom `PasswordPolicyRule`.
+Implementations must handle password data securely. Check with the most current rules and
+standards for handling passwords. Following are a few examples of what to check for
+(applicable at the time of writing this documentation): never send plaintext passwords to
+external services, never log passwords, and zero `char[]` arrays after use.
+
+The example implementations in this section are provided for illustration only and are *not*
+production-ready -- they lack error handling, timeouts, retries, and circuit breaking that
+a production deployment would require.
+====
+
+The `@PasswordStrength` and `@NotCompromised` constraints delegate to user-provided implementations
+that must be registered as beans at bootstrap time. The two interfaces are:
+
+* `PasswordStrengthEstimator` -- estimates password strength (the score scale is defined by the implementation)
+* `CompromisedPasswordChecker` -- checks whether a password has appeared in a known data breach
+
+Both accept `char[]` rather than `String` so the caller can zero the array after validation.
+
+Register beans via the `addBeanConfigurer()` method on the Hibernate Validator configuration:
+
+[[example-password-strength-registration]]
+.Registering a `PasswordStrengthEstimator`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordValidationServicesTest.java[tags=weightRegistration]
+----
+====
+
+[[example-compromised-password-registration]]
+.Registering a `CompromisedPasswordChecker`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordValidationServicesTest.java[tags=compromisedRegistration]
+----
+====
+
+===== Example: zxcvbn4j-based password strength estimator
+
+The https://github.com/nulab/zxcvbn4j[zxcvbn4j] library is a Java port of the
+https://github.com/dropbox/zxcvbn[Dropbox zxcvbn] algorithm. It can be wrapped in a few lines:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Zxcvbn4jPasswordStrengthEstimator.java[tags=include]
+----
+====
+
+Other libraries such as https://github.com/GoSimpleLLC/nbvcxz[nbvcxz] can be wrapped in the same way.
+
+===== Example: Have I Been Pwned compromised password checker
+
+The https://haveibeenpwned.com/Passwords[Have I Been Pwned] service exposes a free, anonymous
+API that uses k-anonymity: only the first five characters of the SHA-1 hash are sent to the server.
+The following implementation uses the JDK `HttpClient`:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/HaveIBeenPwnedPasswordChecker.java[tags=include]
+----
+====
+
+[CAUTION]
+====
+This example is for illustration only. A production implementation should include proper error handling,
+timeouts, retries with backoff, and circuit breaking. Consider caching results and respecting the
+API's rate limits. Always verify that your implementation never sends the full password or
+its complete hash to any external service.
+====
+
+[[section-password-policy]]
+==== Composable password policies
+
+The `@PasswordPolicy` constraint lets you define composable password validation rules in a single annotation.
+Unlike `@PasswordStrength` or `@NotCompromised`, which each check one aspect, `@PasswordPolicy` combines
+multiple rules -- and each failing rule produces its own constraint violation with a specific message.
+
+A policy is defined by implementing `PasswordPolicyDefinition` and configuring rules via the `PasswordPolicyBuilder`:
+
+[[example-password-policy-basic]]
+.Defining a password policy
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=policyDefinition]
+----
+====
+
+Apply it to a field using `@PasswordPolicy`:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=policyUsage]
+----
+====
+
+===== Built-in rules
+
+The builder provides convenience methods for common password policy rules:
+
+[cols="3,5", options="header"]
+|===
+| Builder method | Description
+
+| `minLength(int min)` | Password must be at least `min` characters long
+| `maxLength(int max)` | Password must be at most `max` characters long
+| `requireCharacters(CharacterType type, int min)` | Password must contain at least `min` characters of the given type (`UPPERCASE`, `LOWERCASE`, `DIGIT`, `SPECIAL`)
+| `noSequence()` | Rejects passwords containing 3+ sequential characters (e.g. "abc", "321")
+| `noKeyboardWalk()` | Rejects passwords containing walks across adjacent keys (e.g. "qwerty", "asdf", "4eszxdr5"). Defaults to the QWERTY layout with a minimum walk length of 4. Use `noKeyboardWalk(KeyboardLayout...)` to specify different layouts (QWERTY, AZERTY, DVORAK, NORDIC, CYRILLIC_UA), or `noKeyboardWalk(int, KeyboardLayout...)` to also set a custom minimum walk length. Custom layouts can be created via `KeyboardLayout.of(...)`. Shifted and diacritical characters are mapped to their base key.
+| `noWhitespace()` | Rejects passwords containing whitespace characters
+| `noRepeatingCharacters(int max)` | Rejects passwords where the same character repeats more than `max` times consecutively (e.g. "aaa")
+| `allowedCharacters(char... chars)` | Restricts the password to only the specified characters
+| `illegalCharacters(char... chars)` | Rejects passwords containing any of the specified characters
+| `strengthEstimator(int minScore, PasswordStrengthEstimator)` | Requires a minimum strength score using a `PasswordStrengthEstimator` (see <<section-password-validation-services>>)
+| `compromisedChecker(CompromisedPasswordChecker)` | Rejects passwords flagged as compromised using a `CompromisedPasswordChecker` (see <<section-password-validation-services>>)
+|===
+
+===== Custom rules
+
+For requirements not covered by the built-in methods, use `addRule()` with either a lambda or a full
+`PasswordPolicyRule` implementation.
+
+====== Lambda rules
+
+Simple checks can be expressed as one-liners:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=lambdaRules]
+----
+====
+
+====== Custom rules with external services
+
+More complex rules that depend on external resources -- dictionary lookups, password history checks,
+breach databases -- should delegate to an external service interface. The application provides the
+implementation; the rule only needs the contract:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHistoryService.java[tags=include]
+----
+====
+
+The rule receives the service via its constructor and delegates to it:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordHistoryRule.java[tags=include]
+----
+====
+
+`PasswordPolicyDefinition` classes are resolved through the bean system
+(see <<section-bean-system>>). By default, they are instantiated via their no-arg constructor.
+In other environments, you can make the definition a managed bean --
+its dependencies will be injected by the container. You can also register it
+via `addBeanConfigurer()` to wire dependencies programmatically:
+
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=serviceRules]
+----
+====
+
+[[section-password-policy-class-level]]
+===== Class-level validation with `AbstractPasswordPolicyValidator`
+
+When a password policy rule needs access to other bean properties -- for example, to reject passwords
+that contain the username -- `@PasswordPolicy` can be placed on the class instead of the password field.
+
+Hibernate Validator does not ship a class-level validator; you provide your own by extending
+`AbstractPasswordPolicyValidator<T>`. This base class resolves the policy definition, builds
+the rules, and runs the validation. You only need to implement two methods:
+
+* `getPassword(T)` -- extracts the password from the bean
+* `bindProperties(T, BiConsumer<String, Object>)` -- binds additional properties that rules can read
+via `PasswordContext.get(name, type)`
+
+For example, first, define a rule that reads a property from the context:
+
+[[example-password-policy-no-username-rule]]
+.A rule that rejects passwords containing the username
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=noUsernameRule]
+----
+====
+
+Define a policy that uses this rule alongside standard rules:
+
+[[example-password-policy-class-level-policy]]
+.A policy definition using cross-field rules
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=classLevelPolicy]
+----
+====
+
+Annotate the bean with `@PasswordPolicy` at the class level:
+
+[[example-password-policy-class-level-bean]]
+.A bean with class-level `@PasswordPolicy`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=classLevelBean]
+----
+====
+
+Implement the validator by extending `AbstractPasswordPolicyValidator`:
+
+[[example-password-policy-class-level-validator]]
+.Class-level validator implementation
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/PasswordPolicyTest.java[tags=classLevelValidator]
+----
+====
+
+Since this is a custom validator for an existing constraint, it must be registered with Hibernate
+Validator. This can be done via XML, the `ServiceLoader` mechanism, or the programmatic API.
+See <<section-constraint-definition-contribution>> for details.
 
 ==== Logging of values under validation
 

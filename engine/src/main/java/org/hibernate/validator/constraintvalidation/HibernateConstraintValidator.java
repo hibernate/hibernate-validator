@@ -38,4 +38,14 @@ public interface HibernateConstraintValidator<A extends Annotation, T> extends C
 	 */
 	default void initialize(ConstraintDescriptor<A> constraintDescriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
 	}
+
+	/**
+	 * Releases any resources held by this validator (e.g. {@link org.hibernate.validator.bean.BeanHolder} instances).
+	 * <p>
+	 * Called when the constraint validator is evicted from the cache or when the {@link ConstraintValidatorFactory} is closed.
+	 *
+	 * @since 9.2.0
+	 */
+	default void close() {
+	}
 }

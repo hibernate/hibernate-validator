@@ -11,6 +11,8 @@ import org.hibernate.validator.spi.messageinterpolation.LocaleResolverContext;
 
 public class DefaultLocaleResolver implements LocaleResolver {
 
+	public static final String NAME = "default";
+
 	@Override
 	public Locale resolve(LocaleResolverContext context) {
 		return context.getDefaultLocale();

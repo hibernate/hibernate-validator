@@ -9,6 +9,7 @@ import java.time.Duration;
 
 import jakarta.validation.ValidatorFactory;
 
+import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProvider;
@@ -66,6 +67,18 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 */
 	@Incubating
 	PropertyNodeNameProvider getPropertyNodeNameProvider();
+
+	/**
+	 * Returns the {@link BeanResolver} for resolving beans registered via
+	 * {@link BaseHibernateValidatorConfiguration#addBeanConfigurer(org.hibernate.validator.spi.bean.BeanConfigurer)}
+	 * or discovered via {@link java.util.ServiceLoader}.
+	 *
+	 * @return the bean resolver
+	 *
+	 * @since 9.2.0
+	 */
+	@Incubating
+	BeanResolver getBeanResolver();
 
 	/**
 	 * Returns a context for validator configuration via options from the
