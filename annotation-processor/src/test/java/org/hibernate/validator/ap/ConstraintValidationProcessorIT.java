@@ -24,6 +24,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithContainsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithISSNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithIpAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
@@ -823,6 +824,22 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void isbnConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithISBNConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 20 )
+		);
+	}
+
+	@Test
+	public void issnConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithISSNConstraints.class )
 		};
 
 		boolean compilationResult =
