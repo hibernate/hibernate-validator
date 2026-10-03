@@ -64,6 +64,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -171,6 +172,7 @@ public class MessagePropertiesTest {
 							violationOf( NullOrNotBlank.class ),
 							violationOf( NullOrNotEmpty.class ),
 							violationOf( Port.class ),
+							violationOf( StartsWith.class ),
 							violationOf( Range.class ),
 							violationOf( UniqueElements.class ),
 							violationOf( URL.class ),
@@ -335,6 +337,9 @@ public class MessagePropertiesTest {
 
 		@Port
 		private int port = 70000;
+
+		@StartsWith("foo")
+		private String startsWith = "barfoo";
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
