@@ -146,6 +146,15 @@
                                     <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/net/bytebuddy/main</outputDirectory>
                                     <destFileName>byte-buddy-${version.net.bytebuddy.byte-buddy}.jar</destFileName>
                                 </artifactItem>
+                                <!-- And Hibernate Accessor, added as a resource root to the HV module by setupModules.groovy -->
+                                <artifactItem>
+                                    <groupId>org.hibernate.accessor</groupId>
+                                    <artifactId>hibernate-accessor</artifactId>
+                                    <version>${version.org.hibernate.accessor}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildfly.actual.target-dir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                    <destFileName>hibernate-accessor-${version.org.hibernate.accessor}.jar</destFileName>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
