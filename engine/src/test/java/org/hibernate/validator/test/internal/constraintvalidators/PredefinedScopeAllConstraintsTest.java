@@ -63,6 +63,7 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.UUID;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -145,6 +146,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( DurationMax.class, new DurationMaxBean() );
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
+		testConstraint( StartsWith.class, new StartsWithBean() );
 		testConstraint( UUID.class, new UUIDBean() );
 		testConstraint( DateTimeFormat.class, new DateTimeFormatBean() );
 
@@ -352,6 +354,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Contains("xyz")
 		private String contains = "no match here";
+	}
+
+	private static class StartsWithBean {
+
+		@StartsWith("xyz")
+		private String startsWith = "no match here";
 	}
 
 	private static class LuhnCheckBean {
