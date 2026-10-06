@@ -754,6 +754,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@EndsWith(value=, ignoreCase=)`:: Validates that the annotated character sequence ends with at least one of the specified suffixes. When `ignoreCase` is set to `true`, the comparison is case-insensitive using `Locale.ROOT`.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@UniqueElements`:: Checks that the annotated collection only contains unique elements. The equality is determined using the `equals()` method. The default message does not include the list of duplicate elements but you can include it by overriding the message and using the `{duplicates}` message parameter. The list of duplicate elements is also included in the dynamic payload of the constraint violation.
 	Supported data types::: `Collection`
 	Hibernate metadata impact::: None

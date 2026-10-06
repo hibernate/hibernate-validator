@@ -50,6 +50,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
@@ -147,6 +148,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
 		testConstraint( StartsWith.class, new StartsWithBean() );
+		testConstraint( EndsWith.class, new EndsWithBean() );
 		testConstraint( UUID.class, new UUIDBean() );
 		testConstraint( DateTimeFormat.class, new DateTimeFormatBean() );
 
@@ -360,6 +362,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@StartsWith("xyz")
 		private String startsWith = "no match here";
+	}
+
+	private static class EndsWithBean {
+
+		@EndsWith("xyz")
+		private String endsWith = "no match here";
 	}
 
 	private static class LuhnCheckBean {
