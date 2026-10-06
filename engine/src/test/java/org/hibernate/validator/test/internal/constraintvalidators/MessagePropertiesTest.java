@@ -51,6 +51,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.constraints.Length;
@@ -189,6 +190,7 @@ public class MessagePropertiesTest {
 							violationOf( DurationMin.class ),
 							violationOf( ScriptAssert.class ),
 							violationOf( StartsWith.class ),
+							violationOf( EndsWith.class ),
 							violationOf( UUID.class )
 					);
 
@@ -385,6 +387,9 @@ public class MessagePropertiesTest {
 
 		@StartsWith("abc")
 		private String startsWith = "no match here";
+
+		@EndsWith("xyz")
+		private String endsWith = "no match here";
 
 		@UUID
 		private String uuid = "invalid";

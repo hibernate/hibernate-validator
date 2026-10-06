@@ -21,9 +21,9 @@ import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInCon
 import org.hibernate.validator.ap.testmodel.ModelWithBitcoinAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithContainsConstraints;
-import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithEndsWithConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithIpAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
@@ -33,6 +33,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithKorRRNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUniqueElementsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
@@ -927,6 +928,25 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void startsWithConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithStartsWithConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 15 ),
+				new DiagnosticExpectation( Kind.ERROR, 18 ),
+				new DiagnosticExpectation( Kind.ERROR, 21 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2259")
+	public void endsWithConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithEndsWithConstraints.class )
 		};
 
 		boolean compilationResult =

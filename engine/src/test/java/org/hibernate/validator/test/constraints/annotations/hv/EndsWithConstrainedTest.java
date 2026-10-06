@@ -12,36 +12,35 @@ import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
 
-import org.hibernate.validator.constraints.StartsWith;
+import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
 import org.testng.annotations.Test;
 
 /**
  * @author Andrea Boriero
- * @author Koen Aers
  */
 @Test
-public class StartsWithConstrainedTest extends AbstractConstrainedTest {
+public class EndsWithConstrainedTest extends AbstractConstrainedTest {
 
 	@Test
-	public void testStartsWithValid() {
+	public void testEndsWithValid() {
 		Foo foo = new Foo( "foobar" );
 		Set<ConstraintViolation<Foo>> violations = validator.validate( foo );
 		assertNoViolations( violations );
 	}
 
 	@Test
-	public void testStartsWithInvalid() {
+	public void testEndsWithInvalid() {
 		Foo foo = new Foo( "hello" );
 		Set<ConstraintViolation<Foo>> violations = validator.validate( foo );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( StartsWith.class )
+				violationOf( EndsWith.class )
 		);
 	}
 
 	@Test
-	public void testStartsWithNullValid() {
+	public void testEndsWithNullValid() {
 		Foo foo = new Foo( null );
 		Set<ConstraintViolation<Foo>> violations = validator.validate( foo );
 		assertNoViolations( violations );
@@ -59,29 +58,29 @@ public class StartsWithConstrainedTest extends AbstractConstrainedTest {
 		Bar bar = new Bar( "hello" );
 		Set<ConstraintViolation<Bar>> violations = validator.validate( bar );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( StartsWith.class )
+				violationOf( EndsWith.class )
 		);
 	}
 
 	@Test
-	public void testMultiplePrefixesValid() {
-		Baz baz = new Baz( "barbaz" );
+	public void testMultipleSuffixesValid() {
+		Baz baz = new Baz( "foobar" );
 		Set<ConstraintViolation<Baz>> violations = validator.validate( baz );
 		assertNoViolations( violations );
 	}
 
 	@Test
-	public void testMultiplePrefixesInvalid() {
+	public void testMultipleSuffixesInvalid() {
 		Baz baz = new Baz( "hello" );
 		Set<ConstraintViolation<Baz>> violations = validator.validate( baz );
 		assertThat( violations ).containsOnlyViolations(
-				violationOf( StartsWith.class )
+				violationOf( EndsWith.class )
 		);
 	}
 
 	private static class Foo {
 
-		@StartsWith("foo")
+		@EndsWith("bar")
 		private final String string;
 
 		public Foo(String string) {
@@ -91,7 +90,7 @@ public class StartsWithConstrainedTest extends AbstractConstrainedTest {
 
 	private static class Bar {
 
-		@StartsWith(value = "foo", ignoreCase = true)
+		@EndsWith(value = "bar", ignoreCase = true)
 		private final String string;
 
 		public Bar(String string) {
@@ -101,7 +100,7 @@ public class StartsWithConstrainedTest extends AbstractConstrainedTest {
 
 	private static class Baz {
 
-		@StartsWith({ "foo", "bar" })
+		@EndsWith({ "foo", "bar" })
 		private final String string;
 
 		public Baz(String string) {
