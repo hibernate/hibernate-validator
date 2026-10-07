@@ -85,7 +85,24 @@ public abstract class AbstractConstraintValidatorManagerImpl implements Constrai
 		}
 
 		constraintValidator = validatorDescriptor.newInstance( constraintValidatorFactory );
-		initializeValidator( descriptor, constraintValidator, initializationContext );
+		try {
+			initializeValidator( descriptor, constraintValidator, initializationContext );
+		}
+		catch (RuntimeException | Error failure) {
+			try {
+				closeValidator( constraintValidator );
+			}
+			catch (RuntimeException | Error cleanupFailure) {
+				failure.addSuppressed( cleanupFailure );
+			}
+			try {
+				constraintValidatorFactory.releaseInstance( constraintValidator );
+			}
+			catch (RuntimeException | Error cleanupFailure) {
+				failure.addSuppressed( cleanupFailure );
+			}
+			throw failure;
+		}
 
 		if ( constraintValidator instanceof HibernateConstraintValidator<?, ?> hibernateConstraintValidator ) {
 			onValidatorCreated( hibernateConstraintValidator );

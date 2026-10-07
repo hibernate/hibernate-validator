@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
@@ -20,6 +21,7 @@ import java.util.Set;
 
 import jakarta.validation.ClockProvider;
 import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintValidatorFactory;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -30,6 +32,7 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import jakarta.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.constraintvalidation.spi.DefaultConstraintValidatorFactory;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
@@ -57,6 +60,79 @@ public class ConstraintValidatorManagerTest {
 		constraintValidatorFactory = new DefaultConstraintValidatorFactory();
 		constraintValidatorManager = new ConstraintValidatorManagerImpl( constraintValidatorFactory, getDummyConstraintValidatorInitializationContext() );
 		validator = getValidator();
+	}
+
+	@Test
+	public void testInitializationFailureClosesAndReleasesValidator() {
+		assertInitializationFailureCleanup( false );
+	}
+
+	@Test
+	public void testInitializationFailurePreservesExceptionWhenCleanupFails() {
+		assertInitializationFailureCleanup( true );
+	}
+
+	private void assertInitializationFailureCleanup(boolean failCleanup) {
+		FailingValidator instance = new FailingValidator( failCleanup );
+		boolean[] released = { false };
+		ConstraintValidatorFactory factory = new ConstraintValidatorFactory() {
+			@Override
+			@SuppressWarnings("unchecked")
+			public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+				return (T) instance;
+			}
+
+			@Override
+			public void releaseInstance(ConstraintValidator<?, ?> validator) {
+				assertThat( validator ).isSameAs( instance );
+				released[0] = true;
+				if ( failCleanup ) {
+					throw instance.releaseFailure;
+				}
+			}
+		};
+		Throwable failure = catchThrowable( () -> constraintValidatorManager.getInitializedValidator(
+				String.class, getConstraintDescriptorForProperty( "s1" ), factory, getDummyConstraintValidatorInitializationContext() ) );
+		assertThat( failure ).hasCause( instance.initializationFailure );
+		assertThat( instance.closed ).isTrue();
+		assertThat( released[0] ).isTrue();
+		assertThat( constraintValidatorManager.numberOfCachedConstraintValidatorInstances() ).isZero();
+		if ( failCleanup ) {
+			assertThat( failure.getSuppressed() ).containsExactly( instance.closeFailure, instance.releaseFailure );
+		}
+		else {
+			assertThat( failure.getSuppressed() ).isEmpty();
+		}
+	}
+
+	private static class FailingValidator implements HibernateConstraintValidator<NotNull, String> {
+		private final IllegalStateException initializationFailure = new IllegalStateException( "initialization" );
+		private final IllegalStateException closeFailure = new IllegalStateException( "close" );
+		private final IllegalStateException releaseFailure = new IllegalStateException( "release" );
+		private final boolean failCleanup;
+		private boolean closed;
+
+		private FailingValidator(boolean failCleanup) {
+			this.failCleanup = failCleanup;
+		}
+
+		@Override
+		public void initialize(NotNull annotation) {
+			throw initializationFailure;
+		}
+
+		@Override
+		public boolean isValid(String value, ConstraintValidatorContext context) {
+			return true;
+		}
+
+		@Override
+		public void close() {
+			closed = true;
+			if ( failCleanup ) {
+				throw closeFailure;
+			}
+		}
 	}
 
 	@Test
