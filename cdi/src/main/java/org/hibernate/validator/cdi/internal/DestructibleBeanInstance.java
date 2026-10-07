@@ -15,16 +15,42 @@ import jakarta.enterprise.inject.spi.InjectionTarget;
 public class DestructibleBeanInstance<T> {
 	private final T instance;
 	private final InjectionTarget<T> injectionTarget;
+	private final CreationalContext<T> creationalContext;
 
 	public DestructibleBeanInstance(BeanManager beanManager, Class<T> key) {
 		this.injectionTarget = createInjectionTarget( beanManager, key );
-		this.instance = createAndInjectBeans( beanManager, injectionTarget );
+		this.creationalContext = beanManager.createCreationalContext( null );
+		T producedInstance = null;
+		try {
+			producedInstance = injectionTarget.produce( creationalContext );
+			injectBeans( producedInstance );
+		}
+		catch (RuntimeException | Error failure) {
+			if ( producedInstance != null ) {
+				try {
+					injectionTarget.dispose( producedInstance );
+				}
+				catch (RuntimeException | Error cleanupFailure) {
+					failure.addSuppressed( cleanupFailure );
+				}
+			}
+			releaseAfterFailure( failure );
+			throw failure;
+		}
+		this.instance = producedInstance;
 	}
 
 	@SuppressWarnings("unchecked")
 	public DestructibleBeanInstance(BeanManager beanManager, T instance) {
 		this.injectionTarget = createInjectionTarget( beanManager, (Class<T>) instance.getClass() );
-		injectBeans( beanManager, beanManager.createCreationalContext( null ), injectionTarget, instance );
+		this.creationalContext = beanManager.createCreationalContext( null );
+		try {
+			injectBeans( instance );
+		}
+		catch (RuntimeException | Error failure) {
+			releaseAfterFailure( failure );
+			throw failure;
+		}
 		this.instance = instance;
 	}
 
@@ -33,8 +59,41 @@ public class DestructibleBeanInstance<T> {
 	}
 
 	public void destroy() {
-		injectionTarget.preDestroy( instance );
-		injectionTarget.dispose( instance );
+		Throwable failure = null;
+		try {
+			injectionTarget.preDestroy( instance );
+		}
+		catch (RuntimeException | Error cleanupFailure) {
+			failure = cleanupFailure;
+		}
+		try {
+			injectionTarget.dispose( instance );
+		}
+		catch (RuntimeException | Error cleanupFailure) {
+			if ( failure == null ) {
+				failure = cleanupFailure;
+			}
+			else {
+				failure.addSuppressed( cleanupFailure );
+			}
+		}
+		if ( failure != null ) {
+			releaseAfterFailure( failure );
+			if ( failure instanceof RuntimeException runtimeException ) {
+				throw runtimeException;
+			}
+			throw (Error) failure;
+		}
+		creationalContext.release();
+	}
+
+	private void releaseAfterFailure(Throwable failure) {
+		try {
+			creationalContext.release();
+		}
+		catch (RuntimeException | Error cleanupFailure) {
+			failure.addSuppressed( cleanupFailure );
+		}
 	}
 
 	private InjectionTarget<T> createInjectionTarget(BeanManager beanManager, Class<T> type) {
@@ -42,16 +101,7 @@ public class DestructibleBeanInstance<T> {
 		return beanManager.getInjectionTargetFactory( annotatedType ).createInjectionTarget( null );
 	}
 
-	private static <T> T createAndInjectBeans(BeanManager beanManager, InjectionTarget<T> injectionTarget) {
-		CreationalContext<T> creationalContext = beanManager.createCreationalContext( null );
-
-		T instance = injectionTarget.produce( creationalContext );
-		injectBeans( beanManager, creationalContext, injectionTarget, instance );
-
-		return instance;
-	}
-
-	private static <T> void injectBeans(BeanManager beanManager, CreationalContext<T> creationalContext, InjectionTarget<T> injectionTarget, T instance) {
+	private void injectBeans(T instance) {
 		injectionTarget.inject( instance, creationalContext );
 		injectionTarget.postConstruct( instance );
 	}
