@@ -28,6 +28,7 @@ import org.hibernate.validator.cfg.defs.ar.CUILDef;
 import org.hibernate.validator.cfg.defs.ar.CUITDef;
 import org.hibernate.validator.cfg.defs.br.CNPJDef;
 import org.hibernate.validator.cfg.defs.br.CPFDef;
+import org.hibernate.validator.cfg.defs.br.RENAVAMDef;
 import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
 import org.hibernate.validator.cfg.defs.kor.KorRRNDef;
 import org.hibernate.validator.cfg.defs.pl.NIPDef;
@@ -40,6 +41,7 @@ import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.constraints.pl.NIP;
@@ -61,6 +63,7 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( CUIL.class, new CUILDef(), "20-12345678-6", "30-12345678-1", "invalid Argentine Unique Labor Identification Code (CUIL)" );
 		doProgrammaticTest( CUIT.class, new CUITDef(), "30-12345678-1", "21-12345678-2", "invalid Argentine Unique Tax Identification Code (CUIT)" );
 
+		doProgrammaticTest( RENAVAM.class, new RENAVAMDef(), "00616425929", "02163351641", "invalid Brazilian RENAVAM number" );
 		doProgrammaticTest( TituloEleitoral.class, new TituloEleitoralDef(), "083578481406", "48255-77", "invalid Brazilian Voter ID card number" );
 		doProgrammaticTest( CPF.class, new CPFDef(), "134.241.313-00", "48255-77", "invalid Brazilian individual taxpayer registry number (CPF)" );
 		doProgrammaticTest( CNPJ.class, new CNPJDef(), "91.509.901/0001-69", "91.509.901/0001-60",
