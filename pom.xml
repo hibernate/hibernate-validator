@@ -157,7 +157,7 @@
         -->
         <version.com.fasterxml.classmate>1.7.1</version.com.fasterxml.classmate>
         <version.joda-time>2.14.4</version.joda-time>
-        <version.org.slf4j>2.0.19</version.org.slf4j>
+        <version.org.slf4j>2.0.20</version.org.slf4j>
         <version.org.apache.logging.log4j>2.25.5</version.org.apache.logging.log4j>
 
         <!--
@@ -200,7 +200,7 @@
         <version.org.apache.groovy>5.0.8</version.org.apache.groovy>
         <version.com.google.guava>33.5.0-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>6.2.19</version.org.springframework.spring-expression>
-        <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.0.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
+        <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.1.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.20.2</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.20</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.17.8</version.net.bytebuddy.byte-buddy>
