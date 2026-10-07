@@ -32,6 +32,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_RENAVAM;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CONTAINS;
@@ -155,6 +156,7 @@ import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.constraints.pl.NIP;
@@ -944,6 +946,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TRIMMED ) ) {
 			putBuiltinConstraint( tmpConstraints, Trimmed.class, TrimmedValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_RENAVAM ) ) {
+			putBuiltinConstraint( tmpConstraints, RENAVAM.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL ) ) {
 			putBuiltinConstraint( tmpConstraints, TituloEleitoral.class );

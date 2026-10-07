@@ -828,6 +828,11 @@ Hibernate Validator!
 	Hibernate metadata impact::: None
 	Country::: Brazil
 
+`@RENAVAM`:: Checks that the annotated character sequence represents a valid Brazilian vehicle registration number (RENAVAM). Supports the current 11-digit representation and the legacy 9-digit representation.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Brazil
+
 `@TituloEleitoral`:: Checks that the annotated character sequence represents a Brazilian voter ID card number (http://www.exceldoseujeito.com.br/2008/12/19/validar-cpf-cnpj-e-titulo-de-eleitor-parte-ii/[Título Eleitoral])
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None

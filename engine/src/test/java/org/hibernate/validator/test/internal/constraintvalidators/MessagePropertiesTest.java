@@ -79,6 +79,7 @@ import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
@@ -192,6 +193,7 @@ public class MessagePropertiesTest {
 							violationOf( CUIT.class ),
 							violationOf( CNPJ.class ),
 							violationOf( CPF.class ),
+							violationOf( RENAVAM.class ),
 							violationOf( TituloEleitoral.class ),
 							violationOf( REGON.class ),
 							violationOf( NIP.class ),
@@ -390,6 +392,9 @@ public class MessagePropertiesTest {
 
 		@CPF
 		private String cpf = "invalid";
+
+		@RENAVAM
+		private String renavam = "invalid";
 
 		@TituloEleitoral
 		private String tituloEleitoral = "invalid";
