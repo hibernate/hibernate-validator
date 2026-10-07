@@ -26,6 +26,12 @@ public class LowerCaseValidator implements ConstraintValidator<LowerCase, CharSe
 		}
 
 		// All characters must either be non-letters or lowercase letters
-		return value.chars().allMatch( ch -> !Character.isLetter( ch ) || Character.isLowerCase( ch ) );
+		for ( int i = 0; i < value.length(); i++ ) {
+			char ch = value.charAt( i );
+			if ( Character.isLetter( ch ) && !Character.isLowerCase( ch ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.LowerCase.List;
  * The annotated element must contain only lowercase letters. Non-letter characters
  * (digits, punctuation, whitespace, etc.) are ignored and do not cause validation to fail.
  * <p>
- * {@code null} elements are considered valid.
+ * {@code null} values and empty character sequences are considered valid.
  *
  * @author Andrea Boriero
  * @since 9.2

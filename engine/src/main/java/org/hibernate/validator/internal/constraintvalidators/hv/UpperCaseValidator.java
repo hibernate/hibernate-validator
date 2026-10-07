@@ -26,6 +26,12 @@ public class UpperCaseValidator implements ConstraintValidator<UpperCase, CharSe
 		}
 
 		// All characters must either be non-letters or uppercase letters
-		return value.chars().allMatch( ch -> !Character.isLetter( ch ) || Character.isUpperCase( ch ) );
+		for ( int i = 0; i < value.length(); i++ ) {
+			char ch = value.charAt( i );
+			if ( Character.isLetter( ch ) && !Character.isUpperCase( ch ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
