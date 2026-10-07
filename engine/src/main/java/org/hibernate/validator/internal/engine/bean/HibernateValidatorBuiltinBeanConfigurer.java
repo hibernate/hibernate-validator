@@ -4,9 +4,11 @@
  */
 package org.hibernate.validator.internal.engine.bean;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.bean.BeanHolder;
 
 import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
+import org.hibernate.validator.internal.engine.HibernateValidatorAccessContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.DefaultLocaleResolver;
 import org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory;
 import org.hibernate.validator.internal.metadata.DefaultBeanMetaDataClassNormalizer;
@@ -24,6 +26,8 @@ public class HibernateValidatorBuiltinBeanConfigurer implements BeanConfigurer {
 
 	@Override
 	public void configure(BeanConfigurationContext context) {
+		context.define( AccessorFactory.class, HibernateValidatorAccessContext.DEFAULT_ACCESSOR_FACTORY_NAME,
+				resolver -> BeanHolder.of( AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() ) ) );
 		context.define( ScriptEvaluatorFactory.class, DefaultScriptEvaluatorFactory.NAME,
 				resolver -> BeanHolder.of( new DefaultScriptEvaluatorFactory( context.classLoader() ) ) );
 		context.define( GetterPropertySelectionStrategy.class, DefaultGetterPropertySelectionStrategy.NAME,

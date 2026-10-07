@@ -443,29 +443,23 @@ final class ValidatorFactoryConfigurationHelper {
 	}
 
 	static AccessorFactory determineAccessorFactory(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,
-			ClassLoader externalClassLoader) {
-		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getAccessorFactory() != null ) {
-			LOG.usingAccessorFactory( hibernateSpecificConfig.getAccessorFactory().getClass() );
-			return hibernateSpecificConfig.getAccessorFactory();
+			BeanResolver beanResolver) {
+		AccessorFactory accessorFactory;
+		try {
+			accessorFactory = resolveBeanComponent( AccessorFactory.class, HibernateValidatorAccessContext.DEFAULT_ACCESSOR_FACTORY_NAME,
+					HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME,
+					hibernateSpecificConfig, AbstractConfigurationImpl::getAccessorFactory,
+					properties, beanResolver );
 		}
-
-		String accessorFactoryFqcn = properties.get( HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME );
-		if ( accessorFactoryFqcn != null ) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<? extends AccessorFactory> clazz =
-						(Class<? extends AccessorFactory>) LoadClass.action( accessorFactoryFqcn, externalClassLoader );
-				AccessorFactory accessorFactory = NewInstance.action( clazz, "accessor factory class" );
-				LOG.usingAccessorFactory( clazz );
-
-				return accessorFactory;
-			}
-			catch (Exception e) {
+		catch (Exception e) {
+			String accessorFactoryFqcn = properties.get( HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME );
+			if ( accessorFactoryFqcn != null && ( hibernateSpecificConfig == null || hibernateSpecificConfig.getAccessorFactory() == null ) ) {
 				throw LOG.getUnableToInstantiateAccessorFactoryClassException( accessorFactoryFqcn, e );
 			}
+			throw e;
 		}
-
-		return AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() );
+		LOG.usingAccessorFactory( accessorFactory.getClass() );
+		return accessorFactory;
 	}
 
 	static BeanMetaDataClassNormalizer determineBeanMetaDataClassNormalizer(AbstractConfigurationImpl<?> hibernateSpecificConfig,

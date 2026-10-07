@@ -200,7 +200,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 		this.javaBeanHelper = new JavaBeanHelper( ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, beanResolver ),
 				ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, beanResolver ),
-				determineAccessorFactory( hibernateSpecificConfig, properties, externalClassLoader ) );
+				determineAccessorFactory( hibernateSpecificConfig, properties, beanResolver ) );
 		this.beanMetadataClassNormalizer = determineBeanMetaDataClassNormalizer( hibernateSpecificConfig, properties, beanResolver );
 
 		// first we want to register any validators coming from a service loader. Since they are just loaded and there's

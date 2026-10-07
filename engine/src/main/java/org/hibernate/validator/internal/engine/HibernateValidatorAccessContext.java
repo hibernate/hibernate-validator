@@ -11,9 +11,11 @@ import java.util.Map;
 import org.hibernate.accessor.spi.AccessContext;
 import org.hibernate.accessor.spi.AccessorConfiguration;
 
-class HibernateValidatorAccessContext implements AccessContext {
+public class HibernateValidatorAccessContext implements AccessContext {
 
-	static AccessorConfiguration configuration() {
+	public static final String DEFAULT_ACCESSOR_FACTORY_NAME = "default";
+
+	public static AccessorConfiguration configuration() {
 		return new AccessorConfiguration( new HibernateValidatorAccessContext(), Map.of() );
 	}
 
