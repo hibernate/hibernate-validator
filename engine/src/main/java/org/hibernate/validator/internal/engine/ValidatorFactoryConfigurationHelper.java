@@ -44,6 +44,7 @@ import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.GetInstancesFromServiceLoader;
 import org.hibernate.validator.internal.util.actions.LoadClass;
 import org.hibernate.validator.internal.util.actions.NewInstance;
+import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
@@ -349,14 +350,27 @@ final class ValidatorFactoryConfigurationHelper {
 								resolvedClassLoader,
 								true
 						);
-						return BeanHolder.of( new ResourceBundleMessageInterpolator(
-								userResourceBundleLocator,
-								contributorResourceBundleLocator,
-								supportedLocales,
-								defaultLocale,
-								localeResolver,
-								preload
-						) );
+						// EL initializes its expression factory through the TCCL.
+						ClassLoader externalClassLoader = hibernateSpecificConfig.getExternalClassLoader();
+						ClassLoader originalContextClassLoader = GetClassLoader.fromContext();
+						try {
+							if ( externalClassLoader != null ) {
+								SetContextClassLoader.action( externalClassLoader );
+							}
+							return BeanHolder.of( new ResourceBundleMessageInterpolator(
+									userResourceBundleLocator,
+									contributorResourceBundleLocator,
+									supportedLocales,
+									defaultLocale,
+									localeResolver,
+									preload
+							) );
+						}
+						finally {
+							if ( externalClassLoader != null ) {
+								SetContextClassLoader.action( originalContextClassLoader );
+							}
+						}
 					}
 			) );
 		}
