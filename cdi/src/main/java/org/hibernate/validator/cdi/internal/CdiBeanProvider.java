@@ -45,7 +45,7 @@ public class CdiBeanProvider implements BeanProvider {
 
 	private <T> BeanHolder<T> resolve(Class<T> typeReference, Annotation... qualifiers) {
 		Instance<T> instance = beanManager.createInstance().select( typeReference, qualifiers );
-		if ( !instance.isResolvable() ) {
+		if ( instance.isUnsatisfied() ) {
 			throw new BeanNotFoundException( "No CDI bean found for type " + typeReference.getName() );
 		}
 		return new CdiBeanHolder<>( instance.getHandle() );
