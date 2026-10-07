@@ -167,7 +167,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 
 		this.getterPropertySelectionStrategy = ValidatorFactoryConfigurationHelper.determineGetterPropertySelectionStrategy( hibernateSpecificConfig, properties, beanResolver );
 		this.propertyNodeNameProvider = ValidatorFactoryConfigurationHelper.determinePropertyNodeNameProvider( hibernateSpecificConfig, properties, beanResolver );
-		this.accessorFactory = determineAccessorFactory( hibernateSpecificConfig, properties, externalClassLoader );
+		this.accessorFactory = determineAccessorFactory( hibernateSpecificConfig, properties, beanResolver );
 
 		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		ConstraintHelper constraintHelper = ConstraintHelper.forBuiltinConstraints(
