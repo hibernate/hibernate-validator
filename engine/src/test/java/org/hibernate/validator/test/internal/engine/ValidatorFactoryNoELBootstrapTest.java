@@ -7,6 +7,7 @@ package org.hibernate.validator.test.internal.engine;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -21,8 +22,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.Min;
 
+import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.util.actions.GetClassLoader;
 import org.hibernate.validator.internal.util.actions.SetContextClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -111,6 +114,63 @@ public class ValidatorFactoryNoELBootstrapTest {
 		}
 	}
 
+	@Test
+	public void externalClassLoaderProvidesExpressionFactoryAndRestoresContextClassLoader() throws Throwable {
+		runWithoutElLibs( ExternalClassLoaderProvidesExpressionFactory.class, EL_IMPL_PACKAGE_PREFIX, true );
+	}
+
+	public static class ExternalClassLoaderProvidesExpressionFactory {
+
+		public void run() {
+			ClassLoader originalClassLoader = GetClassLoader.fromContext();
+			ClassLoader externalClassLoader = new ClassLoader( originalClassLoader ) {
+				@Override
+				public Class<?> loadClass(String name) throws ClassNotFoundException {
+					return originalClassLoader.loadClass( name );
+				}
+			};
+
+			try ( ValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
+					.configure()
+					.externalClassLoader( externalClassLoader )
+					.buildValidatorFactory() ) {
+				assertSame( GetClassLoader.fromContext(), originalClassLoader );
+				ConstraintViolationAssert.assertThat( factory.getValidator().validate( new SomeBean() ) )
+						.containsOnlyViolations( violationOf( Min.class ).withMessage( "must be greater than or equal to 42" ) );
+			}
+			assertSame( GetClassLoader.fromContext(), originalClassLoader );
+		}
+	}
+
+	@Test
+	public void failedExternalClassLoaderBootstrapRestoresContextClassLoader() throws Throwable {
+		runWithoutElLibs( FailedExternalClassLoaderBootstrap.class, EL_IMPL_PACKAGE_PREFIX );
+	}
+
+	public static class FailedExternalClassLoaderBootstrap {
+
+		public void run() {
+			ClassLoader originalClassLoader = GetClassLoader.fromContext();
+			ClassLoader externalClassLoader = new ClassLoader( originalClassLoader ) {
+				@Override
+				public Class<?> loadClass(String name) throws ClassNotFoundException {
+					return originalClassLoader.loadClass( name );
+				}
+			};
+			try {
+				Validation.byProvider( HibernateValidator.class )
+						.configure()
+						.externalClassLoader( externalClassLoader )
+						.buildValidatorFactory();
+				fail( "An exception should have been thrown" );
+			}
+			catch (ValidationException e) {
+				assertTrue( e.getMessage().startsWith( "HV000183" ) );
+				assertSame( GetClassLoader.fromContext(), originalClassLoader );
+			}
+		}
+	}
+
 	public static class SomeBean {
 
 		@Min(42)
@@ -134,6 +194,8 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		private final String packageMissing;
 
+		private boolean allowExternalClassLoader;
+
 		public ELIgnoringClassLoader(String packageMissing) {
 			super( ELIgnoringClassLoader.class.getClassLoader() );
 			this.packageMissing = packageMissing;
@@ -141,8 +203,11 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		@Override
 		public Class<?> loadClass(String className) throws ClassNotFoundException {
-			// This is what we in the end want to achieve. Throw ClassNotFoundException for jakarta.el classes
-			if ( className.startsWith( packageMissing ) ) {
+			// Hide EL unless the regression test enables access through its external child loader.
+			if ( className.startsWith( packageMissing )
+					&& ( !allowExternalClassLoader
+							|| GetClassLoader.fromContext() == this
+							|| GetClassLoader.fromContext().getParent() != this ) ) {
 				throw new ClassNotFoundException();
 			}
 
@@ -221,10 +286,15 @@ public class ValidatorFactoryNoELBootstrapTest {
 	 * {@link ExpressionFactory} in {@link ExpressionFactory#newInstance(java.util.Properties)}.
 	 */
 	private void runWithoutElLibs(Class<?> delegateType, String packageMissing) throws Throwable {
+		runWithoutElLibs( delegateType, packageMissing, false );
+	}
+
+	private void runWithoutElLibs(Class<?> delegateType, String packageMissing, boolean allowExternalClassLoader) throws Throwable {
 		try {
 			ClassLoader originClassLoader = GetClassLoader.fromContext();
 			try {
-				ClassLoader classLoader = new ELIgnoringClassLoader( packageMissing );
+				ELIgnoringClassLoader classLoader = new ELIgnoringClassLoader( packageMissing );
+				classLoader.allowExternalClassLoader = allowExternalClassLoader;
 				SetContextClassLoader.action( classLoader );
 
 				Object test = classLoader.loadClass( delegateType.getName() ).getConstructor().newInstance();
