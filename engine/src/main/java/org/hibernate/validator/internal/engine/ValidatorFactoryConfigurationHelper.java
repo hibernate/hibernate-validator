@@ -313,13 +313,15 @@ final class ValidatorFactoryConfigurationHelper {
 			}
 		}
 
-		// 1. Built-in defaults (lowest priority)
+		// Configurer order does not establish override priority: duplicate names for the same bean type are rejected.
+		// Factory components select an explicit instance or a configured class-name property before using a built-in default.
+		// 1. Register built-in defaults.
 		configurers.add( new HibernateValidatorBuiltinBeanConfigurer() );
 
-		// 2. ServiceLoader-discovered configurers
+		// 2. Register beans from ServiceLoader-discovered configurers.
 		configurers.addAll( GetInstancesFromServiceLoader.action( classLoader, BeanConfigurer.class ) );
 
-		// 3. User-provided configurers (highest priority)
+		// 3. Register beans from user-provided configurers.
 		if ( configurationState instanceof AbstractConfigurationImpl<?> hibernateSpecificConfig ) {
 			configurers.addAll( hibernateSpecificConfig.getBeanConfigurers() );
 			beanProvider = hibernateSpecificConfig.getBeanProvider();
