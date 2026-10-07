@@ -30,7 +30,7 @@ class StrengthRule implements PasswordPolicyRule {
 	@Override
 	public boolean isValid(PasswordContext passwordContext, HibernateConstraintValidatorContext context) {
 		PasswordStrengthResult result = estimator.estimate( passwordContext.password() );
-		if ( result.score() >= minScore ) {
+		if ( result.meetsMinimumStrength( minScore ) ) {
 			return true;
 		}
 		context.addMessageParameter( "score", result.score() );

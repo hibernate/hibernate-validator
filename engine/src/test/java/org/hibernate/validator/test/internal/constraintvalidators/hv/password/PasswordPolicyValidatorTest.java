@@ -7,12 +7,14 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -270,6 +272,37 @@ public class PasswordPolicyValidatorTest {
 
 		violations = v.validate( new StrengthPolicyBean( "abcdefghijklmnop" ) );
 		assertNoViolations( violations );
+	}
+
+	@Test
+	public void strengthEstimatorUsesMinimumStrengthPredicate() {
+		PasswordStrengthEstimator estimator = password -> new PasswordStrengthResult() {
+			@Override
+			public int score() {
+				return password.length < 8 ? PasswordStrengthScore.VERY_STRONG : PasswordStrengthScore.WEAK;
+			}
+
+			@Override
+			public String feedback() {
+				return null;
+			}
+
+			@Override
+			public boolean meetsMinimumStrength(int minimumStrength) {
+				assertEquals( minimumStrength, PasswordStrengthScore.STRONG );
+				return password.length >= 8;
+			}
+		};
+		try ( ValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addBeanConfigurer( context -> context.define(
+						PasswordStrengthEstimator.class, BeanReference.ofInstance( estimator ) ) )
+				.buildValidatorFactory() ) {
+			Validator validator = factory.getValidator();
+			assertNoViolations( validator.validate( new StrengthPolicyBean( "abcdefghijklmnop" ) ) );
+			assertThat( validator.validate( new StrengthPolicyBean( "ab" ) ) )
+					.containsOnlyViolations( violationOf( PasswordPolicy.class ) );
+		}
 	}
 
 	@Test
