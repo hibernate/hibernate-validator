@@ -10,7 +10,7 @@ def withMavenWorkspace(Closure body) {
 }
 
 def withMavenWorkspace(jdk, Closure body) {
-	withMaven(jdk: jdk, maven: 'Apache Maven 3.9',
+	withMaven(jdk: jdk, maven: 'Apache Maven 3.10',
 			mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository',
 			options: [
 					// Artifacts are not needed and take up disk space
