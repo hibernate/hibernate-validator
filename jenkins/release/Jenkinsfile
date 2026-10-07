@@ -51,7 +51,7 @@ pipeline {
         cron('0 15 * * 0')
     }
 	tools {
-		maven 'Apache Maven 3.9'
+		maven 'Apache Maven 3.10'
 		jdk 'OpenJDK 25 Latest'
 	}
 	options {
