@@ -14,18 +14,138 @@
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 :html-meta-description: Hibernate Validator, Annotation based constraints for your domain model - What's new in {hvVersionShort}
 :html-meta-keywords: hibernate, validator, hibernate validator, validation, jakarta bean validation, jakarta validation, bean validation
-:html-meta-canonical-link: https://docs.hibernate.org/stable/validator/migration/en-US/html_single/
+:html-meta-canonical-link: https://docs.hibernate.org/stable/validator/whats-new/en-US/html_single/
 :html-meta-version-family: {hvVersionShort}
 :version-selector-enabled: true
 
+== New constraints
+
+Hibernate Validator {hvVersionShort} adds the following built-in constraints.
+Corresponding constraint definitions are also available for programmatic constraint mapping.
+
+[cols="2,5", options="header"]
+|===
+| Constraint | Purpose
+
+| `@NullOrNotBlank`
+| Accepts `null` or a character sequence containing at least one non-whitespace character.
+
+| `@NullOrNotEmpty`
+| Accepts `null` or a non-empty character sequence, collection, map or array.
+
+| `@Contains`
+| Checks for specified substrings. By default all must be present; `minRequired` allows requiring a minimum number of matches.
+
+| `@StartsWith`, `@EndsWith`
+| Checks for at least one of the specified prefixes or suffixes. Case-insensitive matching is optional.
+
+| `@UpperCase`, `@LowerCase`
+| Checks the case of letters in a character sequence, ignoring non-letter characters.
+
+| `@Trimmed`
+| Checks that a character sequence has no leading or trailing whitespace, using the same whitespace definition as `String.strip()`.
+
+| `@Hexadecimal`
+| Checks hexadecimal character sequences, with options for letter case, fullwidth characters, empty values and a required prefix.
+
+| `@DateTimeFormat`
+| Checks that a character sequence represents a date and/or time matching a `DateTimeFormatter` pattern, with configurable locales and lenient parsing.
+
+| `@Port`
+| Checks that a numeric value or character sequence represents a port number between 0 and 65535, inclusive.
+
+| `@IBAN`
+| Checks International Bank Account Numbers, including country-specific lengths and check digits. Spaces are ignored; lowercase letters can be accepted with `allowLowercase`.
+
+| `@BIC`
+| Checks Bank Identifier Codes (SWIFT codes).
+
+| `@ISSN`
+| Checks International Standard Serial Numbers.
+
+| `@CUIT`, `@CUIL` (`org.hibernate.validator.constraints.ar`)
+| Checks Argentine tax and labor identification codes, respectively.
+
+| `@RUC` (`org.hibernate.validator.constraints.py`)
+| Checks Paraguayan taxpayer registration numbers.
+
+| `@RENAVAM` (`org.hibernate.validator.constraints.br`)
+| Checks Brazilian vehicle registration numbers in the current 11-digit or legacy 9-digit representation.
+
+| `@PasswordStrength`, `@NotCompromised`, `@PasswordPolicy`
+| Checks password strength, exposure in data breaches, or a configurable set of password policy rules. See the next section for configuration requirements.
+|===
+
+`@NullOrNotBlank` and `@NullOrNotEmpty` are particularly useful for optional values:
+an empty `Optional` is valid, while a present value must satisfy the constraint.
+Many of the new constraints are incubating; consult their Javadoc for their API status and configuration options.
+
+`@BitcoinAddress` and `@IpAddress` are now repeatable, allowing multiple declarations
+on the same element without an explicit container annotation.
+
+== Password validation
+
+`@PasswordStrength(min = ...)` delegates to a user-provided `PasswordStrengthEstimator`.
+The `min` attribute is required, and its scale is defined by the estimator implementation.
+`@NotCompromised` delegates to a user-provided `CompromisedPasswordChecker`.
+These services must be registered through the bean resolution system described below;
+Hibernate Validator does not supply a default strength estimator or compromised password checker.
+
+`@PasswordPolicy` references a `PasswordPolicyDefinition`, which uses a builder to combine
+rules for length, character types, whitespace, sequences, keyboard walks, strength,
+compromised passwords and custom checks. Each failing rule produces its own constraint violation.
+The password constraints support `CharSequence` and `char[]` values and accept `null`.
+`@PasswordPolicy` can also be used on custom types through `AbstractPasswordPolicyValidator`.
+
+== Bean resolution and dependency injection
+
+A new bean resolution system supports registering implementations by type and, optionally, by name.
+Use `addBeanConfigurer()` to register beans programmatically, or expose `BeanConfigurer`
+implementations through `ServiceLoader`. A custom `BeanProvider` integrates other dependency injection frameworks.
+With the `hibernate-validator-cdi` extension, a CDI-backed provider is discovered automatically.
+
+Custom constraint validators can access the `BeanResolver` through
+`HibernateConstraintValidatorInitializationContext#getBeanResolver()`.
+It is also exposed by `HibernateValidatorFactory#getBeanResolver()`.
+Existing configuration setters continue to select the built-in pluggable components;
+registering a bean alone does not override a component with a built-in default.
+
+== Configurable property access
+
+Hibernate Validator now uses Hibernate Accessor to read bean properties.
+Reflection remains the default, while optional ASM and ByteBuddy (or Class-File API)
+accessor factories can generate property accessors to avoid reflective calls during
+validation. Configure an `AccessorFactory` using `accessorFactory()` or the
+`hibernate.validator.accessor_factory` configuration property.
+The optional factories are provided by `org.hibernate.accessor:hibernate-accessor-asm`
+and `org.hibernate.accessor:hibernate-accessor-bytebuddy`.
+
+== Message interpolation improvements
+
+Custom message interpolators can retrieve the constraint validator payload through
+`HibernateMessageInterpolatorContext#getConstraintValidatorPayload(Class)`.
+This exposes the payload configured for constraint validators to message interpolation as well.
+
+`HibernateConstraintValidatorContext#addMessageParameter()` and `addExpressionVariable()`
+now accept `null` values.
+
 == `PropertyNodeNameProvider` improvements
 
-We've identified that in some scenarios, e.g., with the recent Jackson 3 changes,
-it might be useful to have access to additional information when trying to
-construct the property node name. For these reasons, `PropertyNodeNameProvider` now
-comes with the `getName(Property property, PropertyNodeNameProviderContext context)`.
-`PropertyNodeNameProviderContext` opens up access to the current getter name strategy.
+`PropertyNodeNameProvider` now provides
+`getName(Property property, PropertyNodeNameProviderContext context)`.
+The context exposes the current getter property selection strategy, which can help
+integrations such as Jackson 3 determine the property name.
+The original `getName(Property)` method is deprecated for removal;
+existing implementations remain supported through the new method's default implementation.
 
-At the same time `org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty` introduced
-an extra `getMemberName()` method. As `JavaBeanProperty` is backed by a field/getter
-this method returns the name of such class member.
+`org.hibernate.validator.spi.nodenameprovider.JavaBeanProperty#getMemberName()`
+returns the name of the field or getter backing the property.
+
+== Validation performance and fixes
+
+Constraint validator contexts are reused where possible, and interface constraint tracking
+avoids unnecessary work for beans without interface constraints.
+
+`@CPF` validation now rejects partially formatted identifiers; see the migration guide
+for the supported representations. The regular expression based URL validator also handles
+URLs without a host without throwing a `NullPointerException`.
