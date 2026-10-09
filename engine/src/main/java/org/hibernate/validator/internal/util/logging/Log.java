@@ -1010,4 +1010,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 288, value = "Duplicate bean references for name '%1$s': %2$s, %3$s")
 	IllegalStateException getDuplicateBeanReferencesForNameException(String name, String existing, String duplicate);
 
+	@Message(id = 289, value = "Cannot modify the root path node. Add the container property before customizing its element.")
+	IllegalStateException getUnableToModifyRootPathNodeException();
+
 }
