@@ -29,12 +29,6 @@ NOTE: If you think something is missing or something does not work, please link:
 If you're looking to migrate from an earlier version, you should migrate step-by-step, from one minor version to the next,
 following the migration guide of link:https://hibernate.org/validator/documentation/migrate/[each version].
 
-[WARNING]
-====
-As this release includes significant changes to the processed bean tracking, path implementation and related areas,
-we encourage users to give it a try and report any findings, especially if there are non-trivial validation scenarios.
-====
-
 [[requirements]]
 == Requirements
 
@@ -47,11 +41,21 @@ are the same as those of Hibernate Validator {hvVersionPreviousShort}.
 The coordinates of Maven artifacts in Hibernate Validator {hvVersionShort}
 are the same as in Hibernate Validator {hvVersionPreviousShort}.
 
+The core engine now depends on `org.hibernate.accessor:hibernate-accessor`.
+Dependency managers resolve this transitively; applications managing their runtime class path
+manually must include it. The ASM and ByteBuddy accessor implementations are optional.
+
 [[configuration]]
 == Configuration
 
 The configuration properties in Hibernate Validator {hvVersionShort},
 in general, are backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
+
+New configuration properties include `hibernate.validator.accessor_factory`,
+`hibernate.validator.message_interpolator` and `hibernate.validator.bean_meta_data_class_normalizer`.
+Existing programmatic setters take precedence over the corresponding properties.
+For components with built-in defaults, registering an implementation through a `BeanConfigurer`
+alone does not replace the default: use the component's setter or configuration property to select it.
 
 [[api]]
 == API
@@ -67,13 +71,35 @@ The https://hibernate.org/community/compatibility-policy/#code-categorization[SP
 in Hibernate Validator {hvVersionShort}
 is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
 
+=== Property node name providers
+
+`PropertyNodeNameProvider#getName(Property)` is deprecated for removal.
+Implement `getName(Property, PropertyNodeNameProviderContext)` instead.
+The method's default implementation delegates to the old method, so existing
+implementations overriding `getName(Property)` continue to work.
+
+Both methods are now default methods, so `PropertyNodeNameProvider` is no longer a functional interface.
+Replace lambda expressions and method references implementing this SPI with a class
+or anonymous class overriding the new method.
+
+=== Constraint validator initialization
+
+`HibernateConstraintValidatorInitializationContext` now declares `getBeanResolver()`.
+
 [[behavior]]
 == Behavior
 
 The behavior of Hibernate Validator {hvVersionShort}
 is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
 
-Keep in mind that the internal representation of the `Path` and `Node` became mutable during validation process,
-so do not rely on these being immutable in your traversable resolvers.
-The `Path` and `Node` representations within the `ConstraintViolation` remains immutable.
+=== CPF validation
 
+`@CPF` now accepts only the fully formatted `XXX.XXX.XXX-XX` representation or an
+unformatted sequence of 11 digits, with valid check digits in either case.
+Partially formatted values, including values with only a dash before the check digits,
+are rejected. Normalize such input to one of the supported representations before validation.
+
+=== Startup logging
+
+The Hibernate Validator version banner (`HV000001`) is now logged at `DEBUG` instead of `INFO`.
+Enable debug logging for `org.hibernate.validator.internal.util.Version` if you need this banner.
