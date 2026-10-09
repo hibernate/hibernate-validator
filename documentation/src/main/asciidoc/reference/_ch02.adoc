@@ -828,6 +828,11 @@ Hibernate Validator!
 	Hibernate metadata impact::: None
 	Country::: Brazil
 
+`@NFeAccessKey`:: Checks that the annotated character sequence represents a valid Brazilian NF-e (Nota Fiscal Eletrônica) access key. Supports access keys containing numeric or alphanumeric CNPJ representations.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Brazil
+
 `@RENAVAM`:: Checks that the annotated character sequence represents a valid Brazilian vehicle registration number (RENAVAM). Supports the current 11-digit representation and the legacy 9-digit representation.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None

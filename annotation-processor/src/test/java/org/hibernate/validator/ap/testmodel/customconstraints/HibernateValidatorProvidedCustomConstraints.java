@@ -20,6 +20,7 @@ import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.NFeAccessKey;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
@@ -47,6 +48,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@CUIT
 	@CNPJ
 	@CPF
+	@NFeAccessKey
 	@RENAVAM
 	@TituloEleitoral
 	@REGON
@@ -74,6 +76,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@CUIT
 	@CNPJ
 	@CPF
+	@NFeAccessKey
 	@RENAVAM
 	@TituloEleitoral
 	@REGON

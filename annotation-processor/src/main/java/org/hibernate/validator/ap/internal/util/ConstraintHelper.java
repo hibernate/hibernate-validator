@@ -309,6 +309,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CUIL_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CUIT_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CNPJ_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NFE_ACCESS_KEY_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.REGON_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NIP_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.PESEL_CHECK, CharSequence.class );
