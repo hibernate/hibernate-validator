@@ -86,6 +86,7 @@ public class TypeNames {
 		public static final String CUIL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ar.CUIL";
 		public static final String CUIT_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ar.CUIT";
 		public static final String CNPJ_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.CNPJ";
+		public static final String NFE_ACCESS_KEY_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.NFeAccessKey";
 		public static final String REGON_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.REGON";
 		public static final String NIP_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.NIP";
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";
