@@ -9,6 +9,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWit
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.expectThrows;
 
 import java.util.List;
 import java.util.Map;
@@ -220,6 +221,29 @@ public class ConstraintValidatorContextImplTest {
 				.property( "bar", true, "test", null, Map.class, 0 )
 				.containerElement( "<map value>", true, "key", null, Map.class, 1 )
 				.containerElement( "<list element>", true, null, 3, List.class, 0 ) );
+	}
+
+	@Test
+	public void testCustomizingFirstNodeIsRejected() {
+		ConstraintValidatorContextImpl context = createEmptyHibernateConstraintValidatorReusableContext();
+		expectThrows( IllegalStateException.class, () -> context.buildConstraintViolationWithTemplate( message )
+				.addPropertyNode( "jobs" ).inIterable() );
+		expectThrows( IllegalStateException.class, () -> context.buildConstraintViolationWithTemplate( message )
+				.addPropertyNode( "jobs" ).inContainer( List.class, 0 ) );
+		expectThrows( IllegalStateException.class, () -> context.buildConstraintViolationWithTemplate( message )
+				.addContainerElementNode( "<list element>", List.class, 0 ).addConstraintViolation() );
+	}
+
+	@Test
+	public void testCustomizingBeanWithinContainerProperty() {
+		ConstraintValidatorContextImpl context = createEmptyHibernateConstraintValidatorReusableContext();
+		context.buildConstraintViolationWithTemplate( message )
+				.addPropertyNode( "jobs" )
+				.addBeanNode().inIterable().atIndex( 3 )
+				.addConstraintViolation();
+
+		assertMessageAndPath( context.getConstraintViolationCreationContexts().get( 0 ), message,
+				pathWith().property( "jobs" ).bean( true, null, 3 ) );
 	}
 
 	private ConstraintValidatorContextImpl createEmptyHibernateConstraintValidatorReusableContext() {

@@ -157,14 +157,17 @@ public final class MutablePath implements Path, Serializable {
 	}
 
 	public void makeLeafNodeIterable() {
+		assertLeafNodeIsNotRoot();
 		currentLeafNode.makeIterable();
 	}
 
 	public void makeLeafNodeIterableAndSetIndex(Integer index) {
+		assertLeafNodeIsNotRoot();
 		currentLeafNode.makeIterableAndSetIndex( index );
 	}
 
 	public void makeLeafNodeIterableAndSetMapKey(Object key) {
+		assertLeafNodeIsNotRoot();
 		currentLeafNode.makeIterableAndSetMapKey( key );
 	}
 
@@ -176,7 +179,14 @@ public final class MutablePath implements Path, Serializable {
 	}
 
 	public void setLeafNodeTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
+		assertLeafNodeIsNotRoot();
 		currentLeafNode.setTypeParameter( containerClass, typeArgumentIndex );
+	}
+
+	private void assertLeafNodeIsNotRoot() {
+		if ( currentLeafNode == MutableNode.ROOT_NODE ) {
+			throw LOG.getUnableToModifyRootPathNodeException();
+		}
 	}
 
 	public void removeLeafNode() {

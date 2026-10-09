@@ -14,6 +14,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.expectThrows;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Path;
@@ -46,6 +48,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -55,6 +58,31 @@ import org.testng.annotations.Test;
  */
 @SuppressWarnings("removal")
 public class MutablePathTest {
+
+	@DataProvider
+	public Object[][] rootNodeMutations() {
+		return new Object[][] {
+				{ (Consumer<MutablePath>) MutablePath::makeLeafNodeIterable },
+				{ (Consumer<MutablePath>) path -> path.makeLeafNodeIterableAndSetIndex( 3 ) },
+				{ (Consumer<MutablePath>) path -> path.makeLeafNodeIterableAndSetMapKey( "key" ) },
+				{ (Consumer<MutablePath>) path -> path.setLeafNodeTypeParameter( Map.class, 1 ) }
+		};
+	}
+
+	@Test(dataProvider = "rootNodeMutations")
+	public void testRootNodeMutationIsRejected(Consumer<MutablePath> mutation) {
+		MutablePath path = MutablePath.createRootPath();
+		IllegalStateException exception = expectThrows( IllegalStateException.class, () -> mutation.accept( path ) );
+		assertTrue( exception.getMessage().startsWith( "HV000289:" ) );
+
+		MutablePath otherPath = MutablePath.createRootPath();
+		otherPath.addPropertyNode( "other" );
+		assertFalse( otherPath.getLeafNode().isInIterable() );
+		assertNull( otherPath.getLeafNode().getIndex() );
+		assertNull( otherPath.getLeafNode().getKey() );
+		assertNull( otherPath.getLeafNode().getContainerClass() );
+		assertNull( otherPath.getLeafNode().getTypeArgumentIndex() );
+	}
 
 	@Test
 	public void testParsing() {
