@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.test.internal.engine.serialization.Email;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ListAppender;
 
 import org.apache.logging.log4j.Level;
@@ -38,10 +39,6 @@ public class ValidAnnotationTest extends AbstractConstrainedTest {
 	 */
 	private static boolean deprecatedUsedOfValueCode(String s) {
 		return s.startsWith( "HV000271" );
-	}
-
-	private static boolean potentiallyDeprecatedUsedOfValueCode(String s) {
-		return s.startsWith( "HV000272" );
 	}
 
 	@BeforeTest
@@ -274,13 +271,21 @@ public class ValidAnnotationTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	public void onPotentiallyCascadable() throws NoSuchMethodException {
+	@TestForIssue(jiraKey = "HV-2159")
+	public void onPotentiallyCascadable() {
+		class Bar {
+			private @NotNull String prop;
+		}
 		class Foo {
 			private @Valid Object prop;
 		}
 
-		validator.validate( new Foo() );
+		Foo foo = new Foo();
+		foo.prop = new Bar();
+		assertThat( validator.validate( foo ) ).hasSize( 1 );
+		foo.prop = List.of( new Bar() );
+		assertThat( validator.validate( foo ) ).hasSize( 1 );
 
-		assertThat( logAppender.getMessages() ).hasSize( 1 ).allMatch( ValidAnnotationTest::potentiallyDeprecatedUsedOfValueCode );
+		assertThat( logAppender.getMessages() ).isEmpty();
 	}
 }

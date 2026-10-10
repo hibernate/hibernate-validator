@@ -955,7 +955,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 271, value = "Using `@Valid` on a container (%1$s) is deprecated. You should apply the annotation on the type argument(s). Affected element: %2$s")
 	void deprecatedUseOfValidOnContainer(@FormatWith(ClassObjectFormatter.class) Class<?> valueType, Object context);
 
-	@LogMessage(level = WARN)
+	@LogMessage(level = DEBUG)
 	@Message(id = 272,
 			value = "Using `@Valid` on a container is deprecated. You should apply the annotation on the type argument(s). (%1$s) can potentially be a container at runtime. Affected element: %2$s")
 	void potentiallyDeprecatedUseOfValidOnContainer(@FormatWith(ClassObjectFormatter.class) Class<?> valueType, Object context);

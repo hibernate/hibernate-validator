@@ -262,6 +262,8 @@ public class CascadingMetaDataBuilder {
 		// and they will be used at runtime to check if any of those could be applied to a runtime type and if PotentiallyContainerCascadingMetaData
 		// should be promoted to ContainerCascadingMetaData or not.
 		if ( !potentialValueExtractorCandidates.isEmpty() ) {
+			// Only log at debug level: the declared type may not be a container (e.g. Object),
+			// and may not allow @Valid to be placed on a type argument.
 			LOG.potentiallyDeprecatedUseOfValidOnContainer( ReflectionHelper.getClassFromType( enclosingType ), context );
 			return PotentiallyContainerCascadingMetaData.of( this, potentialValueExtractorCandidates, context );
 		}
