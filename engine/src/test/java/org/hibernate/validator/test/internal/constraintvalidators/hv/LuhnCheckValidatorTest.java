@@ -104,6 +104,15 @@ public class LuhnCheckValidatorTest {
 		assertFalse( validator.isValid( new MyCustomStringImpl( "79927398714" ), null ) );
 	}
 
+	@Test
+	public void testCheckDigitAtEndIndex() {
+		LuhnCheckValidator validator = new LuhnCheckValidator();
+		validator.initialize( createLuhnCheckAnnotation( 0, 10, 10, false ) );
+
+		assertTrue( validator.isValid( "79927398713", null ) );
+		assertFalse( validator.isValid( "79927398714", null ) );
+	}
+
 	private LuhnCheck createLuhnCheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
 		ConstraintAnnotationDescriptor.Builder<LuhnCheck> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( LuhnCheck.class );
 		descriptorBuilder.setAttribute( "startIndex", start );
