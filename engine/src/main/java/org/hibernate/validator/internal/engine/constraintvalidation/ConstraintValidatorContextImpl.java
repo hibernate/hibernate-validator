@@ -80,6 +80,10 @@ public class ConstraintValidatorContextImpl implements HibernateCrossParameterCo
 
 	@Override
 	public HibernateConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
+		if ( messageTemplate == null ) {
+			throw LOG.getMessageTemplateCannotBeNullException();
+		}
+
 		return new ConstraintViolationBuilderImpl(
 				messageTemplate,
 				getCopyOfBasePath()
