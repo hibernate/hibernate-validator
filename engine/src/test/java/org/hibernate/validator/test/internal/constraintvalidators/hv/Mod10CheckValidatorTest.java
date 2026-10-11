@@ -202,6 +202,15 @@ public class Mod10CheckValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
+	@Test
+	public void testCheckDigitAtEndIndex() {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		validator.initialize( createMod10CheckAnnotation( 0, 10, 10, false ) );
+
+		assertTrue( validator.isValid( "79927398712", null ) );
+		assertFalse( validator.isValid( "79927398714", null ) );
+	}
+
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, int multiplier, int weight) {
 		ConstraintAnnotationDescriptor.Builder<Mod10Check> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Mod10Check.class );
 		descriptorBuilder.setAttribute( "startIndex", start );

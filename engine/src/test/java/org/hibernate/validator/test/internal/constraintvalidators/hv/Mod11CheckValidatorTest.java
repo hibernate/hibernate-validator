@@ -282,6 +282,15 @@ public class Mod11CheckValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
+	@Test
+	public void testCheckDigitAtEndIndex() {
+		Mod11CheckValidator validator = new Mod11CheckValidator();
+		validator.initialize( createMod11CheckAnnotation( 0, 10, 10, false, '0', '0', ProcessingDirection.RIGHT_TO_LEFT ) );
+
+		assertTrue( validator.isValid( "23322023583", null ) );
+		assertFalse( validator.isValid( "23322023584", null ) );
+	}
+
 	private Mod11Check createMod11CheckAnnotation(
 			int start,
 			int end,

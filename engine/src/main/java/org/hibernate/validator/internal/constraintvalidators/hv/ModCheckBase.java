@@ -157,7 +157,7 @@ public abstract class ModCheckBase {
 		if ( endIndex == Integer.MAX_VALUE ) {
 			return value.substring( 0, value.length() - 1 );
 		}
-		else if ( checkDigitIndex == -1 ) {
+		else if ( checkDigitIndex == -1 || checkDigitIndex == endIndex ) {
 			return value.substring( startIndex, endIndex );
 		}
 		else {
