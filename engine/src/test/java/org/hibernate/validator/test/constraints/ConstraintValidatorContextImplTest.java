@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.constraints;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertPathEquals;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.testng.Assert.assertEquals;
@@ -244,6 +245,14 @@ public class ConstraintValidatorContextImplTest {
 
 		assertMessageAndPath( context.getConstraintViolationCreationContexts().get( 0 ), message,
 				pathWith().property( "jobs" ).bean( true, null, 3 ) );
+	}
+
+	@Test
+	public void testNullMessageTemplateIsRejected() {
+		ConstraintValidatorContextImpl context = createEmptyHibernateConstraintValidatorReusableContext();
+		assertThatThrownBy( () -> context.buildConstraintViolationWithTemplate( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageEndingWith( "Message template cannot be null." );
 	}
 
 	private ConstraintValidatorContextImpl createEmptyHibernateConstraintValidatorReusableContext() {

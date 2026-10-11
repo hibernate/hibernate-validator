@@ -1013,4 +1013,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 289, value = "Cannot modify the root path node. Add the container property before customizing its element.")
 	IllegalStateException getUnableToModifyRootPathNodeException();
 
+	@Message(id = 290, value = "Message template cannot be null.")
+	IllegalArgumentException getMessageTemplateCannotBeNullException();
+
 }
