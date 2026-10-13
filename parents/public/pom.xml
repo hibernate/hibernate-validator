@@ -145,7 +145,6 @@
                                     <additionalOptions>
                                         <additionalOption>-html5</additionalOption>
                                         <additionalOption>-Xdoclint:all,-missing</additionalOption>
-                                        <additionalOption>--add-script resources/theme-switch.js</additionalOption>
                                         <!-- Don't repeat inherited method docs; link to the declaring type instead -->
                                         <additionalOption>--override-methods summary</additionalOption>
                                     </additionalOptions>
