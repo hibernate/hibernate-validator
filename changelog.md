@@ -1,5 +1,16 @@
 # Hibernate Validator Changelog
 
+## 9.1.5.Final (2026-10-13)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40454)
+
+
+### Bug
+* [HV-2256](https://hibernate.atlassian.net/browse/HV-2256) - addMessageParameter fix
+
+### Improvement
+* [HV-2263](https://hibernate.atlassian.net/browse/HV-2263) - Bump joda-time to 2.14.4
+
 ## 9.1.4.Final (2026-09-20)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40268)
