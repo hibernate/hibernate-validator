@@ -1,5 +1,104 @@
 # Hibernate Validator Changelog
 
+## 9.2.0.Beta1 (2026-10-13)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/36146)
+
+
+### Bug
+* [HV-2256](https://hibernate.atlassian.net/browse/HV-2256) - addMessageParameter fix
+* [HV-2253](https://hibernate.atlassian.net/browse/HV-2253) - ClassNotFoundException thrown when an EL implementation and OSGi are not on the class path
+* [HV-2231](https://hibernate.atlassian.net/browse/HV-2231) - RegexpURLValidator throws NPE when URL has no authority component
+* [HV-2227](https://hibernate.atlassian.net/browse/HV-2227) - Missing @Repeatable in some constraint annotation like IpAddress
+* [HV-2222](https://hibernate.atlassian.net/browse/HV-2222) - ParameterNode.getParameterIndex throws NPE
+* [HV-2217](https://hibernate.atlassian.net/browse/HV-2217) - HibernateConstraintValidatorContext::addExpressionVariable throws NPE when given null value
+* [HV-2164](https://hibernate.atlassian.net/browse/HV-2164) - NIP constraint javadoc incorrectly states that it is a 9 digit sequence
+* [HV-2159](https://hibernate.atlassian.net/browse/HV-2159) - potentiallyDeprecatedUseOfValidOnContainer spams the log
+* [HV-1945](https://hibernate.atlassian.net/browse/HV-1945) - @LuhnCheck with endIndex and checkDigitIndex equals seems wrong
+* [HV-1923](https://hibernate.atlassian.net/browse/HV-1923) - CPF constraint accepting incorrect format
+* [HV-1825](https://hibernate.atlassian.net/browse/HV-1825) - NPE when pushing a null message to context.buildConstraintViolationWithTemplate
+
+### Improvement
+* [HV-2262](https://hibernate.atlassian.net/browse/HV-2262) - Bump joda-time to 2.15.0
+* [HV-2257](https://hibernate.atlassian.net/browse/HV-2257) - Lower log level of HV000001 version banner from INFO to DEBUG
+* [HV-2247](https://hibernate.atlassian.net/browse/HV-2247) - Integrate Hibernate Accessor
+* [HV-2243](https://hibernate.atlassian.net/browse/HV-2243) - Bump joda-time to 2.14.3
+* [HV-2242](https://hibernate.atlassian.net/browse/HV-2242) - Update to OpenJFX to 17.0.20
+* [HV-2237](https://hibernate.atlassian.net/browse/HV-2237) - Create a rule so constraints annotated as "Incubating" must also have it in their programmatic definition class
+* [HV-2220](https://hibernate.atlassian.net/browse/HV-2220) - Create a new constraint @Port to validate port numbers
+* [HV-2219](https://hibernate.atlassian.net/browse/HV-2219) - Expose constraint validator payload to message interpolators
+* [HV-2216](https://hibernate.atlassian.net/browse/HV-2216) - Use Maven 3.9.16 as a required minimum version for the build
+* [HV-2215](https://hibernate.atlassian.net/browse/HV-2215) - Switch to Hibernate Accessor for handling field/property access
+* [HV-2214](https://hibernate.atlassian.net/browse/HV-2214) - Enable automatic releases
+* [HV-2213](https://hibernate.atlassian.net/browse/HV-2213) - Create a new constraint @NullOrNotEmpty similar to @NotEmpty
+* [HV-2212](https://hibernate.atlassian.net/browse/HV-2212) - Bump joda-time to 2.14.2
+* [HV-2211](https://hibernate.atlassian.net/browse/HV-2211) - Upgrade Jackson test dependency to 3.1.3
+* [HV-2210](https://hibernate.atlassian.net/browse/HV-2210) - Cache whether the declaring class of the constraint location is an interface
+* [HV-2208](https://hibernate.atlassian.net/browse/HV-2208) - Update to OpenJFX to 17.0.19
+* [HV-2207](https://hibernate.atlassian.net/browse/HV-2207) - Use Maven 3.9.15 as a required minimum version for the build
+* [HV-2202](https://hibernate.atlassian.net/browse/HV-2202) - Do not recreate HibernateConstraintValidatorContext if possible
+* [HV-2197](https://hibernate.atlassian.net/browse/HV-2197) - Update to JBoss logging 3.6.3.Final
+* [HV-2194](https://hibernate.atlassian.net/browse/HV-2194) - Bump joda-time to 2.14.1
+* [HV-2191](https://hibernate.atlassian.net/browse/HV-2191) - Simplify PlatformResourceBundleLocator#determineAvailabilityOfResourceBundleControl() to drop reflection
+* [HV-2173](https://hibernate.atlassian.net/browse/HV-2173) - Upgrade to JBoss logging 3.6.2.Final
+* [HV-2172](https://hibernate.atlassian.net/browse/HV-2172) - Update to OpenJFX to 17.0.18
+* [HV-2171](https://hibernate.atlassian.net/browse/HV-2171) - Bump Apache Groovy to 5.0.4
+* [HV-2170](https://hibernate.atlassian.net/browse/HV-2170) - Pass a ROOT locale to loggers to avoid unnecessary class lookups
+* [HV-2169](https://hibernate.atlassian.net/browse/HV-2169) - Update AssertJ to 3.27.7
+* [HV-2168](https://hibernate.atlassian.net/browse/HV-2168) - Test against wildfly-preview 39.0.0.Final
+* [HV-2167](https://hibernate.atlassian.net/browse/HV-2167) - Provide additional context for PropertyNodeNameProvider.getName(..)
+* [HV-2166](https://hibernate.atlassian.net/browse/HV-2166) - Update to com.fasterxml:classmate 1.7.3
+* [HV-2165](https://hibernate.atlassian.net/browse/HV-2165) - Update to OpenJFX to 17.0.17
+* [HV-2162](https://hibernate.atlassian.net/browse/HV-2162) - Provide the member name in the JavaBeanProperty
+* [HV-2161](https://hibernate.atlassian.net/browse/HV-2161) - Adjust the Jackson PropertyNodeNameProvider example to be compatible with Jackson 3
+* [HV-2160](https://hibernate.atlassian.net/browse/HV-2160) - Bump Apache Groovy to 5.0.3
+* [HV-2158](https://hibernate.atlassian.net/browse/HV-2158) - Update documentation theme to the current latest 6.1.2.Final
+* [HV-2157](https://hibernate.atlassian.net/browse/HV-2157) - Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+* [HV-2156](https://hibernate.atlassian.net/browse/HV-2156) - Test against wildfly-preview 38.0.1.Final
+* [HV-1793](https://hibernate.atlassian.net/browse/HV-1793) - Update JavaMoney dependency to MR1 of JSR354
+
+### New Feature
+* [HV-2260](https://hibernate.atlassian.net/browse/HV-2260) - Introduce constraint for Brazilian vehicle registration numbers: @RENAVAM
+* [HV-2258](https://hibernate.atlassian.net/browse/HV-2258) - Add @UpperCase / @LowerCase constraints
+* [HV-2252](https://hibernate.atlassian.net/browse/HV-2252) - Add @ISSN constraint
+* [HV-2250](https://hibernate.atlassian.net/browse/HV-2250) - Add @Hexadecimal constraint
+* [HV-2249](https://hibernate.atlassian.net/browse/HV-2249) - Add @BIC constraint
+* [HV-2248](https://hibernate.atlassian.net/browse/HV-2248) - Add @Trimmed constraint
+* [HV-2246](https://hibernate.atlassian.net/browse/HV-2246) - Adding @IBAN Constraint
+* [HV-2245](https://hibernate.atlassian.net/browse/HV-2245) - Add @StartsWith constraint
+* [HV-2236](https://hibernate.atlassian.net/browse/HV-2236) - Adding @Contains constraint
+* [HV-2235](https://hibernate.atlassian.net/browse/HV-2235) - Use BeanResolver / BeanProvider as a way of configuring various pluggable components of the Validator
+* [HV-2234](https://hibernate.atlassian.net/browse/HV-2234) - Introduce password constraint: @PasswordPolicy
+* [HV-2233](https://hibernate.atlassian.net/browse/HV-2233) - Introduce password constraint: @PasswordStrength 
+* [HV-2232](https://hibernate.atlassian.net/browse/HV-2232) - Introduce password constraint: @NotCompromised 
+* [HV-2230](https://hibernate.atlassian.net/browse/HV-2230) - Add Argentinian CUIT/CUIL and Paraguayan RUC constraints
+* [HV-2226](https://hibernate.atlassian.net/browse/HV-2226) - Adding constraint DatetimeFormat
+* [HV-2199](https://hibernate.atlassian.net/browse/HV-2199) - Create new @NullOrNotEmpty constraint
+* [HV-2193](https://hibernate.atlassian.net/browse/HV-2193) - Create a new constraint @NullOrNotBlank similar to @NotBlank for use with nullable fields and Optional<>
+
+### Remove Feature
+* [HV-2206](https://hibernate.atlassian.net/browse/HV-2206) - Remove HibernateValidatorEnhancedBean
+
+### Task
+* [HV-2265](https://hibernate.atlassian.net/browse/HV-2265) - mn_MN messages translation
+* [HV-2244](https://hibernate.atlassian.net/browse/HV-2244) - Tune the content of javadoc jars to reduce the size of files published to Maven Central
+* [HV-2239](https://hibernate.atlassian.net/browse/HV-2239) - Test against wildfly-preview 41.0.0.Final
+* [HV-2229](https://hibernate.atlassian.net/browse/HV-2229) - Review whether the params map needs to be reset in ConstraintValidatorContextImpl
+* [HV-2225](https://hibernate.atlassian.net/browse/HV-2225) - Upgrade Jackson test dependency to 3.2.0
+* [HV-2224](https://hibernate.atlassian.net/browse/HV-2224) - Test against wildfly-preview 40.0.1.Final
+* [HV-2223](https://hibernate.atlassian.net/browse/HV-2223) - Update documentation theme to the current latest 6.1.3.Final
+* [HV-2221](https://hibernate.atlassian.net/browse/HV-2221) - Test against wildfly-preview 40.0.0.Final
+* [HV-2205](https://hibernate.atlassian.net/browse/HV-2205) - Upgrade Jackson test dependency to 3.1.2
+* [HV-2204](https://hibernate.atlassian.net/browse/HV-2204) - Test against JDK 27
+* [HV-2203](https://hibernate.atlassian.net/browse/HV-2203) - Upgrade Jackson test dependency to 3.1.1
+* [HV-2201](https://hibernate.atlassian.net/browse/HV-2201) - Update hibernate-asciidoctor-extensions from 3.2.0.Final to 3.2.1.Final
+* [HV-2196](https://hibernate.atlassian.net/browse/HV-2196) - Remove unnecessary property ConstraintLocationKind#constraintLocationKind
+* [HV-2195](https://hibernate.atlassian.net/browse/HV-2195) - Explicitly specify the JMH annotation processor in the annotation processor paths
+* [HV-2192](https://hibernate.atlassian.net/browse/HV-2192) - Use Maven 3.9.13 as a required minimum version for the build
+* [HV-2190](https://hibernate.atlassian.net/browse/HV-2190) - Upgrade Jackson test dependency to 3.1.0
+* [HV-2189](https://hibernate.atlassian.net/browse/HV-2189) - Test against wildfly-preview 39.0.1.Final
+* [HV-2163](https://hibernate.atlassian.net/browse/HV-2163) - Use Maven 3.9.12 as a required minimum version for the build
+
 ## 9.1.0.Final (2025-11-07)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/35947)
