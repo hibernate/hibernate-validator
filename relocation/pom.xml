@@ -17,6 +17,23 @@
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Relocation Artifacts</name>
+    <description>Relocation artifacts for Hibernate Validator.</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <pomElements>
+                        <!-- Preserve the target coordinates in relocation artifacts. -->
+                        <distributionManagement>keep</distributionManagement>
+                    </pomElements>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <modules>
         <module>annotation-processor</module>
