@@ -1,6 +1,18 @@
 Hibernate Validator Changelog
 =============================
 
+8.0.6.Final (2026-10-13)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/40269
+
+
+** Bug
+    * HV-2256 addMessageParameter fix
+
+** Task
+    * HV-2244 Tune the content of javadoc jars to reduce the size of files published to Maven Central
+
 8.0.5.Final (2026-07-26)
 -------------------------
 
