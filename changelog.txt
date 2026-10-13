@@ -1,6 +1,34 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.2.Final (2026-10-13)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/35287
+
+
+** Bug
+    * HV-2256 addMessageParameter fix
+    * HV-2231 RegexpURLValidator throws NPE when URL has no authority component
+    * HV-2164 NIP constraint javadoc incorrectly states that it is a 9 digit sequence
+
+** Improvement
+    * HV-2214 Enable automatic releases
+    * HV-2197 Update to JBoss logging 3.6.3.Final
+    * HV-2194 Bump joda-time to 2.14.1
+    * HV-2175 Bump Apache Groovy to 4.0.30
+    * HV-2173 Upgrade to JBoss logging 3.6.2.Final
+    * HV-2172 Update to OpenJFX to 17.0.18
+    * HV-2157 Point to docs.hibernate.org instead of docs.jboss.org/hibernate in various docs
+    * HV-2138 Include license file in the META-INF of published artifacts
+    * HV-2125 Update Hibernate asciidoc theme to 5.1.2.Final
+
+** Task
+    * HV-2244 Tune the content of javadoc jars to reduce the size of files published to Maven Central
+    * HV-2192 Use Maven 3.9.13 as a required minimum version for the build
+    * HV-2163 Use Maven 3.9.12 as a required minimum version for the build
+    * HV-2142 Stage documentation and javadocs to projectroot/target/staging-deploy/documentation
+
 9.0.1.Final (2025-06-13)
 -------------------------
 
