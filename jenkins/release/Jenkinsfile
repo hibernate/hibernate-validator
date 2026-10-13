@@ -207,7 +207,7 @@ pipeline {
 
 									def ghReleaseNote = sh(script: 'realpath -e github_release_notes.md 2>/dev/null', returnStdout: true).trim()
 									sh """
-										bash -xe .release/scripts/release.sh -j ${params.ADDITIONAL_SCRIPT_ARGS} \
+										bash -xe .release/scripts/release.sh -j ${env.ADDITIONAL_SCRIPT_ARGS} \
 												${ghReleaseNote != '' ? '--notes=' + ghReleaseNote : ''} \
 												validator ${releaseVersion.toString()} ${developmentVersion.toString()}
 									"""
