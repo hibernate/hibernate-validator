@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 9.1.0.Final - 2025-11-07*
+*Version: 9.2.0.Beta1 - 2026-10-13*
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.validator/hibernate-validator.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.validator&sort=name)
 [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-validator%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
@@ -41,7 +41,7 @@ Logging will delegate any log requests to that provider.
     <dependency>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator</artifactId>
-        <version>9.1.0.Final</version>
+        <version>9.2.0.Beta1</version>
     </dependency>
     ```
   You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
@@ -60,7 +60,7 @@ extension by adding the following dependency:
     <dependency>
        <groupId>org.hibernate.validator</groupId>
        <artifactId>hibernate-validator-cdi</artifactId>
-       <version>9.1.0.Final</version>
+       <version>9.2.0.Beta1</version>
     </dependency>
     ```
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
