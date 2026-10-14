@@ -494,8 +494,65 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation
 
 [NOTE]
 ====
-`@Valid` is not honored by `validateProperty()` or `validateValue()`.
+`validateProperty()` and `validateValue()` do not perform cascaded validation: selecting an
+association property does not validate constraints on the associated bean, even when the
+association is annotated with `@Valid`.
 ====
+
+Hibernate Validator additionally supports nested property paths for `validateProperty()`, such as
+`"address.city"`. This is an extension beyond the Jakarta Validation contract for a single
+JavaBeans property name. Each intermediate association must be marked for cascading with `@Valid`
+so that the selected property belongs to the root bean's declared validation graph. Only the
+constraints on the selected leaf property are validated; other constraints on the associated bean
+are not checked.
+
+.Nested property validation with `@Valid`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=nestedPropertyBeans]
+
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=nestedPropertyWithValid]
+----
+====
+
+Here, validating `"address"` produces no violations because cascading is suppressed. Validating
+`"address.city"` produces one violation, with the original `customer` as its root bean and
+`"address.city"` as its property path.
+
+.Nested property validation without `@Valid`
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=nestedPropertyWithoutValidBean]
+
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=nestedPropertyWithoutValid]
+----
+====
+
+Without `@Valid` on `address`, the nested path is rejected with an `IllegalArgumentException`.
+To explicitly validate that leaf property, call `validateProperty()` on the address itself.
+The resulting violation has the `"address"` as its root bean and `"city"` as its property path.
+Path validity is checked even when the root bean or the selected property has no constraints.
+For a valid existing property, no applicable constraints means an empty set of violations.
+The link:{bvSpecUrl}#validationapi-validatorapi-validationmethods[Jakarta Validation specification, section 6.1.1]
+requires an empty set when there are no violations and an `IllegalArgumentException` for an invalid
+property name. The requirement for `@Valid` on intermediate associations applies to Hibernate
+Validator's nested-path extension for `validateProperty()`.
+
+[cols="2,3", options="header"]
+|===
+| Selected property or path | Expected result
+| Existing property directly on the root, with applicable constraints | Validate those constraints
+| Existing property directly on the root, without applicable constraints | Empty set
+| Nested path with `@Valid` on every intermediate association, with applicable leaf constraints | Validate only the leaf property's constraints
+| Nested path with `@Valid` on every intermediate association, without applicable leaf constraints | Empty set
+| Nested path missing `@Valid` on an intermediate association | `IllegalArgumentException`, regardless of constraints elsewhere
+| Nonexistent property on the root or at the end of an otherwise valid nested path | `IllegalArgumentException`
+|===
+
+These nested-path examples assume non-null intermediate objects. An association annotated with
+`@Valid` does not cause cascading when that association itself is the selected property.
 
 
 `Validator#validateProperty()` is for example used in the integration of Jakarta Validation into JSF 2
