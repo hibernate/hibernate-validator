@@ -179,10 +179,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Class<T> rootBeanClass = (Class<T>) object.getClass();
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( rootBeanClass );
 
-		if ( !rootBeanMetaData.hasConstraints() ) {
-			return Collections.emptySet();
-		}
-
 		MutablePath propertyPath = MutablePath.createPathFromString( propertyName );
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateProperty( rootBeanClass, rootBeanMetaData, object,
 				propertyPath );
@@ -205,10 +201,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		sanityCheckGroups( groups );
 
 		BeanMetaData<T> rootBeanMetaData = beanMetaDataManager.getBeanMetaData( beanType );
-
-		if ( !rootBeanMetaData.hasConstraints() ) {
-			return Collections.emptySet();
-		}
 
 		MutablePath propertyPath = MutablePath.createPathFromString( propertyName );
 		BaseBeanValidationContext<T> validationContext = getValidationContextBuilder().forValidateValue( beanType, rootBeanMetaData, propertyPath );
