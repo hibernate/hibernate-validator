@@ -11,8 +11,6 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jakarta.validation.ElementKind;
 
@@ -35,21 +33,6 @@ public final class MutablePath implements Path, Serializable {
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	private static final String PROPERTY_PATH_SEPARATOR = ".";
-
-	/**
-	 * Regular expression used to split a string path into its elements.
-	 *
-	 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
-	 */
-	private static final String LEADING_PROPERTY_GROUP = "[^\\[\\.]++"; // everything up to a [ or .
-	private static final String OPTIONAL_INDEX_GROUP = "\\[(\\w*+)\\]";
-	private static final String REMAINING_PROPERTY_STRING = "\\.(.++)"; // processed recursively
-
-	private static final Pattern PATH_PATTERN = Pattern.compile( "(" + LEADING_PROPERTY_GROUP + ")(" + OPTIONAL_INDEX_GROUP + ")?(" + REMAINING_PROPERTY_STRING + ")*+" );
-	private static final int PROPERTY_NAME_GROUP = 1;
-	private static final int INDEXED_GROUP = 2;
-	private static final int INDEX_GROUP = 3;
-	private static final int REMAINING_STRING_GROUP = 5;
 
 	private MutableNode currentLeafNode;
 
@@ -269,50 +252,81 @@ public final class MutablePath implements Path, Serializable {
 		this.currentLeafNode = currentLeafNode;
 	}
 
+	/**
+	* Parses a path without access to the bean or container types. The string representation alone
+	* cannot distinguish a list/array index from a numeric map key: an index of {@code 100}, an
+	* {@code Integer} map key of {@code 100}, and a {@code String} map key of {@code "100"} all appear
+	* as {@code [100]}. For compatibility, selectors consisting of digits that fit in an {@code int}
+	* are interpreted as indexes; other non-empty selectors are interpreted as string map keys.
+	* Paths built during validation retain the actual index or map key in their node metadata.
+	*/
 	private static MutablePath parseProperty(String propertyName) {
 		MutablePath path = createRootPath();
-		String tmp = propertyName;
-		do {
-			Matcher matcher = PATH_PATTERN.matcher( tmp );
-			if ( matcher.matches() ) {
-
-				String value = matcher.group( PROPERTY_NAME_GROUP );
-				if ( !isValidJavaIdentifier( value ) ) {
-					throw LOG.getInvalidJavaIdentifierException( value );
-				}
-
-				// create the node
-				path.addPropertyNode( value );
-
-				// is the node indexable
-				if ( matcher.group( INDEXED_GROUP ) != null ) {
-					path.makeLeafNodeIterable();
-				}
-
-				// take care of the index/key if one exists
-				String indexOrKey = matcher.group( INDEX_GROUP );
-				if ( indexOrKey != null && !indexOrKey.isEmpty() ) {
-					try {
-						Integer i = Integer.parseInt( indexOrKey );
-						path.makeLeafNodeIterableAndSetIndex( i );
-					}
-					catch (NumberFormatException e) {
-						path.makeLeafNodeIterableAndSetMapKey( indexOrKey );
-					}
-				}
-
-				// match the remaining string
-				tmp = matcher.group( REMAINING_STRING_GROUP );
+		int length = propertyName.length();
+		int position = 0;
+		while ( position < length ) {
+			int start = position;
+			while ( position < length && propertyName.charAt( position ) != '.' && propertyName.charAt( position ) != '[' ) {
+				position++;
 			}
-			else {
+			if ( position == start ) {
 				throw LOG.getUnableToParsePropertyPathException( propertyName );
 			}
-		} while ( tmp != null );
+
+			String name = propertyName.substring( start, position );
+			if ( !isValidJavaIdentifier( name ) ) {
+				throw LOG.getInvalidJavaIdentifierException( name );
+			}
+			path.addPropertyNode( name );
+
+			if ( position < length && propertyName.charAt( position ) == '[' ) {
+				int indexStart = ++position;
+				int index = 0;
+				boolean numeric = true;
+				while ( position < length && propertyName.charAt( position ) != ']' ) {
+					char character = propertyName.charAt( position );
+					// Preserve the ASCII word characters accepted by the former regex for keys.
+					boolean digit = character >= '0' && character <= '9';
+					if ( !digit && character != '_' && !( character >= 'a' && character <= 'z' ) && !( character >= 'A' && character <= 'Z' ) ) {
+						throw LOG.getUnableToParsePropertyPathException( propertyName );
+					}
+					if ( numeric ) {
+						int value = character - '0';
+						if ( !digit || index > ( Integer.MAX_VALUE - value ) / 10 ) {
+							numeric = false;
+						}
+						else {
+							index = index * 10 + value;
+						}
+					}
+					position++;
+				}
+				if ( position == length ) {
+					throw LOG.getUnableToParsePropertyPathException( propertyName );
+				}
+
+				if ( position == indexStart ) {
+					path.makeLeafNodeIterable();
+				}
+				else if ( numeric ) {
+					path.makeLeafNodeIterableAndSetIndex( index );
+				}
+				else {
+					path.makeLeafNodeIterableAndSetMapKey( propertyName.substring( indexStart, position ) );
+				}
+				position++;
+			}
+
+			if ( position < length ) {
+				if ( propertyName.charAt( position ) != '.' || ++position == length ) {
+					throw LOG.getUnableToParsePropertyPathException( propertyName );
+				}
+			}
+		}
 
 		if ( path.getLeafNode().isIterable() ) {
 			path.addBeanNode();
 		}
-
 		return path;
 	}
 
