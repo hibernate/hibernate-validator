@@ -23,7 +23,7 @@
 
     <properties>
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>
-        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
+        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme/asciidoc</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
         <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
@@ -259,7 +259,7 @@
                             <attributes>
                                 <stylesdir>css</stylesdir>
                                 <iconfont-remote>false</iconfont-remote>
-                                <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                                <iconfont-name>font-awesome/css/all.min</iconfont-name>
                             </attributes>
                         </configuration>
                     </execution>
@@ -272,7 +272,7 @@
                     </extensions>
                     <sourceDocumentName>index.asciidoc</sourceDocumentName>
                     <attributes>
-                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
+                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/hibernate</docinfodir>
                         <icons>font</icons>
                         <tabsize>4</tabsize>
 
