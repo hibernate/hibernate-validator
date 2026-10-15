@@ -52,6 +52,7 @@ maven-eclipse.xml
 .clover
 .DS_Store
 
-# Maven wrapper files
-.mvn/wrapper
-mvnw*
+.cache
+
+# Local build scan state
+.mvn/.develocity/
