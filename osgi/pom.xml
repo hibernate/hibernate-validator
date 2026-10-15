@@ -23,25 +23,14 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <!-- Internal aggregator; only the Karaf features are published. -->
+        <deploy.skip>true</deploy.skip>
     </properties>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <modules>
         <module>karaf-features</module>
-        <module>integrationtest</module>
     </modules>
-    
+
     <profiles>
         <profile>
             <id>testWithJdk8</id>
@@ -52,10 +41,8 @@
                 </property>
             </activation>
             <modules>
-                <!--
-                Only enable this test on JDK 8 as it is failing on JDK 9+.
-                See https://hibernate.atlassian.net/browse/HV-1478 for more information about the failure.
-                -->
+                <!-- Keep the OSGi integration tests on Java 8 (HV-1478). -->
+                <module>integrationtest</module>
                 <module>felixtest</module>
             </modules>
         </profile>
