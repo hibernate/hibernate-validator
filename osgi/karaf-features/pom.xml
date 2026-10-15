@@ -23,6 +23,7 @@
 
     <properties>
         <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+        <deploy.skip>false</deploy.skip>
     </properties>
 
     <build>

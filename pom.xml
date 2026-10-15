@@ -94,6 +94,7 @@
         <module>performance</module>
         <module>cdi</module>
         <module>modules</module>
+        <module>osgi</module>
         <module>integration</module>
     </modules>
 
@@ -1486,10 +1487,6 @@
                 <!-- Tests specific to Java 17+ won't work with JDK 8, so we disable them. -->
                 <java-version.test.java17.add-test-source-phase>none</java-version.test.java17.add-test-source-phase>
             </properties>
-            <modules>
-                <!-- Only run the OSGi tests for JDK 8 -->
-                <module>osgi</module>
-            </modules>
             <build>
                 <pluginManagement>
                     <plugins>
