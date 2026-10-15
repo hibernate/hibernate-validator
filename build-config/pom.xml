@@ -22,14 +22,12 @@
 
     <properties>
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <!-- Internal build resources are installed locally but not published. -->
+        <deploy.skip>true</deploy.skip>
     </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-            </plugin>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
