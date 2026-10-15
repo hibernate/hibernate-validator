@@ -627,6 +627,19 @@
         </resources>
         <plugins>
             <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <!-- Flattened artifacts do not need the build parent on Maven Central. -->
+                        <inherited>false</inherited>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>${version.enforcer.plugin}</version>
                 <executions>
