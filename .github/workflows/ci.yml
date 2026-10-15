@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+
+# The main CI of Hibernate Validator is https://ci.hibernate.org/job/hibernate-validator/.
+# However, Hibernate Validator builds run on GitHub actions regularly
+# to build on Windows
+# and check that both the Linux and Windows workflows still work
+# and can be used in GitHub forks.
+# See https://docs.github.com/en/actions
+# for more information about GitHub actions.
+
+name: GH Actions CI
+
+on:
+  push:
+    branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
+      - '!4.*'
+      - '!5.*'
+      - '!6.*'
+      - '!8.*'
+      - '!9.*'
+      - '!main'
+      - '!dependabot/**'
+    tags:
+      - '**'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      # Pattern order matters: the last matching inclusion/exclusion wins
+      - '**'
+      - '!4.*'
+      - '!5.*'
+      - '!6.*'
+      - '!8.*'
+      - '!9.*'
+      - '!main'
+      # Ignore dependabot PRs that are not just about build dependencies;
+      # we'll reject such dependant PRs and send a PR ourselves.
+      - '!dependabot/**'
+      - 'dependabot/maven/build-dependencies-**'
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.ref }}, pr = ${{ github.event.pull_request.id }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.repository != 'hibernate/hibernate-validator' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end --no-transfer-progress"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{matrix.os.name}}
+    runs-on: ${{ matrix.os.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: Linux JDK 17
+            runs-on: ubuntu-latest
+            java:
+              version: 17
+          - name: Windows JDK 17
+            runs-on: windows-latest
+            java:
+              version: 17
+    steps:
+      - name: Support longpaths on Windows
+        if: "startsWith(matrix.os.runs-on, 'windows')"
+        run: git config --global core.longpaths true
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Java ${{ matrix.os.java.version }}
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # 6.0.0
+        with:
+          java-version: ${{ matrix.os.java.version }}
+          distribution: temurin
+      # https://github.com/actions/cache/blob/main/examples.md#java---maven
+      - name: Cache local Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
+        with:
+          path: ~/.m2/repository
+          # use a different key than workflows running in trusted mode
+          key: ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ github.event_name == 'push' && 'trusted' || 'untrusted' }}-${{ runner.os }}-maven-
+      - name: Set up Maven
+        run: ./mvnw -v
+
+      - name: Build code and run tests and basic checks (Standalone)
+        run: |
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          ./mvnw "${mvn_args[@]}" clean install \
+              -Pjqassistant -Pdist -Dsurefire.environment=standalone
+      - name: Run TCK tests in container mode
+        run: |
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          ./mvnw "${mvn_args[@]}" clean verify \
+          -Pjqassistant \
+          -am -pl :hibernate-validator-tck-runner \
+          -Dincontainer -Dsurefire.environment=incontainer
