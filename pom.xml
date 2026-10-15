@@ -243,6 +243,7 @@
         <version.surefire.plugin>2.21.0</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.2</version.surefire.plugin.java-version.asm>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
+        <version.flatten-maven-plugin>1.8.0</version.flatten-maven-plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.core>14.0.0.Final</version.org.wildfly.core>
@@ -1292,6 +1293,31 @@
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${version.flatten-maven-plugin}</version>
+                    <configuration>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <!-- Keep things like url, inceptionYear, authors...
+                             everything that's required by Maven Central -->
+                        <flattenMode>ossrh</flattenMode>
+                        <pomElements>
+                            <!-- We have Jakarta staging repo listed to download the TCK,
+                                but there's no point in keeping it listed in the published POM files. -->
+                            <repositories>remove</repositories>
+                        </pomElements>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten-pom</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
