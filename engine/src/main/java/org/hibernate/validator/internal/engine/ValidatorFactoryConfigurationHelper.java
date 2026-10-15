@@ -40,6 +40,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
@@ -303,6 +304,25 @@ final class ValidatorFactoryConfigurationHelper {
 		}
 
 		return ExpressionLanguageFeatureLevel.NONE;
+	}
+
+	static MessageParameterEscaping determineMessageParameterEscaping(AbstractConfigurationImpl<?> hibernateSpecificConfig,
+			Map<String, String> properties) {
+		if ( hibernateSpecificConfig != null && hibernateSpecificConfig.getMessageParameterEscaping() != null ) {
+			return hibernateSpecificConfig.getMessageParameterEscaping();
+		}
+
+		String messageParameterEscapingName = properties.get( HibernateValidatorConfiguration.MESSAGE_PARAMETER_ESCAPING );
+		if ( messageParameterEscapingName != null ) {
+			try {
+				return MessageParameterEscaping.of( messageParameterEscapingName );
+			}
+			catch (IllegalArgumentException e) {
+				throw LOG.invalidMessageParameterEscapingValue( messageParameterEscapingName, e );
+			}
+		}
+
+		return MessageParameterEscaping.ESCAPE;
 	}
 
 	static GetterPropertySelectionStrategy determineGetterPropertySelectionStrategy(AbstractConfigurationImpl<?> hibernateSpecificConfig, Map<String, String> properties,

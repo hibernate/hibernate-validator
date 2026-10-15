@@ -930,4 +930,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = ERROR)
 	@Message(id = 264, value = "Unable to interpolate EL expression '%s' as it uses a disabled feature.")
 	void disabledFeatureInExpressionLanguage(String expression, @Cause Exception e);
+
+	@Message(id = 276, value = "Unable to find a message parameter escaping value for '%s'.")
+	ValidationException invalidMessageParameterEscapingValue(String messageParameterEscapingName, @Cause IllegalArgumentException e);
 }

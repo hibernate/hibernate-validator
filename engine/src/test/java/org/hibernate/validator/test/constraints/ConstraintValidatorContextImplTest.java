@@ -22,6 +22,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLevel;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
 import org.testng.annotations.Test;
 
@@ -228,7 +229,7 @@ public class ConstraintValidatorContextImplTest {
 		path.addBeanNode();
 
 		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl( null, path, null, null, ExpressionLanguageFeatureLevel.BEAN_PROPERTIES,
-				ExpressionLanguageFeatureLevel.NONE );
+				ExpressionLanguageFeatureLevel.NONE, MessageParameterEscaping.ESCAPE );
 		context.disableDefaultConstraintViolation();
 		return context;
 	}
