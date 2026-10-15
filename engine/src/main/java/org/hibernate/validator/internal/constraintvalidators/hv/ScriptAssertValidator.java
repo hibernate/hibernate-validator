@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.
@@ -45,7 +46,7 @@ public class ScriptAssertValidator extends AbstractScriptAssertValidator<ScriptA
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
-			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript );
+			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "script", escapedScript, MessageParameterEscaping.NONE );
 		}
 
 		boolean validationResult = scriptAssertContext.evaluateScriptAssertExpression( value, alias );
