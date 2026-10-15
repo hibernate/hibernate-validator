@@ -25,6 +25,11 @@
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
+    <build>
+        <plugins>
+        </plugins>
+    </build>
+
     <modules>
         <module>karaf-features</module>
         <module>integrationtest</module>

@@ -17,6 +17,12 @@
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Relocation Artifacts</name>
+    <description>Relocation artifacts for Hibernate Validator.</description>
+
+    <build>
+        <plugins>
+        </plugins>
+    </build>
 
     <modules>
         <module>annotation-processor</module>
