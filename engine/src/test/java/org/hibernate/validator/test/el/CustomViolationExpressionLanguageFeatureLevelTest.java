@@ -18,6 +18,9 @@ import static org.testng.Assert.assertTrue;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
@@ -111,7 +114,14 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 		assertThat( validator.validate( new EnableELBeanPropertiesBean( "value" ) ) )
 				.containsOnlyViolations( violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Variable: value" ),
 						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Bean property: 118" ),
-						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Method execution: ${'aaaa'.substring(0, 1)}" ) );
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Method execution: ${'aaaa'.substring(0, 1)}" ),
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Variable List: value" ),
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Bean property List: 118" ),
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Method execution List: ${'aaaa'.substring(0, 1)}" ),
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Variable Map: value" ),
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Bean property Map: 118" ),
+						violationOf( EnableELBeanPropertiesConstraint.class ).withMessage( "Method execution Map: ${'aaaa'.substring(0, 1)}" )
+				);
 	}
 
 	@Test
@@ -125,7 +135,13 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 		assertThat( validator.validate( new EnableELBeanMethodsBean( "value" ) ) )
 				.containsOnlyViolations( violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Variable: value" ),
 						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Bean property: 118" ),
-						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution: a" ) );
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution: a" ),
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Variable List: value" ),
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Bean property List: 118" ),
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution List: a" ),
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Variable Map: value" ),
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Bean property Map: 118" ),
+						violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution Map: a" ) );
 	}
 
 	@Test
@@ -174,7 +190,13 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 						assertThat( validator.validate( new EnableELBeanMethodsBean( "value" ) ) )
 								.containsOnlyViolations( violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Variable: value" ),
 										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Bean property: 118" ),
-										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution: a" ) );
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution: a" ),
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Variable List: value" ),
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Bean property List: 118" ),
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution List: a" ),
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Variable Map: value" ),
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Bean property Map: 118" ),
+										violationOf( EnableELBeanMethodsConstraint.class ).withMessage( "Method execution Map: a" ) );
 					}
 				} );
 	}
@@ -262,7 +284,7 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 	@Retention(RUNTIME)
 	@Documented
-	@Constraint(validatedBy = { EnableELBeanPropertiesStringValidator.class })
+	@Constraint(validatedBy = { EnableELBeanPropertiesStringValidator.class, EnableELBeanPropertiesMapValidator.class, EnableELBeanPropertiesListValidator.class })
 	private @interface EnableELBeanPropertiesConstraint {
 
 		String message() default "-";
@@ -294,20 +316,94 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 		}
 	}
 
+	public static class EnableELBeanPropertiesMapValidator implements ConstraintValidator<EnableELBeanPropertiesConstraint, Map<String, String>> {
+
+		@Override
+		public boolean isValid(Map<String, String> value, ConstraintValidatorContext context) {
+			HibernateConstraintValidatorContext hibernateContext = (HibernateConstraintValidatorContext) context;
+
+			hibernateContext.disableDefaultConstraintViolation();
+
+			String key = value.keySet().iterator().next();
+			hibernateContext.addExpressionVariable( "key", key );
+
+			hibernateContext.buildConstraintViolationWithTemplate( "Variable Map: ${validatedValue[key]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_PROPERTIES )
+					.addBeanNode()
+					.inIterable()
+					.atKey( key )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Bean property Map: ${validatedValue[key].bytes[0]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_PROPERTIES )
+					.addBeanNode()
+					.inIterable()
+					.atKey( key )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Method execution Map: ${'aaaa'.substring(0, 1)}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_PROPERTIES )
+					.addBeanNode()
+					.inIterable()
+					.atKey( key )
+					.addConstraintViolation();
+
+			return false;
+		}
+	}
+
+	public static class EnableELBeanPropertiesListValidator implements ConstraintValidator<EnableELBeanPropertiesConstraint, List<String>> {
+
+		@Override
+		public boolean isValid(List<String> value, ConstraintValidatorContext context) {
+			HibernateConstraintValidatorContext hibernateContext = (HibernateConstraintValidatorContext) context;
+
+			hibernateContext.disableDefaultConstraintViolation();
+			int index = 0;
+			hibernateContext.addExpressionVariable( "index", index );
+			hibernateContext.buildConstraintViolationWithTemplate( "Variable List: ${validatedValue[index]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_PROPERTIES )
+					.addBeanNode()
+					.inIterable()
+					.atIndex( index )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Bean property List: ${validatedValue[index].bytes[0]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_PROPERTIES )
+					.addBeanNode()
+					.inIterable()
+					.atIndex( index )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Method execution List: ${'aaaa'.substring(0, 1)}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_PROPERTIES )
+					.addBeanNode()
+					.inIterable()
+					.atIndex( index )
+					.addConstraintViolation();
+
+			return false;
+		}
+	}
+
 	public static class EnableELBeanPropertiesBean {
 
 		public EnableELBeanPropertiesBean(String value) {
 			this.value = value;
+			this.map = Collections.singletonMap( value, value );
+			this.list = Collections.singletonList( value );
 		}
 
 		@EnableELBeanPropertiesConstraint
 		public String value;
+
+		@EnableELBeanPropertiesConstraint
+		public Map<String, String> map;
+
+		@EnableELBeanPropertiesConstraint
+		public List<String> list;
 	}
 
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 	@Retention(RUNTIME)
 	@Documented
-	@Constraint(validatedBy = { EnableELBeanMethodsStringValidator.class })
+	@Constraint(validatedBy = { EnableELBeanMethodsStringValidator.class, EnableELBeanMethodsListValidator.class, EnableELBeanMethodsMapValidator.class })
 	private @interface EnableELBeanMethodsConstraint {
 
 		String message() default "-";
@@ -339,14 +435,89 @@ public class CustomViolationExpressionLanguageFeatureLevelTest {
 		}
 	}
 
+	public static class EnableELBeanMethodsListValidator implements ConstraintValidator<EnableELBeanMethodsConstraint, List<String>> {
+
+		@Override
+		public boolean isValid(List<String> value, ConstraintValidatorContext context) {
+			HibernateConstraintValidatorContext hibernateContext = (HibernateConstraintValidatorContext) context;
+
+			hibernateContext.disableDefaultConstraintViolation();
+
+			int index = 0;
+			hibernateContext.addExpressionVariable( "index", index );
+			hibernateContext.buildConstraintViolationWithTemplate( "Variable List: ${validatedValue[index]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_METHODS )
+					.addBeanNode()
+					.inIterable()
+					.atIndex( index )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Bean property List: ${validatedValue[index].bytes[0]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_METHODS )
+					.addBeanNode()
+					.inIterable()
+					.atIndex( index )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Method execution List: ${'aaaa'.substring(0, 1)}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_METHODS )
+					.addBeanNode()
+					.inIterable()
+					.atIndex( index )
+					.addConstraintViolation();
+
+			return false;
+		}
+	}
+
+	public static class EnableELBeanMethodsMapValidator implements ConstraintValidator<EnableELBeanMethodsConstraint, Map<String, String>> {
+
+		@Override
+		public boolean isValid(Map<String, String> value, ConstraintValidatorContext context) {
+			HibernateConstraintValidatorContext hibernateContext = (HibernateConstraintValidatorContext) context;
+
+			hibernateContext.disableDefaultConstraintViolation();
+
+			String key = value.keySet().iterator().next();
+			hibernateContext.addExpressionVariable( "key", key );
+
+			hibernateContext.buildConstraintViolationWithTemplate( "Variable Map: ${validatedValue[key]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_METHODS )
+					.addBeanNode()
+					.inIterable()
+					.atKey( key )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Bean property Map: ${validatedValue[key].bytes[0]}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_METHODS )
+					.addBeanNode()
+					.inIterable()
+					.atKey( key )
+					.addConstraintViolation();
+			hibernateContext.buildConstraintViolationWithTemplate( "Method execution Map: ${'aaaa'.substring(0, 1)}" )
+					.enableExpressionLanguage( ExpressionLanguageFeatureLevel.BEAN_METHODS )
+					.addBeanNode()
+					.inIterable()
+					.atKey( key )
+					.addConstraintViolation();
+
+			return false;
+		}
+	}
+
 	public static class EnableELBeanMethodsBean {
 
 		public EnableELBeanMethodsBean(String value) {
 			this.value = value;
+			this.map = Collections.singletonMap( value, value );
+			this.list = Collections.singletonList( value );
 		}
 
 		@EnableELBeanMethodsConstraint
 		public String value;
+
+		@EnableELBeanMethodsConstraint
+		public Map<String, String> map;
+
+		@EnableELBeanMethodsConstraint
+		public List<String> list;
 	}
 
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
