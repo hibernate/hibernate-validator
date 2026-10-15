@@ -26,7 +26,7 @@ public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private static final Annotation[] EMPTY_PARAMETER_ANNOTATIONS = new Annotation[0];
+	static final Annotation[] EMPTY_PARAMETER_ANNOTATIONS = new Annotation[0];
 
 	private final int index;
 
@@ -38,12 +38,16 @@ public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 
 	private final AnnotatedType annotatedType;
 
-	JavaBeanParameter(int index, Parameter parameter, Class<?> type, AnnotatedType annotatedType) {
+	private final Annotation[] annotationsForJDK8303112;
+
+	JavaBeanParameter(int index, Parameter parameter, Class<?> type, AnnotatedType annotatedType,
+			Annotation[] annotationsForJDK8303112) {
 		this.index = index;
 		this.parameter = parameter;
 		this.type = type;
 		this.genericType = getErasedTypeIfTypeVariable( annotatedType.getType() );
 		this.annotatedType = annotatedType;
+		this.annotationsForJDK8303112 = annotationsForJDK8303112;
 	}
 
 	public int getIndex() {
@@ -63,10 +67,14 @@ public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 	@Override
 	public Annotation[] getDeclaredAnnotations() {
 		try {
+			if ( annotationsForJDK8303112 != null ) {
+				// Working around https://bugs.openjdk.org/browse/JDK-8303112
+				return annotationsForJDK8303112.clone();
+			}
 			return parameter.getDeclaredAnnotations();
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
-			// This looks like a JVM bug we are trying to work around, kept as is for now
+			// This looks like our workaround failed... assume there were no annotations and hope for the best.
 			LOG.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
 			return EMPTY_PARAMETER_ANNOTATIONS;
 		}
@@ -84,6 +92,17 @@ public class JavaBeanParameter implements JavaBeanAnnotatedElement {
 
 	@Override
 	public <A extends Annotation> A getAnnotation(Class<A> annotationClass) {
+		if ( annotationsForJDK8303112 != null ) {
+			// Working around https://bugs.openjdk.org/browse/JDK-8303112
+			for ( Annotation annotation : annotationsForJDK8303112 ) {
+				if ( annotationClass.isAssignableFrom( annotation.annotationType() ) ) {
+					@SuppressWarnings("unchecked")
+					A castAnnotation = (A) annotation;
+					return castAnnotation;
+				}
+			}
+			return null;
+		}
 		return parameter.getAnnotation( annotationClass );
 	}
 
