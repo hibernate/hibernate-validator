@@ -55,6 +55,10 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
             <!-- Copy the dependencies into the output folder in order to reference them when
                  creating the test compilation tasks -->
             <plugin>

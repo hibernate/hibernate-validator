@@ -21,6 +21,17 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <pomElements>
+                        <!-- Preserve the target coordinates in relocation artifacts. -->
+                        <distributionManagement>keep</distributionManagement>
+                    </pomElements>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
