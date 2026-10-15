@@ -10,7 +10,7 @@ import groovy.transform.Field
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.4')
+@Library('hibernate-jenkins-pipeline-helpers')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 
@@ -77,7 +77,7 @@ import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
  */
 
 @Field final String DEFAULT_JDK_TOOL = 'OpenJDK 17 Latest'
-@Field final String MAVEN_TOOL = 'Apache Maven 3.6'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.9'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the controller node.
@@ -97,6 +97,18 @@ this.helper = new JobHelper(this)
 helper.runWithNotification {
 
 stage('Configure') {
+	// We want to make sure that if we are building a PR that the branch name will not require any escaping of symbols in it.
+	// Otherwise, it may lead to cryptic build errors.
+	if (helper.scmSource.branch.name && !(helper.scmSource.branch.name ==~ /^[\w\d\/\\_\-\.]+$/)) {
+		throw new IllegalArgumentException("""
+											Branch name ${helper.scmSource.branch.name} contains unexpected symbols.
+											 Only characters, digits and -_.\\/ symbols are allowed in the branch name.
+											 Change the branch name and open a new Pull Request.
+										   """)
+	}
+
+	requireApprovalForPullRequest 'hibernate'
+
 	this.environments = AlternativeMultiMap.create([
 			jdk: [
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
@@ -107,17 +119,13 @@ stage('Configure') {
 					new JdkBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
 							condition: TestCondition.BEFORE_MERGE),
 					new JdkBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
-							condition: TestCondition.BEFORE_MERGE),
-					new JdkBuildEnvironment(testJavaVersion: '18', testCompilerTool: 'OpenJDK 18 Latest',
-							condition: TestCondition.AFTER_MERGE),
-					new JdkBuildEnvironment(testJavaVersion: '19', testCompilerTool: 'OpenJDK 19 Latest',
-							condition: TestCondition.AFTER_MERGE)
+							condition: TestCondition.BEFORE_MERGE)
 			],
 			wildflyTck: [
 					new WildFlyTckBuildEnvironment(testJavaVersion: '8', testLauncherTool: 'OracleJDK8 Latest',
-							condition: TestCondition.ON_DEMAND),
+							condition: TestCondition.AFTER_MERGE),
 					new WildFlyTckBuildEnvironment(testJavaVersion: '11', testCompilerTool: 'OpenJDK 11 Latest',
-							condition: TestCondition.ON_DEMAND)
+							condition: TestCondition.AFTER_MERGE)
 			],
 			sigtest: [
 					new SigTestBuildEnvironment(testJavaVersion: '8', jdkTool: 'OracleJDK8 Latest',
@@ -147,7 +155,9 @@ stage('Configure') {
 			pipelineTriggers(
 					// HSEARCH-3417: do not add snapshotDependencies() here, this was known to cause problems.
 					[
-							issueCommentTrigger('.*test this please.*')
+							issueCommentTrigger('.*test this please.*'),
+							// Run every week @ 01:00 on Saturday
+							cron('0 1 * * 6')
 					]
 							+ helper.generateUpstreamTriggers()
 			),
@@ -170,7 +180,7 @@ while other options will trigger multiple Maven executions in different environm
 							trim: true,
 							description: """A regex filter to apply to the environments that must be checked.
 If this parameter is non-empty, ENVIRONMENT_SET will be ignored and environments whose tag matches the given regex will be checked.
-Some useful filters: 'default', 'jdk', 'jdk-10', 'eclipse'.
+Some useful filters: 'default', 'jdk', 'jdk-10'.
 """
 					)
 			])
