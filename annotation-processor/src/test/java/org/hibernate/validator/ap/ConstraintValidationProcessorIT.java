@@ -18,6 +18,7 @@ import javax.tools.Diagnostic.Kind;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithAlphabeticConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithBitcoinAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithContainsConstraints;
@@ -825,6 +826,24 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 15 ),
 				new DiagnosticExpectation( Kind.ERROR, 18 ),
 				new DiagnosticExpectation( Kind.ERROR, 21 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2261")
+	public void alphabeticConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithAlphabeticConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 17 ),
+				new DiagnosticExpectation( Kind.ERROR, 20 )
 		);
 	}
 

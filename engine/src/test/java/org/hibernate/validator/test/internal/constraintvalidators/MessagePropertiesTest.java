@@ -46,6 +46,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.bean.BeanReference;
+import org.hibernate.validator.constraints.Alphabetic;
 import org.hibernate.validator.constraints.BIC;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.Contains;
@@ -225,7 +226,8 @@ public class MessagePropertiesTest {
 							violationOf( UUID.class ),
 							violationOf( NotCompromised.class ),
 							violationOf( PasswordStrength.class ),
-							violationOf( PasswordPolicy.class )
+							violationOf( PasswordPolicy.class ),
+							violationOf( Alphabetic.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -460,6 +462,9 @@ public class MessagePropertiesTest {
 
 		@PasswordPolicy(FailingPolicy.class)
 		private String passwordPolicy = "ab";
+
+		@Alphabetic
+		private String alphabetic = "invalid123";
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;
