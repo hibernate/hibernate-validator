@@ -30,6 +30,7 @@
         <surefire.jvm.args.additional>-Duser.language=en</surefire.jvm.args.additional>
 
         <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+        <deploy.skip>true</deploy.skip>
     </properties>
 
     <dependencies>
@@ -177,19 +178,6 @@
             <plugin>
                 <groupId>de.thetaphi</groupId>
                 <artifactId>forbiddenapis</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
