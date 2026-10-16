@@ -19,7 +19,6 @@ import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
 
 import org.hibernate.validator.constraints.EAN.List;
 
@@ -39,8 +38,6 @@ import org.hibernate.validator.constraints.EAN.List;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@ReportAsSingleViolation
-@Mod10Check
 public @interface EAN {
 	String message() default "{org.hibernate.validator.constraints.EAN.message}";
 

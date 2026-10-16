@@ -38,6 +38,28 @@ public class EANValidator implements ConstraintValidator<EAN, CharSequence> {
 			return true;
 		}
 		int length = value.length();
-		return length == size;
+		if ( length != size ) {
+			return false;
+		}
+
+		char checkDigit = value.charAt( length - 1 );
+		if ( !Character.isDigit( checkDigit ) ) {
+			return false;
+		}
+
+		int sum = 0;
+		boolean multiplyByThree = true;
+		for ( int i = length - 2; i >= 0; i-- ) {
+			char character = value.charAt( i );
+			// Preserve the ASCII-only body normalization of the composing Mod10Check constraint.
+			if ( character < '0' || character > '9' ) {
+				continue;
+			}
+			int digit = character - '0';
+			sum += digit * ( multiplyByThree ? 3 : 1 );
+			multiplyByThree = !multiplyByThree;
+		}
+
+		return Character.digit( checkDigit, 10 ) == ( 10 - sum % 10 ) % 10;
 	}
 }

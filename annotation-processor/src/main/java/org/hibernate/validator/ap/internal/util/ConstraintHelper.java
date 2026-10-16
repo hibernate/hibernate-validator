@@ -295,6 +295,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DATE_TIME_FORMAT, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MAX, Duration.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MIN, Duration.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EAN, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ENDS_WITH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.HEXADEIMAL, CharSequence.class );
