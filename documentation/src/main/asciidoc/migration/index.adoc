@@ -106,6 +106,7 @@ The following constraints now use dedicated validators instead of constraint com
 [cols="1,2",options="header"]
 |===
 |Constraint |Former composing constraints
+|`@CreditCardNumber` |`@LuhnCheck`
 |`@CPF` |`@Pattern`
 |===
 

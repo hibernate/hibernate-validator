@@ -290,6 +290,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.BITCOIN_ADDRESS, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CODE_POINT_LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CONTAINS, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CREDIT_CARD_NUMBER, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CURRENCY, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DATE_TIME_FORMAT, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MAX, Duration.class );

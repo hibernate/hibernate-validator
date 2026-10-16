@@ -18,9 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.OverridesAttribute;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
 
 import org.hibernate.validator.constraints.CreditCardNumber.List;
 
@@ -37,8 +35,6 @@ import org.hibernate.validator.constraints.CreditCardNumber.List;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@ReportAsSingleViolation
-@LuhnCheck
 public @interface CreditCardNumber {
 	String message() default "{org.hibernate.validator.constraints.CreditCardNumber.message}";
 
@@ -50,7 +46,6 @@ public @interface CreditCardNumber {
 	 * @return Whether non-digit characters in the validated input should be ignored ({@code true}) or result in a
 	 * validation error ({@code false}). Default is {@code false}
 	 */
-	@OverridesAttribute(constraint = LuhnCheck.class, name = "ignoreNonDigitCharacters")
 	boolean ignoreNonDigitCharacters() default false;
 
 	/**
