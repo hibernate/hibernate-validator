@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -229,7 +230,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 			// convert return value locations into getter locations for usage within this meta-data
 			return constraints.stream()
 					.map( c -> withGetterLocation( getterConstraintLocation, c ) )
-					.collect( Collectors.toSet() );
+					.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		}
 
 		private MetaConstraint<?> withGetterLocation(ConstraintLocation getterConstraintLocation, MetaConstraint<?> constraint) {
