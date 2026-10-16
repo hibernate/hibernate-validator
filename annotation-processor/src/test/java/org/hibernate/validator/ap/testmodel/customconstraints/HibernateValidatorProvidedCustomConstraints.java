@@ -96,4 +96,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 
 	@EAN
 	public Date invalidEan;
+
+	@RENAVAM
+	public CharSequence renavam;
 }

@@ -7,15 +7,23 @@ package org.hibernate.validator.test.constraints.annotations.hv.br;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
+import java.util.Random;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import jakarta.validation.ConstraintViolation;
 
+import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.RENAVAM;
+import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
+import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -155,12 +163,74 @@ public class RENAVAMValidatorTest extends AbstractConstrainedTest {
 		}
 	}
 
+	@Test
+	public void testStandaloneConstraint() {
+		assertTrue( validator.getConstraintsForClass( Vehicle.class )
+				.getConstraintsForProperty( "renavam" ).getConstraintDescriptors().iterator().next()
+				.getComposingConstraints().isEmpty() );
+	}
+
+	@Test(dataProvider = "renavamBoundaries")
+	public void testRenavamBoundaries(CharSequence renavam, boolean valid) {
+		assertEquals( validator.validate( new Vehicle( renavam ) ).isEmpty(), valid );
+	}
+
+	@DataProvider
+	public Object[][] renavamBoundaries() {
+		return new Object[][] {
+				{ "", false },
+				{ "000000000", true },
+				{ "00000000000", true },
+				// Remainders zero and one both produce a zero check digit in both representations.
+				{ "000000140", true },
+				{ "000000060", true },
+				{ "00000000140", true },
+				{ "00000000060", true },
+				{ "00000000141", false },
+				{ "000000061", false },
+				{ "00000000٠", false },
+				{ "０00000000", false },
+				{ "0000-0000", false },
+				{ "00000000 ", false },
+				{ " 00000000", false },
+				{ "00000000\n", false },
+				{ "0000000000\n", false },
+				{ new StringBuilder( "137723016" ), true },
+				{ new StringBuilder( "01012655145" ), true },
+				{ "0".repeat( 100_000 ), false }
+		};
+	}
+
+	@Test
+	public void testMatchesLegacyMod11Validator() {
+		ConstraintAnnotationDescriptor.Builder<Mod11Check> descriptor = new ConstraintAnnotationDescriptor.Builder<>( Mod11Check.class );
+		descriptor.setAttribute( "threshold", 9 );
+		descriptor.setAttribute( "treatCheck10As", '0' );
+		Mod11CheckValidator legacy = new Mod11CheckValidator();
+		legacy.initialize( descriptor.build().getAnnotation() );
+		Pattern legacyFormat = Pattern.compile( "(?:[0-9]{9}|[0-9]{11})" );
+		Random random = new Random( 2260 );
+		String mixedCharacters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
+		for ( int size : new int[] { 9, 11 } ) {
+			for ( int sample = 0; sample < 300; sample++ ) {
+				StringBuilder renavam = new StringBuilder();
+				for ( int i = 0; i < size; i++ ) {
+					renavam.append( sample % 2 == 0
+							? (char) ( '0' + random.nextInt( 10 ) )
+							: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
+				}
+				assertEquals( validator.validate( new Vehicle( renavam ) ).isEmpty(),
+						legacyFormat.matcher( renavam ).matches() && legacy.isValid( renavam, null ), renavam.toString() );
+			}
+		}
+	}
+
 	public static class Vehicle {
 
 		@RENAVAM
-		private String renavam;
+		private CharSequence renavam;
 
-		public Vehicle(String renavam) {
+		public Vehicle(CharSequence renavam) {
 			this.renavam = renavam;
 		}
 	}

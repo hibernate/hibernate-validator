@@ -87,6 +87,7 @@ public class TypeNames {
 		public static final String MOD_11_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod11Check";
 		public static final String CUIL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ar.CUIL";
 		public static final String CUIT_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ar.CUIT";
+		public static final String RENAVAM_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.RENAVAM";
 		public static final String CPF_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.CPF";
 		public static final String CNPJ_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".br.CNPJ";
 		public static final String REGON_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.REGON";

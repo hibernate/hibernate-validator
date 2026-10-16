@@ -421,6 +421,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUILValidator
 import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUITValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.RENAVAMValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharArray;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharSequence;
@@ -961,7 +962,7 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, Trimmed.class, TrimmedValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_RENAVAM ) ) {
-			putBuiltinConstraint( tmpConstraints, RENAVAM.class );
+			putBuiltinConstraint( tmpConstraints, RENAVAM.class, RENAVAMValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL ) ) {
 			putBuiltinConstraint( tmpConstraints, TituloEleitoral.class );
