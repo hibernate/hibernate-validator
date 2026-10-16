@@ -102,4 +102,13 @@ public class HibernateValidatorProvidedCustomConstraints {
 
 	@TituloEleitoral
 	public CharSequence tituloEleitoral;
+
+	@Range
+	public CharSequence rangeText;
+
+	@Range
+	public Number rangeNumber;
+
+	@Range
+	public javax.money.MonetaryAmount rangeAmount;
 }

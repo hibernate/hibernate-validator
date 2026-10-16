@@ -413,6 +413,17 @@ import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorFor
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForShort;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.StartsWithValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.TrimmedValidator;
@@ -942,7 +953,21 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraints( tmpConstraints, Port.class, portValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE ) ) {
-			putBuiltinConstraint( tmpConstraints, Range.class );
+			List<Class<? extends ConstraintValidator<Range, ?>>> rangeValidators = new ArrayList<>();
+			rangeValidators.add( RangeValidatorForBigDecimal.class );
+			rangeValidators.add( RangeValidatorForBigInteger.class );
+			rangeValidators.add( RangeValidatorForByte.class );
+			rangeValidators.add( RangeValidatorForDouble.class );
+			rangeValidators.add( RangeValidatorForFloat.class );
+			rangeValidators.add( RangeValidatorForInteger.class );
+			rangeValidators.add( RangeValidatorForLong.class );
+			rangeValidators.add( RangeValidatorForNumber.class );
+			rangeValidators.add( RangeValidatorForShort.class );
+			rangeValidators.add( RangeValidatorForCharSequence.class );
+			if ( isJavaMoneyInClasspath() ) {
+				rangeValidators.add( RangeValidatorForMonetaryAmount.class );
+			}
+			putBuiltinConstraints( tmpConstraints, Range.class, rangeValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_KOR_KORRRN ) ) {
 			putBuiltinConstraint( tmpConstraints, KorRRN.class, KorRRNValidator.class );

@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.InfinityN
 /**
  * @author Marko Bekhta
  */
-final class NumberComparatorHelper {
+public final class NumberComparatorHelper {
 
 	private NumberComparatorHelper() {
 	}
