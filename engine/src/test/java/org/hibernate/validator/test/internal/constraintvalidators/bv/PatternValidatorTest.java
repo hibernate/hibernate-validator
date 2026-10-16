@@ -5,8 +5,12 @@
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.expectThrows;
+
+import java.util.regex.PatternSyntaxException;
 
 import jakarta.validation.constraints.Pattern;
 
@@ -68,7 +72,7 @@ public class PatternValidatorTest {
 		assertTrue( constraint.isValid( "a b c foo", null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidRegularExpression() {
 		ConstraintAnnotationDescriptor.Builder<Pattern> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
 		descriptorBuilder.setAttribute( "regexp", "(unbalanced parentheses" );
@@ -76,6 +80,25 @@ public class PatternValidatorTest {
 		ConstraintAnnotationDescriptor<Pattern> descriptor = descriptorBuilder.build();
 
 		PatternValidator constraint = new PatternValidator();
-		initialize( constraint, descriptor );
+		IllegalArgumentException exception = expectThrows( IllegalArgumentException.class, () -> initialize( constraint, descriptor ) );
+		assertTrue( exception.getMessage().startsWith( "HV000022:" ) );
+		assertTrue( exception.getCause() instanceof PatternSyntaxException );
+		assertEquals( ( (PatternSyntaxException) exception.getCause() ).getPattern(), "(unbalanced parentheses" );
+	}
+
+	@Test
+	public void testCombinedFlagsStillRequireFullMatch() {
+		ConstraintAnnotationDescriptor.Builder<Pattern> descriptor = new ConstraintAnnotationDescriptor.Builder<>( Pattern.class );
+		descriptor.setAttribute( "regexp", "föö # ignored comment" );
+		descriptor.setAttribute( "flags", new Pattern.Flag[] { Pattern.Flag.CASE_INSENSITIVE, Pattern.Flag.COMMENTS, Pattern.Flag.UNICODE_CASE } );
+		PatternValidator constraint = new PatternValidator();
+		initialize( constraint, descriptor.build() );
+
+		assertTrue( constraint.isValid( "FÖÖ", null ) );
+		assertTrue( constraint.isValid( new StringBuilder( "FÖÖ" ), null ) );
+		assertFalse( constraint.isValid( "prefixFÖÖ", null ) );
+		assertFalse( constraint.isValid( "FÖÖsuffix", null ) );
+		assertFalse( constraint.isValid( "FÖÖ\n", null ) );
+		assertFalse( constraint.isValid( "", null ) );
 	}
 }

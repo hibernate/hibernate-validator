@@ -111,4 +111,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 
 	@Range
 	public javax.money.MonetaryAmount rangeAmount;
+
+	@URL
+	public CharSequence url;
 }

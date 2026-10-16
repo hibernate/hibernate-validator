@@ -8,11 +8,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
+import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.validation.Configuration;
@@ -27,6 +29,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.URLDef;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
 import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
@@ -59,71 +62,71 @@ public class URLValidatorTest {
 
 	@Test
 	public void valid_urls_pass_validation() {
-		URL url = descriptorBuilder.build().getAnnotation();
-		urlValidator.initialize( url );
-		assertValidUrls( urlValidator );
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		regexpURLValidator.initialize( url );
+		assertValidUrls( urlValidator );
 		assertValidUrls( regexpURLValidator );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-502")
 	public void url_validators_can_handle_character_sequences() {
-		URL url = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		urlValidator.initialize( url );
 		assertValidCharSequenceUrls( urlValidator );
 
-		regexpURLValidator.initialize( url );
 		assertValidCharSequenceUrls( regexpURLValidator );
 	}
 
 	@Test
 	public void http_protocol_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "protocol", "http" );
-		URL url = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		urlValidator.initialize( url );
 		assertHttpProtocolMatch( urlValidator );
 
-		regexpURLValidator.initialize( url );
 		assertHttpProtocolMatch( regexpURLValidator );
 	}
 
 	@Test
 	public void file_protocol_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "protocol", "file" );
-		URL url = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		urlValidator.initialize( url );
 		assertFileProtocolMatch( urlValidator );
 
-		regexpURLValidator.initialize( url );
 		assertFileProtocolMatch( regexpURLValidator );
 	}
 
 	@Test
 	public void port_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "port", 21 );
-		URL url = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		urlValidator.initialize( url );
 		assertPortMatch( urlValidator );
 
-		regexpURLValidator.initialize( url );
 		assertPortMatch( regexpURLValidator );
 	}
 
 	@Test
 	public void host_can_be_verified_explicitly() {
 		descriptorBuilder.setAttribute( "host", "foobar.com" );
-		URL url = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		urlValidator.initialize( url );
 		assertHostMatch( urlValidator );
 
-		regexpURLValidator.initialize( url );
 		assertHostMatch( regexpURLValidator );
 	}
 
@@ -132,26 +135,23 @@ public class URLValidatorTest {
 		descriptorBuilder.setAttribute( "protocol", "http" );
 		descriptorBuilder.setAttribute( "host", "www.hibernate.org" );
 		descriptorBuilder.setAttribute( "port", 80 );
-		URL url = descriptorBuilder.build().getAnnotation();
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		URLValidator validator = new URLValidator();
-		validator.initialize( url );
-
-		urlValidator.initialize( url );
 		assertProtocolHostAnsPortMatch( urlValidator );
 
-		regexpURLValidator.initialize( url );
 		assertProtocolHostAnsPortMatch( regexpURLValidator );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-323")
 	public void the_empty_string_is_considered_a_valid_url() {
-		URL url = descriptorBuilder.build().getAnnotation();
-		urlValidator.initialize( url );
-		assertTrue( urlValidator.isValid( "", null ) );
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( urlValidator, descriptor );
+		initialize( regexpURLValidator, descriptor );
 
-		regexpURLValidator.initialize( url );
+		assertTrue( urlValidator.isValid( "", null ) );
 		assertTrue( regexpURLValidator.isValid( "", null ) );
 	}
 
@@ -245,21 +245,47 @@ public class URLValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-2231")
 	public void url_without_authority_component_is_invalid_and_does_not_throw() {
-		URL url = descriptorBuilder.build().getAnnotation();
-		regexpURLValidator.initialize( url );
+		ConstraintAnnotationDescriptor<URL> descriptor = descriptorBuilder.build();
+		initialize( regexpURLValidator, descriptor );
 
 		assertFalse( regexpURLValidator.isValid( "http:host.com", null ) );
+	}
+
+	@Test
+	public void direct_initialization_can_replace_regex_flags_protocol_host_and_port() {
+		descriptorBuilder.setAttribute( "protocol", "http" );
+		descriptorBuilder.setAttribute( "host", "first.example" );
+		descriptorBuilder.setAttribute( "port", 80 );
+		descriptorBuilder.setAttribute( "regexp", "http://first[.]example:80/allowed" );
+		ConstraintAnnotationDescriptor<URL> first = descriptorBuilder.build();
+		descriptorBuilder.setAttribute( "protocol", "ftp" );
+		descriptorBuilder.setAttribute( "host", "second.example" );
+		descriptorBuilder.setAttribute( "port", 21 );
+		descriptorBuilder.setAttribute( "regexp", "FTP://SECOND[.]EXAMPLE:21/ALLOWED # comment" );
+		descriptorBuilder.setAttribute( "flags", new Flag[] { Flag.CASE_INSENSITIVE, Flag.COMMENTS } );
+		ConstraintAnnotationDescriptor<URL> second = descriptorBuilder.build();
+		for ( HibernateConstraintValidator<URL, CharSequence> validator : List.of( urlValidator, regexpURLValidator ) ) {
+			initialize( validator, first );
+			assertTrue( validator.isValid( "http://first.example:80/allowed", null ) );
+			initialize( validator, second );
+			assertTrue( validator.isValid( "ftp://second.example:21/allowed", null ) );
+			assertFalse( validator.isValid( "http://first.example:80/allowed", null ) );
+			initialize( validator, first );
+			assertTrue( validator.isValid( "http://first.example:80/allowed", null ) );
+			assertFalse( validator.isValid( "ftp://second.example:21/allowed", null ) );
+		}
 	}
 
 	private void assertDefaultURLConstraintValidatorOverridden(Configuration config,
 			DelegatingConstraintValidatorFactory constraintValidatorFactory) {
 		Validator validator = config.buildValidatorFactory().getValidator();
+		runUrlContainerValidation( validator, new CaseInsensitiveURLContainerAnnotated(), false );
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
 
 		assertNoViolations( constraintViolations );
 		assertEquals(
 				constraintValidatorFactory.requestedConstraintValidators.size(),
-				2, // @URL is a composing constraint, a @Pattern validator impl will also be requested
+				1,
 				"Wrong number of requested validator instances"
 		);
 		assertTrue(
