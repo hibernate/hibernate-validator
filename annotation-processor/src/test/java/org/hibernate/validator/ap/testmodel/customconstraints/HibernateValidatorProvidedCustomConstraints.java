@@ -86,4 +86,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 
 	@CPF
 	public CharSequence cpf;
+
+	@CreditCardNumber
+	public CharSequence creditCardNumber;
 }

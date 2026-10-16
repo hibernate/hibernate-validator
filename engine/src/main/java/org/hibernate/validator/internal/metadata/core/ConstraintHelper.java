@@ -371,6 +371,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.BICValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ContainsValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.CreditCardNumberValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EndsWithValidator;
@@ -837,7 +838,7 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER ) ) {
-			putBuiltinConstraint( tmpConstraints, CreditCardNumber.class );
+			putBuiltinConstraint( tmpConstraints, CreditCardNumber.class, CreditCardNumberValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_DATE_TIME_FORMAT ) ) {
 			putBuiltinConstraint( tmpConstraints, DateTimeFormat.class, DateTimeFormatValidator.class );
