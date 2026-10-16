@@ -8,6 +8,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.internal.util.DigitUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * Checks that a given character sequence (e.g. string) is a valid EAN barcode.
@@ -42,24 +44,8 @@ public class EANValidator implements ConstraintValidator<EAN, CharSequence> {
 			return false;
 		}
 
-		char checkDigit = value.charAt( length - 1 );
-		if ( !Character.isDigit( checkDigit ) ) {
-			return false;
-		}
-
-		int sum = 0;
-		boolean multiplyByThree = true;
-		for ( int i = length - 2; i >= 0; i-- ) {
-			char character = value.charAt( i );
-			// Preserve the ASCII-only body normalization of the composing Mod10Check constraint.
-			if ( character < '0' || character > '9' ) {
-				continue;
-			}
-			int digit = character - '0';
-			sum += digit * ( multiplyByThree ? 3 : 1 );
-			multiplyByThree = !multiplyByThree;
-		}
-
-		return Character.digit( checkDigit, 10 ) == ( 10 - sum % 10 ) % 10;
+		int checkDigit = DigitUtil.getDecimalDigit( value.charAt( length - 1 ) );
+		// Preserve the ASCII-only body normalization of the former composing Mod10Check constraint.
+		return checkDigit >= 0 && checkDigit == ModUtil.calculateMod10Check( value, 0, length - 1, true, 3, 1 );
 	}
 }

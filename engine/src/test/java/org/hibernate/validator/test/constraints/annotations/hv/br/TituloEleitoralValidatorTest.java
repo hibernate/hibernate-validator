@@ -16,12 +16,10 @@ import java.util.regex.Pattern;
 
 import jakarta.validation.ConstraintViolation;
 
-import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
-import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.Mod11TestUtil;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -94,9 +92,7 @@ public class TituloEleitoralValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	public void testMatchesLegacyMod11Validators() {
-		Mod11CheckValidator first = legacyValidator( 0, 7, 10 );
-		Mod11CheckValidator second = legacyValidator( 8, 10, 11 );
+	public void testMatchesIndependentLegacyMod11Reference() {
 		Pattern legacyFormat = Pattern.compile( "[0-9]{12}" );
 		Random random = new Random( 491 );
 		String mixedCharacters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
@@ -108,21 +104,11 @@ public class TituloEleitoralValidatorTest extends AbstractConstrainedTest {
 						: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 			}
 			assertEquals( validator.validate( new Person( number ) ).isEmpty(),
-					legacyFormat.matcher( number ).matches() && first.isValid( number, null ) && second.isValid( number, null ),
+					legacyFormat.matcher( number ).matches()
+							&& Mod11TestUtil.isValidLegacy( number, 0, 7, 10, false, 9, '0', '0', false )
+							&& Mod11TestUtil.isValidLegacy( number, 8, 10, 11, false, 9, '0', '0', false ),
 					number.toString() );
 		}
-	}
-
-	private static Mod11CheckValidator legacyValidator(int startIndex, int endIndex, int checkDigitIndex) {
-		ConstraintAnnotationDescriptor.Builder<Mod11Check> descriptor = new ConstraintAnnotationDescriptor.Builder<>( Mod11Check.class );
-		descriptor.setAttribute( "threshold", 9 );
-		descriptor.setAttribute( "treatCheck10As", '0' );
-		descriptor.setAttribute( "startIndex", startIndex );
-		descriptor.setAttribute( "endIndex", endIndex );
-		descriptor.setAttribute( "checkDigitIndex", checkDigitIndex );
-		Mod11CheckValidator validator = new Mod11CheckValidator();
-		validator.initialize( descriptor.build().getAnnotation() );
-		return validator;
 	}
 
 	public static class Person {

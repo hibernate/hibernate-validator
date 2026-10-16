@@ -8,6 +8,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Random;
@@ -17,9 +18,12 @@ import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.internal.constraintvalidators.hv.CreditCardNumberValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutils.LuhnTestUtil;
+import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -91,9 +95,7 @@ public class CreditCardNumberConstrainedTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	public void testMatchesLegacyLuhnValidator() {
-		LuhnCheckValidator strict = legacyValidator( false );
-		LuhnCheckValidator ignoring = legacyValidator( true );
+	public void testMatchesIndependentLegacyLuhnReference() {
 		Random random = new Random( 906 );
 		String mixedCharacters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
 		for ( int sample = 0; sample < 500; sample++ ) {
@@ -105,13 +107,36 @@ public class CreditCardNumberConstrainedTest extends AbstractConstrainedTest {
 						: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 			}
 			assertEquals( validator.validateValue( CreditCardNumbers.class, "strict", number ).isEmpty(),
-					strict.isValid( number, null ), number.toString() );
+					LuhnTestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, false ), number.toString() );
 			assertEquals( validator.validateValue( CreditCardNumbers.class, "ignoring", number ).isEmpty(),
-					ignoring.isValid( number, null ), number.toString() );
+					LuhnTestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, true ), number.toString() );
 		}
 	}
 
-	private static LuhnCheckValidator legacyValidator(boolean ignoreNonDigitCharacters) {
+	@Test
+	public void testLongInputsPreserveDifferentOverflowContracts() {
+		// A body of nines contributes nine per digit, regardless of the doubling parity.
+		int bodyLength = Integer.MAX_VALUE / 9 + 1;
+		long sum = 9L * bodyLength;
+		int legacyCheck = ( 10 - (int) sum % 10 ) % 10;
+		int mathematicalCheck = (int) ( ( 10 - sum % 10 ) % 10 );
+		assertEquals( sum, 2_147_483_655L );
+		assertEquals( legacyCheck, 1 );
+		assertEquals( mathematicalCheck, 5 );
+		CharSequence number = new RepeatedDigits( bodyLength, '9', (char) ( '0' + legacyCheck ) );
+		assertTrue( luhnValidator( false ).isValid( number, null ) );
+		CreditCardNumberValidator creditCard = new CreditCardNumberValidator();
+		creditCard.initialize( new ConstraintAnnotationDescriptor.Builder<>( CreditCardNumber.class ).build().getAnnotation() );
+		assertFalse( creditCard.isValid( number, null ) );
+		assertTrue( creditCard.isValid( new RepeatedDigits( bodyLength, '9', (char) ( '0' + mathematicalCheck ) ), null ) );
+	}
+
+	@Test
+	public void testCharacterSequenceDoesNotRequireStringConversion() {
+		assertTrue( validator.validateValue( CreditCardNumbers.class, "strict", new RepeatedDigits( 1, '1', '8' ) ).isEmpty() );
+	}
+
+	private static LuhnCheckValidator luhnValidator(boolean ignoreNonDigitCharacters) {
 		ConstraintAnnotationDescriptor.Builder<LuhnCheck> descriptor = new ConstraintAnnotationDescriptor.Builder<>( LuhnCheck.class );
 		descriptor.setAttribute( "ignoreNonDigitCharacters", ignoreNonDigitCharacters );
 		LuhnCheckValidator validator = new LuhnCheckValidator();

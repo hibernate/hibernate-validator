@@ -26,18 +26,56 @@ public final class ModUtil {
 		int sum = 0;
 		boolean even = true;
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
-			int digit = digits.get( index );
-
-			if ( even ) {
-				digit <<= 1;
-			}
-			if ( digit > 9 ) {
-				digit -= 9;
-			}
-			sum += digit;
+			sum += luhnDigit( digits.get( index ), even );
 			even = !even;
 		}
 		return ( 10 - ( sum % 10 ) ) % 10;
+	}
+
+	/**
+	 * Calculates a Luhn sum over a raw character range, with its rightmost digit doubled.
+	 * Filtering does not consume a position in the alternating digit weights.
+	 *
+	 * @param value the input character sequence
+	 * @param start the inclusive raw start index
+	 * @param end the exclusive raw end index
+	 * @param ignoreNonDigits whether to skip all characters other than ASCII digits; otherwise Unicode decimal digits are required
+	 * @return the sum, or {@code -1} for an invalid range or an invalid digit in strict mode
+	 */
+	public static long calculateLuhnSum(CharSequence value, int start, int end, boolean ignoreNonDigits) {
+		if ( start < 0 || end < start || end > value.length() ) {
+			return -1;
+		}
+
+		// At most nine per input character fits in a long for every possible CharSequence length.
+		long sum = 0;
+		boolean doubleDigit = true;
+		for ( int i = end - 1; i >= start; i-- ) {
+			char character = value.charAt( i );
+			int digit;
+			if ( ignoreNonDigits ) {
+				digit = DigitUtil.getAsciiDigit( character );
+				if ( digit < 0 ) {
+					continue;
+				}
+			}
+			else {
+				digit = DigitUtil.getDecimalDigit( character );
+				if ( digit < 0 ) {
+					return -1;
+				}
+			}
+			sum += luhnDigit( digit, doubleDigit );
+			doubleDigit = !doubleDigit;
+		}
+		return sum;
+	}
+
+	private static int luhnDigit(int digit, boolean doubleDigit) {
+		if ( doubleDigit ) {
+			digit <<= 1;
+		}
+		return digit > 9 ? digit - 9 : digit;
 	}
 
 	/**
@@ -53,19 +91,51 @@ public final class ModUtil {
 		int sum = 0;
 		boolean even = true;
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
-			int digit = digits.get( index );
-
-			if ( even ) {
-				digit *= multiplier;
-			}
-			else {
-				digit *= weight;
-			}
-
-			sum += digit;
+			sum += digits.get( index ) * ( even ? multiplier : weight );
 			even = !even;
 		}
 		return ( 10 - ( sum % 10 ) ) % 10;
+	}
+
+	/**
+	 * Calculates a weighted modulo 10 check digit over a raw character range.
+	 * The rightmost retained digit uses {@code multiplier}; skipped characters do not advance the alternating weights.
+	 * Integer multiplication and accumulation preserve the overflow behavior of the list-based method.
+	 *
+	 * @param value the input character sequence
+	 * @param start the inclusive raw start index
+	 * @param end the exclusive raw end index
+	 * @param ignoreNonDigits whether to skip all characters other than ASCII digits; otherwise Unicode decimal digits are required
+	 * @param multiplier the weight of the rightmost retained digit and alternating digits
+	 * @param weight the weight of the other digits
+	 * @return the check digit, or {@code -1} for an invalid range or an invalid digit in strict mode
+	 */
+	public static int calculateMod10Check(CharSequence value, int start, int end, boolean ignoreNonDigits, int multiplier, int weight) {
+		if ( start < 0 || end < start || end > value.length() ) {
+			return -1;
+		}
+
+		int sum = 0;
+		boolean useMultiplier = true;
+		for ( int i = end - 1; i >= start; i-- ) {
+			char character = value.charAt( i );
+			int digit;
+			if ( ignoreNonDigits ) {
+				digit = DigitUtil.getAsciiDigit( character );
+				if ( digit < 0 ) {
+					continue;
+				}
+			}
+			else {
+				digit = DigitUtil.getDecimalDigit( character );
+				if ( digit < 0 ) {
+					return -1;
+				}
+			}
+			sum += digit * ( useMultiplier ? multiplier : weight );
+			useMultiplier = !useMultiplier;
+		}
+		return ( 10 - sum % 10 ) % 10;
 	}
 
 	/**
@@ -81,12 +151,52 @@ public final class ModUtil {
 		int multiplier = 2;
 
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
-			sum += digits.get( index ) * multiplier++;
-			if ( multiplier > threshold ) {
-				multiplier = 2;
-			}
+			sum += digits.get( index ) * multiplier;
+			multiplier = nextMod11Multiplier( multiplier, threshold );
 		}
-		return 11 - ( sum % 11 );
+		return calculateMod11Check( sum );
+	}
+
+	/**
+	 * Calculates the raw modulo 11 complement of a weighted sum, preserving signed integer arithmetic.
+	 */
+	public static int calculateMod11Check(int weightedSum) {
+		return calculateModCheck( weightedSum, 11 );
+	}
+
+	/**
+	 * Maps raw modulo 11 complements ten and eleven to zero, leaving all other results unchanged.
+	 */
+	public static int toZeroMappedMod11CheckDigit(int complement) {
+		return complement == 10 || complement == 11 ? 0 : complement;
+	}
+
+	/**
+	 * Calculates a raw modulo 11 complement over ASCII digits, scanning from right to left with weights
+	 * cycling from two through {@code threshold}. Multiplication, accumulation and weight increments retain
+	 * the integer overflow behavior of the list-based method.
+	 *
+	 * @param value the input character sequence
+	 * @param start the inclusive raw start index
+	 * @param end the exclusive raw end index
+	 * @param threshold the maximum weight before resetting to two; values below two retain weight two
+	 * @return the raw complement (one through twenty-one), or {@code -1} for an invalid range or a non-ASCII digit
+	 */
+	public static int calculateMod11Check(CharSequence value, int start, int end, int threshold) {
+		if ( start < 0 || end < start || end > value.length() ) {
+			return -1;
+		}
+		int sum = 0;
+		int multiplier = 2;
+		for ( int i = end - 1; i >= start; i-- ) {
+			int digit = DigitUtil.getAsciiDigit( value.charAt( i ) );
+			if ( digit < 0 ) {
+				return -1;
+			}
+			sum += digit * multiplier;
+			multiplier = nextMod11Multiplier( multiplier, threshold );
+		}
+		return calculateMod11Check( sum );
 	}
 
 	/**
@@ -119,13 +229,20 @@ public final class ModUtil {
 				multiplier = weights[weights.length - index % weights.length - 1];
 			}
 			else {
-				multiplier++;
-				if ( multiplier > threshold ) {
-					multiplier = 2;
-				}
+				multiplier = nextMod11Multiplier( multiplier, threshold );
 			}
 			sum += digits.get( index ) * multiplier;
 		}
-		return moduloParam - ( sum % moduloParam );
+		return calculateModCheck( sum, moduloParam );
 	}
+
+	private static int nextMod11Multiplier(int multiplier, int threshold) {
+		int next = multiplier + 1;
+		return next > threshold ? 2 : next;
+	}
+
+	private static int calculateModCheck(int weightedSum, int modulus) {
+		return modulus - weightedSum % modulus;
+	}
+
 }

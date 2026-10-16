@@ -8,6 +8,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.internal.util.DigitUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * @author Hardy Ferentschik
@@ -48,33 +50,27 @@ public class CPFValidator implements ConstraintValidator<CPF, CharSequence> {
 				}
 			}
 
-			if ( character < '0' || character > '9' ) {
+			int digit = DigitUtil.getAsciiDigit( character );
+			if ( digit < 0 ) {
 				return false;
 			}
 			allDigitsEqual &= character == firstDigit;
-			int digit = character - '0';
 			if ( digitIndex < 9 ) {
 				firstSum += digit * ( 10 - digitIndex );
 				secondSum += digit * ( 11 - digitIndex );
 			}
 			else if ( digitIndex == 9 ) {
-				if ( digit != checkDigit( firstSum ) ) {
+				if ( digit != ModUtil.toZeroMappedMod11CheckDigit( ModUtil.calculateMod11Check( firstSum ) ) ) {
 					return false;
 				}
 				secondSum += digit * 2;
 			}
-			else if ( digit != checkDigit( secondSum ) ) {
+			else if ( digit != ModUtil.toZeroMappedMod11CheckDigit( ModUtil.calculateMod11Check( secondSum ) ) ) {
 				return false;
 			}
 			digitIndex++;
 		}
 
 		return !allDigitsEqual;
-	}
-
-	private static int checkDigit(int sum) {
-		// Remainders zero and one both map to a zero check digit.
-		int remainder = sum % 11;
-		return remainder < 2 ? 0 : 11 - remainder;
 	}
 }

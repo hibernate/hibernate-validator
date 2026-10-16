@@ -16,12 +16,11 @@ import java.util.regex.Pattern;
 
 import jakarta.validation.ConstraintViolation;
 
-import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.RENAVAM;
-import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
+import org.hibernate.validator.testutils.Mod11TestUtil;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -202,12 +201,7 @@ public class RENAVAMValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	public void testMatchesLegacyMod11Validator() {
-		ConstraintAnnotationDescriptor.Builder<Mod11Check> descriptor = new ConstraintAnnotationDescriptor.Builder<>( Mod11Check.class );
-		descriptor.setAttribute( "threshold", 9 );
-		descriptor.setAttribute( "treatCheck10As", '0' );
-		Mod11CheckValidator legacy = new Mod11CheckValidator();
-		legacy.initialize( descriptor.build().getAnnotation() );
+	public void testMatchesIndependentLegacyMod11Reference() {
 		Pattern legacyFormat = Pattern.compile( "(?:[0-9]{9}|[0-9]{11})" );
 		Random random = new Random( 2260 );
 		String mixedCharacters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
@@ -220,9 +214,15 @@ public class RENAVAMValidatorTest extends AbstractConstrainedTest {
 							: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 				}
 				assertEquals( validator.validate( new Vehicle( renavam ) ).isEmpty(),
-						legacyFormat.matcher( renavam ).matches() && legacy.isValid( renavam, null ), renavam.toString() );
+						legacyFormat.matcher( renavam ).matches() && Mod11TestUtil.isValidLegacy( renavam, 0, Integer.MAX_VALUE, -1, false, 9, '0', '0', false ), renavam.toString() );
 			}
 		}
+	}
+
+	@Test
+	public void testCharacterSequenceDoesNotRequireStringConversion() {
+		assertNoViolations( validator.validate( new Vehicle( new RepeatedDigits( 8, '0', '0' ) ) ) );
+		assertNoViolations( validator.validate( new Vehicle( new RepeatedDigits( 10, '0', '0' ) ) ) );
 	}
 
 	public static class Vehicle {
