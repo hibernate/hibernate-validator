@@ -99,4 +99,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 
 	@RENAVAM
 	public CharSequence renavam;
+
+	@TituloEleitoral
+	public CharSequence tituloEleitoral;
 }
