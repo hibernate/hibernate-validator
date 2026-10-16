@@ -107,13 +107,15 @@ The following constraints now use dedicated validators instead of constraint com
 |===
 |Constraint |Former composing constraints
 |`@CreditCardNumber` |`@LuhnCheck`
+|`@EAN` |`@Mod10Check`
 |`@CPF` |`@Pattern`
 |===
 
 Their constraint descriptors now return an empty set from `getComposingConstraints()`.
 Custom validator definitions for the former composing constraints no longer affect these built-in constraints.
 A replacement validator for one of these built-in constraints must enforce all of its attributes itself.
-Existing character normalization, checksum rules, and numeric comparison semantics are preserved.
+Existing character normalization, checksum rules, and numeric comparison semantics are preserved,
+including `@EAN`'s character-stripping behavior.
 
 === Message parameter escaping enabled by default
 

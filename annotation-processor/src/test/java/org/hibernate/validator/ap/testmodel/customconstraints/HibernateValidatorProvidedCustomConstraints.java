@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.Date;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
+import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
@@ -89,4 +90,10 @@ public class HibernateValidatorProvidedCustomConstraints {
 
 	@CreditCardNumber
 	public CharSequence creditCardNumber;
+
+	@EAN
+	public CharSequence ean;
+
+	@EAN
+	public Date invalidEan;
 }
