@@ -110,6 +110,7 @@ The following constraints now use dedicated validators instead of constraint com
 |`@EAN` |`@Mod10Check`
 |`@CPF` |`@Pattern`
 |`@RENAVAM` |`@Pattern`, `@Mod11Check`
+|`@TituloEleitoral` |`@Pattern`, `@Mod11Check`
 |===
 
 Their constraint descriptors now return an empty set from `getComposingConstraints()`.

@@ -19,35 +19,20 @@ import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraintvalidation.SupportedValidationTarget;
-import jakarta.validation.constraintvalidation.ValidationTarget;
 
-import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.TituloEleitoral.List;
 
 /**
  * Validates a <a href="https://pt.wikipedia.org/wiki/T%C3%ADtulo_de_eleitor">T\u00edtulo Eleitoral</a> (Brazilian Voter ID card number).
  *
+ * <p>
+ * The supported type is {@code CharSequence}. Values must contain exactly twelve ASCII digits.
+ * {@code null} is considered valid.
+ *
  * @author George Gastaldi
  */
-@Pattern(regexp = "[0-9]{12}")
-@Mod11Check.List({
-		@Mod11Check(threshold = 9,
-				endIndex = 7,
-				checkDigitIndex = 10,
-				treatCheck10As = '0'),
-		@Mod11Check(threshold = 9,
-				startIndex = 8,
-				endIndex = 10,
-				checkDigitIndex = 11,
-				treatCheck10As = '0')
-})
-@ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = { })
-@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
