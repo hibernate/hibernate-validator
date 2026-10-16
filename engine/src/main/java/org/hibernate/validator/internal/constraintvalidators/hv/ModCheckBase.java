@@ -153,31 +153,30 @@ public abstract class ModCheckBase {
 	}
 
 	private String extractVerificationString(String value) throws IndexOutOfBoundsException {
-		// the string contains the check digit, just return the digits to verify
-		if ( endIndex == Integer.MAX_VALUE ) {
-			return value.substring( 0, value.length() - 1 );
-		}
-		else if ( checkDigitIndex == -1 || checkDigitIndex == endIndex ) {
-			return value.substring( startIndex, endIndex );
-		}
-		else {
-			return value.substring( startIndex, endIndex + 1 );
-		}
+		return value.substring( getVerificationStartIndex(), getVerificationEndIndex( value.length() ) );
 	}
 
 	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
-		// take last character of string to be validated unless the index is given explicitly
+		return value.charAt( getCheckDigitIndex( value.length() ) );
+	}
+
+	protected int getVerificationStartIndex() {
+		// The default end index historically ignores startIndex and uses the whole body.
+		return endIndex == Integer.MAX_VALUE ? 0 : startIndex;
+	}
+
+	protected int getVerificationEndIndex(int length) {
+		if ( endIndex == Integer.MAX_VALUE ) {
+			return length - 1;
+		}
+		return checkDigitIndex == -1 || checkDigitIndex == endIndex ? endIndex : endIndex + 1;
+	}
+
+	protected int getCheckDigitIndex(int length) {
 		if ( checkDigitIndex == -1 ) {
-			if ( endIndex == Integer.MAX_VALUE ) {
-				return value.charAt( value.length() - 1 );
-			}
-			else {
-				return value.charAt( endIndex );
-			}
+			return endIndex == Integer.MAX_VALUE ? length - 1 : endIndex;
 		}
-		else {
-			return value.charAt( checkDigitIndex );
-		}
+		return checkDigitIndex;
 	}
 
 }

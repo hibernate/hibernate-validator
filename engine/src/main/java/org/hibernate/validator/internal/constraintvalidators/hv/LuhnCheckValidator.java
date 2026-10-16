@@ -7,8 +7,10 @@ package org.hibernate.validator.internal.constraintvalidators.hv;
 import java.util.List;
 
 import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.internal.util.DigitUtil;
 import org.hibernate.validator.internal.util.ModUtil;
 
 /**
@@ -31,6 +33,29 @@ public class LuhnCheckValidator extends ModCheckBase
 				constraintAnnotation.checkDigitIndex(),
 				constraintAnnotation.ignoreNonDigitCharacters()
 		);
+	}
+
+	@Override
+	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
+		if ( value == null ) {
+			return true;
+		}
+		int length = value.length();
+		int checkDigitIndex = getCheckDigitIndex( length );
+		if ( checkDigitIndex < 0 || checkDigitIndex >= length ) {
+			return false;
+		}
+		int checkDigit = DigitUtil.getDecimalDigit( value.charAt( checkDigitIndex ) );
+		if ( checkDigit < 0 ) {
+			return false;
+		}
+		long sum = ModUtil.calculateLuhnSum( value, getVerificationStartIndex(), getVerificationEndIndex( length ), ignoreDelimitingCharacters );
+		if ( sum < 0 ) {
+			return false;
+		}
+		// Preserve the original integer accumulator's overflow before calculating the check digit.
+		int legacySum = (int) sum;
+		return checkDigit == ( 10 - legacySum % 10 ) % 10;
 	}
 
 	/**

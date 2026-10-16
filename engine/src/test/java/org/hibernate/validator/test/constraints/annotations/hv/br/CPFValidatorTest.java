@@ -17,9 +17,9 @@ import java.util.Set;
 import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.br.CPF;
-import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.Mod11TestUtil;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -233,7 +233,7 @@ public class CPFValidatorTest extends AbstractConstrainedTest {
 				cpf.append( digit );
 			}
 			for ( int i = 0; i < 2; i++ ) {
-				int checkDigit = ModUtil.calculateMod11Check( digits );
+				int checkDigit = Mod11TestUtil.calculateMod11CheckLegacy( digits, Integer.MAX_VALUE );
 				checkDigit = checkDigit >= 10 ? 0 : checkDigit;
 				digits.add( checkDigit );
 				cpf.append( checkDigit );

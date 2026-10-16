@@ -8,6 +8,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.internal.util.DigitUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * Validates Brazilian voter registration numbers.
@@ -27,10 +29,10 @@ public class TituloEleitoralValidator implements ConstraintValidator<TituloEleit
 		int secondSum = 0;
 		for ( int i = 0; i < 12; i++ ) {
 			char character = value.charAt( i );
-			if ( character < '0' || character > '9' ) {
+			int digit = DigitUtil.getAsciiDigit( character );
+			if ( digit < 0 ) {
 				return false;
 			}
-			int digit = character - '0';
 			if ( i < 8 ) {
 				// The first check digit covers positions zero through seven with weights nine through two.
 				firstSum += digit * ( 9 - i );
@@ -41,12 +43,7 @@ public class TituloEleitoralValidator implements ConstraintValidator<TituloEleit
 			}
 		}
 
-		return value.charAt( 10 ) - '0' == checkDigit( firstSum )
-				&& value.charAt( 11 ) - '0' == checkDigit( secondSum );
-	}
-
-	private static int checkDigit(int sum) {
-		int remainder = sum % 11;
-		return remainder < 2 ? 0 : 11 - remainder;
+		return value.charAt( 10 ) - '0' == ModUtil.toZeroMappedMod11CheckDigit( ModUtil.calculateMod11Check( firstSum ) )
+				&& value.charAt( 11 ) - '0' == ModUtil.toZeroMappedMod11CheckDigit( ModUtil.calculateMod11Check( secondSum ) );
 	}
 }

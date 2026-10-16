@@ -16,10 +16,9 @@ import java.util.Set;
 import jakarta.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.EAN;
-import org.hibernate.validator.constraints.Mod10Check;
-import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
-import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
+import org.hibernate.validator.testutils.Mod10TestUtil;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -88,9 +87,7 @@ public class EANConstrainedTest extends AbstractConstrainedTest {
 	}
 
 	@Test
-	public void testMatchesLegacyMod10Validator() {
-		Mod10CheckValidator legacy = new Mod10CheckValidator();
-		legacy.initialize( new ConstraintAnnotationDescriptor.Builder<>( Mod10Check.class ).build().getAnnotation() );
+	public void testMatchesIndependentLegacyMod10Reference() {
 		Random random = new Random( 799 );
 		String mixedCharacters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
 		for ( int size : new int[] { 8, 13 } ) {
@@ -102,9 +99,15 @@ public class EANConstrainedTest extends AbstractConstrainedTest {
 							: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 				}
 				assertEquals( validator.validateValue( EANNumbers.class, size == 8 ? "ean8" : "ean13", number ).isEmpty(),
-						legacy.isValid( number, null ), number.toString() );
+						Mod10TestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, true, 3, 1 ), number.toString() );
 			}
 		}
+	}
+
+	@Test
+	public void testCharacterSequenceDoesNotRequireStringConversion() {
+		assertTrue( validator.validateValue( EANNumbers.class, "ean8", new RepeatedDigits( 7, '0', '0' ) ).isEmpty() );
+		assertTrue( validator.validateValue( EANNumbers.class, "ean13", new RepeatedDigits( 12, '0', '0' ) ).isEmpty() );
 	}
 
 	private static class EANNumbers {

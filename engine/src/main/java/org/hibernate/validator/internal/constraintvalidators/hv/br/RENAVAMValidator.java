@@ -8,6 +8,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.br.RENAVAM;
+import org.hibernate.validator.internal.util.DigitUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * Validates current and legacy RENAVAM representations.
@@ -25,24 +27,11 @@ public class RENAVAMValidator implements ConstraintValidator<RENAVAM, CharSequen
 			return false;
 		}
 
-		char checkDigit = value.charAt( length - 1 );
-		if ( checkDigit < '0' || checkDigit > '9' ) {
+		int checkDigit = DigitUtil.getAsciiDigit( value.charAt( length - 1 ) );
+		if ( checkDigit < 0 ) {
 			return false;
 		}
-
-		int sum = 0;
-		int weight = 2;
-		for ( int i = length - 2; i >= 0; i-- ) {
-			char character = value.charAt( i );
-			if ( character < '0' || character > '9' ) {
-				return false;
-			}
-			sum += ( character - '0' ) * weight;
-			// The legacy and current formats both use weights cycling from two through nine.
-			weight = weight == 9 ? 2 : weight + 1;
-		}
-
-		int remainder = sum % 11;
-		return checkDigit - '0' == ( remainder < 2 ? 0 : 11 - remainder );
+		int complement = ModUtil.calculateMod11Check( value, 0, length - 1, 9 );
+		return complement >= 0 && checkDigit == ModUtil.toZeroMappedMod11CheckDigit( complement );
 	}
 }

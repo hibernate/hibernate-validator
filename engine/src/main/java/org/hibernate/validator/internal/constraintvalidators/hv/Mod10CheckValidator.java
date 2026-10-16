@@ -8,8 +8,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.Mod10Check;
+import org.hibernate.validator.internal.util.DigitUtil;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -56,6 +58,23 @@ public class Mod10CheckValidator extends ModCheckBase
 		if ( this.weight < 0 ) {
 			throw LOG.getWeightCannotBeNegativeException( this.weight );
 		}
+	}
+
+	@Override
+	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
+		if ( value == null ) {
+			return true;
+		}
+		int length = value.length();
+		int checkDigitIndex = getCheckDigitIndex( length );
+		if ( checkDigitIndex < 0 || checkDigitIndex >= length ) {
+			return false;
+		}
+		int checkDigit = DigitUtil.getDecimalDigit( value.charAt( checkDigitIndex ) );
+		return checkDigit >= 0
+				&& checkDigit == ModUtil.calculateMod10Check(
+						value, getVerificationStartIndex(), getVerificationEndIndex( length ), ignoreDelimitingCharacters, multiplier, weight
+				);
 	}
 
 	/**
