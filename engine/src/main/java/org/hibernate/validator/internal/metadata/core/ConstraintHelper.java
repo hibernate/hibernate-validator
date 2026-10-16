@@ -371,6 +371,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.BICValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ContainsValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.CreditCardNumberValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EndsWithValidator;
@@ -409,6 +410,17 @@ import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorFor
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForShort;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForBigDecimal;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForFloat;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.StartsWithValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.TrimmedValidator;
@@ -420,6 +432,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUILValidator
 import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUITValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.RENAVAMValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.TituloEleitoralValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharArray;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharSequence;
@@ -837,7 +851,7 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CREDIT_CARD_NUMBER ) ) {
-			putBuiltinConstraint( tmpConstraints, CreditCardNumber.class );
+			putBuiltinConstraint( tmpConstraints, CreditCardNumber.class, CreditCardNumberValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_DATE_TIME_FORMAT ) ) {
 			putBuiltinConstraint( tmpConstraints, DateTimeFormat.class, DateTimeFormatValidator.class );
@@ -936,7 +950,21 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraints( tmpConstraints, Port.class, portValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE ) ) {
-			putBuiltinConstraint( tmpConstraints, Range.class );
+			List<Class<? extends ConstraintValidator<Range, ?>>> rangeValidators = new ArrayList<>();
+			rangeValidators.add( RangeValidatorForBigDecimal.class );
+			rangeValidators.add( RangeValidatorForBigInteger.class );
+			rangeValidators.add( RangeValidatorForByte.class );
+			rangeValidators.add( RangeValidatorForDouble.class );
+			rangeValidators.add( RangeValidatorForFloat.class );
+			rangeValidators.add( RangeValidatorForInteger.class );
+			rangeValidators.add( RangeValidatorForLong.class );
+			rangeValidators.add( RangeValidatorForNumber.class );
+			rangeValidators.add( RangeValidatorForShort.class );
+			rangeValidators.add( RangeValidatorForCharSequence.class );
+			if ( isJavaMoneyInClasspath() ) {
+				rangeValidators.add( RangeValidatorForMonetaryAmount.class );
+			}
+			putBuiltinConstraints( tmpConstraints, Range.class, rangeValidators );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_KOR_KORRRN ) ) {
 			putBuiltinConstraint( tmpConstraints, KorRRN.class, KorRRNValidator.class );
@@ -960,10 +988,10 @@ public abstract class ConstraintHelper {
 			putBuiltinConstraint( tmpConstraints, Trimmed.class, TrimmedValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_RENAVAM ) ) {
-			putBuiltinConstraint( tmpConstraints, RENAVAM.class );
+			putBuiltinConstraint( tmpConstraints, RENAVAM.class, RENAVAMValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL ) ) {
-			putBuiltinConstraint( tmpConstraints, TituloEleitoral.class );
+			putBuiltinConstraint( tmpConstraints, TituloEleitoral.class, TituloEleitoralValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS ) ) {
 			putBuiltinConstraint( tmpConstraints, UniqueElements.class, UniqueElementsValidator.class );

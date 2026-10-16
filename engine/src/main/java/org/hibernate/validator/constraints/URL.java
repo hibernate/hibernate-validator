@@ -18,9 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.OverridesAttribute;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
 import jakarta.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.URL.List;
@@ -84,8 +82,6 @@ import org.hibernate.validator.constraints.URL.List;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@ReportAsSingleViolation
-@Pattern(regexp = "")
 public @interface URL {
 	String message() default "{org.hibernate.validator.constraints.URL.message}";
 
@@ -112,13 +108,11 @@ public @interface URL {
 	/**
 	 * @return an additional regular expression the annotated URL must match. The default is any string ('.*')
 	 */
-	@OverridesAttribute(constraint = Pattern.class, name = "regexp")
 	String regexp() default ".*";
 
 	/**
 	 * @return used in combination with {@link #regexp()} in order to specify a regular expression option
 	 */
-	@OverridesAttribute(constraint = Pattern.class, name = "flags")
 	Pattern.Flag[] flags() default { };
 
 	/**

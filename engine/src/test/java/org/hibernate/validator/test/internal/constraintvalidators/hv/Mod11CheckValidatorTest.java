@@ -6,9 +6,11 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Random;
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -24,6 +26,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValida
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.Mod11TestUtil;
 
 import org.testng.annotations.Test;
 
@@ -289,6 +292,79 @@ public class Mod11CheckValidatorTest {
 
 		assertTrue( validator.isValid( "23322023583", null ) );
 		assertFalse( validator.isValid( "23322023584", null ) );
+	}
+
+	@Test
+	public void testThresholdsWeightsAndDirectionsMatchIndependentLegacyReference() {
+		Random random = new Random( 813 );
+		String characters = "0123456789٠١٢٣٤٥٦٧٨٩ -aXZ";
+		for ( int threshold : new int[] { Integer.MIN_VALUE, -1, 0, 1, 2, 3, 9, Integer.MAX_VALUE } ) {
+			for ( int[] weights : new int[][] { { }, { 2 }, { 2, 7, 3 }, { -1, 0, 3 }, { Integer.MAX_VALUE, Integer.MIN_VALUE } } ) {
+				for ( ProcessingDirection direction : ProcessingDirection.values() ) {
+					for ( boolean ignore : new boolean[] { false, true } ) {
+						Mod11CheckValidator validator = new Mod11CheckValidator();
+						validator.initialize( 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction, weights );
+						for ( CharSequence value : new CharSequence[] { null, "", "0Z", "6X", "19", "1٩", "٠Z", " -0", "123456Z" } ) {
+							assertEquals( validator.isValid( value, null ), Mod11TestUtil.isValidLegacy(
+									value, 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction == ProcessingDirection.LEFT_TO_RIGHT, weights ) );
+						}
+						for ( int sample = 0; sample < 20; sample++ ) {
+							StringBuilder value = new StringBuilder();
+							int length = random.nextInt( 16 );
+							for ( int i = 0; i < length; i++ ) {
+								value.append( sample % 3 == 0
+										? (char) ( '0' + random.nextInt( 10 ) )
+										: characters.charAt( random.nextInt( characters.length() ) ) );
+							}
+							assertEquals( validator.isValid( value, null ), Mod11TestUtil.isValidLegacy(
+									value, 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction == ProcessingDirection.LEFT_TO_RIGHT, weights ),
+									value.toString() );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Test
+	public void testExceptionalCharacterMappingsRemainLiteral() {
+		Mod11CheckValidator validator = new Mod11CheckValidator();
+		validator.initialize( 0, Integer.MAX_VALUE, -1, false, 9, 'X', 'Z', ProcessingDirection.RIGHT_TO_LEFT );
+		assertTrue( validator.isValid( "6X", null ) );
+		assertTrue( validator.isValid( "0Z", null ) );
+		assertTrue( validator.isValid( "1٩", null ) );
+		assertFalse( validator.isValid( "60", null ) );
+		validator.initialize( 0, Integer.MAX_VALUE, -1, false, 9, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
+		assertTrue( validator.isValid( "60", null ) );
+		assertTrue( validator.isValid( "00", null ) );
+		assertFalse( validator.isValid( "6٠", null ) );
+		assertFalse( validator.isValid( "0٠", null ) );
+	}
+
+	@Test
+	public void testCustomWeightsAndDirectionAtPartialCycles() {
+		Mod11CheckValidator validator = new Mod11CheckValidator();
+		validator.initialize( 0, Integer.MAX_VALUE, -1, false, 9, 'X', 'Z', ProcessingDirection.RIGHT_TO_LEFT, 2, 7, 3 );
+		assertTrue( validator.isValid( "125", null ) );
+		validator.initialize( 0, Integer.MAX_VALUE, -1, false, 9, 'X', 'Z', ProcessingDirection.LEFT_TO_RIGHT, 2, 7, 3 );
+		assertTrue( validator.isValid( "129", null ) );
+	}
+
+	@Test
+	public void testSubclassDigitAndNormalizationHooksRemainInUse() {
+		Mod11CheckValidator validator = new Mod11CheckValidator() {
+			@Override
+			protected int extractDigit(char value) {
+				return value == 'A' ? 1 : super.extractDigit( value );
+			}
+
+			@Override
+			protected String stripNonDigitsIfRequired(String value) {
+				return value.replace( "-", "" );
+			}
+		};
+		validator.initialize( 0, Integer.MAX_VALUE, -1, true, 9, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
+		assertTrue( validator.isValid( "A-9", null ) );
 	}
 
 	private Mod11Check createMod11CheckAnnotation(
