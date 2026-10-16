@@ -863,6 +863,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
         Supported data types::: `CharSequence`, `char[]`
         Hibernate metadata impact::: None
 
+`@Alphabetic`:: Checks that every character of the annotated character sequence is a letter, as determined by `Character.isLetter(char)`. Any digit, whitespace, or punctuation character causes validation to fail. `null` values and empty character sequences are considered valid.
+        Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
+
 ===== Country specific constraints
 
 Hibernate Validator offers also some country specific constraints, e.g. for the validation of social
