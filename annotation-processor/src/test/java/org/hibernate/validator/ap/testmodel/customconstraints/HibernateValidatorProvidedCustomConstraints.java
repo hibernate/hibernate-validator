@@ -83,4 +83,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@DurationMax
 	@DurationMin
 	public Date date;
+
+	@CPF
+	public CharSequence cpf;
 }
