@@ -108,6 +108,7 @@ The following constraints now use dedicated validators instead of constraint com
 |Constraint |Former composing constraints
 |`@CreditCardNumber` |`@LuhnCheck`
 |`@EAN` |`@Mod10Check`
+|`@Range` |`@Min`, `@Max`
 |`@CPF` |`@Pattern`
 |`@RENAVAM` |`@Pattern`, `@Mod11Check`
 |`@TituloEleitoral` |`@Pattern`, `@Mod11Check`

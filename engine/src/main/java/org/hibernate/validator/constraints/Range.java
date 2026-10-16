@@ -18,13 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
-import jakarta.validation.OverridesAttribute;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraintvalidation.SupportedValidationTarget;
-import jakarta.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.Range.List;
 
@@ -36,18 +30,12 @@ import org.hibernate.validator.constraints.Range.List;
  */
 @Documented
 @Constraint(validatedBy = { })
-@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@Min(0)
-@Max(Long.MAX_VALUE)
-@ReportAsSingleViolation
 public @interface Range {
-	@OverridesAttribute(constraint = Min.class, name = "value")
 	long min() default 0;
 
-	@OverridesAttribute(constraint = Max.class, name = "value")
 	long max() default Long.MAX_VALUE;
 
 	String message() default "{org.hibernate.validator.constraints.Range.message}";
