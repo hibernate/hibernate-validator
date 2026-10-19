@@ -1,6 +1,26 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.6.Final (2026-10-19)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/32094
+
+
+** Bug
+    * HV-2256 addMessageParameter fix
+    * HV-1978 Expression Language not propagated to iterable node
+    * HV-1939 Annotations on constructors of named classes declared in method get ignored
+    * HV-1932 Incomplete @Positive annotation's default message in fr
+
+** Improvement
+    * HV-1943 Some french validation messages are not quite accurate
+    * HV-1941 Add support for European Portuguese for ValidationMessages
+    * HV-1927 Use Executable#getAnnotatedParameterTypes() instead of Executable#getGenericParameterTypes()
+
+** Task
+    * HV-1934 Upgrade to hibernate-asciidoctor-theme 1.0.6
+
 7.0.5.Final (2022-08-03)
 -------------------------
 
