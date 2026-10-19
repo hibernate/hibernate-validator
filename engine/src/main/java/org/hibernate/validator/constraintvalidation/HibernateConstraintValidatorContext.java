@@ -22,6 +22,7 @@ import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
  */
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
+
 	@Override
 	HibernateConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate);
 
