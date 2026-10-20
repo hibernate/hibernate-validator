@@ -19,13 +19,8 @@ import java.lang.annotation.Target;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.ReportAsSingleViolation;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraintvalidation.SupportedValidationTarget;
-import jakarta.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.Incubating;
-import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.RENAVAM.List;
 
 /**
@@ -33,18 +28,14 @@ import org.hibernate.validator.constraints.br.RENAVAM.List;
  * (National Registry of Motor Vehicles).
  * <p>
  * Both the current 11-digit representation and the legacy 9-digit
- * representation are supported.
+ * representation are supported, using ASCII digits.
  * {@code null} values are considered valid.
  *
  * @author Matheus Pereira
  * @since 9.2
  */
-@Pattern(regexp = "(?:[0-9]{9}|[0-9]{11})")
-@Mod11Check(threshold = 9, treatCheck10As = '0')
-@ReportAsSingleViolation
 @Documented
 @Constraint(validatedBy = { })
-@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)

@@ -4,49 +4,17 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.br;
 
-import java.util.regex.Pattern;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.CPF;
-import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
+import org.hibernate.validator.internal.util.DigitUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * @author Hardy Ferentschik
  */
 public class CPFValidator implements ConstraintValidator<CPF, CharSequence> {
-	private static final Pattern DIGITS_ONLY = Pattern.compile( "\\d+" );
-
-	private final Mod11CheckValidator withSeparatorMod11Validator1 = new Mod11CheckValidator();
-	private final Mod11CheckValidator withSeparatorMod11Validator2 = new Mod11CheckValidator();
-
-	private final Mod11CheckValidator withoutSeparatorMod11Validator1 = new Mod11CheckValidator();
-	private final Mod11CheckValidator withoutSeparatorMod11Validator2 = new Mod11CheckValidator();
-
-	@Override
-	public void initialize(CPF constraintAnnotation) {
-		// validates CPF strings with separator, eg 134.241.313-00
-		// there are two checksums generated. The first over the digits prior the hyphen with the first
-		// check digit being the digit directly after the hyphen. The second checksum is over all digits
-		// pre hyphen + first check digit. The check digit in this case is the second digit after the hyphen
-		withSeparatorMod11Validator1.initialize(
-				0, 10, 12, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
-		);
-		withSeparatorMod11Validator2.initialize(
-				0, 12, 13, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
-		);
-
-		// validates CPF strings without separator, eg 13424131300
-		// checksums as described above, except there are no separator characters
-		withoutSeparatorMod11Validator1.initialize(
-				0, 8, 9, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
-		);
-		withoutSeparatorMod11Validator2.initialize(
-				0, 9, 10, true, Integer.MAX_VALUE, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
-		);
-	}
 
 	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
@@ -54,13 +22,55 @@ public class CPFValidator implements ConstraintValidator<CPF, CharSequence> {
 			return true;
 		}
 
-		if ( DIGITS_ONLY.matcher( value ).matches() ) {
-			return withoutSeparatorMod11Validator1.isValid( value, context )
-					&& withoutSeparatorMod11Validator2.isValid( value, context );
+		int length = value.length();
+		if ( length != 11 && length != 14 ) {
+			return false;
 		}
-		else {
-			return withSeparatorMod11Validator1.isValid( value, context )
-					&& withSeparatorMod11Validator2.isValid( value, context );
+
+		// The two check digits use weights 10..2 and 11..2, respectively.
+		int firstSum = 0;
+		int secondSum = 0;
+		int digitIndex = 0;
+		char firstDigit = value.charAt( 0 );
+		boolean allDigitsEqual = true;
+		for ( int i = 0; i < length; i++ ) {
+			char character = value.charAt( i );
+			if ( length == 14 ) {
+				if ( i == 3 || i == 7 ) {
+					if ( character != '.' ) {
+						return false;
+					}
+					continue;
+				}
+				if ( i == 11 ) {
+					if ( character != '-' ) {
+						return false;
+					}
+					continue;
+				}
+			}
+
+			int digit = DigitUtil.getAsciiDigit( character );
+			if ( digit < 0 ) {
+				return false;
+			}
+			allDigitsEqual &= character == firstDigit;
+			if ( digitIndex < 9 ) {
+				firstSum += digit * ( 10 - digitIndex );
+				secondSum += digit * ( 11 - digitIndex );
+			}
+			else if ( digitIndex == 9 ) {
+				if ( digit != ModUtil.toZeroMappedMod11CheckDigit( ModUtil.calculateMod11Check( firstSum ) ) ) {
+					return false;
+				}
+				secondSum += digit * 2;
+			}
+			else if ( digit != ModUtil.toZeroMappedMod11CheckDigit( ModUtil.calculateMod11Check( secondSum ) ) ) {
+				return false;
+			}
+			digitIndex++;
 		}
+
+		return !allDigitsEqual;
 	}
 }

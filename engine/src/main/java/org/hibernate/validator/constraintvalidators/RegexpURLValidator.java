@@ -7,11 +7,14 @@ package org.hibernate.validator.constraintvalidators;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorInitializationContext;
 import org.hibernate.validator.internal.util.DomainNameUtil;
+import org.hibernate.validator.internal.util.RegexUtil;
 
 /**
  * Validate that the character sequence (e.g. string) is a valid URL using a regular expression.
@@ -20,7 +23,7 @@ import org.hibernate.validator.internal.util.DomainNameUtil;
  *
  * @since 5.2
  */
-public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence> {
+public class RegexpURLValidator implements HibernateConstraintValidator<URL, CharSequence> {
 
 	// see http://stackoverflow.com/questions/161738/what-is-the-best-regular-expression-to-check-if-a-string-is-a-valid-url
 	private static final Pattern URL_REGEX = Pattern
@@ -37,17 +40,26 @@ public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence
 	private String protocol;
 	private String host;
 	private int port;
+	private Pattern regexp;
 
 	@Override
-	public void initialize(URL url) {
+	public void initialize(ConstraintDescriptor<URL> descriptor, HibernateConstraintValidatorInitializationContext initializationContext) {
+		URL url = descriptor.getAnnotation();
 		this.protocol = url.protocol();
 		this.host = url.host();
 		this.port = url.port();
+		this.regexp = RegexUtil.compile( url.regexp(), url.flags(), initializationContext );
 	}
 
 	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
-		if ( value == null || value.length() == 0 ) {
+		if ( value == null ) {
+			return true;
+		}
+		if ( !regexp.matcher( value ).matches() ) {
+			return false;
+		}
+		if ( value.length() == 0 ) {
 			return true;
 		}
 

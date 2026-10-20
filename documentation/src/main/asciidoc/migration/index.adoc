@@ -99,6 +99,29 @@ unformatted sequence of 11 digits, with valid check digits in either case.
 Partially formatted values, including values with only a dash before the check digits,
 are rejected. Normalize such input to one of the supported representations before validation.
 
+=== Standalone built-in constraints
+
+The following constraints now use dedicated validators instead of constraint composition:
+
+[cols="1,2",options="header"]
+|===
+|Constraint |Former composing constraints
+|`@CreditCardNumber` |`@LuhnCheck`
+|`@EAN` |`@Mod10Check`
+|`@Range` |`@Min`, `@Max`
+|`@URL` |`@Pattern`
+|`@CPF` |`@Pattern`
+|`@RENAVAM` |`@Pattern`, `@Mod11Check`
+|`@TituloEleitoral` |`@Pattern`, `@Mod11Check`
+|===
+
+Their constraint descriptors now return an empty set from `getComposingConstraints()`.
+Custom validator definitions for the former composing constraints no longer affect these built-in constraints.
+A replacement validator for one of these built-in constraints must enforce all of its attributes itself.
+In particular, both supplied `@URL` validators now enforce `regexp` and `flags` directly.
+Existing character normalization, checksum rules, and numeric comparison semantics are preserved,
+including `@EAN`'s character-stripping behavior.
+
 === Message parameter escaping enabled by default
 
 Message parameters added via `HibernateConstraintValidatorContext#addMessageParameter()` are now escaped by default.

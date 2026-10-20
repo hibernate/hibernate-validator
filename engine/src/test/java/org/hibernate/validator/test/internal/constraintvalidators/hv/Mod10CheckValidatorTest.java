@@ -6,9 +6,11 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.util.Random;
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -23,7 +25,10 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValida
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
+import org.hibernate.validator.testutils.Mod10TestUtil;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -209,6 +214,102 @@ public class Mod10CheckValidatorTest {
 
 		assertTrue( validator.isValid( "79927398712", null ) );
 		assertFalse( validator.isValid( "79927398714", null ) );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNegativeMultiplier() {
+		new Mod10CheckValidator().initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, -1, 1 ) );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class)
+	public void testNegativeWeight() {
+		new Mod10CheckValidator().initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 3, -1 ) );
+	}
+
+	@DataProvider
+	public Object[][] rawRanges() {
+		return new Object[][] {
+				{ 0, Integer.MAX_VALUE, -1 },
+				{ 4, Integer.MAX_VALUE, -1 },
+				{ 100, Integer.MAX_VALUE, -1 },
+				{ 0, Integer.MAX_VALUE, 0 },
+				{ 3, 15, -1 },
+				{ 3, 13, 15 },
+				{ 0, 10, 10 },
+				{ 1, 1, 1 },
+				{ 1, 1, 0 },
+				{ 2, 8, 0 },
+				{ 0, 100, -1 },
+				{ 0, Integer.MAX_VALUE, -2 },
+				{ 0, 2, -2 },
+				{ 0, Integer.MAX_VALUE, Integer.MAX_VALUE },
+				{ 0, Integer.MAX_VALUE - 1, -1 }
+		};
+	}
+
+	@Test(dataProvider = "rawRanges")
+	public void testRawRangesMatchIndependentLegacyReference(int start, int end, int checkIndex) {
+		Random random = new Random( 813 );
+		String characters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
+		for ( int[] weights : new int[][] {
+				{ 3, 1 },
+				{ 0, 0 },
+				{ 0, 1 },
+				{ 4, 9 },
+				{ Integer.MAX_VALUE, Integer.MAX_VALUE },
+				{ Integer.MAX_VALUE, 1 },
+				{ 2, Integer.MAX_VALUE } } ) {
+			for ( boolean ignore : new boolean[] { false, true } ) {
+				Mod10CheckValidator validator = new Mod10CheckValidator();
+				validator.initialize( createMod10CheckAnnotation( start, end, checkIndex, ignore, weights[0], weights[1] ) );
+				for ( CharSequence value : new CharSequence[] {
+						null,
+						"",
+						"0",
+						"٠",
+						"1",
+						"79927398712",
+						"7992739871٢",
+						"٧٩٩٢٧٣٩٨٧١٠",
+						"abc0",
+						" -0",
+						"79927398712-",
+						"123-7992739871-2-456",
+						new StringBuilder( "998" ) } ) {
+					assertEquals( validator.isValid( value, null ),
+							Mod10TestUtil.isValidLegacy( value, start, end, checkIndex, ignore, weights[0], weights[1] ) );
+				}
+				for ( int sample = 0; sample < 50; sample++ ) {
+					StringBuilder value = new StringBuilder();
+					int length = random.nextInt( 30 );
+					for ( int i = 0; i < length; i++ ) {
+						value.append( sample % 3 == 0
+								? (char) ( '0' + random.nextInt( 10 ) )
+								: characters.charAt( random.nextInt( characters.length() ) ) );
+					}
+					assertEquals( validator.isValid( value, null ),
+							Mod10TestUtil.isValidLegacy( value, start, end, checkIndex, ignore, weights[0], weights[1] ), value.toString() );
+				}
+			}
+		}
+	}
+
+	@Test
+	public void testOverflowVectors() {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		validator.initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, Integer.MAX_VALUE, Integer.MAX_VALUE ) );
+		// Both multiplication and addition retain the old integer wraparound.
+		assertTrue( validator.isValid( "91", null ) );
+		assertTrue( validator.isValid( "998", null ) );
+		assertTrue( validator.isValid( "112", null ) );
+		assertFalse( validator.isValid( "994", null ) );
+	}
+
+	@Test
+	public void testCharacterSequenceDoesNotRequireStringConversion() {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		validator.initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false ) );
+		assertTrue( validator.isValid( new RepeatedDigits( 1, '1', '7' ), null ) );
 	}
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, int multiplier, int weight) {
