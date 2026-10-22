@@ -39,7 +39,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Java ${{ matrix.java-version }}
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # 6.1.0
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
@@ -105,7 +105,7 @@ jobs:
           } >> "$LOCAL_REPORT_FILE"
 
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
         with:
           name: tck-standalone-report-html-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/emailable-report.html
@@ -132,7 +132,7 @@ jobs:
           } >> "$LOCAL_REPORT_FILE"
           
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
         with:
           name: tck-container-report-html-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/emailable-report.html
@@ -159,7 +159,7 @@ jobs:
           } >> "$LOCAL_REPORT_FILE"
 
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
         with:
           name: tck-signature-report-xml-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/sigtest/report.xml
@@ -201,7 +201,7 @@ jobs:
           cat "$LOCAL_REPORT_FILE"
 
       - name: Upload Final Report as an Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
         with:
           name: final-report-${{matrix.java-version}}
           path: ${{ env.REPORT_FILE }}
