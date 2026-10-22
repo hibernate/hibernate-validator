@@ -45,6 +45,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.bean.BeanReference;
+import org.hibernate.validator.constraints.Alphabetic;
 import org.hibernate.validator.constraints.BIC;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.Contains;
@@ -179,6 +180,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( NotCompromised.class, new NotCompromisedBean() );
 		testConstraint( PasswordStrength.class, new PasswordStrengthBean() );
 		testConstraint( PasswordPolicy.class, new PasswordPolicyBean() );
+		testConstraint( Alphabetic.class, new AlphabeticBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -631,6 +633,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Hexadecimal
 		private String hexadecimal = "invalid-hex-!";
+	}
+
+	private static class AlphabeticBean {
+
+		@Alphabetic
+		private String alphabetic = "invalid123";
 	}
 
 }
