@@ -192,7 +192,6 @@ updates:
           - "org.testng:*"
           - "org.easymock:*"
           - "org.jboss.arquillian:*"
-          - "org.jboss.arquillian.container:*"
           - "org.jboss.modules:*"
           - "org.jboss.shrinkwrap.resolver:*"
           - "com.fasterxml.woodstox:*"
