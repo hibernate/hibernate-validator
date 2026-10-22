@@ -183,7 +183,7 @@
         <version.org.codehaus.groovy>2.4.21</version.org.codehaus.groovy>
         <version.com.google.guava>30.1.1-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>5.3.39</version.org.springframework.spring-expression>
-        <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.2.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
+        <version.org.jboss.arquillian.container.arquillian-weld-embedded>3.0.1.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.com.fasterxml.jackson.core.jackson-databind>2.13.5</version.com.fasterxml.jackson.core.jackson-databind>
         <version.com.fasterxml.jackson.core.jackson-annotations>2.13.5</version.com.fasterxml.jackson.core.jackson-annotations>
         <version.net.bytebuddy.byte-buddy>1.11.22</version.net.bytebuddy.byte-buddy>
