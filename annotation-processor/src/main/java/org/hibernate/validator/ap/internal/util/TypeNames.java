@@ -118,6 +118,7 @@ public class TypeNames {
 		public static final String DURATION_MIN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMin";
 		public static final String DURATION_MAX = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMax";
 		public static final String ALPHABETIC = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Alphabetic";
+		public static final String ALPHANUMERIC = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Alphanumeric";
 	}
 
 	public static class JodaTypes {
