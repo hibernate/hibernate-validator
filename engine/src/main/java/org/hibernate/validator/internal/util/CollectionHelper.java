@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -123,6 +124,20 @@ public final class CollectionHelper {
 	 */
 	public static <T> Set<T> toImmutableSet(Set<? extends T> set) {
 		return Set.copyOf( set );
+	}
+
+	/**
+	 * Converts the provided set to an unmodifiable set that preserves the iteration order of the given set.
+	 * <p>
+	 * Unlike {@link #toImmutableSet(Set)}, whose iteration order changes from one JVM run to another, this keeps
+	 * the order stable, which is relevant for sets exposed through the Bean Validation metadata API.
+	 *
+	 * @param set the set to convert.
+	 * @return the unmodifiable, insertion ordered copy of the set.
+	 * @param <T> the type of the set elements.
+	 */
+	public static <T> Set<T> toImmutableOrderedSet(Set<? extends T> set) {
+		return Collections.unmodifiableSet( new LinkedHashSet<>( set ) );
 	}
 
 	/**

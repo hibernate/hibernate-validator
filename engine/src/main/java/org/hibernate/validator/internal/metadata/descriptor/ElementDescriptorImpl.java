@@ -12,8 +12,8 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +55,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 			boolean defaultGroupSequenceRedefined,
 			List<Class<?>> defaultGroupSequence) {
 		this.type = (Class<?>) TypeHelper.getErasedType( type );
-		this.constraintDescriptors = CollectionHelper.toImmutableSet( constraintDescriptors );
+		this.constraintDescriptors = CollectionHelper.toImmutableOrderedSet( constraintDescriptors );
 		this.defaultGroupSequenceRedefined = defaultGroupSequenceRedefined;
 		this.defaultGroupSequence = CollectionHelper.toImmutableList( defaultGroupSequence );
 	}
@@ -128,9 +128,9 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 		@Override
 		public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
-			Set<ConstraintDescriptor<?>> matchingDescriptors = new HashSet<ConstraintDescriptor<?>>();
+			Set<ConstraintDescriptor<?>> matchingDescriptors = new LinkedHashSet<ConstraintDescriptor<?>>();
 			findMatchingDescriptors( matchingDescriptors );
-			return CollectionHelper.toImmutableSet( matchingDescriptors );
+			return CollectionHelper.toImmutableOrderedSet( matchingDescriptors );
 		}
 
 		@Override

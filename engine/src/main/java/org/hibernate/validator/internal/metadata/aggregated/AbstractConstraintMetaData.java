@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,10 +57,10 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 			boolean isConstrained) {
 		this.name = name;
 		this.type = type;
-		this.directConstraints = CollectionHelper.toImmutableSet( directConstraints );
-		this.containerElementsConstraints = CollectionHelper.toImmutableSet( containerElementsConstraints );
+		this.directConstraints = CollectionHelper.toImmutableOrderedSet( directConstraints );
+		this.containerElementsConstraints = CollectionHelper.toImmutableOrderedSet( containerElementsConstraints );
 		this.allConstraints = Stream.concat( directConstraints.stream(), containerElementsConstraints.stream() )
-				.collect( Collectors.collectingAndThen( Collectors.toSet(), CollectionHelper::toImmutableSet ) );
+				.collect( Collectors.collectingAndThen( Collectors.toCollection( LinkedHashSet::new ), CollectionHelper::toImmutableOrderedSet ) );
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
 	}
@@ -152,7 +153,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
-		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
+		Set<ConstraintDescriptorImpl<?>> theValue = newLinkedHashSet();
 
 		for ( MetaConstraint<?> oneConstraint : constraints ) {
 			theValue.add( oneConstraint.getDescriptor() );
