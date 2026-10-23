@@ -11,8 +11,7 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -28,7 +27,7 @@ final class ReturnValueConstraintMappingContextImpl
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
 	ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
-		super( executableContext.getTypeContext().getConstraintMapping(), executableContext.getCallable().getType() );
+		super( executableContext.getTypeContext().getConstraintMapping(), ReflectionHelper.typeOf( executableContext.executable ) );
 		this.executableContext = executableContext;
 	}
 
@@ -39,15 +38,13 @@ final class ReturnValueConstraintMappingContextImpl
 
 	@Override
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getCallable() ) );
+		addConstraint( definition );
 		return this;
 	}
 
 	@Override
 	public ReturnValueConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsForReturnValue(
-				executableContext.getCallable(), ignoreAnnotations
-		);
+		this.ignoreAnnotations = ignoreAnnotations;
 		return this;
 	}
 
@@ -73,24 +70,12 @@ final class ReturnValueConstraintMappingContextImpl
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType() {
-		return super.containerElement(
-				this, executableContext.getTypeContext(), ConstraintLocation.forReturnValue( executableContext.getCallable() )
-		);
+		return super.containerElement( this, executableContext.getTypeContext() );
 	}
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
-		return super.containerElement(
-				this,
-				executableContext.getTypeContext(),
-				ConstraintLocation.forReturnValue( executableContext.getCallable() ),
-				index,
-				nestedIndexes
-		);
+		return super.containerElement( this, executableContext.getTypeContext(), index, nestedIndexes );
 	}
 
-	@Override
-	protected ConstraintType getConstraintType() {
-		return ConstraintType.GENERIC;
-	}
 }

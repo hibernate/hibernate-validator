@@ -28,6 +28,7 @@ import org.hibernate.validator.bean.BeanResolver;
 import org.hibernate.validator.bean.BeanRetrieval;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.context.ResolvedConstraintMapping;
 import org.hibernate.validator.internal.engine.bean.BeanResolverImpl;
 import org.hibernate.validator.internal.engine.bean.HibernateValidatorBuiltinBeanConfigurer;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
@@ -73,7 +74,7 @@ final class ValidatorFactoryConfigurationHelper {
 				: null;
 	}
 
-	static Set<DefaultConstraintMapping> determineConstraintMappings(TypeResolutionHelper typeResolutionHelper,
+	static Set<ResolvedConstraintMapping> determineConstraintMappings(TypeResolutionHelper typeResolutionHelper,
 			ConfigurationState configurationState, JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
@@ -92,14 +93,14 @@ final class ValidatorFactoryConfigurationHelper {
 				externalClassLoader );
 
 		for ( ConstraintMappingContributor contributor : contributors ) {
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( javaBeanHelper, constraintMappings );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
 			contributor.createConstraintMappings( builder );
 		}
 
-		return constraintMappings;
+		return materialize( constraintMappings, javaBeanHelper );
 	}
 
-	static Set<DefaultConstraintMapping> determineServiceLoadedConstraintMappings(
+	static Set<ResolvedConstraintMapping> determineServiceLoadedConstraintMappings(
 			TypeResolutionHelper typeResolutionHelper,
 			JavaBeanHelper javaBeanHelper, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
@@ -110,9 +111,17 @@ final class ValidatorFactoryConfigurationHelper {
 				externalClassLoader != null ? externalClassLoader : GetClassLoader.fromContext()
 		);
 		DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder(
-				javaBeanHelper, constraintMappings );
+				constraintMappings );
 		serviceLoaderBasedContributor.createConstraintMappings( builder );
-		return constraintMappings;
+		return materialize( constraintMappings, javaBeanHelper );
+	}
+
+	private static Set<ResolvedConstraintMapping> materialize(Set<DefaultConstraintMapping> declarations, JavaBeanHelper javaBeanHelper) {
+		Set<ResolvedConstraintMapping> mappings = newHashSet();
+		for ( DefaultConstraintMapping declaration : declarations ) {
+			mappings.add( declaration.materialize( javaBeanHelper ) );
+		}
+		return mappings;
 	}
 
 	static boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {
@@ -526,10 +535,10 @@ final class ValidatorFactoryConfigurationHelper {
 		return new DefaultLocaleResolver();
 	}
 
-	static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
+	static void registerCustomConstraintValidators(Set<ResolvedConstraintMapping> constraintMappings,
 			ConstraintHelper constraintHelper) {
 		Set<Class<?>> definedConstraints = newHashSet();
-		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
+		for ( ResolvedConstraintMapping constraintMapping : constraintMappings ) {
 			for ( ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
 				processConstraintDefinitionContribution( contribution, constraintHelper, definedConstraints );
 			}
@@ -582,17 +591,15 @@ final class ValidatorFactoryConfigurationHelper {
 	private static class DefaultConstraintMappingBuilder
 			implements ConstraintMappingContributor.ConstraintMappingBuilder {
 
-		private final JavaBeanHelper javaBeanHelper;
 		private final Set<DefaultConstraintMapping> mappings;
 
-		public DefaultConstraintMappingBuilder(JavaBeanHelper javaBeanHelper, Set<DefaultConstraintMapping> mappings) {
-			this.javaBeanHelper = javaBeanHelper;
+		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings) {
 			this.mappings = mappings;
 		}
 
 		@Override
 		public ConstraintMapping addConstraintMapping() {
-			DefaultConstraintMapping mapping = new DefaultConstraintMapping( javaBeanHelper );
+			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
 			mappings.add( mapping );
 			return mapping;
 		}

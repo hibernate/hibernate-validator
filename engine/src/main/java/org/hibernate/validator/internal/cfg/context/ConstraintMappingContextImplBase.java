@@ -6,15 +6,12 @@ package org.hibernate.validator.internal.cfg.context;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.core.MetaConstraints;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Base class for implementations of constraint mapping creational context types.
@@ -23,58 +20,33 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
  */
 abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBase {
 
-	private final Set<ConfiguredConstraint<?>> constraints;
+	private final List<ConstraintDef<?, ?>> constraints = new ArrayList<>();
+	protected Boolean ignoreAnnotations;
 
 	ConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
 		super( mapping );
-		this.constraints = newHashSet();
 	}
-
-	/**
-	 * Returns the type of constraints hosted on the element configured by this creational context.
-	 *
-	 * @return the type of constraints hosted on the element configured by this creational context
-	 */
-	protected abstract ConstraintType getConstraintType();
 
 	protected DefaultConstraintMapping getConstraintMapping() {
 		return mapping;
 	}
 
-	/**
-	 * Adds a constraint to the set of constraints managed by this creational context.
-	 *
-	 * @param constraint the constraint to add
-	 */
-	protected void addConstraint(ConfiguredConstraint<?> constraint) {
+	protected void addConstraint(ConstraintDef<?, ?> constraint) {
 		constraints.add( constraint );
 	}
 
-	protected Set<MetaConstraint<?>> getConstraints(ConstraintCreationContext constraintCreationContext) {
-		if ( constraints == null ) {
-			return Collections.emptySet();
+	// TODO Snapshot the constraint definitions here, i.e. call ConfiguredConstraint#createAnnotationDescriptor()
+	// while materializing instead of leaving it to the metadata providers. As it stands, only the list of definitions
+	// is snapshotted, not their contents: mutating a ConstraintDef after a factory has been built still changes that
+	// factory, because the descriptor is created lazily, when ProgrammaticMetaDataProvider builds the bean
+	// configurations. MappingMaterializationTest#laterDeclarationsDoNotChangeAnExistingFactory only covers adding
+	// definitions, so it does not catch this. Pre-existing behavior, kept as is so that this refactoring does not
+	// change semantics.
+	protected Set<ConfiguredConstraint<?>> materializeConstraints(ConstraintLocation location) {
+		Set<ConfiguredConstraint<?>> resolved = newHashSet();
+		for ( ConstraintDef<?, ?> definition : constraints ) {
+			resolved.add( ConfiguredConstraint.forLocation( definition, location ) );
 		}
-
-		Set<MetaConstraint<?>> metaConstraints = newHashSet();
-
-		for ( ConfiguredConstraint<?> configuredConstraint : constraints ) {
-			metaConstraints.add( asMetaConstraint( configuredConstraint, constraintCreationContext ) );
-		}
-
-		return metaConstraints;
-	}
-
-	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintCreationContext constraintCreationContext) {
-		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintCreationContext.getConstraintHelper(),
-				config.getLocation().getConstrainable(),
-				config.createAnnotationDescriptor(),
-				config.getLocation().getKind(),
-				getConstraintType()
-		);
-
-		return MetaConstraints.create( constraintCreationContext.getTypeResolutionHelper(),
-				constraintCreationContext.getValueExtractorManager(),
-				constraintCreationContext.getConstraintValidatorManager(), constraintDescriptor, config.getLocation() );
+		return resolved;
 	}
 }

@@ -15,15 +15,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.validator.cfg.context.Cascadable;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementTarget;
 import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
@@ -41,7 +38,10 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final Type configuredType;
+	// Null for getters: their type depends on the destination factory's getter selection strategy.
+	protected final Type configuredType;
+	private boolean implicitContainerSelection;
+	private boolean duplicateContainerElementPath;
 	protected boolean isCascading;
 	protected final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
@@ -86,90 +86,76 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 		return new GroupConversionTargetContextImpl<>( from, getThis(), this );
 	}
 
-	public ContainerElementConstraintMappingContext containerElement(ContainerElementTarget parent, TypeConstraintMappingContextImpl<?> typeContext,
-			ConstraintLocation location) {
-
-		// HV-1428 Container element support is disabled for arrays
-		if ( TypeHelper.isArray( configuredType ) ) {
-			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( configuredType );
+	public ContainerElementConstraintMappingContext containerElement(ContainerElementTarget parent, TypeConstraintMappingContextImpl<?> typeContext) {
+		if ( configuredType != null ) {
+			checkImplicitSelection( configuredType );
 		}
-
-		if ( configuredType instanceof ParameterizedType ) {
-			if ( ( (ParameterizedType) configuredType ).getActualTypeArguments().length > 1 ) {
-				throw LOG.getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException( configuredType );
-			}
-		}
-		else if ( !TypeHelper.isArray( configuredType ) ) {
-			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( configuredType );
-		}
-
-		return containerElement( parent, typeContext, location, 0 );
+		ContainerElementConstraintMappingContext context = containerElement( parent, typeContext, 0 );
+		implicitContainerSelection = true;
+		return context;
 	}
 
 	public ContainerElementConstraintMappingContext containerElement(ContainerElementTarget parent, TypeConstraintMappingContextImpl<?> typeContext,
-			ConstraintLocation location, int index, int... nestedIndexes) {
+			int index, int... nestedIndexes) {
 		Contracts.assertTrue( index >= 0, "Type argument index must not be negative" );
-
-		// HV-1428 Container element support is disabled for arrays
-		if ( TypeHelper.isArray( configuredType ) ) {
-			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( configuredType );
+		for ( int nestedIndex : nestedIndexes ) {
+			Contracts.assertTrue( nestedIndex >= 0, "Type argument index must not be negative" );
 		}
-
-		if ( !( configuredType instanceof ParameterizedType ) && !( TypeHelper.isArray( configuredType ) ) ) {
-			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( configuredType );
+		if ( configuredType != null ) {
+			checkContainerType( configuredType );
 		}
-
 		ContainerElementPathKey key = new ContainerElementPathKey( index, nestedIndexes );
-		boolean configuredBefore = !configuredPaths.add( key );
-		if ( configuredBefore ) {
-			throw LOG.getContainerElementTypeHasAlreadyBeenConfiguredViaProgrammaticApiException(
-					location.getTypeForValidatorResolution()
-			);
-		}
-
-		// As we already checked that the specific path was not yet configured we should not worry about returning the same context here,
-		// as it means that there are some nested indexes which make a difference, And at the end a new context will be returned by call
-		// to containerElementContext#nestedContainerElement().
-		ContainerElementConstraintMappingContextImpl containerElementContext = containerElementContexts.get( index );
-		if ( containerElementContext == null ) {
-			containerElementContext = new ContainerElementConstraintMappingContextImpl( typeContext, parent, location, index );
-			containerElementContexts.put( index, containerElementContext );
-		}
-
-		if ( nestedIndexes.length > 0 ) {
-			return containerElementContext.nestedContainerElement( nestedIndexes );
-		}
-		else {
-			return containerElementContext;
-		}
-	}
-
-	public boolean isCascading() {
-		return isCascading;
-	}
-
-	protected Set<MetaConstraint<?>> getTypeArgumentConstraints(ConstraintCreationContext constraintCreationContext) {
-		return containerElementContexts.values()
-				.stream()
-				.map( t -> t.build( constraintCreationContext ) )
-				.flatMap( Set::stream )
-				.collect( Collectors.toSet() );
-	}
-
-	protected CascadingMetaDataBuilder getCascadingMetaDataBuilder() {
-		Map<TypeVariable<?>, CascadingMetaDataBuilder> typeParametersCascadingMetaData = containerElementContexts.values().stream()
-				.filter( c -> c.getContainerElementCascadingMetaDataBuilder() != null )
-				.collect( Collectors.toMap( c -> c.getContainerElementCascadingMetaDataBuilder().getTypeParameter(),
-						c -> c.getContainerElementCascadingMetaDataBuilder() ) );
-
-		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
-			CascadingMetaDataBuilder cascadingMetaDataBuilder = typeArgumentContext.getContainerElementCascadingMetaDataBuilder();
-			if ( cascadingMetaDataBuilder != null ) {
-				typeParametersCascadingMetaData.put( cascadingMetaDataBuilder.getTypeParameter(), cascadingMetaDataBuilder );
+		if ( !configuredPaths.add( key ) ) {
+			if ( configuredType == null ) {
+				// Getters: the duplicate is detected here, but the type to report is only known once the destination
+				// factory has resolved the getter, so the error is raised while materializing.
+				duplicateContainerElementPath = true;
+			}
+			else {
+				throw LOG.getContainerElementTypeHasAlreadyBeenConfiguredViaProgrammaticApiException( configuredType );
 			}
 		}
+		ContainerElementConstraintMappingContextImpl context = containerElementContexts.get( index );
+		if ( context == null ) {
+			context = new ContainerElementConstraintMappingContextImpl( typeContext, parent, configuredType, index );
+			containerElementContexts.put( index, context );
+		}
+		return nestedIndexes.length == 0 ? context : context.nestedContainerElement( nestedIndexes );
+	}
 
-		return CascadingMetaDataBuilder.annotatedObject( configuredType, isCascading, typeParametersCascadingMetaData, groupConversions );
+	static void checkContainerType(Type type) {
+		// HV-1428 Container element support is disabled for arrays.
+		if ( TypeHelper.isArray( type ) ) {
+			throw LOG.getContainerElementConstraintsAndCascadedValidationNotSupportedOnArraysException( type );
+		}
+		if ( !( type instanceof ParameterizedType ) ) {
+			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( type );
+		}
+	}
+
+	private static void checkImplicitSelection(Type type) {
+		checkContainerType( type );
+		if ( ( (ParameterizedType) type ).getActualTypeArguments().length > 1 ) {
+			throw LOG.getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException( type );
+		}
+	}
+
+	ResolvedConstraintMapping.ResolvedCascading materializeCascading(ConstraintLocation location, Type resolvedType) {
+		if ( implicitContainerSelection ) {
+			checkImplicitSelection( resolvedType );
+		}
+		if ( duplicateContainerElementPath ) {
+			throw LOG.getContainerElementTypeHasAlreadyBeenConfiguredViaProgrammaticApiException( resolvedType );
+		}
+		Set<ConfiguredConstraint<?>> constraints = new HashSet<>();
+		Map<TypeVariable<?>, CascadingMetaDataBuilder> cascading = new HashMap<>();
+		for ( ContainerElementConstraintMappingContextImpl child : containerElementContexts.values() ) {
+			ResolvedConstraintMapping.ResolvedCascading resolved = child.materialize( location );
+			constraints.addAll( resolved.containerConstraints );
+			cascading.put( resolved.cascading.getTypeParameter(), resolved.cascading );
+		}
+		return new ResolvedConstraintMapping.ResolvedCascading( constraints,
+				CascadingMetaDataBuilder.annotatedObject( resolvedType, isCascading, cascading, new HashMap<>( groupConversions ) ) );
 	}
 
 	private static class ContainerElementPathKey {
@@ -179,7 +165,7 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 
 		public ContainerElementPathKey(int index, int[] nestedIndexes) {
 			this.index = index;
-			this.nestedIndexes = nestedIndexes;
+			this.nestedIndexes = nestedIndexes.clone();
 		}
 
 		@Override

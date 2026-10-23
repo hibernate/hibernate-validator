@@ -4,8 +4,9 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.lang.reflect.Constructor;
+
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
 
 /**
  * Constraint mapping creational context representing a constructor.
@@ -14,15 +15,13 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
  */
 class ConstructorConstraintMappingContextImpl extends ExecutableConstraintMappingContextImpl implements ConstructorConstraintMappingContext {
 
-	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, JavaBeanConstructor constructor) {
+	<T> ConstructorConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Constructor<?> constructor) {
 		super( typeContext, constructor );
 	}
 
 	@Override
 	public ConstructorConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		typeContext.mapping
-				.getAnnotationProcessingOptions()
-				.ignoreConstraintAnnotationsOnMember( callable, ignoreAnnotations );
+		this.ignoreAnnotations = ignoreAnnotations;
 
 		return this;
 	}

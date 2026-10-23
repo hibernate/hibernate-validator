@@ -33,6 +33,8 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
 import org.hibernate.validator.bean.BeanHolder;
 import org.hibernate.validator.bean.BeanRetrieval;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.bean.BeanProvider;
 
 import com.acme.accessor.internal.TestAccessorFactory;
@@ -105,6 +107,55 @@ public class AccessorFactoryConfigurationTest {
 				.buildValidatorFactory() )
 				.isInstanceOf( ValidationException.class )
 				.hasMessageStartingWith( "HV000278" );
+	}
+
+	@Test(dataProvider = "scopes")
+	public void programmaticMappingUsesLateAccessorConfiguration(boolean predefinedScope) {
+		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Bean.class ).ignoreAllAnnotations().field( "name" )
+				.constraint( new NotNullDef() );
+		TrackingAccessorFactory accessorFactory = new TrackingAccessorFactory();
+		assertThat( accessorFactory.fieldReaders ).isZero();
+		try ( ValidatorFactory factory = config.addMapping( mapping ).accessorFactory( accessorFactory ).buildValidatorFactory() ) {
+			assertThat( factory.getValidator().validate( new Bean() ) ).hasSize( 1 );
+			assertThat( accessorFactory.fieldReaders ).isPositive();
+		}
+		try ( ValidatorFactory factory = configuration( predefinedScope ).addMapping( mapping )
+				.addProperty( HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME, TestAccessorFactory.class.getName() )
+				.buildValidatorFactory() ) {
+			assertThat( factory.getValidator().validate( new Bean() ) ).hasSize( 1 );
+			TrackingAccessorFactory second = (TrackingAccessorFactory) factory.unwrap( HibernateValidatorFactory.class ).getAccessorFactory();
+			assertThat( second ).isNotSameAs( accessorFactory );
+			assertThat( second.fieldReaders ).isPositive();
+		}
+	}
+
+	@Test(dataProvider = "scopes")
+	public void declarationCollectionDoesNotUseConfiguredAccessor(boolean predefinedScope) {
+		TrackingAccessorFactory accessorFactory = new TrackingAccessorFactory();
+		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope ).accessorFactory( accessorFactory );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Bean.class ).ignoreAllAnnotations().field( "name" )
+				.constraint( new NotNullDef() );
+		assertThat( accessorFactory.fieldReaders ).isZero();
+	}
+
+	@Test(dataProvider = "scopes")
+	public void programmaticMappingUsesBeanResolvedAccessor(boolean predefinedScope) {
+		TrackingAccessorFactory sourceAccessor = new TrackingAccessorFactory();
+		BaseHibernateValidatorConfiguration<?> source = configuration( predefinedScope ).accessorFactory( sourceAccessor );
+		ConstraintMapping mapping = source.createConstraintMapping();
+		mapping.type( Bean.class ).ignoreAllAnnotations().field( "name" ).constraint( new NotNullDef() );
+		try ( ValidatorFactory factory = configuration( predefinedScope ).addMapping( mapping ).buildValidatorFactory() ) {
+			HibernateValidatorFactory hibernateFactory = factory.unwrap( HibernateValidatorFactory.class );
+			try ( BeanHolder<AccessorFactory> resolved = hibernateFactory.getBeanResolver()
+					.resolve( AccessorFactory.class, "default", BeanRetrieval.BUILTIN ) ) {
+				assertThat( hibernateFactory.getAccessorFactory().getClass() ).isEqualTo( resolved.get().getClass() );
+			}
+			assertThat( factory.getValidator().validate( new Bean() ) ).hasSize( 1 );
+			assertThat( sourceAccessor.fieldReaders ).isZero();
+		}
 	}
 
 	private BaseHibernateValidatorConfiguration<?> configuration(boolean predefinedScope) {

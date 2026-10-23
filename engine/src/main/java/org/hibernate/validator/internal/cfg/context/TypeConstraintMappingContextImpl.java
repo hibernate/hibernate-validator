@@ -9,9 +9,13 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -19,21 +23,15 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Constrainable;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanConstructor;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanField;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanMethod;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.actions.NewInstance;
+import org.hibernate.validator.internal.util.actions.GetDeclaredConstructor;
+import org.hibernate.validator.internal.util.actions.GetDeclaredField;
+import org.hibernate.validator.internal.util.actions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
@@ -53,45 +51,42 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
-	private final JavaBeanHelper javaBeanHelper;
-
 	private final Class<C> beanClass;
 
-	private final Set<ExecutableConstraintMappingContextImpl> executableContexts = newHashSet();
-	private final Set<AbstractPropertyConstraintMappingContextImpl<?>> propertyContexts = newHashSet();
-	private final Set<Constrainable> configuredMembers = newHashSet();
+	private final List<MemberContext> memberContexts = new ArrayList<>();
+	private final Set<Member> configuredMembers = newHashSet();
+	private final Set<String> configuredGetters = newHashSet();
+	private boolean ignoreAllAnnotations;
 
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	TypeConstraintMappingContextImpl(JavaBeanHelper javaBeanHelper, DefaultConstraintMapping mapping, Class<C> beanClass) {
+	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
 		super( mapping );
-		this.javaBeanHelper = javaBeanHelper;
 		this.beanClass = beanClass;
-		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
 	@Override
 	public TypeConstraintMappingContext<C> constraint(ConstraintDef<?, ?> definition) {
-		addConstraint( ConfiguredConstraint.forType( definition, beanClass ) );
+		addConstraint( definition );
 		return this;
 	}
 
 	@Override
 	public TypeConstraintMappingContext<C> ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, ignoreAnnotations );
+		this.ignoreAnnotations = ignoreAnnotations;
 		return this;
 	}
 
 	@Override
 	public TypeConstraintMappingContext<C> ignoreAllAnnotations() {
-		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.TRUE );
+		this.ignoreAllAnnotations = true;
 		return this;
 	}
 
 	@Override
 	public TypeConstraintMappingContext<C> defaultGroupSequence(Class<?>... defaultGroupSequence) {
-		this.defaultGroupSequence = Arrays.asList( defaultGroupSequence );
+		this.defaultGroupSequence = Arrays.asList( defaultGroupSequence.clone() );
 		return this;
 	}
 
@@ -105,21 +100,19 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public PropertyConstraintMappingContext field(String property) {
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
-		Optional<JavaBeanField> foundField = javaBeanHelper.findDeclaredField( beanClass, property );
+		Field field = GetDeclaredField.action( beanClass, property );
 
-		if ( !foundField.isPresent() ) {
+		if ( field == null ) {
 			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, ElementType.FIELD );
 		}
 
-		JavaBeanField javaBeanField = foundField.get();
-
-		if ( configuredMembers.contains( javaBeanField ) ) {
+		if ( configuredMembers.contains( field ) ) {
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
-		FieldConstraintMappingContextImpl context = new FieldConstraintMappingContextImpl( this, javaBeanField );
-		configuredMembers.add( javaBeanField );
-		propertyContexts.add( context );
+		FieldConstraintMappingContextImpl context = new FieldConstraintMappingContextImpl( this, field );
+		configuredMembers.add( field );
+		memberContexts.add( context );
 		return context;
 	}
 
@@ -127,21 +120,11 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public PropertyConstraintMappingContext getter(String property) {
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
-		Optional<JavaBeanGetter> foundGetter = javaBeanHelper.findDeclaredGetter( beanClass, property );
-
-		if ( !foundGetter.isPresent() ) {
-			throw LOG.getUnableToFindPropertyWithAccessException( beanClass, property, ElementType.METHOD );
-		}
-
-		JavaBeanGetter javaBeanGetter = foundGetter.get();
-
-		if ( configuredMembers.contains( javaBeanGetter ) ) {
+		if ( !configuredGetters.add( property ) ) {
 			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
-
-		GetterConstraintMappingContextImpl context = new GetterConstraintMappingContextImpl( this, javaBeanGetter );
-		configuredMembers.add( javaBeanGetter );
-		propertyContexts.add( context );
+		GetterConstraintMappingContextImpl context = new GetterConstraintMappingContextImpl( this, property );
+		memberContexts.add( context );
 		return context;
 	}
 
@@ -149,42 +132,38 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( name, MESSAGES.methodNameMustNotBeNull() );
 
-		Optional<JavaBeanMethod> foundMethod = javaBeanHelper.findDeclaredMethod( beanClass, name, parameterTypes );
+		Method method = GetDeclaredMethod.action( beanClass, name, parameterTypes );
 
-		if ( !foundMethod.isPresent() ) {
+		if ( method == null ) {
 			throw LOG.getBeanDoesNotContainMethodException( beanClass, name, parameterTypes );
 		}
 
-		JavaBeanMethod javaBeanMethod = foundMethod.get();
-
-		if ( configuredMembers.contains( javaBeanMethod ) ) {
+		if ( configuredMembers.contains( method ) ) {
 			throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( name, parameterTypes )
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, javaBeanMethod );
-		configuredMembers.add( javaBeanMethod );
-		executableContexts.add( context );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
+		configuredMembers.add( method );
+		memberContexts.add( context );
 
 		return context;
 	}
 
 	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
-		Optional<JavaBeanConstructor> foundConstructor = javaBeanHelper.findDeclaredConstructor( beanClass, parameterTypes );
+		Constructor<C> constructor = GetDeclaredConstructor.action( beanClass, parameterTypes );
 
-		if ( !foundConstructor.isPresent() ) {
+		if ( constructor == null ) {
 			throw LOG.getBeanDoesNotContainConstructorException(
 					beanClass,
 					parameterTypes
 			);
 		}
 
-		JavaBeanConstructor javaBeanConstructor = foundConstructor.get();
-
-		if ( configuredMembers.contains( javaBeanConstructor ) ) {
+		if ( configuredMembers.contains( constructor ) ) {
 			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
 					ExecutableHelper.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
@@ -193,62 +172,40 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		ConstructorConstraintMappingContextImpl context = new ConstructorConstraintMappingContextImpl(
 				this,
-				javaBeanConstructor
+				constructor
 		);
-		configuredMembers.add( javaBeanConstructor );
-		executableContexts.add( context );
+		configuredMembers.add( constructor );
+		memberContexts.add( context );
 
 		return context;
 	}
 
-	BeanConfiguration<C> build(ConstraintCreationContext constraintCreationContext) {
-		return new BeanConfiguration<>(
-				ConfigurationSource.API,
-				beanClass,
-				buildConstraintElements( constraintCreationContext ),
-				defaultGroupSequence,
-				getDefaultGroupSequenceProvider()
-		);
+	ResolvedConstraintMapping.ResolvedType<C> materialize(JavaBeanHelper helper,
+			AnnotationProcessingOptionsImpl options) {
+		// Recording this unconditionally - and not only when ignoreAllAnnotations() was called - makes a programmatic
+		// mapping override the ignore-annotations default of an XML <bean> element for the same type. That is
+		// questionable, but it is the long-standing behavior and changing it would require a dedicated ticket.
+		options.ignoreAnnotationConstraintForClass( beanClass, ignoreAllAnnotations );
+		if ( ignoreAnnotations != null ) {
+			options.ignoreClassLevelConstraintAnnotations( beanClass, ignoreAnnotations );
+		}
+		Set<Constrainable> resolvedMembers = newHashSet();
+		List<ResolvedConstraintMapping.ResolvedElement> members = new ArrayList<>();
+		for ( MemberContext member : memberContexts ) {
+			members.add( member.materialize( helper, options, resolvedMembers ) );
+		}
+		return new ResolvedConstraintMapping.ResolvedType<>( beanClass,
+				materializeConstraints( ConstraintLocation.forClass( beanClass ) ),
+				members, defaultGroupSequence, defaultGroupSequenceProviderClass );
 	}
 
-	private Set<ConstrainedElement> buildConstraintElements(ConstraintCreationContext constraintCreationContext) {
-		Set<ConstrainedElement> elements = newHashSet();
-
-		//class-level configuration
-		elements.add(
-				new ConstrainedType(
-						ConfigurationSource.API,
-						beanClass,
-						getConstraints( constraintCreationContext )
-				)
-		);
-
-		//constructors/methods
-		for ( ExecutableConstraintMappingContextImpl executableContext : executableContexts ) {
-			elements.add( executableContext.build( constraintCreationContext ) );
-		}
-
-		//properties
-		for ( AbstractPropertyConstraintMappingContextImpl<?> propertyContext : propertyContexts ) {
-			elements.add( propertyContext.build( constraintCreationContext ) );
-		}
-
-		return elements;
-	}
-
-	private DefaultGroupSequenceProvider<? super C> getDefaultGroupSequenceProvider() {
-		return defaultGroupSequenceProviderClass != null
-				? NewInstance.action( defaultGroupSequenceProviderClass, "default group sequence provider" )
-				: null;
+	interface MemberContext {
+		ResolvedConstraintMapping.ResolvedElement materialize(JavaBeanHelper helper,
+				AnnotationProcessingOptionsImpl options, Set<Constrainable> resolvedMembers);
 	}
 
 	Class<?> getBeanClass() {
 		return beanClass;
-	}
-
-	@Override
-	protected ConstraintType getConstraintType() {
-		return ConstraintType.GENERIC;
 	}
 
 }
