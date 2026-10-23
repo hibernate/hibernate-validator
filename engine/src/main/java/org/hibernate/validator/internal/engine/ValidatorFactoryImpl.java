@@ -53,7 +53,7 @@ import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.bean.BeanResolver;
-import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.context.ResolvedConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManagerImpl;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
@@ -106,7 +106,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * no programmatic constraints
 	 */
 	@Immutable
-	private final Set<DefaultConstraintMapping> constraintMappings;
+	private final Set<ResolvedConstraintMapping> constraintMappings;
 
 	/**
 	 * The constraint creation context containing all the helpers necessary to the constraint creation.

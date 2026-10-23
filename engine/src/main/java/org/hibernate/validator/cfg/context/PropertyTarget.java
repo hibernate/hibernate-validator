@@ -34,6 +34,9 @@ public interface PropertyTarget {
 	 * apply on the specified getter property.
 	 * <p>
 	 * A given getter may only be configured once.
+	 * Getter resolution uses the destination validator factory's getter selection strategy.
+	 * Missing getters, invalid getter container types and collisions with explicit method
+	 * declarations are reported when building the validator factory.
 	 *
 	 * @param property The getter property name (using the Java Bean notation, e.g. {@code name} to address {@code getName()})
 	 * 		that represents a property on which to apply the following constraints.

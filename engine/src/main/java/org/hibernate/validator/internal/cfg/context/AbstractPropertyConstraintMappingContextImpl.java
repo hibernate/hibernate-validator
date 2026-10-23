@@ -4,15 +4,12 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.lang.reflect.Type;
+
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.properties.Property;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -22,31 +19,25 @@ import org.hibernate.validator.internal.properties.Property;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Marko Bekhta
  */
-abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
+abstract class AbstractPropertyConstraintMappingContextImpl
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
-		implements PropertyConstraintMappingContext {
+		implements PropertyConstraintMappingContext, TypeConstraintMappingContextImpl.MemberContext {
 
-	private final TypeConstraintMappingContextImpl<?> typeContext;
+	protected final TypeConstraintMappingContextImpl<?> typeContext;
 
-	// either Field or Method
-	private final T property;
-	private final ConstraintLocation location;
-
-	protected AbstractPropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, T property, ConstraintLocation location) {
-		super( typeContext.getConstraintMapping(), property.getType() );
+	protected AbstractPropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Type type) {
+		super( typeContext.getConstraintMapping(), type );
 		this.typeContext = typeContext;
-		this.property = property;
-		this.location = location;
 	}
 
 	@Override
-	protected AbstractPropertyConstraintMappingContextImpl<?> getThis() {
+	protected AbstractPropertyConstraintMappingContextImpl getThis() {
 		return this;
 	}
 
 	@Override
 	public PropertyConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( property, ignoreAnnotations );
+		this.ignoreAnnotations = ignoreAnnotations;
 		return this;
 	}
 
@@ -72,22 +63,12 @@ abstract class AbstractPropertyConstraintMappingContextImpl<T extends Property>
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType() {
-		return super.containerElement( this, typeContext, location );
+		return super.containerElement( this, typeContext );
 	}
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
-		return super.containerElement( this, typeContext, location, index, nestedIndexes );
+		return super.containerElement( this, typeContext, index, nestedIndexes );
 	}
 
-	abstract ConstrainedElement build(ConstraintCreationContext constraintCreationContext);
-
-	@Override
-	protected ConstraintType getConstraintType() {
-		return ConstraintType.GENERIC;
-	}
-
-	protected T getProperty() {
-		return property;
-	}
 }
