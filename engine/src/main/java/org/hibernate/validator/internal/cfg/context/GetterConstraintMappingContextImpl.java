@@ -4,14 +4,20 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.lang.annotation.ElementType;
+import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.properties.Constrainable;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * An implementation of {@link AbstractPropertyConstraintMappingContextImpl} for a getter property.
@@ -20,30 +26,37 @@ import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
  *
  * @author Marko Bekhta
  */
-final class GetterConstraintMappingContextImpl extends AbstractPropertyConstraintMappingContextImpl<JavaBeanGetter> {
+final class GetterConstraintMappingContextImpl extends AbstractPropertyConstraintMappingContextImpl {
 
-	GetterConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, JavaBeanGetter javaBeanGetter) {
-		super( typeContext, javaBeanGetter, ConstraintLocation.forGetter( javaBeanGetter ) );
+	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
+
+	private final String property;
+
+	GetterConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, String property) {
+		super( typeContext, null );
+		this.property = property;
 	}
 
 	@Override
 	public PropertyConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint(
-				ConfiguredConstraint.forGetter(
-						definition, getProperty()
-				)
-		);
+		addConstraint( definition );
 		return this;
 	}
 
 	@Override
-	ConstrainedElement build(ConstraintCreationContext constraintCreationContext) {
-		return new ConstrainedExecutable(
-				ConfigurationSource.API,
-				getProperty(),
-				getConstraints( constraintCreationContext ),
-				getTypeArgumentConstraints( constraintCreationContext ),
-				getCascadingMetaDataBuilder()
-		);
+	public ResolvedConstraintMapping.ResolvedElement materialize(JavaBeanHelper helper,
+			AnnotationProcessingOptionsImpl options,
+			Set<Constrainable> resolvedMembers) {
+		JavaBeanGetter resolved = helper.findDeclaredGetter( typeContext.getBeanClass(), property ).orElseThrow(
+				() -> LOG.getUnableToFindPropertyWithAccessException( typeContext.getBeanClass(), property, ElementType.METHOD ) );
+		if ( !resolvedMembers.add( resolved ) ) {
+			throw LOG.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( typeContext.getBeanClass(), property );
+		}
+		ConstraintLocation location = ConstraintLocation.forGetter( resolved );
+		if ( ignoreAnnotations != null ) {
+			options.ignoreConstraintAnnotationsOnMember( resolved, ignoreAnnotations );
+		}
+		return new ResolvedConstraintMapping.ResolvedExecutable( resolved, List.of(), Set.of(),
+				materializeConstraints( ConstraintLocation.forReturnValue( resolved ) ), materializeCascading( location, resolved.getType() ) );
 	}
 }

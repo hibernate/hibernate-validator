@@ -258,7 +258,7 @@ public interface Log extends BasicLogger {
 	GroupDefinitionException getWrongDefaultGroupSequenceProviderTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 56, value = "Method or constructor %1$s doesn't have a parameter with index %2$d.")
-	IllegalArgumentException getInvalidExecutableParameterIndexException(Callable callable, int index);
+	IllegalArgumentException getInvalidExecutableParameterIndexException(Object callable, int index);
 
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
@@ -637,11 +637,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 174,
 			value = "Parameter %3$s of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, Callable callable, int parameterIndex);
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, Object callable, int parameterIndex);
 
 	@Message(id = 175,
 			value = "The return value of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, Callable callable);
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, Object callable);
 
 	@Message(id = 176,
 			value = "Constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
@@ -649,7 +649,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 177,
 			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
-	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, Callable callable);
+	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, Object callable);
 
 	@Message(id = 178, value = "Multiplier cannot be negative: %d.")
 	IllegalArgumentException getMultiplierCannotBeNegativeException(int multiplier);

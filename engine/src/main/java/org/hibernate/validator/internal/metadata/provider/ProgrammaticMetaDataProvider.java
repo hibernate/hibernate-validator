@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.context.ResolvedConstraintMapping;
+import org.hibernate.validator.internal.cfg.context.ResolvedConstraintMapping.ResolvedType;
 import org.hibernate.validator.internal.engine.ConstraintCreationContext;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -36,7 +37,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 	private final Map<String, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	public ProgrammaticMetaDataProvider(ConstraintCreationContext constraintCreationContext, Set<DefaultConstraintMapping> constraintMappings) {
+	public ProgrammaticMetaDataProvider(ConstraintCreationContext constraintCreationContext, Set<ResolvedConstraintMapping> constraintMappings) {
 		Contracts.assertNotNull( constraintMappings );
 
 		configuredBeans = CollectionHelper.toImmutableMap(
@@ -47,24 +48,22 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 		annotationProcessingOptions = mergeAnnotationProcessingOptions( constraintMappings );
 	}
 
-	private static void assertUniquenessOfConfiguredTypes(Set<DefaultConstraintMapping> mappings) {
+	private static void assertUniquenessOfConfiguredTypes(Set<ResolvedConstraintMapping> mappings) {
 		Set<Class<?>> allConfiguredTypes = newHashSet();
 
-		for ( DefaultConstraintMapping constraintMapping : mappings ) {
-			for ( Class<?> configuredType : constraintMapping.getConfiguredTypes() ) {
-				if ( allConfiguredTypes.contains( configuredType ) ) {
-					throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( configuredType );
+		for ( ResolvedConstraintMapping constraintMapping : mappings ) {
+			for ( ResolvedType<?> resolvedType : constraintMapping.getTypes() ) {
+				if ( !allConfiguredTypes.add( resolvedType.getBeanClass() ) ) {
+					throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( resolvedType.getBeanClass() );
 				}
 			}
-
-			allConfiguredTypes.addAll( constraintMapping.getConfiguredTypes() );
 		}
 	}
 
-	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings,
+	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<ResolvedConstraintMapping> mappings,
 			ConstraintCreationContext constraintCreationContext) {
 		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
-		for ( DefaultConstraintMapping mapping : mappings ) {
+		for ( ResolvedConstraintMapping mapping : mappings ) {
 			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintCreationContext );
 
 			for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
@@ -85,7 +84,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return a single annotation processing options object
 	 */
-	private static AnnotationProcessingOptions mergeAnnotationProcessingOptions(Set<DefaultConstraintMapping> mappings) {
+	private static AnnotationProcessingOptions mergeAnnotationProcessingOptions(Set<ResolvedConstraintMapping> mappings) {
 		// if we only have one mapping we can return the context of just this mapping
 		if ( mappings.size() == 1 ) {
 			return mappings.iterator().next().getAnnotationProcessingOptions();
@@ -93,7 +92,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 
 		AnnotationProcessingOptions options = new AnnotationProcessingOptionsImpl();
 
-		for ( DefaultConstraintMapping mapping : mappings ) {
+		for ( ResolvedConstraintMapping mapping : mappings ) {
 			options.merge( mapping.getAnnotationProcessingOptions() );
 		}
 

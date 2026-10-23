@@ -15,9 +15,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import jakarta.validation.Constraint;
@@ -27,7 +29,9 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Payload;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.metadata.ConstructorDescriptor;
 import jakarta.validation.metadata.MethodDescriptor;
 import jakarta.validation.metadata.MethodType;
@@ -40,6 +44,7 @@ import org.hibernate.validator.test.constraints.Object;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -73,6 +78,44 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 
 		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedConstructors().size(), 0 );
 		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedMethods( MethodType.NON_GETTER ).size(), 0 );
+	}
+
+	@DataProvider
+	public String[][] xmlIgnoreAnnotations() {
+		return new String[][] { { "" }, { "ignore-annotations=\"true\"" } };
+	}
+
+	/**
+	 * Configuring a type programmatically resets the {@code ignore-annotations} default of an XML {@code <bean>}
+	 * element for that same type, so the annotation constraints of {@link Foo} are taken into account again. That is
+	 * questionable - the programmatic mapping never asked for it - but it is the long-standing behavior, so it is
+	 * pinned down here until it is revisited on its own.
+	 */
+	@Test(dataProvider = "xmlIgnoreAnnotations")
+	public void testProgrammaticMappingOverridesXmlIgnoreAnnotations(String ignoreAnnotationsAttribute) {
+		String xml = """
+				<constraint-mappings xmlns="https://jakarta.ee/xml/ns/validation/mapping" version="3.1">
+					<bean class="%s" %s/>
+				</constraint-mappings>
+				""".formatted( Foo.class.getName(), ignoreAnnotationsAttribute );
+		config.addMapping( new ByteArrayInputStream( xml.getBytes( StandardCharsets.UTF_8 ) ) );
+
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Foo.class ).field( "property" ).constraint( new NullDef() );
+		config.addMapping( mapping );
+
+		try ( ValidatorFactory factory = config.buildValidatorFactory() ) {
+			Validator validator = factory.getValidator();
+			Foo bean = new Foo();
+			assertThat( validator.validate( bean ) ).containsOnlyViolations(
+					violationOf( NotNull.class ).withProperty( "property" )
+			);
+
+			bean.property = "value";
+			assertThat( validator.validate( bean ) ).containsOnlyViolations(
+					violationOf( Null.class ).withProperty( "property" )
+			);
+		}
 	}
 
 	@Test
