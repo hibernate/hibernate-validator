@@ -74,6 +74,9 @@ Corresponding constraint definitions are also available for programmatic constra
 
 | `@PasswordStrength`, `@NotCompromised`, `@PasswordPolicy`
 | Checks password strength, exposure in data breaches, or a configurable set of password policy rules. See the next section for configuration requirements.
+
+| `@Alphanumeric`
+| Checks that every character in a character sequence is a letter or a digit, as determined by `Character.isLetterOrDigit(char)`.
 |===
 
 `@NullOrNotBlank` and `@NullOrNotEmpty` are particularly useful for optional values:
