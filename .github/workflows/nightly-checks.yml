@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+
+name: Nightly checks
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        description: Branch to check out
+        type: string
+        required: true
+      build-jdk:
+        description: JDK for documentation builds
+        type: string
+        required: true
+      docs:
+        description: Build PDF documentation and distribution packages
+        type: boolean
+        default: false
+      strict-jaxp:
+        description: Test with strict JAXP security settings
+        type: boolean
+        default: false
+      jaxp-jdk:
+        description: JDK providing the strict JAXP configuration template
+        type: string
+        default: '25'
+      reproducibility:
+        description: Check build reproducibility
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress -Dscan=false -Dno-build-cache"
+
+jobs:
+  documentation:
+    name: Documentation PDF
+    if: ${{ inputs.docs }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          ref: ${{ inputs.branch }}
+          persist-credentials: false
+      - name: Set up Java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
+        with:
+          java-version: ${{ inputs.build-jdk }}
+          distribution: temurin
+      - name: Build documentation and distribution packages
+        run: |
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          ./mvnw "${mvn_args[@]}" clean install -Pdocumentation-pdf -DskipTests
+
+  strict-jaxp:
+    name: Strict JAXP security settings
+    if: ${{ inputs.strict-jaxp }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          ref: ${{ inputs.branch }}
+          persist-credentials: false
+      - name: Set up Java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # 6.0.1
+        with:
+          java-version: ${{ inputs.jaxp-jdk }}
+          distribution: temurin
+      - name: Build with strict JAXP security settings
+        run: |
+          read -ra mvn_args <<< "$MAVEN_ARGS"
+          jaxp_properties="$RUNNER_TEMP/jaxp-strict.properties"
+          cp "$JAVA_HOME/conf/jaxp-strict.properties.template" "$jaxp_properties"
+          ./mvnw "${mvn_args[@]}" clean install \
+            -Dsurefire.jvm.args.jaxp.strict-args="-Djava.xml.config.file=$jaxp_properties" \
+            -Djava-version.test.release=23
+
+  reproducibility:
+    name: Build reproducibility
+    if: ${{ inputs.reproducibility }}
+    uses: hibernate/.github/.github/workflows/reproducible-build-check.yml@main
+    with:
+      branch: ${{ inputs.branch }}
+    permissions:
+      contents: read
