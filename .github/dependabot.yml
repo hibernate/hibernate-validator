@@ -16,6 +16,7 @@ updates:
     allow:
       - dependency-name: "actions/*"
       - dependency-name: "redhat-actions/*"
+      - dependency-name: "oracle-actions/*"
     assignees: [ "marko-bekhta" ]
   - package-ecosystem: "maven"
     directory: "/" # Location of package manifests

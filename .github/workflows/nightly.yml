@@ -11,13 +11,26 @@ on:
 permissions: { }
 
 jobs:
-  reproducible-build-check:
+  checks:
+    name: Nightly ${{ matrix.branch }}
     strategy:
       fail-fast: false
       matrix:
-        branch: [ 'main', '9.1', '9.0', '8.0' ]
-    uses: hibernate/.github/.github/workflows/reproducible-build-check.yml@main
+        # Reproducibility is supported on main, 9.1, and 9.0.
+        include:
+          - { branch: 'main', build-jdk: '25', docs: true, strict-jaxp: true, jaxp-jdk: '25', reproducibility: true }
+          - { branch: '9.1', build-jdk: '25', docs: true, strict-jaxp: true, jaxp-jdk: '25', reproducibility: true }
+          - { branch: '9.0', build-jdk: '21', docs: true, strict-jaxp: true, jaxp-jdk: '23', reproducibility: true }
+          - { branch: '8.0', build-jdk: '17', docs: true, strict-jaxp: false, jaxp-jdk: '25', reproducibility: false }
+          - { branch: '7.0', build-jdk: '17', docs: true, strict-jaxp: false, jaxp-jdk: '25', reproducibility: false }
+          - { branch: '6.2', build-jdk: '17', docs: true, strict-jaxp: false, jaxp-jdk: '25', reproducibility: false }
+    uses: ./.github/workflows/nightly-checks.yml
     with:
       branch: ${{ matrix.branch }}
+      build-jdk: ${{ matrix.build-jdk }}
+      docs: ${{ matrix.docs }}
+      strict-jaxp: ${{ matrix.strict-jaxp }}
+      jaxp-jdk: ${{ matrix.jaxp-jdk }}
+      reproducibility: ${{ matrix.reproducibility }}
     permissions:
       contents: read
