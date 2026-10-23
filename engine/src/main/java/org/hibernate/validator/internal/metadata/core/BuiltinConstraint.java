@@ -101,7 +101,8 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_COMPROMISED( "org.hibernate.validator.constraints.NotCompromised" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_POLICY( "org.hibernate.validator.constraints.PasswordPolicy" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_STRENGTH( "org.hibernate.validator.constraints.PasswordStrength" ),
-	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHABETIC( "org.hibernate.validator.constraints.Alphabetic" );
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHABETIC( "org.hibernate.validator.constraints.Alphabetic" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHANUMERIC( "org.hibernate.validator.constraints.Alphanumeric" );
 
 	private static final Map<String, Set<BuiltinConstraint>> CONSTRAINT_MAPPING;
 

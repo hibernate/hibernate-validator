@@ -77,6 +77,9 @@ Corresponding constraint definitions are also available for programmatic constra
 
 | `@Alphabetic`
 | Checks that every character in a character sequence is a letter, as determined by `Character.isLetter(char)`.
+
+| `@Alphanumeric`
+| Checks that every character in a character sequence is a letter or a digit, as determined by `Character.isLetterOrDigit(char)`.
 |===
 
 `@NullOrNotBlank` and `@NullOrNotEmpty` are particularly useful for optional values:
