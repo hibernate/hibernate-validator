@@ -4,8 +4,6 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Type;
-
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
@@ -13,11 +11,9 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.properties.Callable;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -36,7 +32,7 @@ final class ParameterConstraintMappingContextImpl
 	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
 		super(
 				executableContext.getTypeContext().getConstraintMapping(),
-				executableContext.callable.getParameterGenericType( parameterIndex )
+				executableContext.getParameterType( parameterIndex )
 		);
 
 		this.executableContext = executableContext;
@@ -50,23 +46,13 @@ final class ParameterConstraintMappingContextImpl
 
 	@Override
 	public ParameterConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint(
-				ConfiguredConstraint.forParameter(
-						definition,
-						executableContext.getCallable(),
-						parameterIndex
-				)
-		);
+		addConstraint( definition );
 		return this;
 	}
 
 	@Override
 	public ParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnParameter(
-				executableContext.getCallable(),
-				parameterIndex,
-				ignoreAnnotations
-		);
+		this.ignoreAnnotations = ignoreAnnotations;
 		return this;
 	}
 
@@ -97,40 +83,22 @@ final class ParameterConstraintMappingContextImpl
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType() {
-		return super.containerElement(
-				this,
-				executableContext.getTypeContext(),
-				ConstraintLocation.forParameter( executableContext.getCallable(), parameterIndex )
-		);
+		return super.containerElement( this, executableContext.getTypeContext() );
 	}
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
-		return super.containerElement(
-				this,
-				executableContext.getTypeContext(),
-				ConstraintLocation.forParameter( executableContext.getCallable(), parameterIndex ),
-				index,
-				nestedIndexes
-		);
+		return super.containerElement( this, executableContext.getTypeContext(), index, nestedIndexes );
 	}
 
-	public ConstrainedParameter build(ConstraintCreationContext constraintCreationContext) {
-		Type parameterType = executableContext.getCallable().getParameterGenericType( parameterIndex );
-
-		return new ConstrainedParameter(
-				ConfigurationSource.API,
-				executableContext.getCallable(),
-				parameterType,
-				parameterIndex,
-				getConstraints( constraintCreationContext ),
-				getTypeArgumentConstraints( constraintCreationContext ),
-				getCascadingMetaDataBuilder()
-		);
+	ResolvedConstraintMapping.ResolvedParameter materialize(Callable callable,
+			AnnotationProcessingOptionsImpl options) {
+		if ( ignoreAnnotations != null ) {
+			options.ignoreConstraintAnnotationsOnParameter( callable, parameterIndex, ignoreAnnotations );
+		}
+		ConstraintLocation location = ConstraintLocation.forParameter( callable, parameterIndex );
+		return new ResolvedConstraintMapping.ResolvedParameter( callable, parameterIndex, materializeConstraints( location ),
+				materializeCascading( location, callable.getParameterGenericType( parameterIndex ) ) );
 	}
 
-	@Override
-	protected ConstraintType getConstraintType() {
-		return ConstraintType.GENERIC;
-	}
 }

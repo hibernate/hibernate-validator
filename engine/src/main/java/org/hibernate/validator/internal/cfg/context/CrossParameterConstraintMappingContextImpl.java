@@ -10,7 +10,6 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 
 /**
  * Constraint mapping creational context which allows to configure cross-parameter constraints for a method or constructor.
@@ -30,15 +29,13 @@ final class CrossParameterConstraintMappingContextImpl
 
 	@Override
 	public CrossParameterConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forCrossParameter( definition, executableContext.getCallable() ) );
+		addConstraint( definition );
 		return this;
 	}
 
 	@Override
 	public CrossParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
-		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsForCrossParameterConstraint(
-				executableContext.getCallable(), ignoreAnnotations
-		);
+		this.ignoreAnnotations = ignoreAnnotations;
 		return this;
 	}
 
@@ -62,8 +59,4 @@ final class CrossParameterConstraintMappingContextImpl
 		return executableContext.returnValue();
 	}
 
-	@Override
-	protected ConstraintType getConstraintType() {
-		return ConstraintType.CROSS_PARAMETER;
-	}
 }

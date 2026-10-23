@@ -208,6 +208,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 				.type( FishTank.class )
 				.getter( "size" )
 				.containerElementType( 1 );
+		config.addMapping( newMapping ).buildValidatorFactory().close();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -218,6 +219,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 				.type( FishTank.class )
 				.getter( "model" )
 				.containerElementType( 2 );
+		config.addMapping( newMapping ).buildValidatorFactory().close();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -228,6 +230,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 				.type( FishTank.class )
 				.getter( "fishOfTheMonth" )
 				.containerElementType( 1, 2 );
+		config.addMapping( newMapping ).buildValidatorFactory().close();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -238,6 +241,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 				.type( FishTank.class )
 				.getter( "fishCountByType" )
 				.containerElementType();
+		config.addMapping( newMapping ).buildValidatorFactory().close();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -250,6 +254,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 				.containerElementType( 0, 1, 0 )
 				.constraint( new NotNullDef() )
 				.containerElementType( 0, 1, 0 );
+		config.addMapping( newMapping ).buildValidatorFactory().close();
 	}
 
 	public static class FishTank {

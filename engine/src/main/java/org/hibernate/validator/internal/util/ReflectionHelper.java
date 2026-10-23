@@ -7,6 +7,7 @@ package org.hibernate.validator.internal.util;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
@@ -77,6 +78,14 @@ public final class ReflectionHelper {
 	 * Private constructor in order to avoid instantiation.
 	 */
 	private ReflectionHelper() {
+	}
+
+	/**
+	 * Returns the type of an annotated type, erasing a bare type variable just as JavaBeanParameter does.
+	 */
+	public static Type typeOf(AnnotatedType annotatedType) {
+		Type type = annotatedType.getType();
+		return type instanceof TypeVariable<?> ? TypeHelper.getErasedType( type ) : type;
 	}
 
 	/**

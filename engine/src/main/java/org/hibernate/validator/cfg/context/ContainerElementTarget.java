@@ -11,6 +11,9 @@ import org.hibernate.validator.Incubating;
 /**
  * Facet of a constraint mapping creational context which allows to select a type argument or the component type of the
  * (return) type of the current property, parameter or method as target for the next operations.
+ * <p>
+ * Getter container types are checked during validator factory construction, using the
+ * factory's getter selection strategy. Other known container types are checked immediately.
  *
  * @author Gunnar Morling
  * @since 6.0

@@ -4,23 +4,25 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.engine.ConstraintCreationContext;
-import org.hibernate.validator.internal.metadata.aggregated.CascadingMetaDataBuilder;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.Callable;
+import org.hibernate.validator.internal.properties.Constrainable;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -31,25 +33,35 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
-abstract class ExecutableConstraintMappingContextImpl {
+abstract class ExecutableConstraintMappingContextImpl implements TypeConstraintMappingContextImpl.MemberContext {
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
 	protected final TypeConstraintMappingContextImpl<?> typeContext;
-	protected final Callable callable;
+	protected final Executable executable;
+
+	/**
+	 * Annotated parameter types rather than generic ones: they preserve the indexes of implicit and synthetic
+	 * constructor parameters, just as {@code JavaBeanParameter} does. Cached, as the JDK hands out a defensive copy
+	 * on every call.
+	 */
+	private final AnnotatedType[] annotatedParameterTypes;
+
+	protected Boolean ignoreAnnotations;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Callable callable) {
+	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Executable executable) {
 		this.typeContext = typeContext;
-		this.callable = callable;
-		this.parameterContexts = new ParameterConstraintMappingContextImpl[callable.getParameterTypes().length];
+		this.executable = executable;
+		this.annotatedParameterTypes = executable.getAnnotatedParameterTypes();
+		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterCount()];
 	}
 
 	public ParameterConstraintMappingContext parameter(int index) {
-		if ( index < 0 || index >= callable.getParameterTypes().length ) {
-			throw LOG.getInvalidExecutableParameterIndexException( callable, index );
+		if ( index < 0 || index >= executable.getParameterCount() ) {
+			throw LOG.getInvalidExecutableParameterIndexException( executableDescription(), index );
 		}
 
 		ParameterConstraintMappingContextImpl context = parameterContexts[index];
@@ -57,7 +69,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( context != null ) {
 			throw LOG.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					callable,
+					executableDescription(),
 					index
 			);
 		}
@@ -71,7 +83,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( crossParameterContext != null ) {
 			throw LOG.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					callable
+					executableDescription()
 			);
 		}
 
@@ -83,7 +95,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( returnValueContext != null ) {
 			throw LOG.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					callable
+					executableDescription()
 			);
 		}
 
@@ -91,46 +103,58 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return returnValueContext;
 	}
 
-	public Callable getCallable() {
-		return callable;
+	private String executableDescription() {
+		return ExecutableHelper.getExecutableAsString(
+				executable.getDeclaringClass().getSimpleName() + "#" + executable.getName(), executable.getParameterTypes() );
+	}
+
+	Type getParameterType(int index) {
+		return ReflectionHelper.typeOf( annotatedParameterTypes[index] );
 	}
 
 	public TypeConstraintMappingContextImpl<?> getTypeContext() {
 		return typeContext;
 	}
 
-	public ConstrainedElement build(ConstraintCreationContext constraintCreationContext) {
-		return new ConstrainedExecutable(
-				ConfigurationSource.API,
-				callable,
-				getParameters( constraintCreationContext ),
-				crossParameterContext != null ? crossParameterContext.getConstraints( constraintCreationContext ) : Collections.<MetaConstraint<?>>emptySet(),
-				returnValueContext != null ? returnValueContext.getConstraints( constraintCreationContext ) : Collections.<MetaConstraint<?>>emptySet(),
-				returnValueContext != null ? returnValueContext.getTypeArgumentConstraints( constraintCreationContext ) : Collections.<MetaConstraint<?>>emptySet(),
-				returnValueContext != null ? returnValueContext.getCascadingMetaDataBuilder() : CascadingMetaDataBuilder.nonCascading()
-		);
-	}
-
-	private List<ConstrainedParameter> getParameters(ConstraintCreationContext constraintCreationContext) {
-		List<ConstrainedParameter> constrainedParameters = newArrayList();
-
+	@Override
+	public ResolvedConstraintMapping.ResolvedElement materialize(JavaBeanHelper helper,
+			AnnotationProcessingOptionsImpl options,
+			Set<Constrainable> resolvedMembers) {
+		Callable callable = helper.executable( executable );
+		if ( !resolvedMembers.add( callable ) ) {
+			if ( executable instanceof Method ) {
+				throw LOG.getMethodHasAlreadyBeenConfiguredViaProgrammaticApiException( typeContext.getBeanClass(),
+						ExecutableHelper.getExecutableAsString( executable.getName(), executable.getParameterTypes() ) );
+			}
+			throw LOG.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException( typeContext.getBeanClass(),
+					ExecutableHelper.getExecutableAsString( typeContext.getBeanClass().getSimpleName(), executable.getParameterTypes() ) );
+		}
+		if ( ignoreAnnotations != null ) {
+			options.ignoreConstraintAnnotationsOnMember( callable, ignoreAnnotations );
+		}
+		List<ResolvedConstraintMapping.ResolvedParameter> parameters = new ArrayList<>();
 		for ( int i = 0; i < parameterContexts.length; i++ ) {
 			ParameterConstraintMappingContextImpl parameter = parameterContexts[i];
-			if ( parameter != null ) {
-				constrainedParameters.add( parameter.build( constraintCreationContext ) );
-			}
-			else {
-				constrainedParameters.add(
-						new ConstrainedParameter(
-								ConfigurationSource.API,
-								callable,
-								callable.getParameterGenericType( i ),
-								i
-						)
-				);
-			}
+			parameters.add( parameter == null
+					? new ResolvedConstraintMapping.ResolvedParameter( callable, i, Set.of(), ResolvedConstraintMapping.ResolvedCascading.empty() )
+					: parameter.materialize( callable, options ) );
 		}
-
-		return constrainedParameters;
+		if ( crossParameterContext != null && crossParameterContext.ignoreAnnotations != null ) {
+			options.ignoreConstraintAnnotationsForCrossParameterConstraint( callable, crossParameterContext.ignoreAnnotations );
+		}
+		if ( returnValueContext != null && returnValueContext.ignoreAnnotations != null ) {
+			options.ignoreConstraintAnnotationsForReturnValue( callable, returnValueContext.ignoreAnnotations );
+		}
+		ConstraintLocation returnLocation =
+				ConstraintLocation.forReturnValue( callable );
+		return new ResolvedConstraintMapping.ResolvedExecutable( callable, parameters,
+				crossParameterContext == null
+						? Set.of()
+						: crossParameterContext.materializeConstraints(
+								ConstraintLocation.forCrossParameter( callable ) ),
+				returnValueContext == null ? Set.of() : returnValueContext.materializeConstraints( returnLocation ),
+				returnValueContext == null
+						? ResolvedConstraintMapping.ResolvedCascading.empty()
+						: returnValueContext.materializeCascading( returnLocation, callable.getType() ) );
 	}
 }

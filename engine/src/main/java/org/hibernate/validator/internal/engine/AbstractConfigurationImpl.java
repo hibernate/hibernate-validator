@@ -43,8 +43,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.HibernateCon
 import org.hibernate.validator.internal.engine.resolver.TraversableResolvers;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.valueextraction.ValueExtractorManager;
-import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
-import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
@@ -436,11 +434,7 @@ public abstract class AbstractConfigurationImpl<T extends BaseHibernateValidator
 
 	@Override
 	public final DefaultConstraintMapping createConstraintMapping() {
-		return new DefaultConstraintMapping( new JavaBeanHelper(
-				getterPropertySelectionStrategy == null ? new DefaultGetterPropertySelectionStrategy() : getterPropertySelectionStrategy,
-				validationBootstrapParameters.getPropertyNodeNameProvider() == null ? defaultPropertyNodeNameProvider : validationBootstrapParameters.getPropertyNodeNameProvider(),
-				accessorFactory == null ? AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() ) : accessorFactory
-		) );
+		return new DefaultConstraintMapping();
 	}
 
 	@Override

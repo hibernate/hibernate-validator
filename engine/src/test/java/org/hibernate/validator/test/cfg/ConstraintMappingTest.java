@@ -11,6 +11,7 @@ import static org.hibernate.validator.testutils.ConstraintValidatorInitializatio
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -31,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.groups.Default;
 
+import org.hibernate.accessor.AccessorFactory;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -45,11 +47,14 @@ import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectionStrategy;
+import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
@@ -282,6 +287,7 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.getter( "numberOfHelpers" )
 				.constraint( new NotNullDef() );
+		config.addMapping( mapping ).buildValidatorFactory().close();
 	}
 
 	@Test
@@ -547,9 +553,12 @@ public class ConstraintMappingTest {
 	}
 
 	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
-		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
-				getDummyConstraintCreationContext()
-		);
+		Set<BeanConfiguration<?>> beanConfigurations = mapping.materialize( new JavaBeanHelper(
+				new DefaultGetterPropertySelectionStrategy(),
+				new DefaultPropertyNodeNameProvider(),
+				AccessorFactory.reflection( MethodHandles.lookup() ) ) ).getBeanConfigurations(
+						getDummyConstraintCreationContext()
+				);
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
 			if ( beanConfiguration.getBeanClass() == type ) {

@@ -53,7 +53,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
 import org.hibernate.validator.bean.BeanResolver;
-import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.context.ResolvedConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.HibernateConstraintValidatorInitializationContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.PredefinedScopeConstraintValidatorManagerImpl;
@@ -209,7 +209,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 			mappingParser.parse( configurationState.getMappingStreams() );
 		}
 
-		Set<DefaultConstraintMapping> constraintMappings = Collections.unmodifiableSet(
+		Set<ResolvedConstraintMapping> constraintMappings = Collections.unmodifiableSet(
 				determineConstraintMappings(
 						typeResolutionHelper,
 						configurationState,
@@ -389,7 +389,7 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 	private static List<MetaDataProvider> buildMetaDataProviders(
 			ConstraintCreationContext constraintCreationContext,
 			XmlMetaDataProvider xmlMetaDataProvider,
-			Set<DefaultConstraintMapping> constraintMappings
+			Set<ResolvedConstraintMapping> constraintMappings
 	) {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
