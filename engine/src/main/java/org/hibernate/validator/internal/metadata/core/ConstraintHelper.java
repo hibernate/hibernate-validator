@@ -32,6 +32,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_NFE_ACCESS_KEY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_RENAVAM;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH;
@@ -162,6 +163,7 @@ import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.NFeAccessKey;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.kor.KorRRN;
@@ -420,6 +422,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUILValidator
 import org.hibernate.validator.internal.constraintvalidators.hv.ar.CUITValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.NFeAccessKeyValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharArray;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharSequence;
@@ -832,6 +835,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF ) ) {
 			putBuiltinConstraint( tmpConstraints, CPF.class, CPFValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_NFE_ACCESS_KEY ) ) {
+			putBuiltinConstraint( tmpConstraints, NFeAccessKey.class, NFeAccessKeyValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY ) && isJavaMoneyInClasspath() ) {
 			putBuiltinConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );

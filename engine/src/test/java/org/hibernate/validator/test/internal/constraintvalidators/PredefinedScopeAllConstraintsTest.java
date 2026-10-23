@@ -82,6 +82,7 @@ import org.hibernate.validator.constraints.ar.CUIL;
 import org.hibernate.validator.constraints.ar.CUIT;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.br.NFeAccessKey;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
@@ -161,6 +162,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CUIT.class, new CUITBean() );
 		testConstraint( CNPJ.class, new CNPJBean() );
 		testConstraint( CPF.class, new CPFBean() );
+		testConstraint( NFeAccessKey.class, new NFeAccessKeyBean() );
 		testConstraint( RENAVAM.class, new RENAVAMBean() );
 		testConstraint( TituloEleitoral.class, new TituloEleitoralBean() );
 		testConstraint( REGON.class, new REGONBean() );
@@ -519,6 +521,11 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@CPF
 		private String cpf = "invalid";
+	}
+
+	private static class NFeAccessKeyBean {
+		@NFeAccessKey
+		private String nfeAccessKey = "invalid";
 	}
 
 	private static class RENAVAMBean {
