@@ -10,6 +10,7 @@ import jakarta.el.ELResolver;
 import jakarta.el.ExpressionFactory;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StandardELContext;
 
@@ -26,6 +27,7 @@ public class BeanPropertiesElContext extends StandardELContext {
 		resolver.add( new ListELResolver( true ) );
 		resolver.add( new MapELResolver( true ) );
 		resolver.add( new ResourceBundleELResolver() );
+		resolver.add( new RecordELResolver() );
 		resolver.add( new BeanPropertiesELResolver() );
 		DEFAULT_RESOLVER = resolver;
 	}
