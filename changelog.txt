@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+7.0.7.Final (2026-10-25)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/40499
+
+
+** Improvement
+    * HV-2278 Bump jakarta.enterprise:jakarta.enterprise.cdi-api 3.0.1
+
 7.0.6.Final (2026-10-19)
 -------------------------
 
