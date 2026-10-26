@@ -105,14 +105,6 @@ pipeline {
             }
         }
 		stage('Release') {
-			when {
-				beforeAgent true
-				// Releases must be triggered explicitly
-				// This is just for safety; normally the Jenkins job for this pipeline
-				// should be configured to "Suppress automatic SCM triggering"
-				// See https://stackoverflow.com/questions/58259326/prevent-jenkins-multibranch-pipeline-from-triggering-builds-for-new-branches
-				triggeredBy cause: "UserIdCause"
-			}
 			steps {
 				script {
 					print "INFO: params.RELEASE_VERSION = ${params.RELEASE_VERSION}"
