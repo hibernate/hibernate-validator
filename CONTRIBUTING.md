@@ -82,7 +82,7 @@ and once you have one, run this from the root of your local clone of Hibernate V
 ```
 
 To opt out from build scans for a particular build (e.g. when working on a security vulnerability),
-pass `-Dscan=false` to Maven.
+pass `-Ddevelocity.scan.disabled=true` to Maven.
 
 ### <a id="setup-ide"></a> IDE
 

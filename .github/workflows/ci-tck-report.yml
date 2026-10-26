@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright Red Hat Inc. and Hibernate Authors
 
-name: "GH Actions TCK report"
+name: TCK report
 
 on:
   push:
@@ -17,29 +17,30 @@ defaults:
     shell: bash
 
 env:
-  MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress -Dscan=false -Dno-build-cache -Denforcer.skip=true"
+  COMMON_MAVEN_ARGS: "-e -B --settings .github/mvn-settings.xml --fail-at-end -Pci-build --no-transfer-progress -Ddevelocity.scan.disabled=true -Dno-build-cache -Denforcer.skip=true"
   REPORT_FILE: "Hibernate-Validator-${{github.ref_name}}-Jakarta-Validation-TCK-Results.asciidoc"
 
-permissions:
-  contents: read
+permissions: { }
 
 jobs:
   build:
-    name: JDK ${{ matrix.java-version }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: JDK ${{ matrix.java-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest ]
         java-version: [ '17', '21' ]
 
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up Java ${{ matrix.java-version }}
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # 6.1.0
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
@@ -90,7 +91,7 @@ jobs:
           REF_NAME: ${{github.ref_name}}
           JAVA_VERSION: ${{matrix.java-version}}
         run: |
-          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_args <<< "$COMMON_MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" clean verify -pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner
           
           {
@@ -105,7 +106,7 @@ jobs:
           } >> "$LOCAL_REPORT_FILE"
 
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: tck-standalone-report-html-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/emailable-report.html
@@ -117,7 +118,7 @@ jobs:
           REF_NAME: ${{github.ref_name}}
           JAVA_VERSION: ${{matrix.java-version}}
         run: |
-          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_args <<< "$COMMON_MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" clean verify -pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared
 
           {
@@ -132,7 +133,7 @@ jobs:
           } >> "$LOCAL_REPORT_FILE"
           
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: tck-container-report-html-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/emailable-report.html
@@ -144,7 +145,7 @@ jobs:
           REF_NAME: ${{github.ref_name}}
           JAVA_VERSION: ${{matrix.java-version}}
         run: |
-          read -ra mvn_args <<< "$MAVEN_ARGS"
+          read -ra mvn_args <<< "$COMMON_MAVEN_ARGS"
           ./mvnw "${mvn_args[@]}" clean verify -pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner -Psigtest
 
           {
@@ -159,7 +160,7 @@ jobs:
           } >> "$LOCAL_REPORT_FILE"
 
       - name: Upload TCK Report as an Artifact
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: tck-signature-report-xml-${{matrix.java-version}}
           path: tck-runner/target/surefire-reports/sigtest/report.xml
@@ -201,7 +202,7 @@ jobs:
           cat "$LOCAL_REPORT_FILE"
 
       - name: Upload Final Report as an Artifact
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # 7.0.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: final-report-${{matrix.java-version}}
           path: ${{ env.REPORT_FILE }}
