@@ -3,7 +3,7 @@
 *Version: 9.2.0.Beta1 - 2026-10-13*
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.validator/hibernate-validator.svg?label=Maven%20Central&style=for-the-badge)](https://central.sonatype.com/search?namespace=org.hibernate.validator&sort=name)
-[![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.hibernate.org%2Fjob%2Fhibernate-validator%2Fjob%2Fmain%2F&style=for-the-badge)](https://ci.hibernate.org/view/Validator/job/hibernate-validator/job/main/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/hibernate/hibernate-validator/ci.yml?branch=main&style=for-the-badge)](https://github.com/hibernate/hibernate-validator/actions/workflows/ci.yml?query=branch%3Amain)
 [![Sonar Coverage](https://img.shields.io/sonar/coverage/hibernate_hibernate-validator?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/project/activity?id=hibernate_hibernate-validator&graph=coverage)
 [![Quality gate](https://img.shields.io/sonar/alert_status/hibernate_hibernate-validator?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge)](https://sonarcloud.io/dashboard?id=hibernate_hibernate-validator)
 [![Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?style=for-the-badge&logo=gradle)](https://develocity.commonhaus.dev/scans?search.rootProjectNames=Hibernate%20Validator)
@@ -78,11 +78,11 @@ You can build Hibernate Validator from source. Refer to the [Contributing to Hib
 
 ## Continuous Integration
 
-The official Continuous Integration service for the project is hosted on [ci.hibernate.org](http://ci.hibernate.org/view/Validator/).
+Continuous integration happens on GitHub Actions.
 
-We also include a [GitHub action build file](.github/workflows/build.yml) that can be used by those interested in
-running builds on their own forks. 
-This build runs on Linux and Windows and executes the TCK both in standalone and in container [modes](tck-runner/README.md). 
+See [.github/workflows/ci.yml](.github/workflows/ci.yml),
+[.github/workflows/nightly.yml](.github/workflows/nightly.yml),
+and [.github/workflows/build.yml](.github/workflows/build.yml) for the workflow definitions.
 
 ## Hibernate Validator URLs
 
@@ -92,4 +92,4 @@ This build runs on Linux and Windows and executes the TCK both in standalone and
 * [Downloads](https://hibernate.org/validator/downloads/)
 * [Mailing Lists](https://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
-* [Continuous Integration](http://ci.hibernate.org/view/Validator/)
+* [Continuous Integration](https://github.com/hibernate/hibernate-validator/actions/workflows/ci.yml)
