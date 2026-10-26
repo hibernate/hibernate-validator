@@ -28,6 +28,7 @@ public class BeanMethodsELContext extends StandardELContext {
 		resolver.add( new ListELResolver( true ) );
 		resolver.add( new MapELResolver( true ) );
 		resolver.add( new ResourceBundleELResolver() );
+		resolver.add( new RecordPropertiesELResolver() );
 		resolver.add( new BeanELResolver( true ) );
 		DEFAULT_RESOLVER = resolver;
 	}
