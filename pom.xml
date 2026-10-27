@@ -201,13 +201,13 @@
         <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
         <version.org.easymock>5.7.0</version.org.easymock>
-        <version.io.rest-assured>6.2.0</version.io.rest-assured>
+        <version.io.rest-assured>6.3.0</version.io.rest-assured>
         <version.org.apache.groovy>6.0.0</version.org.apache.groovy>
         <version.com.google.guava>33.7.2-jre</version.com.google.guava>
-        <version.org.springframework.spring-expression>7.0.9</version.org.springframework.spring-expression>
+        <version.org.springframework.spring-expression>7.0.10</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.1.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
         <version.tools.jackson.core.jackson-bom>3.2.4</version.tools.jackson.core.jackson-bom>
-        <version.net.bytebuddy.byte-buddy>1.18.15</version.net.bytebuddy.byte-buddy>
+        <version.net.bytebuddy.byte-buddy>1.18.16</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
         <version.org.apache.karaf>4.2.0</version.org.apache.karaf>
@@ -260,12 +260,12 @@
         <version.shade.plugin>3.6.2</version.shade.plugin>
         <version.sigtest.plugin>2.7</version.sigtest.plugin>
         <version.source.plugin>3.4.0</version.source.plugin>
-        <version.surefire.plugin>3.6.0</version.surefire.plugin>
+        <version.surefire.plugin>3.6.1</version.surefire.plugin>
         <version.surefire.plugin.java-version.asm>9.11.1</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.flatten-maven-plugin>1.8.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
-        <version.sisu-maven-plugin>1.1.0</version.sisu-maven-plugin>
+        <version.sisu-maven-plugin>1.1.1</version.sisu-maven-plugin>
         <version.versions.plugin>2.23.0</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>3.10.4</version.spotless-maven-plugin>
