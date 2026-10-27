@@ -190,7 +190,7 @@
         <version.com.nulab-inc.zxcvbn4j>1.9.0</version.com.nulab-inc.zxcvbn4j>
 
         <!-- JavaFX dependencies -->
-        <version.org.openjfx>17.0.20</version.org.openjfx>
+        <version.org.openjfx>17.0.21</version.org.openjfx>
 
         <!-- Test dependencies -->
         <version.org.jboss.arquillian>1.10.2.Final</version.org.jboss.arquillian>
