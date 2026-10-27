@@ -750,6 +750,10 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@Encoding(charset=)`:: Validates that every character of the annotated character sequence can be encoded in the given `charset` (e.g. `US-ASCII`, `ISO-8859-1`). `null` and empty sequences are considered valid. Unpaired surrogates are invalid: characters outside the Basic Multilingual Plane (e.g. most emoji) are represented in Java by a pair of `char` values, a high surrogate (`U+D800`-`U+DBFF`) followed by a low surrogate (`U+DC00`-`U+DFFF`); a surrogate without its counterpart (e.g. in a string truncated in the middle of an emoji) does not represent any character and cannot be encoded in any charset. No Unicode normalization is applied. An unknown or encode-incapable charset causes an exception at initialization.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@EndsWith(value=, ignoreCase=)`:: Validates that the annotated character sequence ends with at least one of the specified suffixes. When `ignoreCase` is set to `true`, the comparison is case-insensitive using `Locale.ROOT`.
     Supported data types::: `CharSequence`
     Hibernate metadata impact::: None
