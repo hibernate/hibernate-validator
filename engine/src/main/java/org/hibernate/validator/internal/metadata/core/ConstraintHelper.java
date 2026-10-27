@@ -38,6 +38,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CURRENCY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_DATE_TIME_FORMAT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENCODING;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENDS_WITH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_HEXADEIMAL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IBAN;
@@ -132,6 +133,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
@@ -378,6 +380,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ContainsValidato
 import org.hibernate.validator.internal.constraintvalidators.hv.CreditCardNumberValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.EncodingValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EndsWithValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.HexadecimalValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.IBANValidator;
@@ -869,6 +872,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN ) ) {
 			putBuiltinConstraint( tmpConstraints, EAN.class, EANValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENCODING ) ) {
+			putBuiltinConstraint( tmpConstraints, Encoding.class, EncodingValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENDS_WITH ) ) {
 			putBuiltinConstraint( tmpConstraints, EndsWith.class, EndsWithValidator.class );
