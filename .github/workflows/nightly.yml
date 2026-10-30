@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright Red Hat Inc. and Hibernate Authors
+#
+# Nightly CI: runs additional environments that are too expensive for every push/PR,
+# plus a reproducible build check across maintained branches.
+# Uses the same reusable workflow as ci.yml for the build + test pattern.
 
 name: Nightly
 
@@ -12,6 +16,7 @@ permissions: { }
 
 jobs:
   reproducible-build-check:
+    if: github.repository == 'hibernate/hibernate-validator' || github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
@@ -21,3 +26,30 @@ jobs:
       branch: ${{ matrix.branch }}
     permissions:
       contents: read
+
+  build:
+    if: github.repository == 'hibernate/hibernate-validator' || github.event_name != 'schedule'
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+    with:
+      # --- JDK versions ---
+      # We build with JDK 25 but our baseline is Java 17, so we test with JDK 17 and 21.
+      # We enable preview features when testing newer builds of OpenJDK:
+      # even if we don't use these features, just enabling them can cause side effects
+      # and it's useful to test that.
+      matrix-json: >-
+        [
+          { "name": "JDK", "java-test-version": 21 },
+          { "name": "JDK", "java-test-version": 26,
+            "maven-args": "-Dsurefire.jvm.args.commandline=--enable-preview" },
+          { "name": "JDK", "java-test-version": 27,
+            "maven-args": "-Dsurefire.jvm.args.commandline=--enable-preview" },
+          { "name": "JDK", "java-test-version": 28, "java-test-from": "jdk.java.net",
+            "maven-args": "-Dsurefire.jvm.args.commandline=--enable-preview" },
+          { "name": "WildFly TCK",
+            "maven-args": "-am -pl :hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared" },
+          { "name": "Documentation PDF", "full-build": true, "coverage": false,
+            "maven-args": "-Pdocumentation-pdf -DskipTests" }
+        ]
+    secrets: inherit

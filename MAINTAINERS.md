@@ -12,8 +12,8 @@ In any case:
 
 * Check that everything has been pushed to the upstream repository.
 * Check that the CI jobs for the branch you want to release are green:
-  * Check that the [main build CI job](https://ci.hibernate.org/view/Validator/job/hibernate-validator/).
-  * Check that the [nightly CI job](https://ci.hibernate.org/view/Validator/job/hibernate-validator-nightly/).
+  * Check the [main CI workflow](https://github.com/hibernate/hibernate-validator/actions/workflows/ci.yml).
+  * Check the [nightly CI workflow](https://github.com/hibernate/hibernate-validator/actions/workflows/nightly.yml).
   In particular to make sure that the build is reproducible.
 * Check Jira:
   * Check there are no outstanding issues assigned to the release.
