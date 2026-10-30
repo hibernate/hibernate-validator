@@ -15,6 +15,8 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation.ConstraintLocationKind;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -251,6 +253,9 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	 * {@code messageParameters}, {@code expressionVariables} and {@code dynamicPayload} are not taken into account for
 	 * equality. These variables solely enrich the actual Constraint Violation with additional information e.g how we
 	 * actually got to this CV.
+	 * <p>
+	 * The kind of element the constraint was declared on is taken into account, so that the same constraint declared on
+	 * a field and on its getter results in two violations even when they agree on everything else (HV-2251).
 	 *
 	 * @return true if the two ConstraintViolation's are considered equals; false otherwise
 	 */
@@ -286,6 +291,9 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
 			return false;
 		}
+		if ( constraintLocationKind( constraintDescriptor ) != constraintLocationKind( that.constraintDescriptor ) ) {
+			return false;
+		}
 		return true;
 	}
 
@@ -317,6 +325,23 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		result = 31 * result + System.identityHashCode( value );
 		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
 		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
+		ConstraintLocationKind constraintLocationKind = constraintLocationKind( constraintDescriptor );
+		result = 31 * result + ( constraintLocationKind != null ? constraintLocationKind.hashCode() : 0 );
 		return result;
+	}
+
+	/**
+	 * Returns the kind of element the violated constraint was declared on, or {@code null} if the descriptor does not
+	 * carry that information.
+	 * <p>
+	 * A constraint declared on a field and the same constraint declared on the getter of that property are two distinct
+	 * declarations which both have to be reported (Bean Validation specification, section 5.1.2), even though the two
+	 * violations agree on the property path, the invalid value and the constraint descriptor.
+	 */
+	private static ConstraintLocationKind constraintLocationKind(ConstraintDescriptor<?> constraintDescriptor) {
+		if ( constraintDescriptor instanceof ConstraintDescriptorImpl<?> constraintDescriptorImpl ) {
+			return constraintDescriptorImpl.getConstraintLocationKind();
+		}
+		return null;
 	}
 }

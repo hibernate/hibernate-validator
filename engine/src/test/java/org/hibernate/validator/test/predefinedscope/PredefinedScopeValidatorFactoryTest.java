@@ -52,8 +52,10 @@ public class PredefinedScopeValidatorFactoryTest {
 		assertNoViolations( violations );
 
 		violations = validator.validate( new Bean( null, "invalid" ) );
+		// @Email is declared on both the field and the getter, which are two violations (HV-2251)
 		assertThat( violations ).containsOnlyViolations(
 				violationOf( NotNull.class ).withProperty( "property" ),
+				violationOf( Email.class ).withProperty( "email" ),
 				violationOf( Email.class ).withProperty( "email" ) );
 
 		violations = validator.forExecutables()
@@ -85,6 +87,9 @@ public class PredefinedScopeValidatorFactoryTest {
 				violationOf( NotNull.class )
 						.withPropertyPath( pathWith().constructor( Bean.class ).returnValue()
 								.property( "property" ) ),
+				violationOf( Email.class )
+						.withPropertyPath( pathWith().constructor( Bean.class ).returnValue()
+								.property( "email" ) ),
 				violationOf( Email.class )
 						.withPropertyPath( pathWith().constructor( Bean.class ).returnValue()
 								.property( "email" ) ) );
@@ -150,6 +155,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
 			assertThat( violations ).containsOnlyViolations(
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ),
 					violationOf( Email.class ).withProperty( "email" ).withMessage( "doit être une adresse électronique syntaxiquement correcte" ) );
 		}
 		finally {
@@ -170,6 +176,7 @@ public class PredefinedScopeValidatorFactoryTest {
 
 			Set<ConstraintViolation<Bean>> violations = validator.validate( new Bean( "", "invalid" ) );
 			assertThat( violations ).containsOnlyViolations(
+					violationOf( Email.class ).withProperty( "email" ).withMessage( "must be a well-formed email address" ),
 					violationOf( Email.class ).withProperty( "email" ).withMessage( "must be a well-formed email address" ) );
 		}
 		finally {
