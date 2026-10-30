@@ -80,7 +80,7 @@ public final class ResolvedConstraintMapping {
 	private static <A extends Annotation> MetaConstraint<A> buildConstraint(ConfiguredConstraint<A> constraint, ConstraintType type,
 			ConstraintCreationContext context) {
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<>( context.getConstraintHelper(),
-				constraint.getLocation().getConstrainable(), constraint.createAnnotationDescriptor(), constraint.getLocation().getKind(), type );
+				constraint.getLocation().getConstrainable(), constraint.getAnnotationDescriptor(), constraint.getLocation().getKind(), type );
 		return MetaConstraints.create( context.getTypeResolutionHelper(), context.getValueExtractorManager(),
 				context.getConstraintValidatorManager(), descriptor, constraint.getLocation() );
 	}

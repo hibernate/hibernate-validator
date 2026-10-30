@@ -163,6 +163,18 @@ public class MappingMaterializationTest {
 	}
 
 	@Test(dataProvider = "scopes")
+	public void laterDefinitionMutationsDoNotChangeAnExistingFactory(boolean predefinedScope) {
+		ConstraintMapping mapping = configuration( predefinedScope ).createConstraintMapping();
+		NotNullDef definition = new NotNullDef().message( "first" );
+		mapping.type( Bean.class ).field( "values" ).constraint( definition );
+		try ( ValidatorFactory factory = configuration( predefinedScope ).addMapping( mapping ).buildValidatorFactory() ) {
+			definition.message( "mutated" );
+			assertThat( factory.getValidator().validate( new Bean() ) ).extracting( violation -> violation.getMessage() )
+					.containsExactly( "first" );
+		}
+	}
+
+	@Test(dataProvider = "scopes")
 	public void implicitGetterContainerSelectionIsDistinctFromExplicitZero(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping implicit = config.createConstraintMapping();

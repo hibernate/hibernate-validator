@@ -35,13 +35,6 @@ abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBas
 		constraints.add( constraint );
 	}
 
-	// TODO Snapshot the constraint definitions here, i.e. call ConfiguredConstraint#createAnnotationDescriptor()
-	// while materializing instead of leaving it to the metadata providers. As it stands, only the list of definitions
-	// is snapshotted, not their contents: mutating a ConstraintDef after a factory has been built still changes that
-	// factory, because the descriptor is created lazily, when ProgrammaticMetaDataProvider builds the bean
-	// configurations. MappingMaterializationTest#laterDeclarationsDoNotChangeAnExistingFactory only covers adding
-	// definitions, so it does not catch this. Pre-existing behavior, kept as is so that this refactoring does not
-	// change semantics.
 	protected Set<ConfiguredConstraint<?>> materializeConstraints(ConstraintLocation location) {
 		Set<ConfiguredConstraint<?>> resolved = newHashSet();
 		for ( ConstraintDef<?, ?> definition : constraints ) {
