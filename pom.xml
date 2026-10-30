@@ -200,6 +200,7 @@
         <version.org.testng>7.12.0</version.org.testng>
         <version.org.assertj.assertj-core>3.27.7</version.org.assertj.assertj-core>
         <version.junit>4.13.2</version.junit>
+        <version.junit-platform>1.13.4</version.junit-platform>
         <version.org.easymock>5.7.0</version.org.easymock>
         <version.io.rest-assured>6.3.0</version.io.rest-assured>
         <version.org.apache.groovy>6.0.0</version.org.apache.groovy>
@@ -513,6 +514,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-suite</artifactId>
+                <version>${version.junit-platform}</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
