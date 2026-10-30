@@ -35,10 +35,13 @@ class ConfiguredConstraint<A extends Annotation> {
 
 	private final ConstraintDef<?, A> constraint;
 	private final ConstraintLocation location;
+	private final ConstraintAnnotationDescriptor<A> annotationDescriptor;
 
 	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location) {
 		this.constraint = constraint;
 		this.location = location;
+		// Snapshot the definition's contents right away so that mutating it afterwards does not affect this constraint.
+		this.annotationDescriptor = createAnnotationDescriptor( constraint );
 	}
 
 	static <A extends Annotation> ConfiguredConstraint<A> forLocation(ConstraintDef<?, A> constraint, ConstraintLocation location) {
@@ -53,7 +56,11 @@ class ConfiguredConstraint<A extends Annotation> {
 		return location;
 	}
 
-	public ConstraintAnnotationDescriptor<A> createAnnotationDescriptor() {
+	public ConstraintAnnotationDescriptor<A> getAnnotationDescriptor() {
+		return annotationDescriptor;
+	}
+
+	private static <A extends Annotation> ConstraintAnnotationDescriptor<A> createAnnotationDescriptor(ConstraintDef<?, A> constraint) {
 		try {
 			@SuppressWarnings("unchecked")
 			AnnotationDescriptor<A> annotationDescriptor = (AnnotationDescriptor<A>) CREATE_ANNOTATION_DESCRIPTOR_METHOD_HANDLE.invoke( constraint );

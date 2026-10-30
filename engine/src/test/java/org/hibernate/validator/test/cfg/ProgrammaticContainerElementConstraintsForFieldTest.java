@@ -6,6 +6,7 @@
 package org.hibernate.validator.test.cfg;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
@@ -266,6 +267,33 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 				.type( FishTank.class )
 				.field( "fishCountByType" )
 				.containerElementType();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2280")
+	public void nestedContainerElementTypeWithoutTypeArgumentTargetsTheFirstTypeArgument() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+				.type( FishTank.class )
+				.field( "fishCountByType" )
+				.containerElementType( 1 )
+				.constraint( new MinDef().value( 1 ) )
+				.containerElementType()
+				.constraint( new SizeDef().max( 1 ) );
+
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		FishTank fishTank = new FishTank();
+		fishTank.fishCountByType = new HashMap<>();
+		fishTank.fishCountByType.put( "BB", -1 );
+
+		Set<ConstraintViolation<FishTank>> violations = validator.validate( fishTank );
+
+		assertThat( violations ).containsOnlyPaths(
+				pathWith().property( "fishCountByType" ).containerElement( "<map key>", true, "BB", null, Map.class, 0 ),
+				pathWith().property( "fishCountByType" ).containerElement( "<map value>", true, "BB", null, Map.class, 1 )
+		);
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
