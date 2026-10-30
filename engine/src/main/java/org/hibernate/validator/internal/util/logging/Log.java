@@ -1019,4 +1019,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 291, value = "Message template cannot be null.")
 	IllegalArgumentException getMessageTemplateCannotBeNullException();
 
+	@Message(id = 292, value = "%1$s is not a supported charset or does not support encoding.")
+	IllegalArgumentException getUnsupportedEncodingCharsetException(String charset, @Cause Exception e);
+
 }

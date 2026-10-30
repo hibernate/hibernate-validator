@@ -74,6 +74,7 @@ public class TypeNames {
 		public static final String DATE_TIME_FORMAT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".DateTimeFormat";
 		public static final String EAN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".EAN";
 		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
+		public static final String ENCODING = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Encoding";
 		public static final String ENDS_WITH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".EndsWith";
 		public static final String HEXADEIMAL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Hexadecimal";
 		public static final String IBAN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".IBAN";

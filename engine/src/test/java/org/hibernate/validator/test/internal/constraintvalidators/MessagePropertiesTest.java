@@ -55,6 +55,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
@@ -187,6 +188,7 @@ public class MessagePropertiesTest {
 							violationOf( Currency.class ),
 							violationOf( DateTimeFormat.class ),
 							violationOf( EAN.class ),
+							violationOf( Encoding.class ),
 							violationOf( BIC.class ),
 							violationOf( IBAN.class ),
 							violationOf( Hexadecimal.class ),
@@ -341,6 +343,9 @@ public class MessagePropertiesTest {
 
 		@EAN
 		private String ean = "invalid";
+
+		@Encoding(charset = "US-ASCII")
+		private String encoding = "\u00e9";
 
 		@BIC
 		private String bic = "invalid";

@@ -54,6 +54,7 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
@@ -139,6 +140,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CreditCardNumber.class, new CreditCardNumberBean() );
 		testConstraint( Currency.class, new CurrencyBean() );
 		testConstraint( EAN.class, new EANBean() );
+		testConstraint( Encoding.class, new EncodingBean() );
 		testConstraint( BIC.class, new BICBean() );
 		testConstraint( IBAN.class, new IBANBean() );
 		testConstraint( ISBN.class, new ISBNBean() );
@@ -364,6 +366,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@EAN
 		private String ean = "invalid";
+	}
+
+	private static class EncodingBean {
+
+		@Encoding(charset = "US-ASCII")
+		private String encoding = "\u00e9";
 	}
 
 	private static class BICBean {
