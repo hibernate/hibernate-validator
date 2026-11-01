@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+9.0.3.Final (2026-11-01)
+-------------------------
+
+https://hibernate.atlassian.net/projects/HV/versions/40496
+
+
+** Bug
+    * HV-2283 Missing EL6.0 support for `record`s in messages
+
 9.0.2.Final (2026-10-13)
 -------------------------
 
