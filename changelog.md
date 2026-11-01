@@ -1,5 +1,16 @@
 # Hibernate Validator Changelog
 
+## 9.1.6.Final (2026-11-01)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40494)
+
+
+### Bug
+* [HV-2283](https://hibernate.atlassian.net/browse/HV-2283) - Missing EL6.0 support for `record`s in messages
+
+### Improvement
+* [HV-2286](https://hibernate.atlassian.net/browse/HV-2286) - Update to OpenJFX to 17.0.21
+
 ## 9.1.5.Final (2026-10-13)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40454)
