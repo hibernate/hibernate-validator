@@ -48,7 +48,7 @@ jobs:
             "maven-args": "-Dsurefire.jvm.args.commandline=--enable-preview" },
           { "name": "JDK", "java-test-version": 28, "java-test-from": "jdk.java.net",
             "maven-args": "-Dsurefire.jvm.args.commandline=--enable-preview" },
-          { "name": "WildFly TCK",
+          { "name": "Validation TCK - in-container",
             "maven-args": "-am -pl :hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared" },
           { "name": "Documentation PDF", "full-build": true, "coverage": false,
             "maven-args": "-Pdocumentation-pdf -DskipTests" }

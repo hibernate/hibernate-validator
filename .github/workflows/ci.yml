@@ -5,7 +5,7 @@
 # Delegates to the reusable build.yml workflow, which:
 # 1. Compiles sources, runs standalone tests, and builds docs (initial build)
 # 2. Runs static checks in parallel (checkstyle, jqassistant, enforcer, etc.)
-# 3. Runs the test matrix (TCK in-container, sig test, Windows)
+# 3. Runs the test matrix (Validation TCK - in-container, sig test, Windows)
 # 4. Prepares a Sonar coverage bundle from all test results
 
 name: CI
@@ -55,14 +55,14 @@ jobs:
       run-sonar: true
       # See the matrix-json input description in build.yml for available fields.
       # JDK 17: baseline JDK version (we build with 25 but target 17)
-      # TCK in-container: runs the TCK with WildFly in container mode
+      # Validation TCK - in-container: runs the TCK with WildFly in container mode
       # Sig test: Jakarta Validation API signature compatibility check
       # Windows: full build from scratch (no Linux containers available)
       matrix-json: >-
         [
           { "name": "JDK", "java-test-version": 17,
             "runs-on": "runs-on/fleet=linux-standard/env=commonhaus" },
-          { "name": "TCK in-container",
+          { "name": "Validation TCK - in-container",
             "maven-args": "-am -pl :hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared",
             "runs-on": "runs-on/fleet=linux-standard/env=ibm" },
           { "name": "Sig test", "coverage": false,

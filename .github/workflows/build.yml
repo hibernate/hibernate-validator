@@ -30,7 +30,7 @@ on:
         description: >-
           JSON array of test matrix entries. Each entry is an object with the following fields:
 
-          - name (string, REQUIRED): short display name for the job, e.g. "JDK", "TCK in-container", "Windows".
+          - name (string, REQUIRED): short display name for the job, e.g. "JDK", "Validation TCK - in-container", "Windows".
             Appears in the GitHub Actions UI. For JDK entries, the version is appended automatically.
           - java-test-version (integer, optional): JDK version to run tests with, e.g. 17, 21, 28.
             When set and different from MAVEN_JAVA_VERSION, a separate test JDK is installed and
