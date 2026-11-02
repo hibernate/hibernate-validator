@@ -53,6 +53,7 @@ jobs:
     with:
       initial-build-runs-on: "runs-on/fleet=linux-standard/env=ibm"
       run-sonar: true
+      # See the matrix-json input description in build.yml for available fields.
       # JDK 17: baseline JDK version (we build with 25 but target 17)
       # TCK in-container: runs the TCK with WildFly in container mode
       # Sig test: Jakarta Validation API signature compatibility check

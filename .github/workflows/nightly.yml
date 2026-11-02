@@ -33,6 +33,7 @@ jobs:
     permissions:
       contents: read
     with:
+      # See the matrix-json input description in build.yml for available fields.
       # --- JDK versions ---
       # We build with JDK 25 but our baseline is Java 17, so we test with JDK 17 and 21.
       # We enable preview features when testing newer builds of OpenJDK:
