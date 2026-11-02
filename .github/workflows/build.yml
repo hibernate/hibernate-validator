@@ -27,7 +27,27 @@ on:
         required: false
         default: 'ubuntu-latest'
       matrix-json:
-        description: 'JSON array of test matrix entries'
+        description: >-
+          JSON array of test matrix entries. Each entry is an object with the following fields:
+
+          - name (string, REQUIRED): short display name for the job, e.g. "JDK", "TCK in-container", "Windows".
+            Appears in the GitHub Actions UI. For JDK entries, the version is appended automatically.
+          - java-test-version (integer, optional): JDK version to run tests with, e.g. 17, 21, 28.
+            When set and different from MAVEN_JAVA_VERSION, a separate test JDK is installed and
+            its path passed to Maven via -Djava-version.test.compiler.java_home / -Djava-version.test.release.
+          - java-test-from (string, optional): where to download the test JDK from.
+            Set to "jdk.java.net" for EA builds via oracle-actions/setup-java; omit for temurin.
+          - maven-args (string, optional): extra Maven arguments appended to the command line,
+            e.g. "-Dsurefire.jvm.args.commandline=--enable-preview" or "-Dincontainer -Dincontainer-prepared".
+          - full-build (boolean, optional, default false): when true, runs a full "clean install"
+            from scratch instead of downloading the initial build artifact. Use for environments
+            where the initial build artifact cannot be reused (e.g. Windows).
+          - coverage (boolean, optional, default true): when false, skips JaCoCo coverage collection
+            and excludes this entry from the Sonar coverage bundle.
+          - runs-on (string, optional, default "ubuntu-latest"): GitHub Actions runner label,
+            e.g. "windows-latest" or "runs-on/fleet=linux-standard/env=commonhaus".
+            RunsOn Fleet labels are only effective on the upstream repository; forks fall back to ubuntu-latest.
+          - timeout (integer, optional, default 60): job timeout in minutes.
         type: string
         required: true
       run-sonar:
