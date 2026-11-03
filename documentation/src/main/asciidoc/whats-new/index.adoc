@@ -119,8 +119,8 @@ registering a bean alone does not override a component with a built-in default.
 == Configurable property access
 
 Hibernate Validator now uses Hibernate Accessor to read bean properties.
-Reflection remains the default, while optional ASM and ByteBuddy (or Class-File API)
-accessor factories can generate property accessors to avoid reflective calls during
+The Class-File API factory is the default on JDK 24 and later, with reflection used on earlier JDKs.
+Optional ASM and ByteBuddy accessor factories can generate property accessors to avoid reflective calls during
 validation. Configure an `AccessorFactory` using `accessorFactory()` or the
 `hibernate.validator.accessor_factory` configuration property.
 The optional factories are provided by `org.hibernate.accessor:hibernate-accessor-asm`

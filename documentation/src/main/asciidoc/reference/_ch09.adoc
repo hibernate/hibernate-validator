@@ -625,14 +625,15 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CustomScri
 [[section-accessor-factory]]
 ==== Configuring the `AccessorFactory`
 
-Hibernate Validator uses the `AccessorFactory` from Hibernate Accessor library to access bean property
-values during validation. By default, a reflection-based factory is used which accesses properties via the
-standard Java Reflection API.
+Hibernate Validator uses an `AccessorFactory` from Hibernate Accessor to access bean property values during
+validation. By default, it uses the bytecode-generating Class-File API factory on JDK 24 and later;
+on earlier JDKs, it uses a reflection-based factory.
 
-For improved performance in throughput-sensitive scenarios, Hibernate Validator supports switching to
-bytecode-generating accessor factories that produce optimized accessors at startup time, avoiding the overhead
-of reflective calls at validation time.
-Two such factories are available as separate artifacts:
+The Class-File API factory generates accessors to reduce reflective calls during validation. It can also be
+configured explicitly on JDK 17 through 23 when the SmallRye `jdk-classfile-backport` library is available.
+The reflection factory can be selected explicitly on any supported JDK.
+
+Hibernate Accessor also provides bytecode-generating factories in separate artifacts:
 
 * *ASM-based*: provided by `org.hibernate.accessor:hibernate-accessor-asm`
 * *ByteBuddy-based*: provided by `org.hibernate.accessor:hibernate-accessor-bytebuddy`
@@ -662,6 +663,18 @@ or
 ===== Programmatic configuration
 
 To configure the accessor factory programmatically, use `HibernateValidatorConfiguration#accessorFactory()`.
+
+For example, to select the Class-File API factory explicitly:
+
+[source, java, indent=0]
+----
+ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+        .configure()
+        .accessorFactory( AccessorFactory.classFile( MethodHandles.lookup() ) )
+        .buildValidatorFactory();
+----
+
+Use `AccessorFactory.reflection( MethodHandles.lookup() )` to select the reflection factory explicitly.
 
 [[example-accessor-factory-bytebuddy-programmatically]]
 .Configuring the ByteBuddy-based `AccessorFactory`
@@ -725,9 +738,8 @@ The specified class must have a no-arg constructor.
 
 [NOTE]
 ====
-The built-in bytecode-based factories (`AsmAccessorFactory`, `ByteBuddyAccessorFactory`)
-require a `MethodHandles.Lookup` argument and therefore cannot be used via XML configuration.
-Programmatic configuration is the recommended approach for these factories.
+The Class-File, ASM and ByteBuddy factories are configured through methods that accept a `MethodHandles.Lookup`.
+Use programmatic configuration to select these factories explicitly.
 ====
 
 [[section-password-validation-services]]
