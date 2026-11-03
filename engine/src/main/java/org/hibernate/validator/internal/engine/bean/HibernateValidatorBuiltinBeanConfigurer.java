@@ -27,7 +27,9 @@ public class HibernateValidatorBuiltinBeanConfigurer implements BeanConfigurer {
 	@Override
 	public void configure(BeanConfigurationContext context) {
 		context.define( AccessorFactory.class, HibernateValidatorAccessContext.DEFAULT_ACCESSOR_FACTORY_NAME,
-				resolver -> BeanHolder.of( AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() ) ) );
+				resolver -> BeanHolder.of( Runtime.version().feature() >= 24
+						? AccessorFactory.classFile( HibernateValidatorAccessContext.configuration() )
+						: AccessorFactory.reflection( HibernateValidatorAccessContext.configuration() ) ) );
 		context.define( ScriptEvaluatorFactory.class, DefaultScriptEvaluatorFactory.NAME,
 				resolver -> BeanHolder.of( new DefaultScriptEvaluatorFactory( context.classLoader() ) ) );
 		context.define( GetterPropertySelectionStrategy.class, DefaultGetterPropertySelectionStrategy.NAME,
