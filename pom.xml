@@ -265,7 +265,7 @@
         <version.versions.plugin>2.19.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
-        <version.jacoco.plugin>0.8.15</version.jacoco.plugin>
+        <version.jacoco.plugin>0.8.16</version.jacoco.plugin>
         <version.maven.injection.plugin>1.0.2</version.maven.injection.plugin>
 
         <!-- Forbidden API related properties -->
