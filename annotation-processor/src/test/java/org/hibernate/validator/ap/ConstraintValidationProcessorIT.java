@@ -39,6 +39,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNotCompromisedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithNumericConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordPolicyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordStrengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
@@ -854,6 +855,24 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void alphanumericConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithAlphanumericConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 17 ),
+				new DiagnosticExpectation( Kind.ERROR, 20 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2285")
+	public void numericConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithNumericConstraints.class )
 		};
 
 		boolean compilationResult =

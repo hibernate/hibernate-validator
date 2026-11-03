@@ -69,6 +69,7 @@ import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
+import org.hibernate.validator.constraints.Numeric;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -229,7 +230,8 @@ public class MessagePropertiesTest {
 							violationOf( PasswordStrength.class ),
 							violationOf( PasswordPolicy.class ),
 							violationOf( Alphabetic.class ),
-							violationOf( Alphanumeric.class )
+							violationOf( Alphanumeric.class ),
+							violationOf( Numeric.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -470,6 +472,9 @@ public class MessagePropertiesTest {
 
 		@Alphanumeric
 		private String alphanumeric = "invalid!";
+
+		@Numeric
+		private String numeric = "invalid1";
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;
