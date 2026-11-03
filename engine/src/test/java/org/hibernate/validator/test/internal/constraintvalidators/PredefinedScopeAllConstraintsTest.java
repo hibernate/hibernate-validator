@@ -64,6 +64,7 @@ import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
+import org.hibernate.validator.constraints.Numeric;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -180,6 +181,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( PasswordPolicy.class, new PasswordPolicyBean() );
 		testConstraint( Alphabetic.class, new AlphabeticBean() );
 		testConstraint( Alphanumeric.class, new AlphanumericBean() );
+		testConstraint( Numeric.class, new NumericBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -644,6 +646,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Alphanumeric
 		private String alphanumeric = "invalid!";
+	}
+
+	private static class NumericBean {
+
+		@Numeric
+		private String numeric = "invalid1";
 	}
 
 }
