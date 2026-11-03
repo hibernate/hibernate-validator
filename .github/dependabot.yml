@@ -207,8 +207,6 @@ updates:
       - dependency-name: "org.apache.bval:*"
       # dependencies that we align on Wildfly version that is used:
       - dependency-name: "org.jboss.weld:*"
-      # 3.0.2.Final requires CDI 4 / Weld 5; Validator 7.0 uses CDI 3 / Weld 4.
-      - dependency-name: "org.jboss.arquillian.container:arquillian-weld-embedded"
       - dependency-name: "org.wildfly.arquillian:*"
       - dependency-name: "jakarta.validation:jakarta.validation-api"
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
@@ -278,6 +276,8 @@ updates:
       # dependencies that we align on Wildfly version that is used:
       - dependency-name: "org.jboss.weld:*"
       - dependency-name: "org.wildfly.arquillian:*"
+      # 3.0.2.Final requires CDI 4 / Weld 5; Validator 7.0 uses CDI 3 / Weld 4.
+      - dependency-name: "org.jboss.arquillian.container:arquillian-weld-embedded"
       - dependency-name: "jakarta.validation:jakarta.validation-api"
       - dependency-name: "jakarta.persistence:jakarta.persistence-api"
       - dependency-name: "jakarta.el:jakarta.el-api"
