@@ -4,7 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import static org.testng.Assert.assertSame;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import jakarta.validation.Validation;
 import jakarta.validation.ValidationException;
@@ -13,7 +14,7 @@ import jakarta.validation.ValidatorFactory;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link ValidatorFactoryImpl}.
@@ -22,10 +23,11 @@ import org.testng.annotations.Test;
  */
 public class ValidatorFactoryTest {
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-		validatorFactory.unwrap( ValidatorFactoryImpl.class );
+		assertThatThrownBy( () -> validatorFactory.unwrap( ValidatorFactoryImpl.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -33,9 +35,9 @@ public class ValidatorFactoryTest {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 
 		HibernateValidatorFactory asHibernateValidatorFactory = validatorFactory.unwrap( HibernateValidatorFactory.class );
-		assertSame( asHibernateValidatorFactory, validatorFactory );
+		assertSame( validatorFactory, asHibernateValidatorFactory );
 
 		Object asObject = validatorFactory.unwrap( Object.class );
-		assertSame( asObject, validatorFactory );
+		assertSame( validatorFactory, asObject );
 	}
 }

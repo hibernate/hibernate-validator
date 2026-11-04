@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPathStringRepresentations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
@@ -31,7 +32,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.testutils.CandidateForTck;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integrative test for group conversion.
@@ -231,10 +232,11 @@ public abstract class AbstractGroupConversionTest {
 		);
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "HV000127.*PostalSequence.*")
+	@Test
 	public void conversionFromSequenceCausesException() {
-		validator.validate( new User8() );
+		assertThatThrownBy( () -> validator.validate( new User8() ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000127.*PostalSequence.*" );
 	}
 
 	@Test

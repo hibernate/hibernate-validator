@@ -4,13 +4,13 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertThrows;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -25,9 +25,10 @@ import org.hibernate.validator.constraints.BIC;
 import org.hibernate.validator.internal.constraintvalidators.hv.BICValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * A set of tests for {@link BIC} constraint validator ({@link BICValidator}), which
@@ -39,7 +40,7 @@ public class BICValidatorTest {
 
 	private BICValidator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		validator = new BICValidator();
 		validator.initialize( createBICAnnotation( false, new String[0], new String[0] ) );
@@ -80,12 +81,12 @@ public class BICValidatorTest {
 		assertInvalidBIC( "deuTDEFF" );
 	}
 
-	@DataProvider
-	public Object[][] lowercaseModes() {
+	public static Object[][] lowercaseModes() {
 		return new Object[][] { { false }, { true } };
 	}
 
-	@Test(dataProvider = "lowercaseModes")
+	@ParameterizedTest
+	@MethodSource("lowercaseModes")
 	public void alphanumericBankCodes(boolean allowLowercase) {
 		validator.initialize( createBICAnnotation( allowLowercase, new String[0], new String[0] ) );
 		assertValidBIC( "D3UTDEFF" );
@@ -104,7 +105,8 @@ public class BICValidatorTest {
 		}
 	}
 
-	@Test(dataProvider = "lowercaseModes")
+	@ParameterizedTest
+	@MethodSource("lowercaseModes")
 	public void nonAsciiCharactersAreInvalid(boolean allowLowercase) {
 		validator.initialize( createBICAnnotation( allowLowercase, new String[0], new String[0] ) );
 		// Greek/fullwidth letters, Arabic/fullwidth digits and uncased letters.
@@ -257,20 +259,19 @@ public class BICValidatorTest {
 		assertValidBIC( "DEUTDE0FXXX" );
 	}
 
-	@Test
-	public void testInvalidCountryCodeInAttribute() throws Exception {
-		// Invalid country codes in the countryCodes attribute should throw IllegalArgumentException
-		assertThrows( IllegalArgumentException.class, () -> {
-			validator.initialize( createBICAnnotation( false, new String[] { "ZZ" }, new String[0] ) );
-		} );
+	public static Object[][] invalidCountryCodes() {
+		return new Object[][] {
+				{ new String[] { "ZZ" } },
+				{ new String[] { "DE", "INVALID" } },
+				{ new String[] { "XX" } }
+		};
+	}
 
-		assertThrows( IllegalArgumentException.class, () -> {
-			validator.initialize( createBICAnnotation( false, new String[] { "DE", "INVALID" }, new String[0] ) );
-		} );
-
-		assertThrows( IllegalArgumentException.class, () -> {
-			validator.initialize( createBICAnnotation( false, new String[] { "XX" }, new String[0] ) );
-		} );
+	@ParameterizedTest
+	@MethodSource("invalidCountryCodes")
+	public void testInvalidCountryCodeInAttribute(String[] countryCodes) {
+		assertThatThrownBy( () -> validator.initialize( createBICAnnotation( false, countryCodes, new String[0] ) ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

@@ -6,7 +6,7 @@ package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.lang.annotation.Retention;
@@ -33,17 +33,19 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MessageInterpolationTest {
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void createValidator() throws Exception {
 		final StringBuilder lines = new StringBuilder();
 		lines.append( "bar=Message is \\\\{escaped\\\\}" ).append( "\r\n" );
@@ -79,35 +81,35 @@ public class MessageInterpolationTest {
 	@TestForIssue(jiraKey = "HV-184")
 	public void testCurlyBracesEscapingShouldBeRespected() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Bar.class ).iterator().next();
-		assertEquals( violation.getMessage(), "Message is {escaped}" );
+		assertEquals( "Message is {escaped}", violation.getMessage() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-184")
 	public void testAppendReplacementNeedsToEscapeBackslashAndDollarSign() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Baz.class ).iterator().next();
-		assertEquals( violation.getMessage(), "Message is US$ 5" );
+		assertEquals( "Message is US$ 5", violation.getMessage() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-184")
 	public void testUnknownParametersShouldBePreserved() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Qux.class ).iterator().next();
-		assertEquals( violation.getMessage(), "Message is {missing}" );
+		assertEquals( "Message is {missing}", violation.getMessage() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-506")
 	public void testInterpolationOfArrayParameter() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Buz.class ).iterator().next();
-		assertEquals( violation.getMessage(), "Message is [bar, baz, qux]" );
+		assertEquals( "Message is [bar, baz, qux]", violation.getMessage() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-729")
 	public void testDollarSignEscapingShouldBeRespected() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Zap.class ).iterator().next();
-		assertEquals( violation.getMessage(), "Message is $10" );
+		assertEquals( "Message is $10", violation.getMessage() );
 	}
 
 	public interface Bar {

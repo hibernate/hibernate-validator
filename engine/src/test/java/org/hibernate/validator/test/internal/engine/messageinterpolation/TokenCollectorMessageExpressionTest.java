@@ -4,14 +4,17 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
 
+import org.junit.jupiter.api.Test;
+
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
-import org.testng.annotations.Test;
 
 /**
  * Tests for {@code TokenCollector} in message expression mode.
@@ -86,9 +89,11 @@ public class TokenCollectorMessageExpressionTest extends AbstractTokenCollectorT
 				.returns( false, Token::isParameter );
 	}
 
-	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
+	@Test
 	public void testDollarThenClosingBraceThrowsException() {
-		new TokenCollector( "$}", getInterpolationTermType() );
+		assertThatThrownBy( () -> new TokenCollector( "$}", getInterpolationTermType() ) )
+				.isInstanceOf( MessageDescriptorFormatException.class )
+				.hasMessageMatching( "HV000168.*" );
 	}
 
 	@Test

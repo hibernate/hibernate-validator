@@ -20,13 +20,13 @@ import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class NotCompromisedConstrainedTest extends AbstractConstrainedTest {
 
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()

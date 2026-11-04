@@ -5,6 +5,7 @@
 
 package org.hibernate.validator.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -36,8 +37,8 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -46,7 +47,7 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 	private HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = getConfiguration( HibernateValidator.class );
 	}
@@ -167,106 +168,127 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void canDeclareContainerElementConstraintsForArrayTypedFieldProgrammatically() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "fishNames" )
-				.containerElementType()
-				.constraint( new SizeDef().max( 5 ) );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "fishNames" )
+					.containerElementType()
+					.constraint( new SizeDef().max( 5 ) );
 
-		config.addMapping( newMapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
+			config.addMapping( newMapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
 
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+			Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void canDeclareContainerElementConstraintsForListContainingArrayTypeFieldProgrammatically() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "fishNamesByMonth" )
-				.containerElementType( 0, 0 )
-				.constraint( new SizeDef().max( 5 ) );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "fishNamesByMonth" )
+					.containerElementType( 0, 0 )
+					.constraint( new SizeDef().max( 5 ) );
 
-		config.addMapping( newMapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
+			config.addMapping( newMapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
 
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+			Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000226:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void canDeclareContainerElementConstraintsForMultiDimensionalArrayTypeFieldProgrammatically() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "fishNamesByMonthAsArray" )
-				.containerElementType( 0, 0 )
-				.constraint( new SizeDef().max( 5 ) );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "fishNamesByMonthAsArray" )
+					.containerElementType( 0, 0 )
+					.constraint( new SizeDef().max( 5 ) );
 
-		config.addMapping( newMapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
+			config.addMapping( newMapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
 
-		Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
+			Set<ConstraintViolation<FishTank>> violations = validator.validate( new FishTank() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( Size.class ).withMessage( "size must be between 0 and 5" )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000226:.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000211.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void declaringContainerElementConstraintOnNonGenericFieldCausesException() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "size" )
-				.containerElementType( 1 );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "size" )
+					.containerElementType( 1 );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000211.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void declaringContainerElementConstraintForNonExistingTypeArgumentIndexOnFieldCausesException() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "model" )
-				.containerElementType( 2 );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "model" )
+					.containerElementType( 2 );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000212.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void declaringContainerElementConstraintForNonExistingNestedTypeArgumentIndexOnFieldCausesException() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "fishOfTheMonth" )
-				.containerElementType( 1, 2 );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "fishOfTheMonth" )
+					.containerElementType( 1, 2 );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000212.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void omittingTypeArgumentForMultiTypeArgumentTypeOnFieldCausesException() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "fishCountByType" )
-				.containerElementType();
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "fishCountByType" )
+					.containerElementType();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000213.*" );
 	}
 
 	@Test
@@ -296,16 +318,19 @@ public class ProgrammaticContainerElementConstraintsForFieldTest {
 		);
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1239")
 	public void configuringSameContainerElementTwiceCausesException() {
-		ConstraintMapping newMapping = config.createConstraintMapping();
-		newMapping
-				.type( FishTank.class )
-				.field( "tagsOfFishOfTheMonth" )
-				.containerElementType( 0, 1, 0 )
-				.constraint( new NotNullDef() )
-				.containerElementType( 0, 1, 0 );
+		assertThatThrownBy( () -> {
+			ConstraintMapping newMapping = config.createConstraintMapping();
+			newMapping
+					.type( FishTank.class )
+					.field( "tagsOfFishOfTheMonth" )
+					.containerElementType( 0, 1, 0 )
+					.constraint( new NotNullDef() )
+					.containerElementType( 0, 1, 0 );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000214.*" );
 	}
 
 	public static class FishTank {

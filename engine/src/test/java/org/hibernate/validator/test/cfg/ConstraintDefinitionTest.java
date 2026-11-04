@@ -9,6 +9,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 
@@ -35,8 +36,8 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link ConstraintMapping#constraintDefinition(Class)} et al.
@@ -49,26 +50,24 @@ public class ConstraintDefinitionTest {
 	private HibernateValidatorConfiguration config;
 	private DefaultConstraintMapping mapping;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		mapping = (DefaultConstraintMapping) config.createConstraintMapping();
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The annotation type must not be null when creating a constraint definition."
-	)
+	@Test
 	public void testNullClass() {
-		mapping.constraintDefinition( null );
+		assertThatThrownBy( () -> mapping.constraintDefinition( null ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV[0-9]*: The annotation type must not be null when creating a constraint definition." );
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The annotation type must be annotated with @jakarta.validation.Constraint when creating a constraint definition."
-	)
+	@Test
 	public void testNonConstraintAnnotation() {
-		mapping.constraintDefinition( NonConstraintAnnotation.class );
+		assertThatThrownBy( () -> mapping.constraintDefinition( NonConstraintAnnotation.class ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV[0-9]*: The annotation type must be annotated with @jakarta.validation.Constraint when creating a constraint definition." );
 	}
 
 	@Test
@@ -157,36 +156,36 @@ public class ConstraintDefinitionTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*:"
-					+ " .*\\$ConstraintAnnotation is configured more than once via the programmatic constraint definition API."
-	)
+	@Test
 	public void testMultipleDefinitionForSameConstraintOnSameConstraintMapping() {
-		mapping.constraintDefinition( ConstraintAnnotation.class )
-				.validatedBy( NonDefaultLongValidator.class )
-				.constraintDefinition( ConstraintAnnotation.class )
-				.includeExistingValidators( false )
-				.validatedBy( NonDefaultIntegerValidator.class );
+		assertThatThrownBy( () -> {
+			mapping.constraintDefinition( ConstraintAnnotation.class )
+					.validatedBy( NonDefaultLongValidator.class )
+					.constraintDefinition( ConstraintAnnotation.class )
+					.includeExistingValidators( false )
+					.validatedBy( NonDefaultIntegerValidator.class );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV[0-9]*:"
+						+ " .*\\$ConstraintAnnotation is configured more than once via the programmatic constraint definition API." );
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*:"
-					+ " .*\\$ConstraintAnnotation is configured more than once via the programmatic constraint definition API."
-	)
+	@Test
 	public void testMultipleDefinitionForSameConstraintOnDifferentConstraintMappings() {
-		mapping.constraintDefinition( ConstraintAnnotation.class )
-				.validatedBy( NonDefaultLongValidator.class );
+		assertThatThrownBy( () -> {
+			mapping.constraintDefinition( ConstraintAnnotation.class )
+					.validatedBy( NonDefaultLongValidator.class );
 
-		ConstraintMapping otherMapping = config.createConstraintMapping();
-		otherMapping.constraintDefinition( ConstraintAnnotation.class )
-				.includeExistingValidators( false )
-				.validatedBy( NonDefaultIntegerValidator.class );
+			ConstraintMapping otherMapping = config.createConstraintMapping();
+			otherMapping.constraintDefinition( ConstraintAnnotation.class )
+					.includeExistingValidators( false )
+					.validatedBy( NonDefaultIntegerValidator.class );
 
-		config.addMapping( mapping );
-		config.addMapping( otherMapping );
-		config.buildValidatorFactory().getValidator();
+			config.addMapping( mapping );
+			config.addMapping( otherMapping );
+			config.buildValidatorFactory().getValidator();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV[0-9]*:"
+						+ " .*\\$ConstraintAnnotation is configured more than once via the programmatic constraint definition API." );
 	}
 
 	@Test
@@ -251,31 +250,31 @@ public class ConstraintDefinitionTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = UnexpectedTypeException.class,
-			expectedExceptionsMessageRegExp = "HV000150:.*"
-	)
+	@Test
 	public void testMultipleValidatorsForSameType() {
-		mapping.constraintDefinition( ConstraintAnnotation.class )
-				.includeExistingValidators( true )
-				.validatedBy( NonDefaultIntegerValidator.class );
+		assertThatThrownBy( () -> {
+			mapping.constraintDefinition( ConstraintAnnotation.class )
+					.includeExistingValidators( true )
+					.validatedBy( NonDefaultIntegerValidator.class );
 
-		config.addMapping( mapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
-		validator.validate( new ConstrainedIntegerFieldBean() );
+			config.addMapping( mapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
+			validator.validate( new ConstrainedIntegerFieldBean() );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000150:.*" );
 	}
 
-	@Test(
-			expectedExceptions = UnexpectedTypeException.class,
-			expectedExceptionsMessageRegExp = "HV000150:.*"
-	)
+	@Test
 	public void testMultipleValidatorsForSameTypeWithNoCallToIncludeExistingValidators() {
-		mapping.constraintDefinition( ConstraintAnnotation.class )
-				.validatedBy( NonDefaultIntegerValidator.class );
+		assertThatThrownBy( () -> {
+			mapping.constraintDefinition( ConstraintAnnotation.class )
+					.validatedBy( NonDefaultIntegerValidator.class );
 
-		config.addMapping( mapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
-		validator.validate( new ConstrainedIntegerFieldBean() );
+			config.addMapping( mapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
+			validator.validate( new ConstrainedIntegerFieldBean() );
+		} ).isInstanceOf( UnexpectedTypeException.class )
+				.hasMessageMatching( "HV000150:.*" );
 	}
 
 	@Test

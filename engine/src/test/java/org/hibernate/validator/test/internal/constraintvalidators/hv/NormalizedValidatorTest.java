@@ -4,18 +4,22 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.Normalizer;
+import java.util.stream.Stream;
 
 import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the {@link Normalized} constraint.
@@ -26,21 +30,28 @@ public class NormalizedValidatorTest {
 
 	private ConstraintAnnotationDescriptor.Builder<Normalized> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Normalized.class );
 	}
 
-	@Test
-	public void testIsValid() {
+	@ParameterizedTest
+	@MethodSource("testIsValidData")
+	public void testIsValid(String value) {
 		descriptorBuilder.setMessage( "{validator.Normalized}" );
 		Normalized l = descriptorBuilder.build().getAnnotation();
 		NormalizedValidator constraint = new NormalizedValidator();
 		constraint.initialize( l );
-		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( "", null ) );
-		assertTrue( constraint.isValid( "foobar", null ) );
-		assertTrue( constraint.isValid( "\uFE64script\uFE65", null ) );
+		assertTrue( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testIsValidData() {
+		return Stream.of(
+				Arguments.of( (String) null ),
+				Arguments.of( "" ),
+				Arguments.of( "foobar" ),
+				Arguments.of( "\uFE64script\uFE65" )
+		);
 	}
 
 	@Test

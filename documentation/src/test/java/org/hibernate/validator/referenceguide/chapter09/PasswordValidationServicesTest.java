@@ -7,9 +7,9 @@ package org.hibernate.validator.referenceguide.chapter09;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -25,8 +25,8 @@ import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class PasswordValidationServicesTest {
 
@@ -46,14 +46,14 @@ public class PasswordValidationServicesTest {
 		assertTrue( result.score() >= PasswordStrengthScore.STRONG );
 	}
 
-	@Ignore("Requires network access to the Have I Been Pwned API")
+	@Disabled("Requires network access to the Have I Been Pwned API")
 	@Test
 	public void haveIBeenPwnedCompromisedPassword() {
 		HaveIBeenPwnedPasswordChecker checker = new HaveIBeenPwnedPasswordChecker();
 		assertTrue( checker.check( "password".toCharArray() ).compromised() );
 	}
 
-	@Ignore("Requires network access to the Have I Been Pwned API")
+	@Disabled("Requires network access to the Have I Been Pwned API")
 	@Test
 	public void haveIBeenPwnedSafePassword() {
 		HaveIBeenPwnedPasswordChecker checker = new HaveIBeenPwnedPasswordChecker();
@@ -82,7 +82,7 @@ public class PasswordValidationServicesTest {
 		assertNoViolations( violations );
 	}
 
-	@Ignore("Requires network access to the Have I Been Pwned API")
+	@Disabled("Requires network access to the Have I Been Pwned API")
 	@Test
 	public void notCompromisedValidation() {
 		//tag::compromisedRegistration[]

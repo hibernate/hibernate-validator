@@ -8,7 +8,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import jakarta.validation.Validator;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Marko Bekhta
@@ -17,7 +17,7 @@ public abstract class AbstractConstrainedTest {
 
 	protected Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		validator = getValidator();
 	}

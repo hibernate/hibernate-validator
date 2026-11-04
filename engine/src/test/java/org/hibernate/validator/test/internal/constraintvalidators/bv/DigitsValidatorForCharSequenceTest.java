@@ -4,8 +4,11 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Stream;
 
 import jakarta.validation.constraints.Digits;
 
@@ -14,19 +17,24 @@ import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDesc
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Alaa Nassef
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DigitsValidatorForCharSequenceTest {
 
 	private static DigitsValidatorForCharSequence constraint;
 	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setAttribute( "integer", 5 );
@@ -38,42 +46,63 @@ public class DigitsValidatorForCharSequenceTest {
 		constraint.initialize( p );
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 	}
 
+	@ParameterizedTest
+	@MethodSource("testValidData")
+	public void testValid(String value) {
+		assertTrue( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testValidData() {
+		return Stream.of(
+				Arguments.of( (String) null ),
+				Arguments.of( "0" ),
+				Arguments.of( "500.2" ),
+				Arguments.of( "-12456.22" ),
+				Arguments.of( "-000000000.22" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testInvalidData")
+	public void testInvalid(String value) {
+		assertFalse( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testInvalidData() {
+		return Stream.of(
+				Arguments.of( "" ),
+				Arguments.of( "256874.0" ),
+				Arguments.of( "12.0001" )
+		);
+	}
+
 	@Test
-	public void testIsValid() {
-		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( "0", null ) );
-		assertTrue( constraint.isValid( "500.2", null ) );
-		assertTrue( constraint.isValid( "-12456.22", null ) );
-		assertTrue( constraint.isValid( "-000000000.22", null ) );
-		//should throw number format exception
-		assertFalse( constraint.isValid( "", null ) );
-		assertFalse( constraint.isValid( "256874.0", null ) );
-		assertFalse( constraint.isValid( "12.0001", null ) );
-	}
-
-	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNegativeIntegerLength() {
-		descriptorBuilder.setAttribute( "integer", -1 );
-		descriptorBuilder.setAttribute( "fraction", 1 );
-		Digits p = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			descriptorBuilder.setAttribute( "integer", -1 );
+			descriptorBuilder.setAttribute( "fraction", 1 );
+			Digits p = descriptorBuilder.build().getAnnotation();
 
-		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
-		constraint.initialize( p );
+			DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
+			constraint.initialize( p );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeFractionLength() {
-		descriptorBuilder.setAttribute( "integer", 1 );
-		descriptorBuilder.setAttribute( "fraction", -1 );
-		Digits p = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			descriptorBuilder.setAttribute( "integer", 1 );
+			descriptorBuilder.setAttribute( "fraction", -1 );
+			Digits p = descriptorBuilder.build().getAnnotation();
 
-		DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
-		constraint.initialize( p );
+			DigitsValidatorForCharSequence constraint = new DigitsValidatorForCharSequence();
+			constraint.initialize( p );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

@@ -15,10 +15,10 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
 
+import org.junit.jupiter.api.Test;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-
-import org.testng.annotations.Test;
 
 /**
  * Asserts constraints mappings contributed via {@code validation.xml} are applied.

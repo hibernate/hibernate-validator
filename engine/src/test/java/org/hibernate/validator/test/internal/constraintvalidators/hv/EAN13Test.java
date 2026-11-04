@@ -22,7 +22,7 @@ import org.hibernate.validator.cfg.defs.EANDef;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik

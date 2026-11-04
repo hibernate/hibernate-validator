@@ -102,8 +102,9 @@ import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 
+import org.junit.jupiter.api.Test;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * Test that all the messages of all the constraints are properly interpolated for all the supported locales.

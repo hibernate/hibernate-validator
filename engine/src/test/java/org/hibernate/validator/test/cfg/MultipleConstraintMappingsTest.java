@@ -4,9 +4,10 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -26,8 +27,8 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link org.hibernate.validator.cfg.ConstraintMapping} et al.
@@ -37,7 +38,7 @@ import org.testng.annotations.Test;
 public class MultipleConstraintMappingsTest {
 	HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = getConfiguration( HibernateValidator.class );
 	}
@@ -62,113 +63,137 @@ public class MultipleConstraintMappingsTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Marathon.class );
 		assertTrue( beanDescriptor.isBeanConstrained(), "There should be constraints defined on the Marathon class" );
 		assertEquals(
-				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"name",
+				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"The property name should be constrained"
 		);
 
 		beanDescriptor = validator.getConstraintsForClass( Runner.class );
 		assertTrue( beanDescriptor.isBeanConstrained(), "There should be constraints defined on the Runner class" );
 		assertEquals(
-				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"name",
+				beanDescriptor.getConstrainedProperties().iterator().next().getPropertyName(),
 				"The property name should be constrained"
 		);
 	}
 
 	@TestForIssue(jiraKey = "HV-500")
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000171.*")
+	@Test
 	public void testSameTypeConfiguredSeveralTimesInSameConstraintMappingCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping
-				.type( Marathon.class )
-				.defaultGroupSequence( Foo.class, Marathon.class )
-				.type( Marathon.class );
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping
+					.type( Marathon.class )
+					.defaultGroupSequence( Foo.class, Marathon.class )
+					.type( Marathon.class );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000171.*" );
 	}
 
 	@TestForIssue(jiraKey = "HV-500")
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000171.*")
+	@Test
 	public void testSameTypeConfiguredSeveralTimesInDifferentConstraintMappingsCausesException() {
-		ConstraintMapping marathonMapping1 = config.createConstraintMapping();
-		marathonMapping1.type( Marathon.class )
-				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping1 = config.createConstraintMapping();
+			marathonMapping1.type( Marathon.class )
+					.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
 
-		ConstraintMapping marathonMapping2 = config.createConstraintMapping();
-		marathonMapping2.type( Marathon.class )
-				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
+			ConstraintMapping marathonMapping2 = config.createConstraintMapping();
+			marathonMapping2.type( Marathon.class )
+					.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
 
-		config.addMapping( marathonMapping1 );
-		config.addMapping( marathonMapping2 );
+			config.addMapping( marathonMapping1 );
+			config.addMapping( marathonMapping2 );
 
-		config.buildValidatorFactory().getValidator();
+			config.buildValidatorFactory().getValidator();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000171.*" );
 	}
 
 	@TestForIssue(jiraKey = "HV-500")
-	@Test(expectedExceptions = GroupDefinitionException.class, expectedExceptionsMessageRegExp = "HV000052.*")
+	@Test
 	public void testConfigurationOfSequenceProviderAndGroupSequenceCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping.type( Marathon.class )
-				.defaultGroupSequence( Foo.class, Marathon.class )
-				.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping.type( Marathon.class )
+					.defaultGroupSequence( Foo.class, Marathon.class )
+					.defaultGroupSequenceProviderClass( MarathonDefaultGroupSequenceProvider.class );
 
-		config.addMapping( marathonMapping );
-		Validator validator = config.buildValidatorFactory().getValidator();
-		validator.validate( new Marathon() );
+			config.addMapping( marathonMapping );
+			Validator validator = config.buildValidatorFactory().getValidator();
+			validator.validate( new Marathon() );
+		} ).isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( "HV000052.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000172.*")
+	@Test
 	public void testSamePropertyConfiguredSeveralTimesCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping.type( Marathon.class )
-				.getter( "name" )
-				.constraint( new NotNullDef() )
-				.getter( "name" );
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping.type( Marathon.class )
+					.getter( "name" )
+					.constraint( new NotNullDef() )
+					.getter( "name" );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000172.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000173.*")
+	@Test
 	public void testSameMethodConfiguredSeveralTimesCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping.type( Marathon.class )
-				.method( "setTournamentDate", Date.class )
-				.parameter( 0 )
-				.constraint( new NotNullDef() )
-				.method( "setTournamentDate", Date.class );
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping.type( Marathon.class )
+					.method( "setTournamentDate", Date.class )
+					.parameter( 0 )
+					.constraint( new NotNullDef() )
+					.method( "setTournamentDate", Date.class );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000173.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000174.*")
+	@Test
 	public void testSameParameterConfiguredSeveralTimesCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping.type( Marathon.class )
-				.method( "setTournamentDate", Date.class )
-				.parameter( 0 )
-				.constraint( new NotNullDef() )
-				.parameter( 0 );
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping.type( Marathon.class )
+					.method( "setTournamentDate", Date.class )
+					.parameter( 0 )
+					.constraint( new NotNullDef() )
+					.parameter( 0 );
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000174.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000175.*")
+	@Test
 	public void testReturnValueConfiguredSeveralTimesCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping.type( Marathon.class )
-				.method( "addRunner", Runner.class )
-				.returnValue()
-				.constraint( new AssertFalseDef() )
-				.parameter( 0 )
-				.returnValue();
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping.type( Marathon.class )
+					.method( "addRunner", Runner.class )
+					.returnValue()
+					.constraint( new AssertFalseDef() )
+					.parameter( 0 )
+					.returnValue();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000175.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000177.*")
+	@Test
 	public void testCrossParameterConfiguredSeveralTimesCausesException() {
-		ConstraintMapping marathonMapping = config.createConstraintMapping();
-		marathonMapping.type( Marathon.class )
-				.method( "addRunner", Runner.class )
-				.crossParameter()
-				.constraint(
-						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
-								GenericAndCrossParameterConstraint.class
-						)
-				)
-				.parameter( 0 )
-				.crossParameter();
+		assertThatThrownBy( () -> {
+			ConstraintMapping marathonMapping = config.createConstraintMapping();
+			marathonMapping.type( Marathon.class )
+					.method( "addRunner", Runner.class )
+					.crossParameter()
+					.constraint(
+							new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+									GenericAndCrossParameterConstraint.class
+							)
+					)
+					.parameter( 0 )
+					.crossParameter();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000177.*" );
 	}
 
 	private interface Foo {

@@ -4,9 +4,10 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 
@@ -17,8 +18,9 @@ import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutils.LuhnTestUtil;
 import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for the {@code LuhnCheckValidator}.
@@ -28,32 +30,36 @@ import org.testng.annotations.Test;
  */
 public class LuhnCheckValidatorTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidStartIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( -1, Integer.MAX_VALUE, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidEndIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 0, -1, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testEndIndexLessThanStartIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 5, 0, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidCheckDigitIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 0, 10, 5, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -119,8 +125,7 @@ public class LuhnCheckValidatorTest {
 		assertFalse( validator.isValid( "79927398714", null ) );
 	}
 
-	@DataProvider
-	public Object[][] rawRanges() {
+	public static Object[][] rawRanges() {
 		return new Object[][] {
 				{ 0, Integer.MAX_VALUE, -1 },
 				{ 4, Integer.MAX_VALUE, -1 },
@@ -140,7 +145,8 @@ public class LuhnCheckValidatorTest {
 		};
 	}
 
-	@Test(dataProvider = "rawRanges")
+	@ParameterizedTest
+	@MethodSource("rawRanges")
 	public void testRawRangesMatchIndependentLegacyReference(int start, int end, int checkIndex) {
 		Random random = new Random( 906 );
 		String characters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
@@ -161,7 +167,7 @@ public class LuhnCheckValidatorTest {
 					"79927398713-",
 					"123-7992739871-3-456",
 					new StringBuilder( "18" ) } ) {
-				assertEquals( validator.isValid( value, null ), LuhnTestUtil.isValidLegacy( value, start, end, checkIndex, ignore ) );
+				assertEquals( LuhnTestUtil.isValidLegacy( value, start, end, checkIndex, ignore ), validator.isValid( value, null ) );
 			}
 			for ( int sample = 0; sample < 100; sample++ ) {
 				StringBuilder value = new StringBuilder();
@@ -171,7 +177,7 @@ public class LuhnCheckValidatorTest {
 							? (char) ( '0' + random.nextInt( 10 ) )
 							: characters.charAt( random.nextInt( characters.length() ) ) );
 				}
-				assertEquals( validator.isValid( value, null ), LuhnTestUtil.isValidLegacy( value, start, end, checkIndex, ignore ), value.toString() );
+				assertEquals( LuhnTestUtil.isValidLegacy( value, start, end, checkIndex, ignore ), validator.isValid( value, null ), value.toString() );
 			}
 		}
 	}

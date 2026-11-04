@@ -14,11 +14,11 @@ import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 import org.hibernate.validator.integration.util.MyValidator;
 
+import org.junit.jupiter.api.Test;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * Tests the usage of a custom validation provider coming as part of the deployment unit.

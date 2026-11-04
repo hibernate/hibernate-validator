@@ -4,14 +4,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -28,7 +30,10 @@ import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.Mod11TestUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for the {@code Mod11CheckValidator}.
@@ -38,7 +43,7 @@ import org.testng.annotations.Test;
  */
 public class Mod11CheckValidatorTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidStartIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -50,10 +55,11 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidEndIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -65,10 +71,11 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testEndIndexLessThanStartIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -80,10 +87,11 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidcheckDigitIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -95,7 +103,8 @@ public class Mod11CheckValidatorTest {
 				'0',
 				ProcessingDirection.RIGHT_TO_LEFT
 		);
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -149,8 +158,9 @@ public class Mod11CheckValidatorTest {
 		assertTrue( validator.isValid( "123-456-789-X", null ) );
 	}
 
-	@Test
-	public void testValidMod11() throws Exception {
+	@ParameterizedTest
+	@MethodSource("testValidMod11Data")
+	public void testValidMod11(String value) throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
 				0,
@@ -163,13 +173,20 @@ public class Mod11CheckValidatorTest {
 		);
 		validator.initialize( modCheck );
 
-		assertTrue( validator.isValid( "23322023583", null ) );
-		assertTrue( validator.isValid( "378.796.950-01", null ) );
-		assertTrue( validator.isValid( "331.814.296-43", null ) );
+		assertTrue( validator.isValid( value, null ) );
 	}
 
-	@Test
-	public void testInvalidMod11() throws Exception {
+	private static Stream<Arguments> testValidMod11Data() {
+		return Stream.of(
+				Arguments.of( "23322023583" ),
+				Arguments.of( "378.796.950-01" ),
+				Arguments.of( "331.814.296-43" )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testInvalidMod11Data")
+	public void testInvalidMod11(String value) throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
 				0,
@@ -182,9 +199,15 @@ public class Mod11CheckValidatorTest {
 		);
 		validator.initialize( modCheck );
 
-		assertFalse( validator.isValid( "23322023584", null ) );
-		assertFalse( validator.isValid( "378.796.950-02", null ) );
-		assertFalse( validator.isValid( "331.814.296-52", null ) );
+		assertFalse( validator.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testInvalidMod11Data() {
+		return Stream.of(
+				Arguments.of( "23322023584" ),
+				Arguments.of( "378.796.950-02" ),
+				Arguments.of( "331.814.296-52" )
+		);
 	}
 
 	@Test
@@ -305,8 +328,8 @@ public class Mod11CheckValidatorTest {
 						Mod11CheckValidator validator = new Mod11CheckValidator();
 						validator.initialize( 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction, weights );
 						for ( CharSequence value : new CharSequence[] { null, "", "0Z", "6X", "19", "1٩", "٠Z", " -0", "123456Z" } ) {
-							assertEquals( validator.isValid( value, null ), Mod11TestUtil.isValidLegacy(
-									value, 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction == ProcessingDirection.LEFT_TO_RIGHT, weights ) );
+							assertEquals( Mod11TestUtil.isValidLegacy(
+									value, 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction == ProcessingDirection.LEFT_TO_RIGHT, weights ), validator.isValid( value, null ) );
 						}
 						for ( int sample = 0; sample < 20; sample++ ) {
 							StringBuilder value = new StringBuilder();
@@ -316,8 +339,8 @@ public class Mod11CheckValidatorTest {
 										? (char) ( '0' + random.nextInt( 10 ) )
 										: characters.charAt( random.nextInt( characters.length() ) ) );
 							}
-							assertEquals( validator.isValid( value, null ), Mod11TestUtil.isValidLegacy(
-									value, 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction == ProcessingDirection.LEFT_TO_RIGHT, weights ),
+							assertEquals( Mod11TestUtil.isValidLegacy(
+									value, 0, Integer.MAX_VALUE, -1, ignore, threshold, 'X', 'Z', direction == ProcessingDirection.LEFT_TO_RIGHT, weights ), validator.isValid( value, null ),
 									value.toString() );
 						}
 					}

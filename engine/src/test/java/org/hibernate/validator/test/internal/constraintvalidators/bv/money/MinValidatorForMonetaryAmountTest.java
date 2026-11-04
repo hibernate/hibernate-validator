@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.money.MonetaryAmount;
 
@@ -15,8 +15,9 @@ import jakarta.validation.constraints.Min;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
+import org.junit.jupiter.api.Test;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * @author Lukas Niemeier

@@ -6,7 +6,7 @@ package org.hibernate.validator.test.internal.engine.groups.conversion;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Integrative test for annotation based group conversion.
@@ -15,7 +15,7 @@ import org.testng.annotations.BeforeMethod;
  */
 public class AnnotationBasedGroupConversionTest extends AbstractGroupConversionTest {
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		validator = getValidator();
 	}

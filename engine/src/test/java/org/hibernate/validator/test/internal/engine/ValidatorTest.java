@@ -11,14 +11,15 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -52,7 +53,7 @@ import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -171,7 +172,7 @@ public class ValidatorTest {
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validate( new H() );
 
 		assertNoViolations( constraintViolations );
-		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 2 );
+		assertEquals( 2, CountValidationCallsValidator.getNumberOfValidationCall() );
 	}
 
 	@Test
@@ -181,7 +182,7 @@ public class ValidatorTest {
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateProperty( new H(), "foo" );
 
 		assertNoViolations( constraintViolations );
-		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
+		assertEquals( 1, CountValidationCallsValidator.getNumberOfValidationCall() );
 	}
 
 	@Test
@@ -191,7 +192,7 @@ public class ValidatorTest {
 		Set<ConstraintViolation<H>> constraintViolations = getValidator().validateValue( H.class, "foo", null );
 
 		assertNoViolations( constraintViolations );
-		assertEquals( CountValidationCallsValidator.getNumberOfValidationCall(), 1 );
+		assertEquals( 1, CountValidationCallsValidator.getNumberOfValidationCall() );
 	}
 
 	@Test
@@ -231,16 +232,18 @@ public class ValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		Validator validator = getValidator();
-		validator.unwrap( ValidatorImpl.class );
+		assertThatThrownBy( () -> validator.unwrap( ValidatorImpl.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToExecutableValidatorCausesValidationException() {
 		Validator validator = getValidator();
-		validator.unwrap( ExecutableValidator.class );
+		assertThatThrownBy( () -> validator.unwrap( ExecutableValidator.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -248,10 +251,10 @@ public class ValidatorTest {
 		Validator validator = getValidator();
 
 		Validator asValidator = validator.unwrap( Validator.class );
-		assertSame( asValidator, validator );
+		assertSame( validator, asValidator );
 
 		Object asObject = validator.unwrap( Object.class );
-		assertSame( asObject, validator );
+		assertSame( validator, asObject );
 	}
 
 	@Test
@@ -324,20 +327,24 @@ public class ValidatorTest {
 		);
 	}
 
-	@Test(expectedExceptions = { ValidationException.class }, expectedExceptionsMessageRegExp = "^HV000195:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1002")
 	public void testValidatePropertyWithNestedPathAndNullPropertyInTheWay() {
 		Validator validator = getValidator();
 		X someX = new X();
-		validator.validateProperty( someX, "list[0].foo" );
+		assertThatThrownBy( () -> validator.validateProperty( someX, "list[0].foo" ) )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "^HV000195:.*" );
 	}
 
-	@Test(expectedExceptions = { IllegalArgumentException.class }, expectedExceptionsMessageRegExp = "^HV000039:.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-1002")
 	public void testValidatePropertyWithNestedPathAndMissingValid() {
 		Validator validator = getValidator();
 		M someM = new M();
-		validator.validateProperty( someM, "foo.baz" );
+		assertThatThrownBy( () -> validator.validateProperty( someM, "foo.baz" ) )
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "^HV000039:.*" );
 	}
 
 	@Test

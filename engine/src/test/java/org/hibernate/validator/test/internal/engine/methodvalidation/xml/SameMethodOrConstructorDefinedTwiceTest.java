@@ -4,20 +4,22 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
  */
 public class SameMethodOrConstructorDefinedTwiceTest {
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000137.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-373")
 	public void testSameMethodSpecifiedMoreThanOnceThrowsException() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -26,10 +28,12 @@ public class SameMethodOrConstructorDefinedTwiceTest {
 						"same-method-defined-twice.xml"
 				)
 		);
-		configuration.buildValidatorFactory();
+		assertThatThrownBy( () -> configuration.buildValidatorFactory() )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000137.*" );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000138.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-373")
 	public void testSameConstructorSpecifiedMoreThanOnceThrowsException() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -39,6 +43,8 @@ public class SameMethodOrConstructorDefinedTwiceTest {
 				)
 		);
 
-		configuration.buildValidatorFactory();
+		assertThatThrownBy( () -> configuration.buildValidatorFactory() )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000138.*" );
 	}
 }

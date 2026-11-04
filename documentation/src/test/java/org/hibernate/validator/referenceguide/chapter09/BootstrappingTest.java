@@ -22,7 +22,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.ScriptAssert;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 

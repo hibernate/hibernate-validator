@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -24,14 +25,14 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.spi.password.CompromisedPasswordChecker;
 import org.hibernate.validator.spi.password.CompromisedPasswordResult;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class NotCompromisedValidatorTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -78,13 +79,15 @@ public class NotCompromisedValidatorTest {
 		assertThat( violations ).containsOnlyViolations( violationOf( NotCompromised.class ) );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void missingCheckerThrows() {
-		Validator noServiceValidator = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator();
-		noServiceValidator.validate( new CharSequenceBean( "test" ) );
+		assertThatThrownBy( () -> {
+			Validator noServiceValidator = Validation.byProvider( HibernateValidator.class )
+					.configure()
+					.buildValidatorFactory()
+					.getValidator();
+			noServiceValidator.validate( new CharSequenceBean( "test" ) );
+		} ).isInstanceOf( ValidationException.class );
 	}
 
 	private static class CharSequenceBean {

@@ -4,11 +4,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 import java.util.Set;
@@ -28,8 +29,9 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
 import org.hibernate.validator.testutils.Mod10TestUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for the {@code Mod10CheckValidator}.
@@ -39,32 +41,36 @@ import org.testng.annotations.Test;
  */
 public class Mod10CheckValidatorTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidStartIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( -1, Integer.MAX_VALUE, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidEndIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, -1, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testEndIndexLessThanStartIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 5, 0, -1, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testInvalidCheckDigitIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, 10, 5, false );
-		validator.initialize( modCheck );
+		assertThatThrownBy( () -> validator.initialize( modCheck ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -216,18 +222,21 @@ public class Mod10CheckValidatorTest {
 		assertFalse( validator.isValid( "79927398714", null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeMultiplier() {
-		new Mod10CheckValidator().initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, -1, 1 ) );
+		assertThatThrownBy( () -> {
+			new Mod10CheckValidator().initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, -1, 1 ) );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeWeight() {
-		new Mod10CheckValidator().initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 3, -1 ) );
+		assertThatThrownBy( () -> {
+			new Mod10CheckValidator().initialize( createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 3, -1 ) );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@DataProvider
-	public Object[][] rawRanges() {
+	public static Object[][] rawRanges() {
 		return new Object[][] {
 				{ 0, Integer.MAX_VALUE, -1 },
 				{ 4, Integer.MAX_VALUE, -1 },
@@ -247,7 +256,8 @@ public class Mod10CheckValidatorTest {
 		};
 	}
 
-	@Test(dataProvider = "rawRanges")
+	@ParameterizedTest
+	@MethodSource("rawRanges")
 	public void testRawRangesMatchIndependentLegacyReference(int start, int end, int checkIndex) {
 		Random random = new Random( 813 );
 		String characters = "0123456789٠١٢٣٤٥٦٧٨٩０１２３４５６７８９ -a";
@@ -276,8 +286,7 @@ public class Mod10CheckValidatorTest {
 						"79927398712-",
 						"123-7992739871-2-456",
 						new StringBuilder( "998" ) } ) {
-					assertEquals( validator.isValid( value, null ),
-							Mod10TestUtil.isValidLegacy( value, start, end, checkIndex, ignore, weights[0], weights[1] ) );
+					assertEquals( Mod10TestUtil.isValidLegacy( value, start, end, checkIndex, ignore, weights[0], weights[1] ), validator.isValid( value, null ) );
 				}
 				for ( int sample = 0; sample < 50; sample++ ) {
 					StringBuilder value = new StringBuilder();
@@ -287,8 +296,7 @@ public class Mod10CheckValidatorTest {
 								? (char) ( '0' + random.nextInt( 10 ) )
 								: characters.charAt( random.nextInt( characters.length() ) ) );
 					}
-					assertEquals( validator.isValid( value, null ),
-							Mod10TestUtil.isValidLegacy( value, start, end, checkIndex, ignore, weights[0], weights[1] ), value.toString() );
+					assertEquals( Mod10TestUtil.isValidLegacy( value, start, end, checkIndex, ignore, weights[0], weights[1] ), validator.isValid( value, null ), value.toString() );
 				}
 			}
 		}

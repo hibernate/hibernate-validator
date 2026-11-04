@@ -8,9 +8,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDescriptor;
 import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -25,7 +25,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -42,9 +42,8 @@ public class CrossParameterDescriptorTest {
 		).getCrossParameterDescriptor();
 
 		assertEquals(
-				descriptor.getElementClass(),
-				Object[].class
-		);
+				Object[].class,
+				descriptor.getElementClass() );
 	}
 
 	@Test
@@ -206,16 +205,15 @@ public class CrossParameterDescriptorTest {
 		Set<ConstraintDescriptor<?>> constraintDescriptors = descriptor.findConstraints()
 				.lookingAt( Scope.LOCAL_ELEMENT )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 0 );
+		assertEquals( 0, constraintDescriptors.size() );
 
 		constraintDescriptors = descriptor.findConstraints()
 				.lookingAt( Scope.HIERARCHY )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals( 1, constraintDescriptors.size() );
 		assertEquals(
-				constraintDescriptors.iterator().next().getAnnotation().annotationType(),
-				ConsistentDateParameters.class
-		);
+				ConsistentDateParameters.class,
+				constraintDescriptors.iterator().next().getAnnotation().annotationType() );
 	}
 
 	@Test

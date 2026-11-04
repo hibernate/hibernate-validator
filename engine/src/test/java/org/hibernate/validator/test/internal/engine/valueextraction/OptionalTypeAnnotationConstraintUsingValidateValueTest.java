@@ -33,18 +33,20 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Test usage of {@link Optional} on fields using validate value.
  *
  * @author George Gastaldi
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OptionalTypeAnnotationConstraintUsingValidateValueTest {
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setup() {
 		validator = getValidator();
 	}

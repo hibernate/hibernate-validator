@@ -5,15 +5,17 @@
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintValidatorInitializationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -43,8 +45,8 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -55,7 +57,7 @@ public class ConstraintValidatorManagerTest {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		constraintValidatorFactory = new DefaultConstraintValidatorFactory();
 		constraintValidatorManager = new ConstraintValidatorManagerImpl( constraintValidatorFactory, getDummyConstraintValidatorInitializationContext() );
@@ -154,41 +156,41 @@ public class ConstraintValidatorManagerTest {
 				getDummyConstraintValidatorInitializationContext()
 		);
 
-		assertTrue( constraintValidator instanceof NotNullValidator, "Unexpected validator type" );
+		assertInstanceOf( NotNullValidator.class, constraintValidator, "Unexpected validator type" );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullValidatedValueThrowsIllegalArgumentException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
-		constraintValidatorManager.getInitializedValidator(
+		assertThatThrownBy( () -> constraintValidatorManager.getInitializedValidator(
 				null,
 				constraintDescriptor,
 				constraintValidatorFactory,
 				getDummyConstraintValidatorInitializationContext()
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullDescriptorThrowsIllegalArgumentException() {
-		constraintValidatorManager.getInitializedValidator(
+		assertThatThrownBy( () -> constraintValidatorManager.getInitializedValidator(
 				String.class,
 				null,
 				constraintValidatorFactory,
 				getDummyConstraintValidatorInitializationContext()
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullFactoryThrowsIllegalArgumentException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
-		constraintValidatorManager.getInitializedValidator(
+		assertThatThrownBy( () -> constraintValidatorManager.getInitializedValidator(
 				String.class,
 				constraintDescriptor,
 				null,
 				getDummyConstraintValidatorInitializationContext()
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -233,8 +235,8 @@ public class ConstraintValidatorManagerTest {
 		);
 
 		assertNotSame(
-				constraintValidator1,
 				constraintValidator2,
+				constraintValidator1,
 				"The validator instances should not be the same"
 		);
 	}
@@ -251,16 +253,16 @@ public class ConstraintValidatorManagerTest {
 					getDummyConstraintValidatorInitializationContext()
 			);
 
-			assertEquals(
-					constraintValidatorManager.numberOfCachedConstraintValidatorInstances(), 1,
+			assertEquals( 1,
+					constraintValidatorManager.numberOfCachedConstraintValidatorInstances(),
 					"There should be only one instance cached"
 			);
 		}
 
 		constraintValidatorManager.clear();
 		assertEquals(
-				constraintValidatorManager.numberOfCachedConstraintValidatorInstances(),
 				0,
+				constraintValidatorManager.numberOfCachedConstraintValidatorInstances(),
 				"Cache should be empty"
 		);
 	}
@@ -544,8 +546,8 @@ public class ConstraintValidatorManagerTest {
 		);
 		Set<ConstraintDescriptor<?>> constraintDescriptorSet = propertyDescriptor.getConstraintDescriptors();
 		assertEquals(
-				constraintDescriptorSet.size(),
 				1,
+				constraintDescriptorSet.size(),
 				"There should be only one constraint descriptor"
 		);
 		return (ConstraintDescriptorImpl<?>) constraintDescriptorSet.iterator().next();

@@ -4,10 +4,10 @@
  */
 package org.hibernate.validator.referenceguide.chapter02.validation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
@@ -18,14 +18,14 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.validation.constraints.NotNull;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class ValidationTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		//tag::setUpValidator[]
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -93,8 +93,7 @@ public class ValidationTest {
 		//tag::nestedPropertyWithoutValid[]
 		CustomerWithoutValid customer = new CustomerWithoutValid();
 
-		assertThrows( IllegalArgumentException.class,
-				() -> validator.validateProperty( customer, "address.city" ) );
+		assertThatThrownBy( () -> validator.validateProperty( customer, "address.city" ) ).isInstanceOf( IllegalArgumentException.class );
 
 		Set<ConstraintViolation<Address>> violations = validator.validateProperty( customer.address, "city" );
 		assertEquals( 1, violations.size() );

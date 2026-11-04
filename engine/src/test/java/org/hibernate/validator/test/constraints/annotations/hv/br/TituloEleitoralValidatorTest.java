@@ -7,8 +7,8 @@ package org.hibernate.validator.test.constraints.annotations.hv.br;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 import java.util.Set;
@@ -21,8 +21,9 @@ import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedT
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.Mod11TestUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class TituloEleitoralValidatorTest extends AbstractConstrainedTest {
 	@Test
@@ -60,13 +61,13 @@ public class TituloEleitoralValidatorTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@Test(dataProvider = "tituloEleitoralBoundaries")
+	@ParameterizedTest
+	@MethodSource("tituloEleitoralBoundaries")
 	public void testTituloEleitoralBoundaries(CharSequence tituloEleitoral, boolean valid) {
-		assertEquals( validator.validate( new Person( tituloEleitoral ) ).isEmpty(), valid );
+		assertEquals( valid, validator.validate( new Person( tituloEleitoral ) ).isEmpty() );
 	}
 
-	@DataProvider
-	public Object[][] tituloEleitoralBoundaries() {
+	public static Object[][] tituloEleitoralBoundaries() {
 		return new Object[][] {
 				{ null, true },
 				{ "", false },
@@ -103,11 +104,9 @@ public class TituloEleitoralValidatorTest extends AbstractConstrainedTest {
 						? (char) ( '0' + random.nextInt( 10 ) )
 						: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 			}
-			assertEquals( validator.validate( new Person( number ) ).isEmpty(),
-					legacyFormat.matcher( number ).matches()
-							&& Mod11TestUtil.isValidLegacy( number, 0, 7, 10, false, 9, '0', '0', false )
-							&& Mod11TestUtil.isValidLegacy( number, 8, 10, 11, false, 9, '0', '0', false ),
-					number.toString() );
+			assertEquals( legacyFormat.matcher( number ).matches()
+					&& Mod11TestUtil.isValidLegacy( number, 0, 7, 10, false, 9, '0', '0', false )
+					&& Mod11TestUtil.isValidLegacy( number, 8, 10, 11, false, 9, '0', '0', false ), validator.validate( new Person( number ) ).isEmpty(), number.toString() );
 		}
 	}
 

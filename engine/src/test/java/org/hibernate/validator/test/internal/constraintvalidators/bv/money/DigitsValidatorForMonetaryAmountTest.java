@@ -4,13 +4,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
+import javax.money.MonetaryAmount;
 
 import jakarta.validation.constraints.Digits;
 
@@ -18,9 +21,13 @@ import org.hibernate.validator.internal.constraintvalidators.bv.money.DigitsVali
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * @author Dario Seidl
@@ -30,14 +37,15 @@ public class DigitsValidatorForMonetaryAmountTest {
 
 	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setMessage( "{validator.digits}" );
 	}
 
-	@Test
-	public void testIsValid() {
+	@ParameterizedTest
+	@MethodSource("testIsValidValidData")
+	public void testIsValidValid(MonetaryAmount value) {
 		descriptorBuilder.setAttribute( "integer", 5 );
 		descriptorBuilder.setAttribute( "fraction", 2 );
 		Digits p = descriptorBuilder.build().getAnnotation();
@@ -45,21 +53,43 @@ public class DigitsValidatorForMonetaryAmountTest {
 		DigitsValidatorForMonetaryAmount constraint = new DigitsValidatorForMonetaryAmount();
 		constraint.initialize( p );
 
+		assertTrue( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testIsValidValidData() {
 		CurrencyUnit currency = Monetary.getCurrency( "EUR" );
+		return Stream.of(
+				Arguments.of( (MonetaryAmount) null ),
+				Arguments.of( Money.of( Byte.valueOf( "0" ), currency ) ),
+				Arguments.of( Money.of( Double.valueOf( "500.2" ), currency ) ),
+				Arguments.of( Money.of( new BigDecimal( "-12345.12" ), currency ) ),
+				Arguments.of( Money.of( Float.valueOf( "-000000000.22" ), currency ) )
+		);
+	}
 
-		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( Money.of( Byte.valueOf( "0" ), currency ), null ) );
-		assertTrue( constraint.isValid( Money.of( Double.valueOf( "500.2" ), currency ), null ) );
+	@ParameterizedTest
+	@MethodSource("testIsValidInvalidData")
+	public void testIsValidInvalid(MonetaryAmount value) {
+		descriptorBuilder.setAttribute( "integer", 5 );
+		descriptorBuilder.setAttribute( "fraction", 2 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
-		assertTrue( constraint.isValid( Money.of( new BigDecimal( "-12345.12" ), currency ), null ) );
-		assertFalse( constraint.isValid( Money.of( new BigDecimal( "-123456.12" ), currency ), null ) );
-		assertFalse( constraint.isValid( Money.of( new BigDecimal( "-123456.123" ), currency ), null ) );
-		assertFalse( constraint.isValid( Money.of( new BigDecimal( "-12345.123" ), currency ), null ) );
-		assertFalse( constraint.isValid( Money.of( new BigDecimal( "12345.123" ), currency ), null ) );
+		DigitsValidatorForMonetaryAmount constraint = new DigitsValidatorForMonetaryAmount();
+		constraint.initialize( p );
 
-		assertTrue( constraint.isValid( Money.of( Float.valueOf( "-000000000.22" ), currency ), null ) );
-		assertFalse( constraint.isValid( Money.of( Integer.valueOf( "256874" ), currency ), null ) );
-		assertFalse( constraint.isValid( Money.of( Double.valueOf( "12.0001" ), currency ), null ) );
+		assertFalse( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testIsValidInvalidData() {
+		CurrencyUnit currency = Monetary.getCurrency( "EUR" );
+		return Stream.of(
+				Arguments.of( Money.of( new BigDecimal( "-123456.12" ), currency ) ),
+				Arguments.of( Money.of( new BigDecimal( "-123456.123" ), currency ) ),
+				Arguments.of( Money.of( new BigDecimal( "-12345.123" ), currency ) ),
+				Arguments.of( Money.of( new BigDecimal( "12345.123" ), currency ) ),
+				Arguments.of( Money.of( Integer.valueOf( "256874" ), currency ) ),
+				Arguments.of( Money.of( Double.valueOf( "12.0001" ), currency ) )
+		);
 	}
 
 	@Test
@@ -78,24 +108,26 @@ public class DigitsValidatorForMonetaryAmountTest {
 		assertFalse( constraint.isValid( Money.of( Double.valueOf( "500.2" ), currency ), null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeIntegerLength() {
 		descriptorBuilder.setAttribute( "integer", -1 );
 		descriptorBuilder.setAttribute( "fraction", 1 );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForMonetaryAmount constraint = new DigitsValidatorForMonetaryAmount();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeFractionLength() {
 		descriptorBuilder.setAttribute( "integer", 1 );
 		descriptorBuilder.setAttribute( "fraction", -1 );
 		Digits p = descriptorBuilder.build().getAnnotation();
 
 		DigitsValidatorForMonetaryAmount constraint = new DigitsValidatorForMonetaryAmount();
-		constraint.initialize( p );
+		assertThatThrownBy( () -> constraint.initialize( p ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

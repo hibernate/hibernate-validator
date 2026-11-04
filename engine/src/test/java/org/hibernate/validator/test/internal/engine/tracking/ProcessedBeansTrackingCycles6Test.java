@@ -8,6 +8,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -15,23 +16,24 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * In this case we have cascading validation on generics.
  */
 public class ProcessedBeansTrackingCycles6Test {
 
-	@DataProvider(name = "validators")
-	public Object[][] createValidators() {
-		return new Object[][] {
-				{ ValidatorUtil.getValidator() },
-				{ ValidatorUtil.getPredefinedValidator( Set.of( Parent.class, ChildWithNoCycles.class, Child.class ) ) }
-		};
+	private static Stream<Arguments> createValidators() {
+		return Stream.of(
+				Arguments.of( ValidatorUtil.getValidator() ),
+				Arguments.of( ValidatorUtil.getPredefinedValidator( Set.of( Parent.class, ChildWithNoCycles.class, Child.class ) ) )
+		);
 	}
 
-	@Test(dataProvider = "validators")
+	@ParameterizedTest
+	@MethodSource("createValidators")
 	public void testCycle(Validator validator) {
 		Parent<ChildWithNoCycles, ChildWithNoCycles> parent = new Parent<>();
 		parent.children = List.of( new ChildWithNoCycles(), new Child( parent ) );

@@ -29,7 +29,7 @@ import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
 import org.hibernate.validator.spi.password.PasswordPolicyRule;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PasswordPolicyTest {
 

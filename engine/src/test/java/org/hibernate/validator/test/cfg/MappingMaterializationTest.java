@@ -34,17 +34,18 @@ import org.hibernate.validator.spi.nodenameprovider.PropertyNodeNameProviderCont
 import org.hibernate.validator.spi.properties.ConstrainableExecutable;
 import org.hibernate.validator.spi.properties.GetterPropertySelectionStrategy;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class MappingMaterializationTest {
 
-	@DataProvider
-	public Object[][] scopes() {
+	public static Object[][] scopes() {
 		return new Object[][] { { false }, { true } };
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void declarationsUseDestinationGetterStrategyAndNames(boolean predefinedScope) {
 		AtomicInteger namingCalls = new AtomicInteger();
 		BaseHibernateValidatorConfiguration<?> source = configuration( predefinedScope )
@@ -71,7 +72,8 @@ public class MappingMaterializationTest {
 		assertThat( namingCalls ).hasValue( 0 );
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void getterFailuresAreDeferred(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -80,7 +82,8 @@ public class MappingMaterializationTest {
 				.isInstanceOf( ValidationException.class ).hasMessageStartingWith( "HV000013" );
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void getterContainerFailuresAreDeferred(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -90,7 +93,8 @@ public class MappingMaterializationTest {
 				.isInstanceOf( ValidationException.class ).hasMessageContaining( "parameterized" );
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void getterMethodCollisionsAreDeferred(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -101,7 +105,8 @@ public class MappingMaterializationTest {
 				.isInstanceOf( ValidationException.class ).hasMessageStartingWith( "HV000173" );
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void contributorsUseDestinationConfiguration(boolean predefinedScope) {
 		try ( ValidatorFactory factory = configuration( predefinedScope )
 				.addProperty( BaseHibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTORS, Contributor.class.getName() )
@@ -122,7 +127,8 @@ public class MappingMaterializationTest {
 				.isInstanceOf( ValidationException.class ).hasMessageContaining( "index" );
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void signatureAndContainerPathsAreCopied(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -145,7 +151,8 @@ public class MappingMaterializationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void laterDeclarationsDoNotChangeAnExistingFactory(boolean predefinedScope) {
 		ConstraintMapping mapping = configuration( predefinedScope ).createConstraintMapping();
 		PropertyConstraintMappingContext property = mapping.type( Bean.class ).field( "values" )
@@ -162,7 +169,8 @@ public class MappingMaterializationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void laterDefinitionMutationsDoNotChangeAnExistingFactory(boolean predefinedScope) {
 		ConstraintMapping mapping = configuration( predefinedScope ).createConstraintMapping();
 		NotNullDef definition = new NotNullDef().message( "first" );
@@ -174,7 +182,8 @@ public class MappingMaterializationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void implicitGetterContainerSelectionIsDistinctFromExplicitZero(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping implicit = config.createConstraintMapping();
@@ -193,7 +202,8 @@ public class MappingMaterializationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void duplicateGetterContainerElementPathReportsTheContainerType(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping mapping = config.createConstraintMapping();

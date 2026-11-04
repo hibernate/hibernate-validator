@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.constraintvalidator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import jakarta.validation.ConstraintDefinitionException;
@@ -11,8 +12,8 @@ import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Guillaume Smet
@@ -22,14 +23,16 @@ public class ConstraintDefinitionTypeMismatchTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = getValidator();
 	}
 
-	@Test(expectedExceptions = ConstraintDefinitionException.class, expectedExceptionsMessageRegExp = "^HV000243:.*")
+	@Test
 	public void constraint_validator_constraint_type_mismatch_causes_exception() {
-		validator.validate( new TypeMismatchBean() );
+		assertThatThrownBy( () -> validator.validate( new TypeMismatchBean() ) )
+				.isInstanceOf( ConstraintDefinitionException.class )
+				.hasMessageMatching( "^HV000243:.*" );
 	}
 
 	public class TypeMismatchBean {

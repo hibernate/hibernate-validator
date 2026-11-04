@@ -16,8 +16,8 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta
@@ -26,7 +26,7 @@ public class MethodPathStringRepresentationTest extends AbstractPathStringRepres
 
 	private CityService cityService;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		this.cityService = new CityServiceImpl();
 	}

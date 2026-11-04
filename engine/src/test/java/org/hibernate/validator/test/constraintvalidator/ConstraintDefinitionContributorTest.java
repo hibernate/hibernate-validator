@@ -15,8 +15,8 @@ import jakarta.validation.Validator;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test related to constraint validator discovery.
@@ -28,7 +28,7 @@ public class ConstraintDefinitionContributorTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = getValidator();
 	}

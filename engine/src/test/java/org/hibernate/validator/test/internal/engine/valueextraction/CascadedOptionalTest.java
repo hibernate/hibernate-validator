@@ -8,8 +8,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertT
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import java.util.Set;
@@ -21,8 +21,9 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Ensure we can handle a field of type T and a getter of type Optional<T>.
@@ -30,11 +31,12 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  */
 @TestForIssue(jiraKey = "HV-1080")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CascadedOptionalTest {
 
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setupValidator() {
 		validator = getValidator();
 	}

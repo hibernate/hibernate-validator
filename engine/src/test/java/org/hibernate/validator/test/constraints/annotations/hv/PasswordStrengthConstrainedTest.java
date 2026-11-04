@@ -21,13 +21,13 @@ import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.spi.password.PasswordStrengthScore;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PasswordStrengthConstrainedTest extends AbstractConstrainedTest {
 
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()

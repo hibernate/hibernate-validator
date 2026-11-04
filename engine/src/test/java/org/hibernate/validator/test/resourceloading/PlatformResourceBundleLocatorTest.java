@@ -7,7 +7,7 @@ package org.hibernate.validator.test.resourceloading;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,8 +23,8 @@ import java.util.ResourceBundle;
 
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -34,7 +34,7 @@ public class PlatformResourceBundleLocatorTest {
 
 	private PlatformResourceBundleLocator bundleLocator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		bundleLocator = new PlatformResourceBundleLocator(
 				BASE_RESOURCE_NAME, new TestClassLoader( PlatformResourceBundleLocatorTest.class.getClassLoader() ),
@@ -45,8 +45,8 @@ public class PlatformResourceBundleLocatorTest {
 	@Test
 	public void multiple_properties_files_can_be_aggregated() {
 		ResourceBundle resourceBundle = bundleLocator.getResourceBundle( Locale.ROOT );
-		assertEquals(
-				resourceBundle.keySet().size(), 2, "There should be two keys since the root bundle is aggregated"
+		assertEquals( 2,
+				resourceBundle.keySet().size(), "There should be two keys since the root bundle is aggregated"
 		);
 		assertThat( resourceBundle.keySet() ).containsOnly( "foo", "bar" );
 	}
@@ -54,8 +54,8 @@ public class PlatformResourceBundleLocatorTest {
 	@Test
 	public void aggregation_works_across_bundle_families() {
 		ResourceBundle resourceBundle = bundleLocator.getResourceBundle( Locale.GERMAN );
-		assertEquals(
-				resourceBundle.keySet().size(), 3, "There should be two keys since the bundle is aggregated"
+		assertEquals( 3,
+				resourceBundle.keySet().size(), "There should be two keys since the bundle is aggregated"
 		);
 		assertThat( resourceBundle.keySet() ).containsOnly( "foo", "bar", "snafu" );
 	}
@@ -63,8 +63,8 @@ public class PlatformResourceBundleLocatorTest {
 	@Test
 	public void the_most_specific_key_value_pair_is_returned() {
 		ResourceBundle resourceBundle = bundleLocator.getResourceBundle( Locale.GERMAN );
-		assertEquals(
-				resourceBundle.getString( "foo" ), "123_de",
+		assertEquals( "123_de",
+				resourceBundle.getString( "foo" ),
 				"The language specific version of the value should be retrieved"
 		);
 	}

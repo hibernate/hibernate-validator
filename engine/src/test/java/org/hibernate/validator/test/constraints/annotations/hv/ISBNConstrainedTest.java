@@ -15,7 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.ISBN;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test to make sure that elements annotated with {@link ISBN} are validated.

@@ -30,14 +30,13 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @TestForIssue(jiraKey = "HV-2283")
 public class RecordExpressionLanguageTest {
 
-	@DataProvider
-	public Object[][] expressions() {
+	public static Object[][] expressions() {
 		// Expression, expected result with properties enabled, expected result with methods enabled, method invocations.
 		Object[][] expressions = {
 				{ "${validatedValue.name}", "Alice", "Alice", 0 },
@@ -70,7 +69,8 @@ public class RecordExpressionLanguageTest {
 		return cases.toArray( new Object[0][] );
 	}
 
-	@Test(dataProvider = "expressions")
+	@ParameterizedTest
+	@MethodSource("expressions")
 	public void record_expression_language_feature_level(ExpressionLanguageFeatureLevel level, String expression, String expectedMessage,
 			int expectedInvocations) {
 		AtomicInteger invocations = new AtomicInteger();

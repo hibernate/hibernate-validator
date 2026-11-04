@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.Hexadecimal.HexStrictness;
@@ -15,8 +15,10 @@ import org.hibernate.validator.internal.constraintvalidators.hv.HexadecimalValid
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests the {@link Hexadecimal} constraint.
@@ -29,7 +31,7 @@ public class HexadecimalValidatorTest {
 	private ConstraintAnnotationDescriptor.Builder<Hexadecimal> descriptorBuilder;
 	private Hexadecimal annotation;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Hexadecimal.class );
 		validator = new HexadecimalValidator();
@@ -208,48 +210,14 @@ public class HexadecimalValidatorTest {
 		assertFalse( validator.isValid( "#ff0088", null ) );
 	}
 
-	@Test
+	@ParameterizedTest
+	@ValueSource(strings = { "^0x", "0x$", "[" })
 	@TestForIssue(jiraKey = "HV-2250")
-	public void rejectsPrefixRegularExpressionStartingWithCaret() {
-		descriptorBuilder.setAttribute( "prefix", "^0x" );
+	public void rejectsInvalidPrefixRegularExpression(String prefix) {
+		descriptorBuilder.setAttribute( "prefix", prefix );
 		annotation = descriptorBuilder.build().getAnnotation();
 
-		try {
-			validator.initialize( annotation );
-			fail( "Expected an IllegalArgumentException" );
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-2250")
-	public void rejectsPrefixRegularExpressionEndsWithDollar() {
-		descriptorBuilder.setAttribute( "prefix", "0x$" );
-		annotation = descriptorBuilder.build().getAnnotation();
-
-		try {
-			validator.initialize( annotation );
-			fail( "Expected an IllegalArgumentException" );
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-2250")
-	public void rejectsInvalidPrefixRegularExpression() {
-		descriptorBuilder.setAttribute( "prefix", "[" );
-		annotation = descriptorBuilder.build().getAnnotation();
-
-		try {
-			validator.initialize( annotation );
-			fail( "Expected an IllegalArgumentException" );
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> validator.initialize( annotation ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 }

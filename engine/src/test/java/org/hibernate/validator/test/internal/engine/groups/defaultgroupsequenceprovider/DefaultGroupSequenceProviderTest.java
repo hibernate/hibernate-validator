@@ -30,43 +30,42 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DefaultGroupSequenceProviderTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void init() {
 		validator = getValidator();
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
-	)
+	@Test
 	public void testNullProviderDefaultGroupSequence() {
-		validator.validate( new A() );
+		assertThatThrownBy( () -> validator.validate( new A() ) )
+				.isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( ".* must be part of the redefined default group sequence." );
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = ".* must be part of the redefined default group sequence."
-	)
+	@Test
 	public void testNotValidProviderDefaultGroupSequenceDefinition() {
-		validator.validate( new B() );
+		assertThatThrownBy( () -> validator.validate( new B() ) )
+				.isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( ".* must be part of the redefined default group sequence." );
 	}
 
-	@Test(
-			expectedExceptions = GroupDefinitionException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The default group sequence provider defined for .* has the wrong type"
-	)
+	@Test
 	public void testDefinitionOfDefaultGroupSequenceProviderWithWrongType() {
-		validator.validate( new D() );
+		assertThatThrownBy( () -> validator.validate( new D() ) )
+				.isInstanceOf( GroupDefinitionException.class )
+				.hasMessageMatching( "HV[0-9]*: The default group sequence provider defined for .* has the wrong type" );
 	}
 
 	@Test

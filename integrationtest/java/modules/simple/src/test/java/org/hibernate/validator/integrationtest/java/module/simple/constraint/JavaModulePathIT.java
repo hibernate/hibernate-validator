@@ -13,7 +13,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.integrationtest.java.module.simple.model.Car;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class JavaModulePathIT {
 

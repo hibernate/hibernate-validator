@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test to make sure that elements annotated with {@link Hexadecimal} are validated.

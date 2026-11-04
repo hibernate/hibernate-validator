@@ -5,12 +5,14 @@
 package org.hibernate.validator.integration.wildfly.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;
+
+import org.junit.jupiter.api.Test;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
@@ -18,8 +20,6 @@ import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-
-import org.testng.annotations.Test;
 
 /**
  * Tests the usage of HV by Jakarta Persistence, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
@@ -61,19 +61,16 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 
 	@Test
 	public void testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured() throws Exception {
-		try {
-			magicianService.storeMagician();
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (Exception e) {
-			Throwable rootException = getRootException( e );
-			assertThat( rootException ).isExactlyInstanceOf( ConstraintViolationException.class );
+		assertThatThrownBy( () -> magicianService.storeMagician() )
+				.satisfies( e -> {
+					Throwable rootException = getRootException( e );
+					assertThat( rootException ).isExactlyInstanceOf( ConstraintViolationException.class );
 
-			ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
-			assertThat( constraintViolationException.getConstraintViolations() ).hasSize( 1 );
-			assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
-					.isEqualTo( "Invalid magician name" );
-		}
+					ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
+					assertThat( constraintViolationException.getConstraintViolations() ).hasSize( 1 );
+					assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
+							.isEqualTo( "Invalid magician name" );
+				} );
 	}
 
 	/**
@@ -83,19 +80,16 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 	// TODO How to make that work reliably also after a HV upgrade within WF?
 	@Test
 	public void testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip() throws Exception {
-		try {
-			magicianService.storeWand();
-			fail( "Expected exception wasn't raised" );
-		}
-		catch (Exception e) {
-			Throwable rootException = getRootException( e );
-			assertThat( rootException ).isExactlyInstanceOf( ConstraintViolationException.class );
+		assertThatThrownBy( () -> magicianService.storeWand() )
+				.satisfies( e -> {
+					Throwable rootException = getRootException( e );
+					assertThat( rootException ).isExactlyInstanceOf( ConstraintViolationException.class );
 
-			ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
-			assertThat( constraintViolationException.getConstraintViolations() ).hasSize( 1 );
-			assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
-					.isEqualTo( "size must be between 5 and 2147483647" );
-		}
+					ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
+					assertThat( constraintViolationException.getConstraintViolations() ).hasSize( 1 );
+					assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
+							.isEqualTo( "size must be between 5 and 2147483647" );
+				} );
 	}
 
 	private Throwable getRootException(Throwable throwable) {

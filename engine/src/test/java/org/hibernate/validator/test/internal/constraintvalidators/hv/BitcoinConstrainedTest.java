@@ -16,7 +16,7 @@ import jakarta.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class BitcoinConstrainedTest extends AbstractConstrainedTest {
 

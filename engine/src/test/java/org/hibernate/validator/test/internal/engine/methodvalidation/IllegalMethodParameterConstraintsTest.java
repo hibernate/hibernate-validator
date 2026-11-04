@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.time.LocalDate;
@@ -15,7 +16,7 @@ import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} and
@@ -24,57 +25,61 @@ import org.testng.annotations.Test;
  *
  * @author Gunnar Morling
  */
-@Test
 public class IllegalMethodParameterConstraintsTest {
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullParameterArrayThrowsException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }, (Class<?>) null
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullGroupsVarargThrowsException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], null
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	public void atValidAddedInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000152.*")
+	@Test
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000152.*" );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	//TODO HV-632: Add more tests
 	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+		assertThatThrownBy( () -> getValidator().forExecutables().validateParameters(
 				new ZipImpl(), ZipImpl.class.getDeclaredMethods()[0], new Object[2]
-		);
+		) ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
 	private interface Foo {

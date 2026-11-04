@@ -19,17 +19,19 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * HV-250
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ClassValidatorWithTypeVariableTest {
 
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		validator = ValidatorUtil.getValidator();
 	}

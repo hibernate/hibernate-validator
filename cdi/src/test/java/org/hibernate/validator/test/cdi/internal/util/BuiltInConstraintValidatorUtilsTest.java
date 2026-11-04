@@ -16,7 +16,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class BuiltInConstraintValidatorUtilsTest {
 

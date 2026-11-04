@@ -6,8 +6,8 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -32,31 +32,28 @@ import jakarta.validation.metadata.MethodDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
  */
 public class IgnoreCrossParameterConstraintTest {
 
-	// used by test framework
-	public IgnoreCrossParameterConstraintTest() {
-	}
+	public static class ValidatedBean {
+		@CrossParameterConstraint
+		ValidatedBean(@NotNull String foo, String bar) {
+		}
 
-	// constructor used for validation
-	@CrossParameterConstraint
-	IgnoreCrossParameterConstraintTest(@NotNull String foo, String bar) {
-	}
-
-	@CrossParameterConstraint
-	public void snafu(@NotNull String foo, String bar) {
+		@CrossParameterConstraint
+		public void snafu(@NotNull String foo, String bar) {
+		}
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-734")
 	public void testCrossParameterConstraintDefinedOnConstructorAndMethod() {
 		Validator validator = ValidatorUtil.getValidator();
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( this.getClass() );
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( ValidatedBean.class );
 
 		// check that the test constructor has a cross parameter constraint
 		ConstructorDescriptor constructorDescriptor = beanDescriptor.getConstraintsForConstructor(
@@ -80,7 +77,7 @@ public class IgnoreCrossParameterConstraintTest {
 	@TestForIssue(jiraKey = "HV-734")
 	public void testCrossParameterConstraintsAreIgnored() {
 		Validator validator = getXmlConfiguredValidator( "ignore-annotations-for-cross-parameter-constraints.xml" );
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( this.getClass() );
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( ValidatedBean.class );
 
 		// check that the test constructor has no cross parameter constraint
 		ConstructorDescriptor constructorDescriptor = beanDescriptor.getConstraintsForConstructor(

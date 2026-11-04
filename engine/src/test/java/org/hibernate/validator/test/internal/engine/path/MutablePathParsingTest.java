@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.internal.engine.path;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +17,12 @@ import jakarta.validation.ElementKind;
 
 import org.hibernate.validator.internal.engine.path.MutablePath;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class MutablePathParsingTest {
-	@DataProvider
-	public Object[][] identifiers() {
+	public static Object[][] identifiers() {
 		return new Object[][] {
 				{ "name" },
 				{ "$value" },
@@ -35,16 +35,16 @@ public class MutablePathParsingTest {
 				{ "a\u0000b" } };
 	}
 
-	@Test(dataProvider = "identifiers")
+	@ParameterizedTest
+	@MethodSource("identifiers")
 	public void javaIdentifierNames(String name) {
 		var iterator = MutablePath.createPathFromString( name + ".value" ).iterator();
-		assertEquals( iterator.next().getName(), name );
-		assertEquals( iterator.next().getName(), "value" );
+		assertEquals( name, iterator.next().getName() );
+		assertEquals( "value", iterator.next().getName() );
 		assertFalse( iterator.hasNext() );
 	}
 
-	@DataProvider
-	public Object[][] iterableSelectors() {
+	public static Object[][] iterableSelectors() {
 		return new Object[][] {
 				{ "", null, null },
 				{ "0", 0, null },
@@ -60,30 +60,30 @@ public class MutablePathParsingTest {
 		};
 	}
 
-	@Test(dataProvider = "iterableSelectors")
+	@ParameterizedTest
+	@MethodSource("iterableSelectors")
 	public void selectorOnIntermediateAndTerminalProperty(String selector, Integer index, String key) {
 		for ( boolean terminal : new boolean[] { false, true } ) {
 			String input = "items[" + selector + "]" + ( terminal ? "" : ".value" );
 			var path = MutablePath.createPathFromString( input );
 			var iterator = path.iterator();
 			var property = iterator.next();
-			assertEquals( property.getName(), "items" );
-			assertEquals( property.getKind(), ElementKind.PROPERTY );
+			assertEquals( "items", property.getName() );
+			assertEquals( ElementKind.PROPERTY, property.getKind() );
 			assertFalse( property.isInIterable() );
 			var element = iterator.next();
-			assertEquals( element.getName(), terminal ? null : "value" );
-			assertEquals( element.getKind(), terminal ? ElementKind.BEAN : ElementKind.PROPERTY );
+			assertEquals( terminal ? null : "value", element.getName() );
+			assertEquals( terminal ? ElementKind.BEAN : ElementKind.PROPERTY, element.getKind() );
 			assertTrue( element.isInIterable() );
-			assertEquals( element.getIndex(), index );
-			assertEquals( element.getKey(), key );
+			assertEquals( index, element.getIndex() );
+			assertEquals( key, element.getKey() );
 			assertFalse( iterator.hasNext() );
 			String normalized = "items[" + ( index != null ? index : selector ) + "]" + ( terminal ? "" : ".value" );
-			assertEquals( path.toString(), normalized );
+			assertEquals( normalized, path.toString() );
 		}
 	}
 
-	@DataProvider
-	public Object[][] validPaths() {
+	public static Object[][] validPaths() {
 		return new Object[][] {
 				{ "name", "name", List.of( property( "name" ) ) },
 				{ "customer.address.city", "customer.address.city", List.of( property( "customer" ), property( "address" ), property( "city" ) ) },
@@ -104,13 +104,13 @@ public class MutablePathParsingTest {
 		};
 	}
 
-	@Test(dataProvider = "validPaths")
+	@ParameterizedTest
+	@MethodSource("validPaths")
 	public void validPathHasExpectedNodes(String input, String normalized, List<ExpectedNode> nodes) {
 		assertParsedPath( input, normalized, nodes );
 	}
 
-	@DataProvider
-	public Object[][] selectorCombinations() {
+	public static Object[][] selectorCombinations() {
 		// Known fragments and their expected values, independent of the parser under test.
 		Selector[] selectors = {
 				new Selector( "", "", false, null, null ),
@@ -143,7 +143,8 @@ public class MutablePathParsingTest {
 		return cases.toArray( Object[][]::new );
 	}
 
-	@Test(dataProvider = "selectorCombinations")
+	@ParameterizedTest
+	@MethodSource("selectorCombinations")
 	public void combinationsPreserveIterableContext(String input, String normalized, List<ExpectedNode> nodes) {
 		assertParsedPath( input, normalized, nodes );
 	}
@@ -154,14 +155,14 @@ public class MutablePathParsingTest {
 		for ( ExpectedNode expected : nodes ) {
 			assertTrue( iterator.hasNext(), input );
 			var actual = iterator.next();
-			assertEquals( actual.getName(), expected.name, input );
-			assertEquals( actual.getKind(), expected.kind, input );
-			assertEquals( actual.isInIterable(), expected.iterable, input );
-			assertEquals( actual.getIndex(), expected.index, input );
-			assertEquals( actual.getKey(), expected.key, input );
+			assertEquals( expected.name, actual.getName(), input );
+			assertEquals( expected.kind, actual.getKind(), input );
+			assertEquals( expected.iterable, actual.isInIterable(), input );
+			assertEquals( expected.index, actual.getIndex(), input );
+			assertEquals( expected.key, actual.getKey(), input );
 		}
 		assertFalse( iterator.hasNext(), input );
-		assertEquals( path.toString(), normalized, input );
+		assertEquals( normalized, path.toString(), input );
 	}
 
 	private static ExpectedNode property(String name) {
@@ -182,8 +183,7 @@ public class MutablePathParsingTest {
 	private record Selector(String text, String normalized, boolean iterable, Integer index, String key) {
 	}
 
-	@DataProvider
-	public Object[][] malformedPaths() {
+	public static Object[][] malformedPaths() {
 		return new Object[][] {
 				{ "." },
 				{ ".name" },
@@ -227,39 +227,40 @@ public class MutablePathParsingTest {
 		};
 	}
 
-	@Test(dataProvider = "malformedPaths")
+	@ParameterizedTest
+	@MethodSource("malformedPaths")
 	public void malformedPathRejected(String input) {
-		expectThrows( IllegalArgumentException.class, () -> MutablePath.createPathFromString( input ) );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( input ) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void rootAndNullPaths() {
 		var root = MutablePath.createPathFromString( "" );
-		assertEquals( root.toString(), "" );
+		assertEquals( "", root.toString() );
 		var iterator = root.iterator();
 		assertNull( iterator.next().getName() );
 		assertFalse( iterator.hasNext() );
-		expectThrows( IllegalArgumentException.class, () -> MutablePath.createPathFromString( null ) );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( null ) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void mixedSelectorsPreserveEachNode() {
 		var path = MutablePath.createPathFromString( "orders[2].addresses[home].lines[].text" );
 		var iterator = path.iterator();
-		assertEquals( iterator.next().getName(), "orders" );
+		assertEquals( "orders", iterator.next().getName() );
 		var address = iterator.next();
-		assertEquals( address.getName(), "addresses" );
-		assertEquals( address.getIndex(), Integer.valueOf( 2 ) );
+		assertEquals( "addresses", address.getName() );
+		assertEquals( Integer.valueOf( 2 ), address.getIndex() );
 		var line = iterator.next();
-		assertEquals( line.getName(), "lines" );
-		assertEquals( line.getKey(), "home" );
+		assertEquals( "lines", line.getName() );
+		assertEquals( "home", line.getKey() );
 		var text = iterator.next();
-		assertEquals( text.getName(), "text" );
+		assertEquals( "text", text.getName() );
 		assertTrue( text.isInIterable() );
 		assertNull( text.getIndex() );
 		assertNull( text.getKey() );
 		assertFalse( iterator.hasNext() );
-		assertEquals( path.toString(), "orders[2].addresses[home].lines[].text" );
+		assertEquals( "orders[2].addresses[home].lines[].text", path.toString() );
 	}
 
 	@Test
@@ -267,9 +268,9 @@ public class MutablePathParsingTest {
 		var path = MutablePath.createPathFromString( "node.".repeat( 5000 ) + "leaf[0]" );
 		int count = 0;
 		for ( var node : path ) {
-			assertEquals( node.getName(), count < 5000 ? "node" : count == 5000 ? "leaf" : null );
+			assertEquals( count < 5000 ? "node" : count == 5000 ? "leaf" : null, node.getName() );
 			count++;
 		}
-		assertEquals( count, 5002 );
+		assertEquals( 5002, count );
 	}
 }

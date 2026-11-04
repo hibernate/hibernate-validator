@@ -4,10 +4,11 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,7 @@ import jakarta.validation.ValidatorFactory;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -40,7 +41,7 @@ public class ConfigurationImplTest {
 		ValidatorFactory factory2 = configuration.buildValidatorFactory();
 		assertNotNull( factory2 );
 
-		assertNotSame( factory1, factory2 );
+		assertNotSame( factory2, factory1 );
 	}
 
 	@Test
@@ -55,8 +56,8 @@ public class ConfigurationImplTest {
 		ValidatorFactory factory2 = configuration.buildValidatorFactory();
 		assertNotNull( factory2 );
 
-		assertNotSame( factory1.getTraversableResolver(), factory2.getTraversableResolver() );
-		assertTrue( factory2.getTraversableResolver() instanceof TestTraversableResolver );
+		assertNotSame( factory2.getTraversableResolver(), factory1.getTraversableResolver() );
+		assertInstanceOf( TestTraversableResolver.class, factory2.getTraversableResolver() );
 	}
 
 	@Test
@@ -74,7 +75,7 @@ public class ConfigurationImplTest {
 			ValidatorFactory factory2 = configuration.buildValidatorFactory();
 			assertNotNull( factory2 );
 
-			assertNotSame( factory1, factory2 );
+			assertNotSame( factory2, factory1 );
 		}
 		finally {
 			mappingStream.close();
@@ -96,14 +97,14 @@ public class ConfigurationImplTest {
 			ValidatorFactory factory2 = configuration.buildValidatorFactory();
 			assertNotNull( factory2 );
 
-			assertNotSame( factory1, factory2 );
+			assertNotSame( factory2, factory1 );
 		}
 		finally {
 			mappingStream.close();
 		}
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000190.*")
+	@Test
 	// UnableToDetermineSchemaVersionException
 	@TestForIssue(jiraKey = "HV-563")
 	public void testReusableConfigurationWithClosedInputStream() throws Exception {
@@ -120,7 +121,9 @@ public class ConfigurationImplTest {
 			mappingStream.close();
 		}
 
-		configuration.buildValidatorFactory();
+		assertThatThrownBy( () -> configuration.buildValidatorFactory() )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000190.*" );
 	}
 
 	private static class TestTraversableResolver implements TraversableResolver {

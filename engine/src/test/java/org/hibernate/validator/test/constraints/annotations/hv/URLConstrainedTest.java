@@ -8,10 +8,10 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.initialize;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -47,8 +47,9 @@ import org.hibernate.validator.internal.util.RegexUtil;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Marko Bekhta
@@ -78,12 +79,12 @@ public class URLConstrainedTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@DataProvider
-	public Object[][] urlValidators() {
+	public static Object[][] urlValidators() {
 		return new Object[][] { { false }, { true } };
 	}
 
-	@Test(dataProvider = "urlValidators")
+	@ParameterizedTest
+	@MethodSource("urlValidators")
 	public void testAdditionalRegexMatchesSeparatePattern(boolean regexpValidator) {
 		try ( ValidatorFactory factory = factory( regexpValidator ) ) {
 			Validator validator = factory.getValidator();
@@ -99,38 +100,40 @@ public class URLConstrainedTest extends AbstractConstrainedTest {
 					"not a URL",
 					"http://example.com/allowed\n",
 					new StringBuilder( "http://example.com/ALLOWED" ) } ) {
-				assertEquals( validator.validateValue( RegexURLs.class, "refined", value ).isEmpty(),
-						validator.validateValue( RegexURLs.class, "composed", value ).isEmpty(), String.valueOf( value ) );
-				assertEquals( validator.validateValue( RegexURLs.class, "multipleFlags", value ).isEmpty(),
-						validator.validateValue( RegexURLs.class, "composed", value ).isEmpty(), String.valueOf( value ) );
+				assertEquals( validator.validateValue( RegexURLs.class, "composed", value ).isEmpty(), validator.validateValue( RegexURLs.class, "refined", value ).isEmpty(),
+						String.valueOf( value ) );
+				assertEquals( validator.validateValue( RegexURLs.class, "composed", value ).isEmpty(), validator.validateValue( RegexURLs.class, "multipleFlags", value ).isEmpty(),
+						String.valueOf( value ) );
 			}
 			assertTrue( validator.validateValue( RegexURLs.class, "refined", null ).isEmpty() );
 			assertTrue( validator.validateValue( RegexURLs.class, "refined", "http://example.com/ALLOWED" ).isEmpty() );
-			assertEquals( validator.validateValue( RegexURLs.class, "refined", "" ).size(), 1 );
-			assertEquals( validator.validateValue( RegexURLs.class, "refined", "http://example.com/denied" ).size(), 1 );
-			assertEquals( validator.validateValue( RegexURLs.class, "refined", "http://example.com/allowed/extra" ).size(), 1 );
-			assertEquals( validator.validateValue( RegexURLs.class, "refined", "http://example.com/prefix/allowed" ).size(), 1 );
+			assertEquals( 1, validator.validateValue( RegexURLs.class, "refined", "" ).size() );
+			assertEquals( 1, validator.validateValue( RegexURLs.class, "refined", "http://example.com/denied" ).size() );
+			assertEquals( 1, validator.validateValue( RegexURLs.class, "refined", "http://example.com/allowed/extra" ).size() );
+			assertEquals( 1, validator.validateValue( RegexURLs.class, "refined", "http://example.com/prefix/allowed" ).size() );
 		}
 	}
 
-	@Test(dataProvider = "urlValidators")
+	@ParameterizedTest
+	@MethodSource("urlValidators")
 	public void testRegexpMessageMatchesLegacyComposition(boolean regexpValidator) {
 		try ( ValidatorFactory factory = factory( regexpValidator ) ) {
 			Set<ConstraintViolation<RegexURLs>> violations = factory.getValidator()
 					.validateValue( RegexURLs.class, "escaped", "http://example.com" );
-			assertEquals( violations.size(), 1 );
+			assertEquals( 1, violations.size() );
 			Set<ConstraintViolation<RegexURLs>> legacyViolations = factory.getValidator()
 					.validateValue( RegexURLs.class, "legacyEscaped", "http://example.com" );
-			assertEquals( legacyViolations.size(), 1 );
-			assertEquals( violations.iterator().next().getMessage(), legacyViolations.iterator().next().getMessage() );
+			assertEquals( 1, legacyViolations.size() );
+			assertEquals( legacyViolations.iterator().next().getMessage(), violations.iterator().next().getMessage() );
 		}
 	}
 
-	@Test(dataProvider = "urlValidators")
+	@ParameterizedTest
+	@MethodSource("urlValidators")
 	public void testCompiledPatternsAreSharedOnlyWithinInitializationContext(boolean regexpValidator) throws Exception {
 		java.util.regex.Pattern first = assertFactoryPatternSharing( regexpValidator );
 		java.util.regex.Pattern second = assertFactoryPatternSharing( regexpValidator );
-		assertNotSame( first, second, "Distinct factories must not share the compiled-pattern cache" );
+		assertNotSame( second, first, "Distinct factories must not share the compiled-pattern cache" );
 	}
 
 	private static java.util.regex.Pattern assertFactoryPatternSharing(boolean regexpValidator) throws Exception {
@@ -144,7 +147,7 @@ public class URLConstrainedTest extends AbstractConstrainedTest {
 		configuration.constraintValidatorFactory( recorder );
 		try ( ValidatorFactory factory = configuration.buildValidatorFactory() ) {
 			assertNoViolations( factory.getValidator().validate( new SharedRegexURLs() ) );
-			assertEquals( recorder.urls.size(), 3 );
+			assertEquals( 3, recorder.urls.size() );
 			java.util.regex.Pattern shared = null;
 			java.util.regex.Pattern otherFlags = null;
 			java.util.regex.Pattern otherRegexp = null;
@@ -152,7 +155,7 @@ public class URLConstrainedTest extends AbstractConstrainedTest {
 				URL annotation = initialization.descriptor().getAnnotation();
 				java.util.regex.Pattern cached = RegexUtil.compile( annotation.regexp(), annotation.flags(), initialization.context() );
 				// Factory bootstrap has already called descriptor initialize followed by annotation initialize.
-				assertSame( compiledPattern( initialization.validator() ), cached );
+				assertSame( cached, compiledPattern( initialization.validator() ) );
 				boolean matchedPatternValidator = false;
 				for ( PatternValidator validator : recorder.patterns ) {
 					matchedPatternValidator |= compiledPattern( validator ) == cached;
@@ -162,7 +165,7 @@ public class URLConstrainedTest extends AbstractConstrainedTest {
 				HibernateConstraintValidator<URL, CharSequence> alternative = regexpValidator ? new URLValidator() : new RegexpURLValidator();
 				alternative.initialize( initialization.descriptor(), initialization.context() );
 				alternative.initialize( annotation );
-				assertSame( compiledPattern( alternative ), cached, "Both supplied URL validators must use the context cache" );
+				assertSame( cached, compiledPattern( alternative ), "Both supplied URL validators must use the context cache" );
 				assertTrue( alternative.isValid( "http://example.com/path", null ) );
 
 				if ( annotation.regexp().equals( SharedRegexURLs.REGEXP ) ) {
@@ -178,9 +181,9 @@ public class URLConstrainedTest extends AbstractConstrainedTest {
 				}
 			}
 			assertTrue( shared != null && otherFlags != null && otherRegexp != null );
-			assertNotSame( shared, otherRegexp, "Cache keys must include the regular expression" );
-			assertNotSame( shared, otherFlags, "Cache keys must include requested flags" );
-			assertEquals( shared.flags(), otherFlags.flags(), "Embedded flags expand the compiled flags independently of the cache key" );
+			assertNotSame( otherRegexp, shared, "Cache keys must include the regular expression" );
+			assertNotSame( otherFlags, shared, "Cache keys must include requested flags" );
+			assertEquals( otherFlags.flags(), shared.flags(), "Embedded flags expand the compiled flags independently of the cache key" );
 			return shared;
 		}
 	}

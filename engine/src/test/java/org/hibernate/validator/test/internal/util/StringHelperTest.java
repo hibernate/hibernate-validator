@@ -6,8 +6,8 @@ package org.hibernate.validator.test.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -15,7 +15,7 @@ import java.util.Locale;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link StringHelper}.
@@ -74,17 +74,17 @@ public class StringHelperTest {
 
 	@Test
 	public void decapitalizeShouldReturnEmptyStringForEmptyString() {
-		assertEquals( StringHelper.decapitalize( "" ), "" );
+		assertEquals( "", StringHelper.decapitalize( "" ) );
 	}
 
 	@Test
 	public void decapitalizeShouldReturnLowerCaseLetter() {
-		assertEquals( StringHelper.decapitalize( "A" ), "a" );
+		assertEquals( "a", StringHelper.decapitalize( "A" ) );
 	}
 
 	@Test
 	public void decapitalizeShouldReturnDecapizalizedWord() {
-		assertEquals( StringHelper.decapitalize( "Giraffe" ), "giraffe" );
+		assertEquals( "giraffe", StringHelper.decapitalize( "Giraffe" ) );
 	}
 
 	@Test
@@ -92,18 +92,18 @@ public class StringHelperTest {
 	public void decapitalizeShouldReturnDecapizalizedWordOnTurkishLocale() {
 		Locale defaultLocale = Locale.getDefault();
 		Locale.setDefault( Locale.forLanguageTag( "tr-TR" ) );
-		assertEquals( StringHelper.decapitalize( "IsIsolationLevelGuaranteed" ), "isIsolationLevelGuaranteed" );
+		assertEquals( "isIsolationLevelGuaranteed", StringHelper.decapitalize( "IsIsolationLevelGuaranteed" ) );
 		Locale.setDefault( defaultLocale );
 	}
 
 	@Test
 	public void decapitalizeShouldReturnSameWordForDecapizalizedWord() {
-		assertEquals( StringHelper.decapitalize( "giraffe" ), "giraffe" );
+		assertEquals( "giraffe", StringHelper.decapitalize( "giraffe" ) );
 	}
 
 	@Test
 	public void decapitalizeShouldReturnSameWordForWordWithSeveralLeadingCapitalLetters() {
-		assertEquals( StringHelper.decapitalize( "GIRaffe" ), "GIRaffe" );
+		assertEquals( "GIRaffe", StringHelper.decapitalize( "GIRaffe" ) );
 	}
 
 	private static class PolarBear {

@@ -13,6 +13,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -26,24 +27,29 @@ import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMax
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Marko Bekhta
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DurationMaxValidatorTest {
 
 	private static Locale PREVIOUS_LOCALE;
 
-	@BeforeClass
+	@BeforeAll
 	public static void saveLocale() {
 		PREVIOUS_LOCALE = Locale.getDefault();
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void restoreLocale() {
 		Locale.setDefault( PREVIOUS_LOCALE );
 	}
@@ -94,15 +100,9 @@ public class DurationMaxValidatorTest {
 		assertNoViolations( constraintViolations );
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("testMessageData")
 	@TestForIssue(jiraKey = "HV-1232")
-	public void testMessage() {
-		testMessage( "must be shorter than or equal to 1 day 100 nanos", true, 1, 100, Duration.ofDays( 2 ) );
-		testMessage( "must be shorter than 1 day 100 nanos", false, 1, 100, Duration.ofDays( 2 ) );
-		testMessage( "must be shorter than or equal to 0", true, 0, 0, Duration.ofDays( 2 ) );
-		testMessage( "must be shorter than 0", false, 0, 0, Duration.ofDays( 2 ) );
-	}
-
 	public void testMessage(String message, boolean inclusive, int days, int nanos, Duration value) {
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class, Locale.ENGLISH );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -123,6 +123,15 @@ public class DurationMaxValidatorTest {
 		);
 	}
 
+	private static Stream<Arguments> testMessageData() {
+		return Stream.of(
+				Arguments.of( "must be shorter than or equal to 1 day 100 nanos", true, 1, 100, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be shorter than 1 day 100 nanos", false, 1, 100, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be shorter than or equal to 0", true, 0, 0, Duration.ofDays( 2 ) ),
+				Arguments.of( "must be shorter than 0", false, 0, 0, Duration.ofDays( 2 ) )
+		);
+	}
+
 	private void doTesting(boolean inclusive) {
 		ConstraintAnnotationDescriptor.Builder<DurationMax> descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( DurationMax.class );
 		descriptorBuilder.setAttribute( "nanos", 100L );
@@ -132,11 +141,11 @@ public class DurationMaxValidatorTest {
 		DurationMaxValidator validator = new DurationMaxValidator();
 		validator.initialize( annotation );
 
-		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( Duration.ofNanos( 10L ), null ) );
-		Assert.assertEquals( validator.isValid( Duration.ofNanos( 100L ), null ), inclusive );
-		Assert.assertFalse( validator.isValid( Duration.ofNanos( 101L ), null ) );
-		Assert.assertFalse( validator.isValid( Duration.ofSeconds( 100L ), null ) );
+		Assertions.assertTrue( validator.isValid( null, null ) );
+		Assertions.assertTrue( validator.isValid( Duration.ofNanos( 10L ), null ) );
+		Assertions.assertEquals( inclusive, validator.isValid( Duration.ofNanos( 100L ), null ) );
+		Assertions.assertFalse( validator.isValid( Duration.ofNanos( 101L ), null ) );
+		Assertions.assertFalse( validator.isValid( Duration.ofSeconds( 100L ), null ) );
 	}
 
 	private static class Task {
