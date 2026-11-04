@@ -24,7 +24,7 @@ public interface HibernateConstraintViolationBuilder extends ConstraintViolation
 	@Incubating
 	default HibernateConstraintViolationBuilder enableExpressionLanguage() {
 		return enableExpressionLanguage( ExpressionLanguageFeatureLevel.DEFAULT );
-	};
+	}
 
 	/**
 	 * Enable Expression Language for the constraint violation created by this builder if the chosen
