@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.spi.nodenameprovider.jackson;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -19,10 +19,10 @@ import jakarta.validation.constraints.Min;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Damir Alibegovic
@@ -34,7 +34,7 @@ public class JacksonAnnotationPropertyNodeNameProviderTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -51,7 +51,7 @@ public class JacksonAnnotationPropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "engine.horse_power" );
+		assertEquals( "engine.horse_power", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class JacksonAnnotationPropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "number_of_seats" );
+		assertEquals( "number_of_seats", violation.getPropertyPath().toString() );
 	}
 
 	private class Car {

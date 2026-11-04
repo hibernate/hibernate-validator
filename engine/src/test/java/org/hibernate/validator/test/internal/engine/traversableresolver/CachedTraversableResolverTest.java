@@ -4,7 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.annotation.ElementType;
 import java.util.HashSet;
@@ -25,18 +26,20 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Emmanuel Bernard
  * @author Guillaume Smet
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CachedTraversableResolverTest {
 
 	private static ValidationXmlTestHelper validationXmlTestHelper;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidationXmlTestHelper() {
 		validationXmlTestHelper = new ValidationXmlTestHelper( CachedTraversableResolverTest.class );
 	}
@@ -89,12 +92,9 @@ public class CachedTraversableResolverTest {
 
 		// Cache disabled at the factory level
 		Validator v = factory.getValidator();
-		try {
-			v.validate( suit, Default.class, Cloth.class );
-			fail( "TraversableResolver calls are apparently cached and shouldn't be" );
-		}
-		catch (ValidationException e) {
-		}
+		Validator v1 = v;
+		assertThatThrownBy( () -> v1.validate( suit, Default.class, Cloth.class ) )
+				.isInstanceOf( ValidationException.class );
 
 		// Cache disabled at the factory level but enabled in the context
 		v = ( (HibernateValidatorContext) factory.usingContext() )
@@ -128,13 +128,9 @@ public class CachedTraversableResolverTest {
 				.enableTraversableResolverResultCache( false )
 				.getValidator();
 
-		v = factory.getValidator();
-		try {
-			v.validate( suit, Default.class, Cloth.class );
-			fail( "TraversableResolver calls are apparently cached and shouldn't be" );
-		}
-		catch (ValidationException e) {
-		}
+		Validator v2 = factory.getValidator();
+		assertThatThrownBy( () -> v2.validate( suit, Default.class, Cloth.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -152,12 +148,8 @@ public class CachedTraversableResolverTest {
 
 						Suit suit = createSuit();
 
-						try {
-							v.validate( suit, Default.class, Cloth.class );
-							fail( "TraversableResolver calls are apparently cached and shouldn't be" );
-						}
-						catch (ValidationException e) {
-						}
+						assertThatThrownBy( () -> v.validate( suit, Default.class, Cloth.class ) )
+								.isInstanceOf( ValidationException.class );
 					}
 				} );
 	}

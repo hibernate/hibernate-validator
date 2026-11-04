@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -22,14 +23,14 @@ import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.spi.password.PasswordStrengthScore;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PasswordStrengthValidatorTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -103,13 +104,15 @@ public class PasswordStrengthValidatorTest {
 		assertNoViolations( violations );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void missingEstimatorThrows() {
-		Validator noServiceValidator = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator();
-		noServiceValidator.validate( new CharSequenceBean( "test" ) );
+		assertThatThrownBy( () -> {
+			Validator noServiceValidator = Validation.byProvider( HibernateValidator.class )
+					.configure()
+					.buildValidatorFactory()
+					.getValidator();
+			noServiceValidator.validate( new CharSequenceBean( "test" ) );
+		} ).isInstanceOf( ValidationException.class );
 	}
 
 	private static class CharSequenceBean {

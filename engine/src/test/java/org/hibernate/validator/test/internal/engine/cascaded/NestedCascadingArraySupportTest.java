@@ -23,13 +23,15 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.engine.path.MutableNode;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HV-1237")
 public class NestedCascadingArraySupportTest {
 
 	// HV-1428 Container element support is disabled for arrays
-	@Test(enabled = false)
+	@Disabled
+	@Test
 	public void testNestedOnArray() {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Red Hat Inc. and Hibernate Authors
+#
+# This file contains forbidden API signatures of TestNG. JUnit should be used instead.
+
+@ignoreUnresolvable
+@defaultMessage TestNG is not allowed, use JUnit instead
+
+################################################################################################################
+#packages
+org.testng.** @ TestNG is not allowed, use JUnit instead
+junit.** @ JUnit 4 is not allowed, use JUnit Jupiter instead

@@ -4,7 +4,8 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -19,7 +20,7 @@ import jakarta.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test that arrays and varargs can be specified in XML with and without default package
@@ -42,7 +43,7 @@ public class DefaultPackageInVarargParameterTest {
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Foo.class );
 		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
-		assertTrue( methodDescriptors.size() == 2, "There should be two constrained methods" );
+		assertEquals( 2, methodDescriptors.size(), "There should be two constrained methods" );
 		for ( MethodDescriptor methodDescriptor : methodDescriptors ) {
 			assertTrue( methodDescriptor.hasConstrainedParameters(), "Parameter should be constrained" );
 			List<ParameterDescriptor> parameterDescriptorList = methodDescriptor.getParameterDescriptors();

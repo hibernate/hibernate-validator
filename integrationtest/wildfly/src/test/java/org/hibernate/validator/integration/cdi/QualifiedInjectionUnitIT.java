@@ -17,10 +17,10 @@ import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.Test;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

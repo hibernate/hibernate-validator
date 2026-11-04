@@ -7,8 +7,8 @@ package org.hibernate.validator.test.constraints.annotations.hv;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -46,10 +46,13 @@ import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorFo
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import org.assertj.core.api.Assertions;
 import org.javamoney.moneta.Money;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+
 
 /**
  * @author Marko Bekhta
@@ -95,15 +98,15 @@ public class RangeConstrainedTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@Test(dataProvider = "numbers")
+	@ParameterizedTest
+	@MethodSource("numbers")
 	public void testNumericRangesMatchMinAndMax(Number number) {
 		assertEquivalent( NumericRanges.class, number );
-		assertEquals( validator.validateValue( NumericRanges.class, "roundedInvertedRange", number ).isEmpty(),
-				validator.validateValue( NumericRanges.class, "roundedInvertedComposed", number ).isEmpty() );
+		assertEquals( validator.validateValue( NumericRanges.class, "roundedInvertedComposed", number ).isEmpty(),
+				validator.validateValue( NumericRanges.class, "roundedInvertedRange", number ).isEmpty() );
 	}
 
-	@DataProvider
-	public Object[][] numbers() {
+	public static Object[][] numbers() {
 		return new Object[][] {
 				{ null },
 				{ (byte) 1 },
@@ -150,13 +153,13 @@ public class RangeConstrainedTest extends AbstractConstrainedTest {
 		};
 	}
 
-	@Test(dataProvider = "numericText")
+	@ParameterizedTest
+	@MethodSource("numericText")
 	public void testTextRangesMatchMinAndMax(CharSequence text) {
 		assertEquivalent( TextRanges.class, text );
 	}
 
-	@DataProvider
-	public Object[][] numericText() {
+	public static Object[][] numericText() {
 		return new Object[][] {
 				{ null },
 				{ "" },
@@ -196,8 +199,7 @@ public class RangeConstrainedTest extends AbstractConstrainedTest {
 		}
 	}
 
-	@DataProvider
-	public Object[][] declaredTypes() {
+	public static Object[][] declaredTypes() {
 		Object[] bytes = { null, Byte.MIN_VALUE, (byte) -2, (byte) 0, (byte) 1, (byte) 3, (byte) 4, Byte.MAX_VALUE };
 		Object[] shorts = { null, Short.MIN_VALUE, (short) -2, (short) 0, (short) 1, (short) 3, (short) 4, Short.MAX_VALUE };
 		Object[] integers = { null, Integer.MIN_VALUE, -2, 0, 1, 3, 4, Integer.MAX_VALUE };
@@ -312,7 +314,8 @@ public class RangeConstrainedTest extends AbstractConstrainedTest {
 		};
 	}
 
-	@Test(dataProvider = "declaredTypes")
+	@ParameterizedTest
+	@MethodSource("declaredTypes")
 	public void testDeclaredTypesSelectDedicatedValidatorsAndMatchMinMax(String prefix, Class<?> expectedValidator, Object[] values) {
 		var configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		var mapping = configuration.createConstraintMapping();
@@ -339,9 +342,8 @@ public class RangeConstrainedTest extends AbstractConstrainedTest {
 			var validator = factory.getValidator();
 			for ( RangeBounds bound : bounds ) {
 				for ( Object value : values ) {
-					assertEquals( validator.validateValue( DeclaredRanges.class, prefix + "Range", value, bound.group() ).isEmpty(),
-							validator.validateValue( DeclaredRanges.class, prefix + "Composed", value, bound.group() ).isEmpty(),
-							prefix + ": " + bound.group().getSimpleName() + ": " + value );
+					assertEquals( validator.validateValue( DeclaredRanges.class, prefix + "Composed", value, bound.group() ).isEmpty(),
+							validator.validateValue( DeclaredRanges.class, prefix + "Range", value, bound.group() ).isEmpty(), prefix + ": " + bound.group().getSimpleName() + ": " + value );
 				}
 			}
 			Assertions.assertThat( recorder.requestedValidators ).contains( expectedValidator );
@@ -445,8 +447,7 @@ public class RangeConstrainedTest extends AbstractConstrainedTest {
 
 	private void assertEquivalent(Class<?> beanClass, Object value) {
 		for ( String prefix : new String[] { "default", "full", "zero", "inverted", "small" } ) {
-			assertEquals( validator.validateValue( beanClass, prefix + "Range", value ).isEmpty(),
-					validator.validateValue( beanClass, prefix + "Composed", value ).isEmpty(),
+			assertEquals( validator.validateValue( beanClass, prefix + "Composed", value ).isEmpty(), validator.validateValue( beanClass, prefix + "Range", value ).isEmpty(),
 					beanClass.getSimpleName() + ": " + prefix + ": " + value );
 		}
 	}

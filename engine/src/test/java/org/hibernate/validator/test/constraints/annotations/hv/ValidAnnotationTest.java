@@ -19,15 +19,18 @@ import org.hibernate.validator.test.internal.engine.serialization.Email;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ListAppender;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ValidAnnotationTest extends AbstractConstrainedTest {
 
 	private ListAppender logAppender;
@@ -41,7 +44,7 @@ public class ValidAnnotationTest extends AbstractConstrainedTest {
 		return s.startsWith( "HV000271" );
 	}
 
-	@BeforeTest
+	@BeforeAll
 	public void setUpLogger() {
 		logAppender = new ListAppender( ValidAnnotationTest.class.getSimpleName() );
 		logAppender.start();
@@ -63,12 +66,12 @@ public class ValidAnnotationTest extends AbstractConstrainedTest {
 		}
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void cleanLogger() {
 		logAppender.clear();
 	}
 
-	@AfterTest
+	@AfterAll
 	public void tearDownLogger() {
 		targetLogger.removeAppender( logAppender );
 		logAppender.stop();

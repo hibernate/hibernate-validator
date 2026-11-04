@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.resourceloading;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -16,7 +16,7 @@ import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for {@link org.hibernate.validator.resourceloading.AggregateResourceBundleLocator}.
@@ -44,13 +44,13 @@ public class AggregateResourceBundleLocatorTest {
 		assertNotNull( resourceBundle );
 
 		//contained in bundle 1
-		assertEquals( resourceBundle.getString( "key_1" ), "value 1 from bundle 1" );
+		assertEquals( "value 1 from bundle 1", resourceBundle.getString( "key_1" ) );
 
 		//contained in both bundles, bundle 1 comes first
-		assertEquals( resourceBundle.getString( "key_2" ), "value 2 from bundle 1" );
+		assertEquals( "value 2 from bundle 1", resourceBundle.getString( "key_2" ) );
 
 		//contained in bundle 2
-		assertEquals( resourceBundle.getString( "key_3" ), "value 3 from bundle 2" );
+		assertEquals( "value 3 from bundle 2", resourceBundle.getString( "key_3" ) );
 	}
 
 	@Test
@@ -67,13 +67,13 @@ public class AggregateResourceBundleLocatorTest {
 		assertNotNull( resourceBundle );
 
 		//contained in bundle 1
-		assertEquals( resourceBundle.getString( "key_1" ), "value 1 from bundle 1" );
+		assertEquals( "value 1 from bundle 1", resourceBundle.getString( "key_1" ) );
 
 		//contained in both bundles, but bundle 1 is queried before bundle 2 (delegate)
-		assertEquals( resourceBundle.getString( "key_2" ), "value 2 from bundle 1" );
+		assertEquals( "value 2 from bundle 1", resourceBundle.getString( "key_2" ) );
 
 		//contained in bundle 2
-		assertEquals( resourceBundle.getString( "key_3" ), "value 3 from bundle 2" );
+		assertEquals( "value 3 from bundle 2", resourceBundle.getString( "key_3" ) );
 	}
 
 	@Test

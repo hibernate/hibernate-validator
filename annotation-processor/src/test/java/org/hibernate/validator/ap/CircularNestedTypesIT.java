@@ -4,12 +4,12 @@
  */
 package org.hibernate.validator.ap;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.ap.testmodel.circular.CircularProperty;
 import org.hibernate.validator.ap.testmodel.circular.CircularPropertyImpl;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests that in case of circular nested types there's no infinite loop during analysis.

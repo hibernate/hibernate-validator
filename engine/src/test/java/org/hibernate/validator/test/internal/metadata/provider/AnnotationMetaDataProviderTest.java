@@ -7,6 +7,7 @@ package org.hibernate.validator.test.internal.metadata.provider;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
@@ -43,8 +44,8 @@ import org.hibernate.validator.internal.properties.DefaultGetterPropertySelectio
 import org.hibernate.validator.internal.properties.javabean.JavaBeanHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -55,7 +56,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 	private AnnotationMetaDataProvider provider;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
 				getDummyConstraintCreationContext(),
@@ -159,9 +160,11 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( field.getCascadingMetaDataBuilder().getGroupConversions() ).isEqualTo( expected );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	@Test
 	public void multipleGroupConversionsOnFieldWithSameFromCauseException() {
-		provider.getBeanConfiguration( User2.class );
+		assertThatThrownBy( () -> provider.getBeanConfiguration( User2.class ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000124.*" );
 	}
 
 	@Test
@@ -253,9 +256,11 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( method.getParameterMetaData( 0 ).getCascadingMetaDataBuilder().getGroupConversions() ).isEqualTo( expected );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	@Test
 	public void multipleGroupConversionsOnParameterWithSameFromCauseException() {
-		provider.getBeanConfiguration( User4.class );
+		assertThatThrownBy( () -> provider.getBeanConfiguration( User4.class ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000124.*" );
 	}
 
 	@Test
@@ -299,9 +304,11 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( constraintInSubType.getAnnotation().annotationType() ).isEqualTo( ScriptAssert.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	@Test
 	public void groupConversionWithSameFromInSingleAndListAnnotationCauseException() {
-		provider.getBeanConfiguration( User3.class );
+		assertThatThrownBy( () -> provider.getBeanConfiguration( User3.class ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000124.*" );
 	}
 
 	private static class Foo {

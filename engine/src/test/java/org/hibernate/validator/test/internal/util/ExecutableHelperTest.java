@@ -5,9 +5,9 @@
 package org.hibernate.validator.test.internal.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.util.classhierarchy.Novella;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link ExecutableHelper}.
@@ -211,12 +211,12 @@ public class ExecutableHelperTest {
 
 	@Test
 	public void executableAsStringShouldReturnMethodNameWithBracesForParameterlessMethod() throws Exception {
-		assertEquals( ExecutableHelper.getExecutableAsString( "foo" ), "foo()" );
+		assertEquals( "foo()", ExecutableHelper.getExecutableAsString( "foo" ) );
 	}
 
 	@Test
 	public void executableAsStringShouldReturnMethodNameWithSimpleParameterTypeNames() throws Exception {
-		assertEquals( ExecutableHelper.getExecutableAsString( "foo", int.class, Foo.class ), "foo(int, Foo)" );
+		assertEquals( "foo(int, Foo)", ExecutableHelper.getExecutableAsString( "foo", int.class, Foo.class ) );
 	}
 
 	@Test

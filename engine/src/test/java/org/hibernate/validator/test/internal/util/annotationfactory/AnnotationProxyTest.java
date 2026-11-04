@@ -12,8 +12,8 @@ import java.lang.annotation.RetentionPolicy;
 
 import org.hibernate.validator.internal.util.annotation.AnnotationDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -24,7 +24,7 @@ public class AnnotationProxyTest {
 
 	private AnnotationDescriptor.Builder<MyAnno> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupAnnotations() throws Exception {
 		realAnnotation = Foo.class.getAnnotation( MyAnno.class );
 		descriptorBuilder = getDescriptorBuilderFromAnnotation( realAnnotation );

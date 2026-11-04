@@ -15,18 +15,19 @@ import jakarta.el.StandardELContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RecordPropertiesELResolver;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @TestForIssue(jiraKey = "HV-2283")
 public class RecordPropertiesELResolverTest {
 
-	@DataProvider
-	public Object[][] components() {
+	public static Object[][] components() {
 		return new Object[][] { { "Alice" }, { null } };
 	}
 
-	@Test(dataProvider = "components")
+	@ParameterizedTest
+	@MethodSource("components")
 	public void components_are_resolved_and_read_only(String name) {
 		RecordPropertiesELResolver resolver = new RecordPropertiesELResolver();
 		ELContext context = new StandardELContext( ExpressionFactory.newInstance() );
@@ -49,8 +50,7 @@ public class RecordPropertiesELResolverTest {
 		assertThat( context.isPropertyResolved() ).isTrue();
 	}
 
-	@DataProvider
-	public Object[][] unmatchedProperties() {
+	public static Object[][] unmatchedProperties() {
 		return new Object[][] {
 				{ new Value( "Alice" ), "displayName" },
 				{ new Value( "Alice" ), "toString" },
@@ -61,7 +61,8 @@ public class RecordPropertiesELResolverTest {
 		};
 	}
 
-	@Test(dataProvider = "unmatchedProperties")
+	@ParameterizedTest
+	@MethodSource("unmatchedProperties")
 	public void unmatched_properties_are_left_for_other_resolvers(Object base, Object property) {
 		RecordPropertiesELResolver resolver = new RecordPropertiesELResolver();
 		ELContext context = new StandardELContext( ExpressionFactory.newInstance() );

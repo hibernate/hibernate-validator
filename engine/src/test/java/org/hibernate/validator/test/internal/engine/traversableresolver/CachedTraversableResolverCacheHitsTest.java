@@ -4,10 +4,10 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.fail;
 
 import java.lang.annotation.ElementType;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HV-2151")
 public class CachedTraversableResolverCacheHitsTest {

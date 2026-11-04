@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -16,65 +16,78 @@ import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @TestForIssue(jiraKey = "HV-1316")
 public class PropertyPathValidationTest {
 	private final Validator validator = getValidator();
 
-	@DataProvider
-	public Object[][] nonCascadingRoots() {
+	public static Object[][] nonCascadingRoots() {
 		return new Object[][] { { new PlainRoot() }, { new ConstrainedRoot() } };
 	}
 
-	@Test(dataProvider = "nonCascadingRoots")
-	public void intermediateAssociationRequiresValid(Object root) {
-		for ( String path : new String[] { "leaf.required", "leaf.optional", "leaf.missing" } ) {
-			expectThrows( IllegalArgumentException.class, () -> validator.validateProperty( root, path ) );
-		}
+	public static Object[][] nonCascadingPropertyPaths() {
+		return new Object[][] {
+				{ new PlainRoot(), "leaf.required" },
+				{ new PlainRoot(), "leaf.optional" },
+				{ new PlainRoot(), "leaf.missing" },
+				{ new ConstrainedRoot(), "leaf.required" },
+				{ new ConstrainedRoot(), "leaf.optional" },
+				{ new ConstrainedRoot(), "leaf.missing" }
+		};
 	}
 
-	@Test(dataProvider = "nonCascadingRoots")
+	@ParameterizedTest
+	@MethodSource("nonCascadingPropertyPaths")
+	public void intermediateAssociationRequiresValid(Object root, String path) {
+		assertThatThrownBy( () -> validator.validateProperty( root, path ) )
+				.isInstanceOf( IllegalArgumentException.class );
+	}
+
+	@ParameterizedTest
+	@MethodSource("nonCascadingRoots")
 	public void directExistingPropertyWithoutApplicableConstraints(Object root) {
 		assertTrue( validator.validateProperty( root, "leaf" ).isEmpty() );
 		assertTrue( validator.validateValue( root.getClass(), "leaf", new Leaf() ).isEmpty() );
 	}
 
-	@Test(dataProvider = "nonCascadingRoots")
+	@ParameterizedTest
+	@MethodSource("nonCascadingRoots")
 	public void missingRootPropertyIsRejected(Object root) {
-		expectThrows( IllegalArgumentException.class, () -> validator.validateProperty( root, "missing" ) );
-		expectThrows( IllegalArgumentException.class, () -> validator.validateValue( root.getClass(), "missing", null ) );
+		assertThatThrownBy( () -> validator.validateProperty( root, "missing" ) ).isInstanceOf( IllegalArgumentException.class );
+		assertThatThrownBy( () -> validator.validateValue( root.getClass(), "missing", null ) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void nestedLeafConstraintsAndViolationContext() {
 		CascadingRoot root = new CascadingRoot();
 		var violations = validator.validateProperty( root, "leaf.required" );
-		assertEquals( violations.size(), 1 );
+		assertEquals( 1, violations.size() );
 		var violation = violations.iterator().next();
-		assertSame( violation.getRootBean(), root );
-		assertSame( violation.getLeafBean(), root.leaf );
-		assertEquals( violation.getPropertyPath().toString(), "leaf.required" );
+		assertSame( root, violation.getRootBean() );
+		assertSame( root.leaf, violation.getLeafBean() );
+		assertEquals( "leaf.required", violation.getPropertyPath().toString() );
 		assertTrue( validator.validateProperty( root, "leaf.optional" ).isEmpty() );
 		assertTrue( validator.validateProperty( root, "leaf" ).isEmpty() );
-		expectThrows( IllegalArgumentException.class, () -> validator.validateProperty( root, "leaf.missing" ) );
+		assertThatThrownBy( () -> validator.validateProperty( root, "leaf.missing" ) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void everyIntermediateAssociationRequiresValid() {
 		DeepRoot root = new DeepRoot();
-		assertEquals( validator.validateProperty( root, "branch.leaf.required" ).size(), 1 );
+		assertEquals( 1, validator.validateProperty( root, "branch.leaf.required" ).size() );
 		assertTrue( validator.validateProperty( root, "branch.leaf.optional" ).isEmpty() );
-		expectThrows( IllegalArgumentException.class, () -> validator.validateProperty( root, "branch.unmarked.required" ) );
+		assertThatThrownBy( () -> validator.validateProperty( root, "branch.unmarked.required" ) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void leafCanBeValidatedDirectly() {
 		Leaf leaf = new Leaf();
 		var violation = validator.validateProperty( leaf, "required" ).iterator().next();
-		assertSame( violation.getRootBean(), leaf );
-		assertEquals( violation.getPropertyPath().toString(), "required" );
+		assertSame( leaf, violation.getRootBean() );
+		assertEquals( "required", violation.getPropertyPath().toString() );
 		assertTrue( validator.validateProperty( leaf, "optional" ).isEmpty() );
 	}
 
@@ -83,7 +96,7 @@ public class PropertyPathValidationTest {
 		assertTrue( validator.validateProperty( new PlainLeaf(), "optional" ).isEmpty() );
 		assertTrue( validator.validateValue( PlainLeaf.class, "optional", null ).isEmpty() );
 		assertTrue( validator.validateProperty( new PlainLeafRoot(), "leaf.optional" ).isEmpty() );
-		expectThrows( IllegalArgumentException.class, () -> validator.validateProperty( new PlainLeafRoot(), "leaf.missing" ) );
+		assertThatThrownBy( () -> validator.validateProperty( new PlainLeafRoot(), "leaf.missing" ) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	public static class Leaf {

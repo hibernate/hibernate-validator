@@ -4,8 +4,10 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.money;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.stream.Stream;
 
 import javax.money.MonetaryAmount;
 
@@ -15,8 +17,11 @@ import jakarta.validation.constraints.DecimalMin;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import org.javamoney.moneta.Money;
-import org.testng.annotations.Test;
 
 /**
  * @author Lukas Niemeier
@@ -26,46 +31,36 @@ public class DecimalMinValidatorForMonetaryAmountTest {
 
 	private final ConstraintValidator<DecimalMin, MonetaryAmount> unit = new DecimalMinValidatorForMonetaryAmount();
 
-	@Test
-	public void nullIsValid() {
-		unit.initialize( decimalMin( "0", true ) );
+	@ParameterizedTest
+	@MethodSource("decimalMinValidTestData")
+	public void testDecimalMinValid(String value, boolean inclusive, MonetaryAmount amount) {
+		unit.initialize( decimalMin( value, inclusive ) );
 
-		assertTrue( unit.isValid( null, null ) );
+		assertTrue( unit.isValid( amount, null ) );
 	}
 
-	@Test
-	public void invalidIfLess() {
-		unit.initialize( decimalMin( "0", true ) );
-
-		assertFalse( unit.isValid( Money.of( -1, "EUR" ), null ) );
+	private static Stream<Arguments> decimalMinValidTestData() {
+		return Stream.of(
+				Arguments.of( "0", true, null ),
+				Arguments.of( "0", true, Money.of( 1, "EUR" ) ),
+				Arguments.of( "0", true, Money.of( 0, "EUR" ) ),
+				Arguments.of( "0", false, Money.of( 1, "EUR" ) )
+		);
 	}
 
-	@Test
-	public void validIfGreater() {
-		unit.initialize( decimalMin( "0", true ) );
+	@ParameterizedTest
+	@MethodSource("decimalMinInvalidTestData")
+	public void testDecimalMinInvalid(String value, boolean inclusive, MonetaryAmount amount) {
+		unit.initialize( decimalMin( value, inclusive ) );
 
-		assertTrue( unit.isValid( Money.of( 1, "EUR" ), null ) );
+		assertFalse( unit.isValid( amount, null ) );
 	}
 
-	@Test
-	public void validIfInclude() {
-		unit.initialize( decimalMin( "0", true ) );
-
-		assertTrue( unit.isValid( Money.of( 0, "EUR" ), null ) );
-	}
-
-	@Test
-	public void invalidIfNotInclude() {
-		unit.initialize( decimalMin( "0", false ) );
-
-		assertFalse( unit.isValid( Money.of( 0, "EUR" ), null ) );
-	}
-
-	@Test
-	public void validIfGreaterAndNotIncluded() {
-		unit.initialize( decimalMin( "0", false ) );
-
-		assertTrue( unit.isValid( Money.of( 1, "EUR" ), null ) );
+	private static Stream<Arguments> decimalMinInvalidTestData() {
+		return Stream.of(
+				Arguments.of( "0", true, Money.of( -1, "EUR" ) ),
+				Arguments.of( "0", false, Money.of( 0, "EUR" ) )
+		);
 	}
 
 	private DecimalMin decimalMin(final String value, final boolean inclusive) {

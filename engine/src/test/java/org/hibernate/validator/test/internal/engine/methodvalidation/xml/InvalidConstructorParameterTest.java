@@ -4,20 +4,22 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.validation.Configuration;
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
  */
 public class InvalidConstructorParameterTest {
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000134.*")
+	@Test
 	@TestForIssue(jiraKey = "HV-373")
 	public void testInvalidConstructorParameterTypeThrowsException() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -27,6 +29,8 @@ public class InvalidConstructorParameterTest {
 				)
 		);
 
-		configuration.buildValidatorFactory();
+		assertThatThrownBy( () -> configuration.buildValidatorFactory() )
+				.isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000134.*" );
 	}
 }

@@ -17,12 +17,14 @@ import jakarta.validation.constraints.Future;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
 import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 /**
  * Test for using the {@code ClockProvider} contract in {@code @Future} validators not covered by the TCK.
@@ -31,6 +33,7 @@ import org.testng.annotations.Test;
  * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-897")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ClockProviderFutureTest {
 
 	private static final ZoneId TZ_BERLIN = ZoneId.of( "Europe/Berlin" );
@@ -38,7 +41,7 @@ public class ClockProviderFutureTest {
 	private static ValidatorFactory validatorFactory;
 	private Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidatorFactoryAndValidationXmlTestHelper() {
 		FixedClockProvider clockProvider = new FixedClockProvider(
 				ZonedDateTime.of(
@@ -51,7 +54,7 @@ public class ClockProviderFutureTest {
 				.buildValidatorFactory();
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		validator = validatorFactory.getValidator();
 	}

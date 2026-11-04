@@ -5,6 +5,7 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
 
@@ -32,8 +33,8 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -42,7 +43,7 @@ public class PropertyMetaDataTest {
 
 	private BeanMetaDataManager beanMetaDataManager;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupBeanMetaDataManager() {
 		beanMetaDataManager = new BeanMetaDataManagerImpl(
 				getDummyConstraintCreationContext(),
@@ -71,9 +72,11 @@ public class PropertyMetaDataTest {
 		assertThat( property.getCascadables().iterator().next().getCascadingMetaData().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
+	@Test
 	public void groupConversionInHierarchyWithSameFrom() {
-		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
+		assertThatThrownBy( () -> beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" ) )
+				.isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000124.*" );
 	}
 
 	public interface Complete extends Default {

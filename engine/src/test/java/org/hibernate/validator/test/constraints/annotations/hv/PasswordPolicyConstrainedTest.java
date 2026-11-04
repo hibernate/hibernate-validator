@@ -19,7 +19,7 @@ import org.hibernate.validator.spi.password.PasswordPolicyBuilder;
 import org.hibernate.validator.spi.password.PasswordPolicyDefinition;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class PasswordPolicyConstrainedTest extends AbstractConstrainedTest {
 

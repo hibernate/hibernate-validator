@@ -7,7 +7,7 @@ package org.hibernate.validator.test.constraints.annotations.hv.br;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,9 @@ import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedT
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.Mod11TestUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class CPFValidatorTest extends AbstractConstrainedTest {
 	private String[] invalidCPFs = {
@@ -178,15 +179,15 @@ public class CPFValidatorTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@Test(dataProvider = "malformedCPFs")
+	@ParameterizedTest
+	@MethodSource("malformedCPFs")
 	public void malformed_cpf_is_invalid(CharSequence cpf) {
 		assertThat( validator.validate( new Person( cpf ) ) ).containsOnlyViolations(
 				violationOf( CPF.class ).withProperty( "cpf" )
 		);
 	}
 
-	@DataProvider
-	public Object[][] malformedCPFs() {
+	public static Object[][] malformedCPFs() {
 		return new Object[][] {
 				{ "" },
 				{ "1342413130" },

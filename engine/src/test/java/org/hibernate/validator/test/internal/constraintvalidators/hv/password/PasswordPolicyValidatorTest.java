@@ -7,7 +7,7 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -38,14 +38,14 @@ import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.spi.password.PasswordStrengthScore;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PasswordPolicyValidatorTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -289,7 +289,7 @@ public class PasswordPolicyValidatorTest {
 
 			@Override
 			public boolean meetsMinimumStrength(int minimumStrength) {
-				assertEquals( minimumStrength, PasswordStrengthScore.STRONG );
+				assertEquals( PasswordStrengthScore.STRONG, minimumStrength );
 				return password.length >= 8;
 			}
 		};

@@ -4,16 +4,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.constraints.Trimmed;
 import org.hibernate.validator.internal.constraintvalidators.hv.TrimmedValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link Trimmed} constraint.
@@ -22,7 +22,7 @@ public class TrimmedValidatorTest {
 
 	private TrimmedValidator constraint;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		ConstraintAnnotationDescriptor.Builder<Trimmed> descriptorBuilder =
 				new ConstraintAnnotationDescriptor.Builder<>( Trimmed.class );

@@ -18,7 +18,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.Abs
 import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.MinValidatorForNumber;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Check correct behavior of {@link MinValidatorForNumber} and

@@ -6,7 +6,7 @@ package org.hibernate.validator.test.spi.nodenameprovider;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,8 +30,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Damir Alibegovic
@@ -43,7 +43,7 @@ public class PropertyNodeNameProviderTest {
 
 	private Validator validator;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
 				.configure()
@@ -60,7 +60,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.brand_name" );
+		assertEquals( "brand.brand_name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = validator.validateProperty( testInstance, "brand.name" );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.brand_name" );
+		assertEquals( "brand.brand_name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Brand>> violations = validator.validateValue( Brand.class, "name", INVALID_BRAND_NAME );
 		ConstraintViolation<Brand> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand_name" );
+		assertEquals( "brand_name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Airplane>> violations = validator.validate( testInstance );
 		ConstraintViolation<Airplane> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "turbojet_engine.speed_in_rpm" );
+		assertEquals( "turbojet_engine.speed_in_rpm", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = validator.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "components[engine].horse_power" );
+		assertEquals( "components[engine].horse_power", violation.getPropertyPath().toString() );
 
 	}
 
@@ -117,7 +117,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = val.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.name" );
+		assertEquals( "brand.name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = val.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.name" );
+		assertEquals( "brand.name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = val.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.name" );
+		assertEquals( "brand.name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = val.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.brand_name" );
+		assertEquals( "brand.brand_name", violation.getPropertyPath().toString() );
 	}
 
 	@Test
@@ -179,7 +179,7 @@ public class PropertyNodeNameProviderTest {
 		Set<ConstraintViolation<Car>> violations = val.validate( testInstance );
 		ConstraintViolation<Car> violation = violations.iterator().next();
 
-		assertEquals( violation.getPropertyPath().toString(), "brand.name" );
+		assertEquals( "brand.name", violation.getPropertyPath().toString() );
 	}
 
 	@Test

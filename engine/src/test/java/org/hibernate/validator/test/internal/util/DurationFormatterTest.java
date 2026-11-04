@@ -10,7 +10,7 @@ import java.time.Duration;
 
 import org.hibernate.validator.internal.util.logging.formatter.DurationFormatter;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta

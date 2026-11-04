@@ -4,8 +4,10 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +20,8 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.model.Custo
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -27,7 +29,7 @@ import org.testng.annotations.Test;
 public class AnnotationBasedMethodValidationTest extends AbstractMethodValidationTest {
 
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	protected void setUp() {
 		validator = ValidatorUtil.getValidator();
 		createProxy();
@@ -44,28 +46,26 @@ public class AnnotationBasedMethodValidationTest extends AbstractMethodValidatio
 		Customer customer = new Customer( null );
 		List<Customer> customers = Arrays.asList( null, customer );
 
-		try {
-			customerRepositoryValidatingProxy.iterableParameterWithCascadingTypeParameter( customers );
-			fail( "Expected ConstraintViolationException wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertEquals( e.getConstraintViolations().size(), 1 );
+		assertThatThrownBy( () -> customerRepositoryValidatingProxy.iterableParameterWithCascadingTypeParameter( customers ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( exception -> {
+					ConstraintViolationException e = (ConstraintViolationException) exception;
+					assertEquals( 1, e.getConstraintViolations().size() );
 
-			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
-			assertEquals( constraintViolation.getMessage(), messagePrefix() + "must not be null" );
-			assertMethod( constraintViolation, "iterableParameterWithCascadingTypeParameter", List.class );
-			assertParameterIndex( constraintViolation, 0 );
-			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
-			assertEquals(
-					constraintViolation.getPropertyPath().toString(),
-					"iterableParameterWithCascadingTypeParameter.customer[1].name"
-			);
-			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getRootBean(), customerRepositoryOriginalBean );
-			assertEquals( constraintViolation.getLeafBean(), customer );
-			assertEquals( constraintViolation.getInvalidValue(), null );
-			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
-			assertEquals( constraintViolation.getExecutableReturnValue(), null );
-		}
+					ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+					assertEquals( messagePrefix() + "must not be null", constraintViolation.getMessage() );
+					assertMethod( constraintViolation, "iterableParameterWithCascadingTypeParameter", List.class );
+					assertParameterIndex( constraintViolation, 0 );
+					assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
+					assertEquals(
+							"iterableParameterWithCascadingTypeParameter.customer[1].name",
+							constraintViolation.getPropertyPath().toString() );
+					assertEquals( CustomerRepositoryImpl.class, constraintViolation.getRootBeanClass() );
+					assertEquals( customerRepositoryOriginalBean, constraintViolation.getRootBean() );
+					assertEquals( customer, constraintViolation.getLeafBean() );
+					assertNull( constraintViolation.getInvalidValue() );
+					assertArrayEquals( new Object[] { customers }, constraintViolation.getExecutableParameters() );
+					assertNull( constraintViolation.getExecutableReturnValue() );
+				} );
 	}
 }

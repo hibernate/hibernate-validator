@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -22,21 +22,23 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Tests for message interpolation using EL.
  *
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ExpressionLanguageMessageInterpolationTest {
 
 	private MessageInterpolator interpolatorUnderTest;
 	private ConstraintDescriptorImpl<NotNull> notNullDescriptor;
 	private ConstraintDescriptorImpl<Size> sizeDescriptor;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		// Create some annotations for testing using AnnotationProxies
 		ConstraintAnnotationDescriptor.Builder<NotNull> notNullAnnotationDescriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( NotNull.class );
@@ -75,7 +77,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -95,7 +97,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -115,7 +117,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "${validatedValue.age}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -133,7 +135,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "${validatedValue.foo}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.foo}", context );
-		assertEquals( actual, expected, "No substitution should occur" );
+		assertEquals( expected, actual, "No substitution should occur" );
 	}
 
 	@Test
@@ -145,7 +147,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				"Validated value was ${validatedValue == null ? 'null' : validatedValue}",
 				context
 		);
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -154,7 +156,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "2 0 2147483647";
 		String actual = interpolatorUnderTest.interpolate( "${1+1} {min} {max}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -163,7 +165,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "${1+1}";
 		String actual = interpolatorUnderTest.interpolate( "\\${1+1}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -172,7 +174,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "${min == 0 ? 'foo' : 'bar'}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -181,7 +183,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "Max 2147483647, min 0";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format('Max %s, min %s', max, min)}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -190,7 +192,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "foo", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -199,7 +201,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "\\foo";
 		String actual = interpolatorUnderTest.interpolate( "\\foo", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -208,7 +210,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "$0";
 		String actual = interpolatorUnderTest.interpolate( "${min}", context );
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -231,7 +233,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				context,
 				Locale.GERMAN
 		);
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 
 		// us locale
 		expected = "42.00";
@@ -240,7 +242,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				context,
 				Locale.US
 		);
-		assertEquals( actual, expected, "Wrong substitution" );
+		assertEquals( expected, actual, "Wrong substitution" );
 	}
 
 	@Test
@@ -250,8 +252,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 		String expected = "${formatter.format('%1$s')}";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format('%1$s')}", context );
 		assertEquals(
-				actual,
 				expected,
+				actual,
 				"Calling of formatter#format w/o format parameter. No substitution should occur"
 		);
 	}
@@ -262,7 +264,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "${formatter.format()}";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format()}", context );
-		assertEquals( actual, expected, "Calling of formatter#format w/o parameters. No substitution should occur" );
+		assertEquals( expected, actual, "Calling of formatter#format w/o parameters. No substitution should occur" );
 	}
 
 	@Test
@@ -271,7 +273,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "${'foobar'.substring(0,3)}", context );
-		assertEquals( actual, expected, "Calling of String#substring should work" );
+		assertEquals( expected, actual, "Calling of String#substring should work" );
 	}
 
 	@Test
@@ -280,7 +282,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "${'foobar'.substring(0,3)}";
 		String actual = interpolatorUnderTest.interpolate( "${'foobar'.substring(0,3)}", context );
-		assertEquals( actual, expected, "Calling of String#substring should work" );
+		assertEquals( expected, actual, "Calling of String#substring should work" );
 	}
 
 	@Test
@@ -289,7 +291,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "${'foobar'.substring(0,3)}";
 		String actual = interpolatorUnderTest.interpolate( "${'foobar'.substring(0,3)}", context );
-		assertEquals( actual, expected, "Calling of String#substring should work" );
+		assertEquals( expected, actual, "Calling of String#substring should work" );
 	}
 
 	@Test
@@ -312,8 +314,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 				Locale.GERMAN
 		);
 		assertEquals(
-				actual,
 				expected,
+				actual,
 				"Wrong substitution, no formatting should occur, because the wrong method name is used"
 		);
 	}
@@ -325,7 +327,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "{";
 		String actual = interpolatorUnderTest.interpolate( "${1 > 0 ? '\\{' : '\\}'}", context );
-		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+		assertEquals( expected, actual, "Curly braces are allowed in EL expressions, but need to be escaped" );
 	}
 
 	@Test
@@ -335,7 +337,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "}";
 		String actual = interpolatorUnderTest.interpolate( "${1 < 0 ? '\\{' : '\\}'}", context );
-		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+		assertEquals( expected, actual, "Curly braces are allowed in EL expressions, but need to be escaped" );
 	}
 
 	@Test
@@ -345,7 +347,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "a{b}d";
 		String actual = interpolatorUnderTest.interpolate( "${1 < 0 ? 'foo' : 'a\\{b\\}d'}", context );
-		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+		assertEquals( expected, actual, "Curly braces are allowed in EL expressions, but need to be escaped" );
 	}
 
 	@Test
@@ -355,7 +357,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 		String expected = "\"";
 		String actual = interpolatorUnderTest.interpolate( "${ true ? \"\\\"\" : \"foo\"}", context );
-		assertEquals( actual, expected, "If quotes are used in EL expression literal quotes need to be escaped" );
+		assertEquals( expected, actual, "If quotes are used in EL expression literal quotes need to be escaped" );
 	}
 
 	@Test
@@ -366,8 +368,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 		String expected = "'";
 		String actual = interpolatorUnderTest.interpolate( "${ false ? 'foo' : '\\''}", context );
 		assertEquals(
-				actual,
 				expected,
+				actual,
 				"If single quotes are used in EL expression literal single quotes need to be escaped"
 		);
 	}

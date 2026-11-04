@@ -11,8 +11,9 @@ import static org.hibernate.validator.internal.engine.messageinterpolation.util.
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.resolveToString;
 import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.unescapeMessageParameter;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class InterpolationHelperTest {
 
@@ -24,7 +25,6 @@ public class InterpolationHelperTest {
 		assertThat( escapeMessageParameter( "${\\}" ) ).isEqualTo( "\\$\\{\\\\\\}" );
 	}
 
-	@DataProvider(name = "escape")
 	public static Object[][] escape() {
 		return new Object[][] {
 				{ null, null },
@@ -53,7 +53,8 @@ public class InterpolationHelperTest {
 		};
 	}
 
-	@Test(dataProvider = "escape")
+	@ParameterizedTest
+	@MethodSource("escape")
 	public void testEscapeMessageParameter(String input, String expected) {
 		assertThat( escapeMessageParameter( input ) ).isEqualTo( expected );
 	}
@@ -65,7 +66,6 @@ public class InterpolationHelperTest {
 		assertThat( escapeMessageParameter( "" ) ).isEmpty();
 	}
 
-	@DataProvider(name = "unescape")
 	public static Object[][] unescape() {
 		return new Object[][] {
 				{ "", "" },
@@ -88,7 +88,8 @@ public class InterpolationHelperTest {
 		};
 	}
 
-	@Test(dataProvider = "unescape")
+	@ParameterizedTest
+	@MethodSource("unescape")
 	public void testUnescapeMessageParameter(String input, String expected) {
 		assertThat( unescapeMessageParameter( input ) ).isEqualTo( expected );
 	}
@@ -99,7 +100,8 @@ public class InterpolationHelperTest {
 		assertThat( unescapeMessageParameter( message ) ).isSameAs( message );
 	}
 
-	@Test(dataProvider = "escape")
+	@ParameterizedTest
+	@MethodSource("escape")
 	public void testUnescapeIsInverseOfEscape(String original, String escaped) {
 		if ( original == null ) {
 			return;
@@ -123,7 +125,6 @@ public class InterpolationHelperTest {
 		assertThatThrownBy( () -> unescapeMessageParameter( null ) ).isInstanceOf( NullPointerException.class );
 	}
 
-	@DataProvider(name = "chars")
 	public static Object[][] chars() {
 		return new Object[][] {
 				{ '{', true },
@@ -144,12 +145,12 @@ public class InterpolationHelperTest {
 		};
 	}
 
-	@Test(dataProvider = "chars")
+	@ParameterizedTest
+	@MethodSource("chars")
 	public void testIsEscapeableChar(char c, boolean expected) {
 		assertThat( isEscapeableChar( c ) ).isEqualTo( expected );
 	}
 
-	@DataProvider(name = "values")
 	public static Object[][] values() {
 		return new Object[][] {
 				{ "plain", "plain" },
@@ -173,7 +174,8 @@ public class InterpolationHelperTest {
 		};
 	}
 
-	@Test(dataProvider = "values")
+	@ParameterizedTest
+	@MethodSource("values")
 	public void testResolveToString(Object value, String expected) {
 		assertThat( resolveToString( value ) ).isEqualTo( expected );
 	}

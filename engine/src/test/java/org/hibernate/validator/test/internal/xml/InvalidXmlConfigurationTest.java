@@ -4,23 +4,27 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import jakarta.validation.ValidationException;
 
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class InvalidXmlConfigurationTest {
 
 	private static ValidationXmlTestHelper validationXmlTestHelper;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidationXmlTestHelper() {
 		validationXmlTestHelper = new ValidationXmlTestHelper( InvalidXmlConfigurationTest.class );
 	}
@@ -28,9 +32,9 @@ public class InvalidXmlConfigurationTest {
 	/**
 	 * Tests requirement 8.a from the BV 1.1 spec.
 	 */
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000100.*")
+	@Test
 	public void testInvalidValidationXml() {
-		validationXmlTestHelper.runWithCustomValidationXml(
+		assertThatThrownBy( () -> validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-InvalidXmlConfigurationTest.xml", new Runnable() {
 
 					@Override
@@ -38,6 +42,7 @@ public class InvalidXmlConfigurationTest {
 						ValidatorUtil.getValidator();
 					}
 				}
-		);
+		) ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000100.*" );
 	}
 }

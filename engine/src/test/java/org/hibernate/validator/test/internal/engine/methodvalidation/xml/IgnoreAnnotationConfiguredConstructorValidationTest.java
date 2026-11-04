@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import static org.testng.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import jakarta.validation.Configuration;
 import jakarta.validation.Validator;
@@ -19,16 +19,18 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Rep
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IgnoreAnnotationConfiguredConstructorValidationTest {
 	private Validator validator;
 
-	@BeforeTest
+	@BeforeAll
 	public void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -17,23 +18,24 @@ import jakarta.validation.constraints.Positive;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * This scenario is a simple return value and parameter cascading validation.
  */
 public class ProcessedBeansTrackingCyclesExecutable1Test {
 
-	@DataProvider(name = "validators")
-	public Object[][] createValidators() {
-		return new Object[][] {
-				{ ValidatorUtil.getValidator() },
-				{ ValidatorUtil.getPredefinedValidator( Set.of( Parent.class, ChildWithNoCycles.class, Child.class ) ) }
-		};
+	private static Stream<Arguments> createValidators() {
+		return Stream.of(
+				Arguments.of( ValidatorUtil.getValidator() ),
+				Arguments.of( ValidatorUtil.getPredefinedValidator( Set.of( Parent.class, ChildWithNoCycles.class, Child.class ) ) )
+		);
 	}
 
-	@Test(dataProvider = "validators")
+	@ParameterizedTest
+	@MethodSource("createValidators")
 	public void testCycle1(Validator validator) throws Exception {
 		Parent parent = new Parent();
 		Method doSomething = Parent.class.getMethod( "doSomething", int.class, List.class );
@@ -46,7 +48,8 @@ public class ProcessedBeansTrackingCyclesExecutable1Test {
 
 	}
 
-	@Test(dataProvider = "validators")
+	@ParameterizedTest
+	@MethodSource("createValidators")
 	public void testCycle2(Validator validator) throws Exception {
 		Parent parent = new Parent();
 		Method doSomething = Parent.class.getMethod( "doSomething", int.class, List.class );
@@ -65,7 +68,8 @@ public class ProcessedBeansTrackingCyclesExecutable1Test {
 		);
 	}
 
-	@Test(dataProvider = "validators")
+	@ParameterizedTest
+	@MethodSource("createValidators")
 	public void testCycle3(Validator validator) throws Exception {
 		Parent parent = new Parent();
 
@@ -77,7 +81,8 @@ public class ProcessedBeansTrackingCyclesExecutable1Test {
 		);
 	}
 
-	@Test(dataProvider = "validators")
+	@ParameterizedTest
+	@MethodSource("createValidators")
 	public void testCycle4(Validator validator) throws Exception {
 		Parent parent = new Parent();
 

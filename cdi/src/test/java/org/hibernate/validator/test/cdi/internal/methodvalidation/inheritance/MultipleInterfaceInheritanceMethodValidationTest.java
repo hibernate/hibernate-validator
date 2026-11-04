@@ -5,23 +5,25 @@
 package org.hibernate.validator.test.cdi.internal.methodvalidation.inheritance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.constraints.NotNull;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class MultipleInterfaceInheritanceMethodValidationTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class MultipleInterfaceInheritanceMethodValidationTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -38,19 +40,15 @@ public class MultipleInterfaceInheritanceMethodValidationTest extends Arquillian
 
 	@Test
 	public void testExecutableValidationUsesSettingFromHighestMethodInHierarchy() throws Exception {
-		try {
-			shipmentService.getShipment();
-			fail( "Method invocation should have caused a ConstraintViolationException" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat(
-					e.getConstraintViolations()
-							.iterator()
-							.next()
-							.getConstraintDescriptor()
-							.getAnnotation()
-							.annotationType() )
-					.isEqualTo( NotNull.class );
-		}
+		assertThatThrownBy( () -> shipmentService.getShipment() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat(
+						( (ConstraintViolationException) e ).getConstraintViolations()
+								.iterator()
+								.next()
+								.getConstraintDescriptor()
+								.getAnnotation()
+								.annotationType() )
+						.isEqualTo( NotNull.class ) );
 	}
 }

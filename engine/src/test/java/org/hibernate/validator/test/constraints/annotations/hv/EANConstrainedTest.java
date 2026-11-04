@@ -7,8 +7,8 @@ package org.hibernate.validator.test.constraints.annotations.hv;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 import java.util.Set;
@@ -20,8 +20,9 @@ import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedT
 import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
 import org.hibernate.validator.testutils.Mod10TestUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Marko Bekhta
@@ -51,14 +52,14 @@ public class EANConstrainedTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@Test(dataProvider = "eanNumbers")
+	@ParameterizedTest
+	@MethodSource("eanNumbers")
 	public void testEANBoundaries(CharSequence number, boolean valid8, boolean valid13) {
-		assertEquals( validator.validateValue( EANNumbers.class, "ean8", number ).isEmpty(), valid8 );
-		assertEquals( validator.validateValue( EANNumbers.class, "ean13", number ).isEmpty(), valid13 );
+		assertEquals( valid8, validator.validateValue( EANNumbers.class, "ean8", number ).isEmpty() );
+		assertEquals( valid13, validator.validateValue( EANNumbers.class, "ean13", number ).isEmpty() );
 	}
 
-	@DataProvider
-	public Object[][] eanNumbers() {
+	public static Object[][] eanNumbers() {
 		return new Object[][] {
 				{ null, true, true },
 				{ "", false, false },
@@ -98,8 +99,8 @@ public class EANConstrainedTest extends AbstractConstrainedTest {
 							? (char) ( '0' + random.nextInt( 10 ) )
 							: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 				}
-				assertEquals( validator.validateValue( EANNumbers.class, size == 8 ? "ean8" : "ean13", number ).isEmpty(),
-						Mod10TestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, true, 3, 1 ), number.toString() );
+				assertEquals( Mod10TestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, true, 3, 1 ), validator.validateValue( EANNumbers.class, size == 8 ? "ean8" : "ean13", number ).isEmpty(),
+						number.toString() );
 			}
 		}
 	}

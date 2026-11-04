@@ -17,7 +17,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.ContainsDef;
 import org.hibernate.validator.constraints.Contains;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link ContainsDef} programmatic constraint definition.

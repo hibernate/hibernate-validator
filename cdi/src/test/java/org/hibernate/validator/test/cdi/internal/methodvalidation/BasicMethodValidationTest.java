@@ -4,23 +4,25 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation;
 
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class BasicMethodValidationTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class BasicMethodValidationTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -41,45 +43,25 @@ public class BasicMethodValidationTest extends Arquillian {
 
 	@Test
 	public void testConstructorValidation() throws Exception {
-		try {
-			repeaterInstance.get();
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> repeaterInstance.get() )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 
 	@Test
 	public void testReturnValueValidation() throws Exception {
-		try {
-			repeater.reverse( null );
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> repeater.reverse( null ) )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 
 	@Test
 	public void testParameterValidation() throws Exception {
-		try {
-			repeater.repeat( null );
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> repeater.repeat( null ) )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 
 	@Test
 	public void testGetterValidation() throws Exception {
-		try {
-			repeater.getHelloWorld();
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> repeater.getHelloWorld() )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 }

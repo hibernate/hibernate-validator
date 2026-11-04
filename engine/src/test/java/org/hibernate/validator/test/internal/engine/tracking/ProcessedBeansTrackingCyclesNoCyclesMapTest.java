@@ -4,8 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.tracking;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.hibernate.validator.PredefinedScopeHibernateValidatorFactory;
 import org.hibernate.validator.internal.engine.PredefinedScopeValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.tracking.ProcessedBeansTrackingStrategy;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * An example of beans with cascading constraints, some cycle and others do not.

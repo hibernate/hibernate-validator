@@ -14,7 +14,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.integrationtest.java.module.no.el.model.Car;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class JavaModulePathIT {
 

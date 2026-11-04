@@ -15,12 +15,11 @@ import jakarta.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.EndsWith;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Andrea Boriero
  */
-@Test
 public class EndsWithConstrainedTest extends AbstractConstrainedTest {
 
 	@Test

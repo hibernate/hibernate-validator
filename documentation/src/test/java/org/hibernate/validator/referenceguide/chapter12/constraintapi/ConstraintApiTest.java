@@ -20,7 +20,7 @@ import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ConstraintApiTest {
 

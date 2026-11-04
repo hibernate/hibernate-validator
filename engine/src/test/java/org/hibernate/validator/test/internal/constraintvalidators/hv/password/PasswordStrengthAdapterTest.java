@@ -4,13 +4,13 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.spi.password.PasswordStrengthScore;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class PasswordStrengthAdapterTest {
 

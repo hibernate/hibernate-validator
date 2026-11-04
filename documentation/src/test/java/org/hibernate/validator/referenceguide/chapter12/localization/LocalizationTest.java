@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter12.localization;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Locale;
@@ -20,7 +20,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolver;
 import org.hibernate.validator.spi.messageinterpolation.LocaleResolverContext;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LocalizationTest {
 

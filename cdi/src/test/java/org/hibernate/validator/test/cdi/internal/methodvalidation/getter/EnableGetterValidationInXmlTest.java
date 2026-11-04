@@ -4,24 +4,26 @@
  */
 package org.hibernate.validator.test.cdi.internal.methodvalidation.getter;
 
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 
 import org.hibernate.validator.test.util.TestHelper;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-public class EnableGetterValidationInXmlTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class EnableGetterValidationInXmlTest {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
@@ -39,12 +41,7 @@ public class EnableGetterValidationInXmlTest extends Arquillian {
 
 	@Test
 	public void testGetterValidationOccursBecauseItIsEnabledInXml() throws Exception {
-		try {
-			foo.getFoo();
-			fail( "method validation should be enabled via validation.xml" );
-		}
-		catch (ConstraintViolationException e) {
-			// success
-		}
+		assertThatThrownBy( () -> foo.getFoo() )
+				.isInstanceOf( ConstraintViolationException.class );
 	}
 }

@@ -4,15 +4,16 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenIterator;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@code TokenIterator}.
@@ -21,18 +22,22 @@ import org.testng.annotations.Test;
  */
 public class TokenIteratorTest {
 
-	@Test(expectedExceptions = IllegalStateException.class)
+	@Test
 	public void testGettingInterpolatedMessageWithoutCallingHasMoreInterpolationTerms() throws Exception {
-		TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
-		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
-		tokenIterator.getInterpolatedMessage();
+		assertThatThrownBy( () -> {
+			TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
+			TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
+			tokenIterator.getInterpolatedMessage();
+		} ).isInstanceOf( IllegalStateException.class );
 	}
 
-	@Test(expectedExceptions = IllegalStateException.class)
+	@Test
 	public void testNextInterpolationTermWithoutCallingHasMoreInterpolationTerms() throws Exception {
-		TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
-		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
-		tokenIterator.nextInterpolationTerm();
+		assertThatThrownBy( () -> {
+			TokenCollector tokenCollector = new TokenCollector( "foo", InterpolationTermType.PARAMETER );
+			TokenIterator tokenIterator = new TokenIterator( tokenCollector.getOriginalMessageDescriptor(), tokenCollector.getTokenList() );
+			tokenIterator.nextInterpolationTerm();
+		} ).isInstanceOf( IllegalStateException.class );
 	}
 
 	@Test
@@ -42,7 +47,7 @@ public class TokenIteratorTest {
 		TokenIterator tokenIterator = new TokenIterator( message, tokenCollector.getTokenList() );
 
 		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no interpolation terms" );
-		assertEquals( tokenIterator.getInterpolatedMessage(), message, "The message should be unchanged" );
+		assertEquals( message, tokenIterator.getInterpolatedMessage(), "The message should be unchanged" );
 	}
 
 	@Test
@@ -59,10 +64,10 @@ public class TokenIteratorTest {
 		TokenIterator tokenIterator = new TokenIterator( message, tokenCollector.getTokenList() );
 
 		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "There should be a term" );
-		assertEquals( tokenIterator.nextInterpolationTerm(), "{foo}", "{foo} should be the first term" );
+		assertEquals( "{foo}", tokenIterator.nextInterpolationTerm(), "{foo} should be the first term" );
 
 		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "There should be a term" );
-		assertEquals( tokenIterator.nextInterpolationTerm(), "{bar}", "{bar} should be the second term" );
+		assertEquals( "{bar}", tokenIterator.nextInterpolationTerm(), "{bar} should be the second term" );
 
 		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no more interpolation terms" );
 	}
@@ -75,8 +80,8 @@ public class TokenIteratorTest {
 
 		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no term" );
 		assertEquals(
-				tokenIterator.getInterpolatedMessage(),
 				message,
+				tokenIterator.getInterpolatedMessage(),
 				"Message should not change since all meta characters are escaped"
 		);
 	}
@@ -121,7 +126,7 @@ public class TokenIteratorTest {
 		TokenIterator tokenIterator = new TokenIterator( message, tokenCollector.getTokenList() );
 
 		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no interpolation terms" );
-		assertEquals( tokenIterator.getInterpolatedMessage(), message, "The message should be unchanged" );
+		assertEquals( message, tokenIterator.getInterpolatedMessage(), "The message should be unchanged" );
 	}
 
 	@Test
@@ -164,13 +169,13 @@ public class TokenIteratorTest {
 		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "There should be a term" );
 
 		String actualTerm = tokenIterator.nextInterpolationTerm();
-		assertEquals( actualTerm, term, "Wrong term" );
+		assertEquals( term, actualTerm, "Wrong term" );
 		tokenIterator.replaceCurrentInterpolationTerm( termReplacement );
 
 		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no more term" );
 		assertEquals(
-				tokenIterator.getInterpolatedMessage(),
 				interpolatedMessage,
+				tokenIterator.getInterpolatedMessage(),
 				"Term did not get properly replaced"
 		);
 	}

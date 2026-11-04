@@ -19,8 +19,8 @@ import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Chris Beckey
@@ -47,11 +47,11 @@ public class ConfigurationFilePropertiesTest {
 			@Override
 			public void run() {
 				GenericBootstrap provider = Validation.byDefaultProvider();
-				Assert.assertNotNull( provider );
+				Assertions.assertNotNull( provider );
 
 				Configuration<?> config = provider.configure();
-				Assert.assertNotNull( config );
-				Assert.assertTrue( config instanceof HibernateValidatorConfiguration );
+				Assertions.assertNotNull( config );
+				Assertions.assertInstanceOf( HibernateValidatorConfiguration.class, config );
 
 				HibernateValidatorConfiguration hibernateConfig = (HibernateValidatorConfiguration) config;
 
@@ -64,7 +64,7 @@ public class ConfigurationFilePropertiesTest {
 				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
 				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
 
-				Assert.assertTrue( methodConfig.isAllowMultipleCascadedValidationOnReturnValues() );
+				Assertions.assertTrue( methodConfig.isAllowMultipleCascadedValidationOnReturnValues() );
 			}
 		} );
 	}
@@ -76,11 +76,11 @@ public class ConfigurationFilePropertiesTest {
 			@Override
 			public void run() {
 				GenericBootstrap provider = Validation.byDefaultProvider();
-				Assert.assertNotNull( provider );
+				Assertions.assertNotNull( provider );
 
 				Configuration<?> config = provider.configure();
-				Assert.assertNotNull( config );
-				Assert.assertTrue( config instanceof HibernateValidatorConfiguration );
+				Assertions.assertNotNull( config );
+				Assertions.assertInstanceOf( HibernateValidatorConfiguration.class, config );
 
 				HibernateValidatorConfiguration hibernateConfig = (HibernateValidatorConfiguration) config;
 
@@ -93,7 +93,7 @@ public class ConfigurationFilePropertiesTest {
 				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
 				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
 
-				Assert.assertTrue( methodConfig.isAllowOverridingMethodAlterParameterConstraint() );
+				Assertions.assertTrue( methodConfig.isAllowOverridingMethodAlterParameterConstraint() );
 			}
 		} );
 	}
@@ -105,11 +105,11 @@ public class ConfigurationFilePropertiesTest {
 			@Override
 			public void run() {
 				GenericBootstrap provider = Validation.byDefaultProvider();
-				Assert.assertNotNull( provider );
+				Assertions.assertNotNull( provider );
 
 				Configuration<?> config = provider.configure();
-				Assert.assertNotNull( config );
-				Assert.assertTrue( config instanceof HibernateValidatorConfiguration );
+				Assertions.assertNotNull( config );
+				Assertions.assertInstanceOf( HibernateValidatorConfiguration.class, config );
 
 				HibernateValidatorConfiguration hibernateConfig = (HibernateValidatorConfiguration) config;
 
@@ -122,7 +122,7 @@ public class ConfigurationFilePropertiesTest {
 				BeanMetaDataManager bmdm = findPropertyOfType( hibernateValidatorImpl, BeanMetaDataManager.class );
 				MethodValidationConfiguration methodConfig = findPropertyOfType( bmdm, MethodValidationConfiguration.class );
 
-				Assert.assertTrue( methodConfig.isAllowParallelMethodsDefineParameterConstraints() );
+				Assertions.assertTrue( methodConfig.isAllowParallelMethodsDefineParameterConstraints() );
 			}
 		} );
 	}

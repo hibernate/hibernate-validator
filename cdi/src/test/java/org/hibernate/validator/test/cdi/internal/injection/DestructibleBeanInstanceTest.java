@@ -17,7 +17,7 @@ import jakarta.enterprise.inject.spi.InjectionTargetFactory;
 
 import org.hibernate.validator.cdi.internal.DestructibleBeanInstance;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class DestructibleBeanInstanceTest {
 

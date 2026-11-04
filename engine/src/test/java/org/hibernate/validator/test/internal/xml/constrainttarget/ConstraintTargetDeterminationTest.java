@@ -4,11 +4,11 @@
  */
 package org.hibernate.validator.test.internal.xml.constrainttarget;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.fail;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -16,8 +16,8 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for automatic determination of constraints with generic and cross-parameter validator when
@@ -29,7 +29,7 @@ public class ConstraintTargetDeterminationTest {
 
 	private OrderService orderService;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		Validator validator = ValidatorUtil.getConfiguration()
 				.addMapping( ConstraintTargetDeterminationTest.class.getResourceAsStream( "hv-769-mapping.xml" ) )
@@ -42,59 +42,56 @@ public class ConstraintTargetDeterminationTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-769")
 	public void shouldDetermineConstraintTargetForReturnValueConstraint() {
-		try {
-			orderService.getNumberOfOrders( 42, true );
-			fail( "Expected exception wasn't thrown" );
-		}
-		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( GenericAndCrossParameterConstraint.class )
-							.withPropertyPath( pathWith()
-									.method( "getNumberOfOrders" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> orderService.getNumberOfOrders( 42, true ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> {
+					ConstraintViolationException cve = (ConstraintViolationException) e;
+					assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( GenericAndCrossParameterConstraint.class )
+									.withPropertyPath( pathWith()
+											.method( "getNumberOfOrders" )
+											.returnValue()
+									)
+					);
+				} );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-769")
 	public void shouldDetermineConstraintTargetForCrossParameterConstraint() {
-		try {
-			orderService.placeOrder( 42, "Best of Glen Closed", 3 );
-			fail( "Expected exception wasn't thrown" );
-		}
-		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( GenericAndCrossParameterConstraint.class )
-							.withPropertyPath( pathWith()
-									.method( "placeOrder" )
-									.crossParameter()
-							)
-			);
-		}
+		assertThatThrownBy( () -> orderService.placeOrder( 42, "Best of Glen Closed", 3 ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> {
+					ConstraintViolationException cve = (ConstraintViolationException) e;
+					assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( GenericAndCrossParameterConstraint.class )
+									.withPropertyPath( pathWith()
+											.method( "placeOrder" )
+											.crossParameter()
+									)
+					);
+				} );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-769")
 	public void shouldDetermineConstraintTargetForComposedConstraint() {
-		try {
-			orderService.cancelOrder( 42, "Item damaged" );
-			fail( "Expected exception wasn't thrown" );
-		}
-		catch (ConstraintViolationException cve) {
-			assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( GenericAndCrossParameterConstraint.class )
-							.withPropertyPath( pathWith()
-									.method( "cancelOrder" )
-									.crossParameter()
-							),
-					violationOf( ComposedGenericAndCrossParameterConstraint.class )
-							.withPropertyPath( pathWith()
-									.method( "cancelOrder" )
-									.crossParameter()
-							)
-			);
-		}
+		assertThatThrownBy( () -> orderService.cancelOrder( 42, "Item damaged" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> {
+					ConstraintViolationException cve = (ConstraintViolationException) e;
+					assertThat( cve.getConstraintViolations() ).containsOnlyViolations(
+							violationOf( GenericAndCrossParameterConstraint.class )
+									.withPropertyPath( pathWith()
+											.method( "cancelOrder" )
+											.crossParameter()
+									),
+							violationOf( ComposedGenericAndCrossParameterConstraint.class )
+									.withPropertyPath( pathWith()
+											.method( "cancelOrder" )
+											.crossParameter()
+									)
+					);
+				} );
 	}
 }

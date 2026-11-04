@@ -7,10 +7,8 @@ package org.hibernate.validator.test.constraints;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertPathEquals;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +23,7 @@ import org.hibernate.validator.messageinterpolation.ExpressionLanguageFeatureLev
 import org.hibernate.validator.messageinterpolation.MessageParameterEscaping;
 import org.hibernate.validator.testutil.ConstraintViolationAssert.PathExpectation;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link ConstraintValidatorContextImpl}.
@@ -165,17 +163,18 @@ public class ConstraintValidatorContextImplTest {
 				.addConstraintViolation();
 
 		List<ConstraintViolationCreationContext> constraintViolationCreationContextList = context.getConstraintViolationCreationContexts();
-		assertTrue( constraintViolationCreationContextList.size() == 2 );
+		assertEquals( 2, constraintViolationCreationContextList.size() );
 		assertMessageAndPath( constraintViolationCreationContextList.get( 0 ), message1, pathWith()
 				.property( "foo" )
 				.property( "bar", true, "key", null ) );
 		assertMessageAndPath( constraintViolationCreationContextList.get( 1 ), message2, pathWith().bean() );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void testUnwrapToImplementationCausesValidationException() {
 		ConstraintValidatorContext context = createEmptyHibernateConstraintValidatorReusableContext();
-		context.unwrap( ConstraintValidatorContextImpl.class );
+		assertThatThrownBy( () -> context.unwrap( ConstraintValidatorContextImpl.class ) )
+				.isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -183,10 +182,10 @@ public class ConstraintValidatorContextImplTest {
 		ConstraintValidatorContext context = createEmptyHibernateConstraintValidatorReusableContext();
 
 		ConstraintValidatorContext asConstraintValidatorContext = context.unwrap( ConstraintValidatorContext.class );
-		assertSame( asConstraintValidatorContext, context );
+		assertSame( context, asConstraintValidatorContext );
 
 		java.lang.Object asObject = context.unwrap( java.lang.Object.class );
-		assertSame( asObject, context );
+		assertSame( context, asObject );
 	}
 
 	@Test
@@ -228,12 +227,12 @@ public class ConstraintValidatorContextImplTest {
 	@Test
 	public void testCustomizingFirstNodeIsRejected() {
 		ConstraintValidatorContextImpl context = createEmptyHibernateConstraintValidatorReusableContext();
-		expectThrows( IllegalStateException.class, () -> context.buildConstraintViolationWithTemplate( message )
-				.addPropertyNode( "jobs" ).inIterable() );
-		expectThrows( IllegalStateException.class, () -> context.buildConstraintViolationWithTemplate( message )
-				.addPropertyNode( "jobs" ).inContainer( List.class, 0 ) );
-		expectThrows( IllegalStateException.class, () -> context.buildConstraintViolationWithTemplate( message )
-				.addContainerElementNode( "<list element>", List.class, 0 ).addConstraintViolation() );
+		assertThatThrownBy( () -> context.buildConstraintViolationWithTemplate( message )
+				.addPropertyNode( "jobs" ).inIterable() ).isInstanceOf( IllegalStateException.class );
+		assertThatThrownBy( () -> context.buildConstraintViolationWithTemplate( message )
+				.addPropertyNode( "jobs" ).inContainer( List.class, 0 ) ).isInstanceOf( IllegalStateException.class );
+		assertThatThrownBy( () -> context.buildConstraintViolationWithTemplate( message )
+				.addContainerElementNode( "<list element>", List.class, 0 ).addConstraintViolation() ).isInstanceOf( IllegalStateException.class );
 	}
 
 	@Test
@@ -269,6 +268,6 @@ public class ConstraintValidatorContextImplTest {
 
 	private void assertMessageAndPath(ConstraintViolationCreationContext constraintViolationCreationContext, String expectedMessage, PathExpectation expectedPath) {
 		assertPathEquals( constraintViolationCreationContext.getPath(), expectedPath );
-		assertEquals( constraintViolationCreationContext.getMessage(), expectedMessage, "Wrong message" );
+		assertEquals( expectedMessage, constraintViolationCreationContext.getMessage(), "Wrong message" );
 	}
 }

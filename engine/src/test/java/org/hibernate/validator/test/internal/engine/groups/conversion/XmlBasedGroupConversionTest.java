@@ -9,7 +9,7 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Integrative test for XML configured group conversion.
@@ -18,7 +18,7 @@ import org.testng.annotations.BeforeMethod;
  */
 public class XmlBasedGroupConversionTest extends AbstractGroupConversionTest {
 	@Override
-	@BeforeMethod
+	@BeforeEach
 	public void setupValidator() {
 		Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

@@ -4,13 +4,13 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Set;
 
@@ -31,25 +31,27 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * Tests the definition of method constraints with the programmatic API.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MethodConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 	private GreetingService wrappedObject;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		wrappedObject = new GreetingServiceImpl();
 	}
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpTest() {
 		config = getConfiguration( HibernateValidator.class );
 	}
@@ -65,21 +67,17 @@ public class MethodConstraintMappingTest {
 
 		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
-		try {
-			service.greet( new User( "foo" ) );
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-									.property( "message" )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( new User( "foo" ) ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+										.property( "message" )
+								)
+				) );
 	}
 
 	@Test
@@ -102,21 +100,17 @@ public class MethodConstraintMappingTest {
 
 		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
-		try {
-			service.greet( new User( "foo" ) );
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "message must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-									.property( "message" )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( new User( "foo" ) ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "message must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+										.property( "message" )
+								)
+				) );
 	}
 
 	@Test
@@ -130,49 +124,45 @@ public class MethodConstraintMappingTest {
 
 		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
-		try {
-			service.greet( new User( null ) );
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "user", 0 )
-									.property( "name" )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( new User( null ) ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "user", 0 )
+										.property( "name" )
+								)
+				) );
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000135.*"
-	)
+	@Test
 	public void testCascadingDefinitionOnMissingMethod() {
-		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( GreetingService.class )
-				.method( "greet" )
-				.returnValue()
-				.valid();
+		assertThatThrownBy( () -> {
+			ConstraintMapping mapping = config.createConstraintMapping();
+			mapping.type( GreetingService.class )
+					.method( "greet" )
+					.returnValue()
+					.valid();
 
-		config.buildValidatorFactory().getValidator();
+			config.buildValidatorFactory().getValidator();
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000135.*" );
 	}
 
-	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV000056.*"
-	)
+	@Test
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
-		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( GreetingService.class )
-				.method( "greet", User.class )
-				.parameter( 1 )
-				.valid();
+		assertThatThrownBy( () -> {
+			ConstraintMapping mapping = config.createConstraintMapping();
+			mapping.type( GreetingService.class )
+					.method( "greet", User.class )
+					.parameter( 1 )
+					.valid();
 
-		config.buildValidatorFactory().getValidator();
+			config.buildValidatorFactory().getValidator();
+		} ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000056.*" );
 	}
 
 	@Test
@@ -236,18 +226,21 @@ public class MethodConstraintMappingTest {
 		}
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	@Test
 	public void testCascadingMethodParameterDefinedOnlyOnSubType() {
-		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( GreetingServiceImpl.class )
-				.method( "greet", User.class )
-				.parameter( 0 )
-				.valid();
-		config.addMapping( mapping );
+		assertThatThrownBy( () -> {
+			ConstraintMapping mapping = config.createConstraintMapping();
+			mapping.type( GreetingServiceImpl.class )
+					.method( "greet", User.class )
+					.parameter( 0 )
+					.valid();
+			config.addMapping( mapping );
 
-		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
+			GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
-		service.greet( new User( null ) );
+			service.greet( new User( null ) );
+		} ).isInstanceOf( ConstraintDeclarationException.class )
+				.hasMessageMatching( "HV000151.*" );
 	}
 
 	@Test
@@ -259,25 +252,21 @@ public class MethodConstraintMappingTest {
 				.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( (User) null );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "user", 0 )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( (User) null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "user", 0 )
+								)
+				) );
 	}
 
 	@Test
@@ -289,25 +278,21 @@ public class MethodConstraintMappingTest {
 				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "string", 0 )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "string", 0 )
+								)
+				) );
 	}
 
 	@Test
@@ -320,31 +305,27 @@ public class MethodConstraintMappingTest {
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "string", 0 )
-							),
-					violationOf( Size.class )
-							.withMessage( "size must be between 2 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "string", 0 )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "string", 0 )
+								),
+						violationOf( Size.class )
+								.withMessage( "size must be between 2 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "string", 0 )
+								)
+				) );
 	}
 
 	@Test
@@ -358,31 +339,27 @@ public class MethodConstraintMappingTest {
 				.constraint( new SizeDef().min( 1 ).max( 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "", "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "string1", 0 )
-							),
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "string2", 1 )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "", "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "string1", 0 )
+								),
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "string2", 1 )
+								)
+				) );
 	}
 
 	@Test
@@ -394,31 +371,27 @@ public class MethodConstraintMappingTest {
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.sayHello( "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "sayHello" )
-									.parameter( "name", 0 )
-							),
-					violationOf( Size.class )
-							.withMessage( "size must be between 2 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "sayHello" )
-									.parameter( "name", 0 )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.sayHello( "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "sayHello" )
+										.parameter( "name", 0 )
+								),
+						violationOf( Size.class )
+								.withMessage( "size must be between 2 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "sayHello" )
+										.parameter( "name", 0 )
+								)
+				) );
 	}
 
 	@Test
@@ -433,38 +406,28 @@ public class MethodConstraintMappingTest {
 
 		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
-		try {
-			service.greet( (User) null );
+		assertThatThrownBy( () -> service.greet( (User) null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "user", 0 )
+								)
+				) );
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "user", 0 )
-							)
-			);
-		}
-
-		try {
-			service.greet( new User( null ) );
-
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.parameter( "user", 0 )
-									.property( "name" )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( new User( null ) ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.parameter( "user", 0 )
+										.property( "name" )
+								)
+				) );
 	}
 
 	@Test
@@ -476,25 +439,21 @@ public class MethodConstraintMappingTest {
 				.constraint( new SizeDef().min( 1 ).max( 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "Hello" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "Hello" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								)
+				) );
 	}
 
 	@Test
@@ -507,31 +466,27 @@ public class MethodConstraintMappingTest {
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "Hello" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							),
-					violationOf( Size.class )
-							.withMessage( "size must be between 2 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "Hello" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								),
+						violationOf( Size.class )
+								.withMessage( "size must be between 2 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								)
+				) );
 	}
 
 	@Test
@@ -543,25 +498,21 @@ public class MethodConstraintMappingTest {
 				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								)
+				) );
 	}
 
 	@Test
@@ -573,31 +524,27 @@ public class MethodConstraintMappingTest {
 				.constraint( new SizeDef().min( 2 ).max( 10 ) );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "Hello", "World" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							),
-					violationOf( Size.class )
-							.withMessage( "size must be between 2 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "Hello", "World" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								),
+						violationOf( Size.class )
+								.withMessage( "size must be between 2 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								)
+				) );
 	}
 
 	@Test
@@ -608,25 +555,21 @@ public class MethodConstraintMappingTest {
 				.constraint( new NotNullDef() );
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.getHello();
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "getHello" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.getHello() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "getHello" )
+										.returnValue()
+								)
+				) );
 	}
 
 	@Test
@@ -637,26 +580,22 @@ public class MethodConstraintMappingTest {
 				.valid();
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.getUser();
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( NotNull.class )
-							.withMessage( "must not be null" )
-							.withPropertyPath( pathWith()
-									.method( "getUser" )
-									.returnValue()
-									.property( "name" )
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.getUser() )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( NotNull.class )
+								.withMessage( "must not be null" )
+								.withPropertyPath( pathWith()
+										.method( "getUser" )
+										.returnValue()
+										.property( "name" )
+								)
+				) );
 	}
 
 	@Test
@@ -744,26 +683,22 @@ public class MethodConstraintMappingTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		GreetingService service = getValidatingProxy( wrappedObject, validator );
 
-		try {
-			service.greet( null, null );
-			fail( "Expected exception wasn't thrown" );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( GenericAndCrossParameterConstraint.class )
-							.withMessage( "default message" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							),
-					violationOf( Size.class )
-							.withMessage( "size must be between 1 and 10" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.returnValue()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( null, null ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( GenericAndCrossParameterConstraint.class )
+								.withMessage( "default message" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								),
+						violationOf( Size.class )
+								.withMessage( "size must be between 1 and 10" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.returnValue()
+								)
+				) );
 	}
 
 	@Test
@@ -780,25 +715,21 @@ public class MethodConstraintMappingTest {
 				);
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.greet( "", "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( GenericAndCrossParameterConstraint.class )
-							.withMessage( "default message" )
-							.withPropertyPath( pathWith()
-									.method( "greet" )
-									.crossParameter()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.greet( "", "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( GenericAndCrossParameterConstraint.class )
+								.withMessage( "default message" )
+								.withPropertyPath( pathWith()
+										.method( "greet" )
+										.crossParameter()
+								)
+				) );
 	}
 
 	@Test
@@ -815,25 +746,21 @@ public class MethodConstraintMappingTest {
 				);
 		config.addMapping( mapping );
 
-		try {
-			GreetingService service = getValidatingProxy(
-					wrappedObject,
-					config.buildValidatorFactory().getValidator()
-			);
-			service.sayNothing( "" );
+		GreetingService service = getValidatingProxy(
+				wrappedObject,
+				config.buildValidatorFactory().getValidator()
+		);
 
-			fail( "Expected exception wasn't thrown." );
-		}
-		catch (ConstraintViolationException e) {
-			assertThat( e.getConstraintViolations() ).containsOnlyViolations(
-					violationOf( GenericAndCrossParameterConstraint.class )
-							.withMessage( "default message" )
-							.withPropertyPath( pathWith()
-									.method( "sayNothing" )
-									.crossParameter()
-							)
-			);
-		}
+		assertThatThrownBy( () -> service.sayNothing( "" ) )
+				.isInstanceOf( ConstraintViolationException.class )
+				.satisfies( e -> assertThat( ( (ConstraintViolationException) e ).getConstraintViolations() ).containsOnlyViolations(
+						violationOf( GenericAndCrossParameterConstraint.class )
+								.withMessage( "default message" )
+								.withPropertyPath( pathWith()
+										.method( "sayNothing" )
+										.crossParameter()
+								)
+				) );
 	}
 
 	private interface TestGroup {

@@ -4,6 +4,7 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
@@ -18,7 +19,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.model.Custo
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Gunnar Morling
@@ -112,29 +113,30 @@ public abstract class AbstractConstructorValidationTest {
 		);
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullParameterArrayThrowsException() throws Exception {
-		executableValidator.validateConstructorParameters(
+		assertThatThrownBy( () -> executableValidator.validateConstructorParameters(
 				CustomerRepositoryImpl.class.getConstructor( Customer.class ),
 				null
-		);
+		) ).isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "null passed as group name.")
+	@Test
 	public void testNullGroupsVarargThrowsException() throws Exception {
-		executableValidator.validateConstructorParameters(
+		assertThatThrownBy( () -> executableValidator.validateConstructorParameters(
 				CustomerRepositoryImpl.class.getConstructor( String.class ),
 				new String[] { "foo" },
 				(Class<?>) null
-		);
+		) ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "null passed as group name." );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000116.*")
+	@Test
 	public void testPassingNullAsConstructorReturnValueThrowsException() throws Exception {
-		executableValidator.validateConstructorReturnValue(
+		assertThatThrownBy( () -> executableValidator.validateConstructorReturnValue(
 				CustomerRepositoryImpl.class.getConstructor(),
 				null
-		);
+		) ).isInstanceOf( IllegalArgumentException.class )
+				.hasMessageMatching( "HV000116.*" );
 	}
 }

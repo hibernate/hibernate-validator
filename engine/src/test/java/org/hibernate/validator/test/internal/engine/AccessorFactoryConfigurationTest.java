@@ -37,19 +37,19 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.bean.BeanProvider;
 
-import com.acme.accessor.internal.TestAccessorFactory;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import com.acme.accessor.internal.TestAccessorFactory;
 
 public class AccessorFactoryConfigurationTest {
 
-	@DataProvider
-	public Object[][] scopes() {
+	public static Object[][] scopes() {
 		return new Object[][] { { false }, { true } };
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void defaultFactoryIsAvailableThroughResolver(boolean predefinedScope) {
 		try ( ValidatorFactory factory = configuration( predefinedScope ).buildValidatorFactory() ) {
 			HibernateValidatorFactory hibernateFactory = factory.unwrap( HibernateValidatorFactory.class );
@@ -62,7 +62,8 @@ public class AccessorFactoryConfigurationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void explicitInstanceTakesPrecedenceOverProperty(boolean predefinedScope) {
 		TrackingAccessorFactory accessorFactory = new TrackingAccessorFactory();
 		try ( ValidatorFactory factory = configuration( predefinedScope )
@@ -75,7 +76,8 @@ public class AccessorFactoryConfigurationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void propertyUsesConstructorAndExternalClassLoader(boolean predefinedScope) {
 		AtomicInteger classLoads = new AtomicInteger();
 		ClassLoader externalClassLoader = new ClassLoader( getClass().getClassLoader() ) {
@@ -100,7 +102,8 @@ public class AccessorFactoryConfigurationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void invalidPropertyPreservesAccessorFactoryError(boolean predefinedScope) {
 		assertThatThrownBy( () -> configuration( predefinedScope )
 				.addProperty( HibernateValidatorConfiguration.ACCESSOR_FACTORY_CLASSNAME, "missing.AccessorFactory" )
@@ -109,7 +112,8 @@ public class AccessorFactoryConfigurationTest {
 				.hasMessageStartingWith( "HV000278" );
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void programmaticMappingUsesLateAccessorConfiguration(boolean predefinedScope) {
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope );
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -131,7 +135,8 @@ public class AccessorFactoryConfigurationTest {
 		}
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void declarationCollectionDoesNotUseConfiguredAccessor(boolean predefinedScope) {
 		TrackingAccessorFactory accessorFactory = new TrackingAccessorFactory();
 		BaseHibernateValidatorConfiguration<?> config = configuration( predefinedScope ).accessorFactory( accessorFactory );
@@ -141,7 +146,8 @@ public class AccessorFactoryConfigurationTest {
 		assertThat( accessorFactory.fieldReaders ).isZero();
 	}
 
-	@Test(dataProvider = "scopes")
+	@ParameterizedTest
+	@MethodSource("scopes")
 	public void programmaticMappingUsesBeanResolvedAccessor(boolean predefinedScope) {
 		TrackingAccessorFactory sourceAccessor = new TrackingAccessorFactory();
 		BaseHibernateValidatorConfiguration<?> source = configuration( predefinedScope ).accessorFactory( sourceAccessor );

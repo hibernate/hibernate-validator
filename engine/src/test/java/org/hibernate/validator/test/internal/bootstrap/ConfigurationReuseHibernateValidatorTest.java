@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.test.internal.bootstrap;
 
-import static org.testng.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Locale;
 
@@ -13,7 +13,7 @@ import jakarta.validation.MessageInterpolator;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Steven Walters
@@ -51,7 +51,7 @@ public class ConfigurationReuseHibernateValidatorTest {
 		MessageInterpolator interpolator2 = new MessageInterpolatorImpl( "Two" );
 		ValidatorFactory factory1 = config.messageInterpolator( interpolator1 ).buildValidatorFactory();
 		ValidatorFactory factory2 = config.messageInterpolator( interpolator2 ).buildValidatorFactory();
-		assertSame( factory1.getMessageInterpolator(), interpolator1 );
-		assertSame( factory2.getMessageInterpolator(), interpolator2 );
+		assertSame( interpolator1, factory1.getMessageInterpolator() );
+		assertSame( interpolator2, factory2.getMessageInterpolator() );
 	}
 }

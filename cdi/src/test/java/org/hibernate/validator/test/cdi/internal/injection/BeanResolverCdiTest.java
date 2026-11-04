@@ -40,18 +40,20 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.arquillian.junit5.ArquillianExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-
-import org.testng.annotations.Test;
 
 /**
  * Tests that {@link BeanResolver} correctly resolves CDI beans via {@code Instance.Handle},
  * including lazy resolution and proper lifecycle through {@link BeanHolder#close()}.
  */
-public class BeanResolverCdiTest extends Arquillian {
+@ExtendWith(ArquillianExtension.class)
+public class BeanResolverCdiTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

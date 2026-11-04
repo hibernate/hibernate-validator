@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.internal.metadata.location;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.reflect.Method;
 
@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.properties.javabean.JavaBeanGetter;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -26,7 +26,7 @@ public class ConstraintLocationTest {
 		ConstraintLocation location1 = ConstraintLocation.forClass( Foo.class );
 		ConstraintLocation location2 = ConstraintLocation.forClass( Foo.class );
 
-		assertEquals( location1, location2, "Two constraint locations for the same type should be equal" );
+		assertEquals( location2, location1, "Two constraint locations for the same type should be equal" );
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class ConstraintLocationTest {
 		ConstraintLocation location1 = ConstraintLocation.forGetter( new JavaBeanGetter( Foo.class, getter, "bar", "bar", getAccessorFactory() ) );
 		ConstraintLocation location2 = ConstraintLocation.forGetter( new JavaBeanGetter( Foo.class, getter, "bar", "bar", getAccessorFactory() ) );
 
-		assertEquals( location1, location2, "Two constraint locations for the same type should be equal" );
+		assertEquals( location2, location1, "Two constraint locations for the same type should be equal" );
 	}
 
 	public static class Foo {

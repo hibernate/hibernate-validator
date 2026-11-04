@@ -4,10 +4,11 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.Set;
@@ -25,7 +26,7 @@ import org.hibernate.validator.testutil.ConstraintViolationAssert;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marko Bekhta
@@ -63,19 +64,21 @@ public class ScriptAssertDefTest {
 		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), pathWith().bean() );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	@TestForIssue(jiraKey = "HV-1201")
 	public void testBadLang() {
-		final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		assertThatThrownBy( () -> {
+			final HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
-		final ConstraintMapping programmaticMapping = configuration.createConstraintMapping();
-		programmaticMapping.type( CalendarEvent.class )
-				.constraint( new ScriptAssertDef().lang( "not real lang" )
-						.script( "and script is not real as well" )
-				);
-		configuration.addMapping( programmaticMapping );
+			final ConstraintMapping programmaticMapping = configuration.createConstraintMapping();
+			programmaticMapping.type( CalendarEvent.class )
+					.constraint( new ScriptAssertDef().lang( "not real lang" )
+							.script( "and script is not real as well" )
+					);
+			configuration.addMapping( programmaticMapping );
 
-		assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), pathWith().bean() );
+			assertCalendarEventViolations( configuration.buildValidatorFactory().getValidator(), pathWith().bean() );
+		} ).isInstanceOf( ValidationException.class );
 	}
 
 	private void assertCalendarEventViolations(Validator validator, ConstraintViolationAssert.PathExpectation propertyPath) {

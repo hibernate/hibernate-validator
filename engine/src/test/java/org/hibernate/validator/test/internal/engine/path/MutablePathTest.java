@@ -4,17 +4,17 @@
  */
 package org.hibernate.validator.test.internal.engine.path;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -48,8 +48,9 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Hardy Ferentschik
@@ -59,8 +60,7 @@ import org.testng.annotations.Test;
 @SuppressWarnings("removal")
 public class MutablePathTest {
 
-	@DataProvider
-	public Object[][] rootNodeMutations() {
+	public static Object[][] rootNodeMutations() {
 		return new Object[][] {
 				{ (Consumer<MutablePath>) MutablePath::makeLeafNodeIterable },
 				{ (Consumer<MutablePath>) path -> path.makeLeafNodeIterableAndSetIndex( 3 ) },
@@ -69,11 +69,12 @@ public class MutablePathTest {
 		};
 	}
 
-	@Test(dataProvider = "rootNodeMutations")
+	@ParameterizedTest
+	@MethodSource("rootNodeMutations")
 	public void testRootNodeMutationIsRejected(Consumer<MutablePath> mutation) {
 		MutablePath path = MutablePath.createRootPath();
-		IllegalStateException exception = expectThrows( IllegalStateException.class, () -> mutation.accept( path ) );
-		assertTrue( exception.getMessage().startsWith( "HV000290:" ) );
+		assertThatThrownBy( () -> mutation.accept( path ) ).isInstanceOf( IllegalStateException.class )
+				.hasMessageStartingWith( "HV000290:" );
 
 		MutablePath otherPath = MutablePath.createRootPath();
 		otherPath.addPropertyNode( "other" );
@@ -92,29 +93,29 @@ public class MutablePathTest {
 
 		assertTrue( propIter.hasNext() );
 		Path.Node elem = propIter.next();
-		assertEquals( elem.getName(), "orders" );
+		assertEquals( "orders", elem.getName() );
 		assertFalse( elem.isInIterable() );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
-		assertEquals( elem.getName(), "deliveryAddress" );
+		assertEquals( "deliveryAddress", elem.getName() );
 		assertTrue( elem.isInIterable() );
-		assertEquals( elem.getIndex(), Integer.valueOf( 3 ) );
+		assertEquals( Integer.valueOf( 3 ), elem.getIndex() );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
-		assertEquals( elem.getName(), "addressline" );
+		assertEquals( "addressline", elem.getName() );
 		assertFalse( elem.isInIterable() );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
 		assertNull( elem.getName() );
 		assertTrue( elem.isInIterable() );
-		assertEquals( elem.getIndex(), Integer.valueOf( 1 ) );
+		assertEquals( Integer.valueOf( 1 ), elem.getIndex() );
 
 		assertFalse( propIter.hasNext() );
 
-		assertEquals( path.toString(), property );
+		assertEquals( property, path.toString() );
 	}
 
 	@Test
@@ -122,7 +123,7 @@ public class MutablePathTest {
 		MutablePath path = MutablePath.createPathFromString( "€Amount" );
 		Iterator<Path.Node> it = path.iterator();
 
-		assertEquals( it.next().getName(), "€Amount" );
+		assertEquals( "€Amount", it.next().getName() );
 	}
 
 	@Test
@@ -130,7 +131,7 @@ public class MutablePathTest {
 		MutablePath path = MutablePath.createPathFromString( "höchstBetrag" );
 		Iterator<Path.Node> it = path.iterator();
 
-		assertEquals( it.next().getName(), "höchstBetrag" );
+		assertEquals( "höchstBetrag", it.next().getName() );
 	}
 
 	@Test
@@ -138,12 +139,13 @@ public class MutablePathTest {
 		MutablePath path = MutablePath.createPathFromString( "höchst\u00f6Betrag" );
 		Iterator<Path.Node> it = path.iterator();
 
-		assertEquals( it.next().getName(), "höchst\u00f6Betrag" );
+		assertEquals( "höchst\u00f6Betrag", it.next().getName() );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testParsingInvalidJavaProperty() {
-		MutablePath.createPathFromString( "1invalid" );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( "1invalid" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -154,41 +156,46 @@ public class MutablePathTest {
 
 		assertTrue( propIter.hasNext() );
 		Path.Node elem = propIter.next();
-		assertEquals( elem.getName(), "order" );
+		assertEquals( "order", elem.getName() );
 		assertFalse( elem.isInIterable() );
 
 		assertTrue( propIter.hasNext() );
 		elem = propIter.next();
-		assertEquals( elem.getName(), "deliveryAddress" );
+		assertEquals( "deliveryAddress", elem.getName() );
 		assertTrue( elem.isInIterable() );
-		assertEquals( elem.getKey(), "foo" );
+		assertEquals( "foo", elem.getKey() );
 
 		assertFalse( propIter.hasNext() );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNull() {
-		MutablePath.createPathFromString( null );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testUnbalancedBraces() {
-		MutablePath.createPathFromString( "foo[.bar" );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( "foo[.bar" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testIndexInMiddleOfProperty() {
-		MutablePath.createPathFromString( "f[1]oo.bar" );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( "f[1]oo.bar" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testTrailingPathSeparator() {
-		MutablePath.createPathFromString( "foo.bar." );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( "foo.bar." ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testLeadingPathSeparator() {
-		MutablePath.createPathFromString( ".foo.bar" );
+		assertThatThrownBy( () -> MutablePath.createPathFromString( ".foo.bar" ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
@@ -259,7 +266,7 @@ public class MutablePathTest {
 		Path.Node node = iter.next();
 		assertNotNull( node );
 		assertTrue( node.isInIterable() );
-		assertEquals( node.getKey(), id );
+		assertEquals( id, node.getKey() );
 	}
 
 	@Test
@@ -283,12 +290,13 @@ public class MutablePathTest {
 
 		MutablePath methodParameterPath = MutablePath.createPathForExecutable( executableMetaData );
 
-		assertEquals( methodParameterPath.toString(), "addItem" );
+		assertEquals( "addItem", methodParameterPath.toString() );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testCreationOfExecutablePathFailsDueToMissingExecutable() {
-		MutablePath.createPathForExecutable( null );
+		assertThatThrownBy( () -> MutablePath.createPathForExecutable( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	class Container {

@@ -10,10 +10,10 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.lang.annotation.Documented;
@@ -43,9 +43,10 @@ import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.test.constraints.Object;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Unit test for {@link org.hibernate.validator.cfg.ConstraintMapping} et al.
@@ -53,11 +54,10 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@Test
 public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	HibernateValidatorConfiguration config;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		config = getConfiguration( HibernateValidator.class );
 	}
@@ -76,12 +76,11 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		Validator validator = config.buildValidatorFactory().getValidator();
 		assertFalse( validator.getConstraintsForClass( Foo.class ).isBeanConstrained() );
 
-		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedConstructors().size(), 0 );
-		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedMethods( MethodType.NON_GETTER ).size(), 0 );
+		assertEquals( 0, validator.getConstraintsForClass( Doer.class ).getConstrainedConstructors().size() );
+		assertEquals( 0, validator.getConstraintsForClass( Doer.class ).getConstrainedMethods( MethodType.NON_GETTER ).size() );
 	}
 
-	@DataProvider
-	public String[][] xmlIgnoreAnnotations() {
+	public static String[][] xmlIgnoreAnnotations() {
 		return new String[][] { { "" }, { "ignore-annotations=\"true\"" } };
 	}
 
@@ -91,7 +90,8 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	 * questionable - the programmatic mapping never asked for it - but it is the long-standing behavior, so it is
 	 * pinned down here until it is revisited on its own.
 	 */
-	@Test(dataProvider = "xmlIgnoreAnnotations")
+	@ParameterizedTest
+	@MethodSource("xmlIgnoreAnnotations")
 	public void testProgrammaticMappingOverridesXmlIgnoreAnnotations(String ignoreAnnotationsAttribute) {
 		String xml = """
 				<constraint-mappings xmlns="https://jakarta.ee/xml/ns/validation/mapping" version="3.1">

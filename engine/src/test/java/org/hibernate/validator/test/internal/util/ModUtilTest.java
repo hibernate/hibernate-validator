@@ -4,8 +4,9 @@
  */
 package org.hibernate.validator.test.internal.util;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,8 +18,9 @@ import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.Mod11TestUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for the {@code ModUtil}.
@@ -30,17 +32,16 @@ public class ModUtilTest {
 	@Test
 	public void testPassLuhnSum() throws Exception {
 		List<Integer> digits = Arrays.asList( 7 );
-		assertEquals( ModUtil.calculateLuhnMod10Check( digits ), 5 );
+		assertEquals( 5, ModUtil.calculateLuhnMod10Check( digits ) );
 
 		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
-		assertEquals( ModUtil.calculateLuhnMod10Check( digits ), 3 );
+		assertEquals( 3, ModUtil.calculateLuhnMod10Check( digits ) );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
-		assertEquals( ModUtil.calculateLuhnMod10Check( digits ), 9 );
+		assertEquals( 9, ModUtil.calculateLuhnMod10Check( digits ) );
 	}
 
-	@DataProvider
-	public Object[][] luhnRanges() {
+	public static Object[][] luhnRanges() {
 		return new Object[][] {
 				{ "7992739871", 0, 10, false, 67L },
 				{ "xx7992739871yy", 2, 12, false, 67L },
@@ -60,25 +61,25 @@ public class ModUtilTest {
 		};
 	}
 
-	@Test(dataProvider = "luhnRanges")
+	@ParameterizedTest
+	@MethodSource("luhnRanges")
 	public void testCharacterSequenceLuhnSum(String value, int start, int end, boolean ignoreNonDigits, long expected) {
-		assertEquals( ModUtil.calculateLuhnSum( value, start, end, ignoreNonDigits ), expected );
+		assertEquals( expected, ModUtil.calculateLuhnSum( value, start, end, ignoreNonDigits ) );
 	}
 
 	@Test
 	public void testFailLuhnSum() throws Exception {
 		List<Integer> digits = Arrays.asList( 7 );
-		assertFalse( ModUtil.calculateLuhnMod10Check( digits ) == 2 );
+		assertNotEquals( 2, ModUtil.calculateLuhnMod10Check( digits ) );
 
 		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
-		assertFalse( ModUtil.calculateLuhnMod10Check( digits ) == 4 );
+		assertNotEquals( 4, ModUtil.calculateLuhnMod10Check( digits ) );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
-		assertFalse( ModUtil.calculateLuhnMod10Check( digits ) == 0 );
+		assertNotEquals( 0, ModUtil.calculateLuhnMod10Check( digits ) );
 	}
 
-	@DataProvider
-	public Object[][] mod10Ranges() {
+	public static Object[][] mod10Ranges() {
 		return new Object[][] {
 				{ "7992739871", 0, 10, false, 3, 1, 2 },
 				{ "xx7992739871yy", 2, 12, false, 3, 1, 2 },
@@ -102,35 +103,36 @@ public class ModUtilTest {
 		};
 	}
 
-	@Test(dataProvider = "mod10Ranges")
+	@ParameterizedTest
+	@MethodSource("mod10Ranges")
 	public void testCharacterSequenceMod10Check(String value, int start, int end, boolean ignoreNonDigits, int multiplier, int weight, int expected) {
-		assertEquals( ModUtil.calculateMod10Check( value, start, end, ignoreNonDigits, multiplier, weight ), expected );
+		assertEquals( expected, ModUtil.calculateMod10Check( value, start, end, ignoreNonDigits, multiplier, weight ) );
 	}
 
 	@Test
 	public void testListMod10OverflowIsPreserved() {
-		assertEquals( ModUtil.calculateMod10Check( Arrays.asList( 9, 9 ), Integer.MAX_VALUE, Integer.MAX_VALUE ), 8 );
-		assertEquals( ModUtil.calculateMod10Check( Arrays.asList( 1, 1 ), Integer.MAX_VALUE, Integer.MAX_VALUE ), 2 );
+		assertEquals( 8, ModUtil.calculateMod10Check( Arrays.asList( 9, 9 ), Integer.MAX_VALUE, Integer.MAX_VALUE ) );
+		assertEquals( 2, ModUtil.calculateMod10Check( Arrays.asList( 1, 1 ), Integer.MAX_VALUE, Integer.MAX_VALUE ) );
 	}
 
 	@Test
 	public void testPassMod11Sum() throws Exception {
 		List<Integer> digits = Arrays.asList( 2 );
-		assertEquals( ModUtil.calculateMod11Check( digits ), 7 );
+		assertEquals( 7, ModUtil.calculateMod11Check( digits ) );
 
 		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
-		assertEquals( ModUtil.calculateMod11Check( digits ), 7 );
+		assertEquals( 7, ModUtil.calculateMod11Check( digits ) );
 
 		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3 );
-		assertEquals( ModUtil.calculateMod11Check( digits ), 10 );
+		assertEquals( 10, ModUtil.calculateMod11Check( digits ) );
 	}
 
-	@DataProvider
-	public Object[][] mod11Thresholds() {
+	public static Object[][] mod11Thresholds() {
 		return new Object[][] { { Integer.MIN_VALUE }, { -1 }, { 0 }, { 1 }, { 2 }, { 3 }, { 9 }, { Integer.MAX_VALUE } };
 	}
 
-	@Test(dataProvider = "mod11Thresholds")
+	@ParameterizedTest
+	@MethodSource("mod11Thresholds")
 	public void testMod11PathsMatchIndependentLegacyReference(int threshold) {
 		Random random = new Random( 813 );
 		for ( int length = 0; length < 32; length++ ) {
@@ -143,16 +145,16 @@ public class ModUtilTest {
 			}
 			value.append( "yy" );
 			int expected = Mod11TestUtil.calculateMod11CheckLegacy( digits, threshold );
-			assertEquals( ModUtil.calculateMod11Check( digits, threshold ), expected );
-			assertEquals( ModUtil.calculateMod11Check( value, 2, 2 + length, threshold ), expected );
+			assertEquals( expected, ModUtil.calculateMod11Check( digits, threshold ) );
+			assertEquals( expected, ModUtil.calculateMod11Check( value, 2, 2 + length, threshold ) );
 			for ( int[] weights : new int[][] { { }, { 2 }, { 2, 7, 3 }, { -1, 0, 3 }, { Integer.MAX_VALUE, Integer.MIN_VALUE } } ) {
 				for ( int modulus : new int[] { 10, 11, -11, Integer.MIN_VALUE, Integer.MAX_VALUE } ) {
-					assertEquals( ModUtil.calculateModXCheckWithWeights( digits, modulus, threshold, weights ),
-							Mod11TestUtil.calculateModXCheckWithWeightsLegacy( digits, modulus, threshold, weights ) );
+					assertEquals( Mod11TestUtil.calculateModXCheckWithWeightsLegacy( digits, modulus, threshold, weights ),
+							ModUtil.calculateModXCheckWithWeights( digits, modulus, threshold, weights ) );
 					List<Integer> reversed = new ArrayList<>( digits );
 					Collections.reverse( reversed );
-					assertEquals( ModUtil.calculateModXCheckWithWeights( reversed, modulus, threshold, weights ),
-							Mod11TestUtil.calculateModXCheckWithWeightsLegacy( reversed, modulus, threshold, weights ) );
+					assertEquals( Mod11TestUtil.calculateModXCheckWithWeightsLegacy( reversed, modulus, threshold, weights ),
+							ModUtil.calculateModXCheckWithWeights( reversed, modulus, threshold, weights ) );
 				}
 			}
 		}
@@ -160,22 +162,22 @@ public class ModUtilTest {
 
 	@Test
 	public void testMod11RangesAndExceptionalResults() {
-		assertEquals( ModUtil.calculateMod11Check( "123", 0, 3, 1 ), 10 );
-		assertEquals( ModUtil.calculateMod11Check( "123", 0, 3, 2 ), 10 );
-		assertEquals( ModUtil.calculateMod11Check( "123", 0, 3, 3 ), 8 );
-		assertEquals( ModUtil.calculateMod11Check( "", 0, 0, 9 ), 11 );
-		assertEquals( ModUtil.calculateMod11Check( "123", -1, 2, 9 ), -1 );
-		assertEquals( ModUtil.calculateMod11Check( "123", 2, 1, 9 ), -1 );
-		assertEquals( ModUtil.calculateMod11Check( "123", 0, 4, 9 ), -1 );
-		assertEquals( ModUtil.calculateMod11Check( "1-2", 0, 3, 9 ), -1 );
-		assertEquals( ModUtil.calculateMod11Check( "١٢", 0, 2, 9 ), -1 );
-		assertEquals( ModUtil.calculateMod11Check( "９", 0, 1, 9 ), -1 );
-		assertEquals( ModUtil.calculateMod11Check( 0 ), 11 );
-		assertEquals( ModUtil.calculateMod11Check( 1 ), 10 );
-		assertEquals( ModUtil.calculateMod11Check( -1 ), 12 );
-		assertEquals( ModUtil.calculateMod11Check( Integer.MIN_VALUE ), 13 );
+		assertEquals( 10, ModUtil.calculateMod11Check( "123", 0, 3, 1 ) );
+		assertEquals( 10, ModUtil.calculateMod11Check( "123", 0, 3, 2 ) );
+		assertEquals( 8, ModUtil.calculateMod11Check( "123", 0, 3, 3 ) );
+		assertEquals( 11, ModUtil.calculateMod11Check( "", 0, 0, 9 ) );
+		assertEquals( -1, ModUtil.calculateMod11Check( "123", -1, 2, 9 ) );
+		assertEquals( -1, ModUtil.calculateMod11Check( "123", 2, 1, 9 ) );
+		assertEquals( -1, ModUtil.calculateMod11Check( "123", 0, 4, 9 ) );
+		assertEquals( -1, ModUtil.calculateMod11Check( "1-2", 0, 3, 9 ) );
+		assertEquals( -1, ModUtil.calculateMod11Check( "١٢", 0, 2, 9 ) );
+		assertEquals( -1, ModUtil.calculateMod11Check( "９", 0, 1, 9 ) );
+		assertEquals( 11, ModUtil.calculateMod11Check( 0 ) );
+		assertEquals( 10, ModUtil.calculateMod11Check( 1 ) );
+		assertEquals( 12, ModUtil.calculateMod11Check( -1 ) );
+		assertEquals( 13, ModUtil.calculateMod11Check( Integer.MIN_VALUE ) );
 		for ( int[] example : new int[][] { { -1, -1 }, { 1, 1 }, { 9, 9 }, { 10, 0 }, { 11, 0 }, { 12, 12 }, { 21, 21 } } ) {
-			assertEquals( ModUtil.toZeroMappedMod11CheckDigit( example[0] ), example[1] );
+			assertEquals( example[1], ModUtil.toZeroMappedMod11CheckDigit( example[0] ) );
 		}
 	}
 
@@ -184,61 +186,63 @@ public class ModUtilTest {
 		// Mathematical sum2812837500 wraps to -1482129796, whose signed modulo11 complement is15.
 		String value = "9".repeat( 25_000 );
 		List<Integer> digits = Collections.nCopies( 25_000, 9 );
-		assertEquals( Mod11TestUtil.calculateMod11CheckLegacy( digits, Integer.MAX_VALUE ), 15 );
-		assertEquals( ModUtil.calculateMod11Check( digits, Integer.MAX_VALUE ), 15 );
-		assertEquals( ModUtil.calculateMod11Check( value, 0, value.length(), Integer.MAX_VALUE ), 15 );
+		assertEquals( 15, Mod11TestUtil.calculateMod11CheckLegacy( digits, Integer.MAX_VALUE ) );
+		assertEquals( 15, ModUtil.calculateMod11Check( digits, Integer.MAX_VALUE ) );
+		assertEquals( 15, ModUtil.calculateMod11Check( value, 0, value.length(), Integer.MAX_VALUE ) );
 	}
 
 	@Test
 	public void testCustomWeightsRemainAnchoredToOriginalIndices() {
-		assertEquals( ModUtil.calculateModXCheckWithWeights( Arrays.asList( 1, 2 ), 11, 9, 2, 7, 3 ), 5 );
-		assertEquals( ModUtil.calculateModXCheckWithWeights( Arrays.asList( 2, 1 ), 11, 9, 2, 7, 3 ), 9 );
-		assertEquals( ModUtil.calculateModXCheckWithWeights( Arrays.asList( 1, 2, 3 ), 11, 9, 2, 7 ), 1 );
+		assertEquals( 5, ModUtil.calculateModXCheckWithWeights( Arrays.asList( 1, 2 ), 11, 9, 2, 7, 3 ) );
+		assertEquals( 9, ModUtil.calculateModXCheckWithWeights( Arrays.asList( 2, 1 ), 11, 9, 2, 7, 3 ) );
+		assertEquals( 1, ModUtil.calculateModXCheckWithWeights( Arrays.asList( 1, 2, 3 ), 11, 9, 2, 7 ) );
 	}
 
-	@Test(expectedExceptions = ArithmeticException.class)
+	@Test
 	public void testZeroModulusStillThrows() {
-		ModUtil.calculateModXCheckWithWeights( Arrays.asList( 1, 2 ), 0, 9 );
+		assertThatThrownBy( () -> {
+			ModUtil.calculateModXCheckWithWeights( Arrays.asList( 1, 2 ), 0, 9 );
+		} ).isInstanceOf( ArithmeticException.class );
 	}
 
 	@Test
 	public void testFailMod11Sum() throws Exception {
 		List<Integer> digits = Arrays.asList( 2 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 6 );
+		assertNotEquals( 6, ModUtil.calculateMod11Check( digits ) );
 
 		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 1 );
+		assertNotEquals( 1, ModUtil.calculateMod11Check( digits ) );
 
 		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 9 );
+		assertNotEquals( 9, ModUtil.calculateMod11Check( digits ) );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-808")
 	public void testFailMod11SelfValidation() throws Exception {
 		List<Integer> digits = Arrays.asList( 0 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 1 );
-		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 1 );
+		assertNotEquals( 1, ModUtil.calculateMod11Check( digits ) );
+		assertNotEquals( 1, ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) );
 
 		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
-		assertEquals( ModUtil.calculateMod11Check( digits ), 11 );
-		assertEquals( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ), 11 );
+		assertEquals( 11, ModUtil.calculateMod11Check( digits ) );
+		assertEquals( 11, ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) );
 
 		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 1 );
-		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 1 );
+		assertNotEquals( 1, ModUtil.calculateMod11Check( digits ) );
+		assertNotEquals( 1, ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 5 );
-		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 5 );
+		assertNotEquals( 5, ModUtil.calculateMod11Check( digits ) );
+		assertNotEquals( 5, ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) );
 
 		digits = Arrays.asList( 3, 7, 8, 7, 9, 6, 9, 5, 0, 0 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 2 );
-		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 2 );
+		assertNotEquals( 2, ModUtil.calculateMod11Check( digits ) );
+		assertNotEquals( 2, ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
-		assertFalse( ModUtil.calculateMod11Check( digits ) == 2 );
-		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 2 );
+		assertNotEquals( 2, ModUtil.calculateMod11Check( digits ) );
+		assertNotEquals( 2, ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) );
 	}
 
 }

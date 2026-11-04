@@ -22,16 +22,18 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.testng.annotations.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Marko Bekhta
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractPathStringRepresentationTest {
 
 	protected Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setupValidator() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
 	}

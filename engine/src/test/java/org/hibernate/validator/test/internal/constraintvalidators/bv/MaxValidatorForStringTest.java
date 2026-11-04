@@ -4,9 +4,9 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.constraints.DecimalMax;
@@ -19,7 +19,7 @@ import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDesc
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -61,13 +61,8 @@ public class MaxValidatorForStringTest {
 		DecimalMax m = descriptorBuilder.build().getAnnotation();
 
 		DecimalMaxValidatorForNumber constraint = new DecimalMaxValidatorForNumber();
-		try {
-			constraint.initialize( m );
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// success
-		}
+		assertThatThrownBy( () -> constraint.initialize( m ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

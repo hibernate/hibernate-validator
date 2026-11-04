@@ -4,7 +4,7 @@
  */
 package org.hibernate.validator.referenceguide.chapter02.containerelement.map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -15,14 +15,14 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class CarTest {
 
 	private static Validator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpValidator() {
 		ValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
 				.configure()

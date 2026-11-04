@@ -4,12 +4,10 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.validator.testutils.ConstraintValidatorInitializationHelper.getDummyConstraintCreationContext;
 import static org.hibernate.validator.testutils.ValidatorUtil.getAccessorFactory;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -38,8 +36,9 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -52,7 +51,7 @@ public class BeanMetaDataManagerTest {
 
 	private BeanMetaDataManagerImpl metaDataManager;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUpBeanMetaDataManager() {
 		metaDataManager = new BeanMetaDataManagerImpl(
 				getDummyConstraintCreationContext(),
@@ -67,7 +66,8 @@ public class BeanMetaDataManagerTest {
 		);
 	}
 
-	@Test(enabled = false, description = "Disabled as it shows false failures too often. Run on demand if required")
+	@Disabled("Disabled as it shows false failures too often. Run on demand if required")
+	@Test
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		Class<?> lastIterationsBean = null;
 		int totalCreatedMetaDataInstances = 0;
@@ -79,7 +79,7 @@ public class BeanMetaDataManagerTest {
 			for ( int i = 0; i < LOOP_COUNT; i++ ) {
 				Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
 				BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
-				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
+				assertThat( meta.getBeanClass() ).as( "The classes should differ in each iteration" ).isNotSameAs( lastIterationsBean );
 				lastIterationsBean = meta.getBeanClass();
 				totalCreatedMetaDataInstances++;
 				cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
@@ -109,18 +109,17 @@ public class BeanMetaDataManagerTest {
 	@Test
 	public void testGetMetaDataForConstrainedEntity() {
 		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
-		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
-		assertTrue( beanMetaData.hasConstraints() );
+		assertThat( beanMetaData ).isInstanceOf( BeanMetaDataImpl.class );
+		assertThat( beanMetaData.hasConstraints() ).isTrue();
 	}
 
 	@Test
 	public void testGetMetaDataForUnConstrainedEntity() {
 		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
-		assertTrue(
-				beanMetaData instanceof BeanMetaDataImpl,
-				"#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass()
-		);
-		assertFalse( beanMetaData.hasConstraints() );
+		assertThat( beanMetaData )
+				.as( "#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass() )
+				.isInstanceOf( BeanMetaDataImpl.class );
+		assertThat( beanMetaData.hasConstraints() ).isFalse();
 	}
 
 	public class CustomClassLoader extends ClassLoader {

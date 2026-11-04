@@ -4,10 +4,11 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.password;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ import org.hibernate.validator.spi.password.PasswordStrengthEstimator;
 import org.hibernate.validator.spi.password.PasswordStrengthResult;
 import org.hibernate.validator.spi.scripting.ScriptEvaluatorFactory;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValidationServiceRegistryTest {
 
@@ -57,7 +58,7 @@ public class ValidationServiceRegistryTest {
 		assertNotNull( retrieved );
 
 		PasswordStrengthResult result = retrieved.estimate( "test".toCharArray() );
-		assertEquals( result.score(), 3 );
+		assertEquals( 3, result.score() );
 	}
 
 	@Test
@@ -92,13 +93,13 @@ public class ValidationServiceRegistryTest {
 
 		PasswordStrengthEstimator weak = resolver.resolve(
 				PasswordStrengthEstimator.class, "weak", BeanRetrieval.ANY ).get();
-		assertEquals( weak.estimate( "x".toCharArray() ).score(), 1 );
+		assertEquals( 1, weak.estimate( "x".toCharArray() ).score() );
 
 		PasswordStrengthEstimator strong = resolver.resolve(
 				PasswordStrengthEstimator.class, "strong", BeanRetrieval.ANY ).get();
-		assertEquals( strong.estimate( "x".toCharArray() ).score(), 5 );
+		assertEquals( 5, strong.estimate( "x".toCharArray() ).score() );
 
-		assertNotSame( weak, strong );
+		assertNotSame( strong, weak );
 	}
 
 	@Test
@@ -120,7 +121,7 @@ public class ValidationServiceRegistryTest {
 		List<BeanReference<PasswordStrengthEstimator>> all =
 				factory.getBeanResolver().allConfiguredForRole( PasswordStrengthEstimator.class );
 
-		assertEquals( all.size(), 2 );
+		assertEquals( 2, all.size() );
 	}
 
 	@Test
@@ -142,7 +143,7 @@ public class ValidationServiceRegistryTest {
 		Map<String, BeanReference<PasswordStrengthEstimator>> named =
 				factory.getBeanResolver().namedConfiguredForRole( PasswordStrengthEstimator.class );
 
-		assertEquals( named.size(), 2 );
+		assertEquals( 2, named.size() );
 		assertTrue( named.containsKey( "alpha" ) );
 		assertTrue( named.containsKey( "beta" ) );
 	}
@@ -162,7 +163,7 @@ public class ValidationServiceRegistryTest {
 		BeanReference<PasswordStrengthEstimator> ref = BeanReference.of(
 				PasswordStrengthEstimator.class, BeanRetrieval.ANY );
 		PasswordStrengthEstimator resolved = factory.getBeanResolver().resolve( ref ).get();
-		assertEquals( resolved.estimate( "x".toCharArray() ).score(), 7 );
+		assertEquals( 7, resolved.estimate( "x".toCharArray() ).score() );
 	}
 
 	@Test
@@ -189,9 +190,9 @@ public class ValidationServiceRegistryTest {
 
 		BeanHolder<List<PasswordStrengthEstimator>> holder = resolver.resolve( refs );
 		List<PasswordStrengthEstimator> resolved = holder.get();
-		assertEquals( resolved.size(), 2 );
-		assertEquals( resolved.get( 0 ).estimate( "x".toCharArray() ).score(), 1 );
-		assertEquals( resolved.get( 1 ).estimate( "x".toCharArray() ).score(), 2 );
+		assertEquals( 2, resolved.size() );
+		assertEquals( 1, resolved.get( 0 ).estimate( "x".toCharArray() ).score() );
+		assertEquals( 2, resolved.get( 1 ).estimate( "x".toCharArray() ).score() );
 	}
 
 	@Test
@@ -206,14 +207,16 @@ public class ValidationServiceRegistryTest {
 		assertNotNull( resolved );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void builtinRetrievalFailsForUnregisteredType() {
-		HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.unwrap( HibernateValidatorFactory.class );
+		assertThatThrownBy( () -> {
+			HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
+					.configure()
+					.buildValidatorFactory()
+					.unwrap( HibernateValidatorFactory.class );
 
-		factory.getBeanResolver().resolve( PasswordStrengthEstimator.class, BeanRetrieval.BUILTIN );
+			factory.getBeanResolver().resolve( PasswordStrengthEstimator.class, BeanRetrieval.BUILTIN );
+		} ).isInstanceOf( ValidationException.class );
 	}
 
 	@Test
@@ -228,14 +231,16 @@ public class ValidationServiceRegistryTest {
 		assertNotNull( resolved );
 	}
 
-	@Test(expectedExceptions = ValidationException.class)
+	@Test
 	public void unresolvedBeanThrowsValidationException() {
-		HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.buildValidatorFactory()
-				.unwrap( HibernateValidatorFactory.class );
+		assertThatThrownBy( () -> {
+			HibernateValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
+					.configure()
+					.buildValidatorFactory()
+					.unwrap( HibernateValidatorFactory.class );
 
-		factory.getBeanResolver().resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY );
+			factory.getBeanResolver().resolve( PasswordStrengthEstimator.class, BeanRetrieval.ANY );
+		} ).isInstanceOf( ValidationException.class );
 	}
 
 	@Test

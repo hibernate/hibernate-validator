@@ -5,7 +5,7 @@
 package org.hibernate.validator.test.internal.xml;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
 
@@ -16,8 +16,9 @@ import jakarta.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import org.junit.jupiter.api.Test;
+
 import org.assertj.core.api.Assertions;
-import org.testng.annotations.Test;
 
 /**
  * Various tests for parsing of XML mapping files.
@@ -60,8 +61,8 @@ public class XmlParsingTest {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
 		Set<ConstraintDescriptor<?>> constraintDescriptorSet = beanDescriptor.getConstraintDescriptors();
 		assertEquals(
-				constraintDescriptorSet.size(),
 				1,
+				constraintDescriptorSet.size(),
 				"There should be only one constraint descriptor"
 		);
 		return (ConstraintDescriptorImpl<?>) constraintDescriptorSet.iterator().next();

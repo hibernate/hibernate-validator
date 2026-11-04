@@ -8,10 +8,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -27,9 +26,12 @@ import org.hibernate.validator.internal.constraintvalidators.hv.IpAddressValidat
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests for {@link IpAddress} constraint validator ({@link IpAddress}).
@@ -37,168 +39,167 @@ import org.testng.annotations.Test;
  * @author Ivan Malutin
  */
 @TestForIssue(jiraKey = "HV-2137")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IpAddressValidatorTest {
 
 	private IpAddressValidator validator;
 
-	@BeforeClass
+	@BeforeAll
 	public void setUp() {
 		validator = new IpAddressValidator();
 	}
 
-	@Test(dataProvider = "validIPv4Addresses")
+	@ParameterizedTest
+	@MethodSource("validIPv4AddressesData")
 	public void validIPv4Addresses(String ipAddress) {
 		validator.initialize( initializeAnnotation( IpAddress.Type.IPv4 ) );
 		assertValidIpAddress( ipAddress );
 	}
 
-	@DataProvider(name = "validIPv4Addresses")
-	String[] validIPv4AddressesData() {
-		return new String[] {
-				"192.168.1.1",
-				"10.0.0.255",
-				"172.16.254.1",
-				"255.255.255.255",
-				"0.0.0.0",
-				"127.0.0.1",
-				"8.8.8.8",
-				"169.254.1.1",
-				"192.0.2.1",
-				"198.51.100.1"
-		};
+	private static Stream<Arguments> validIPv4AddressesData() {
+		return Stream.of(
+				Arguments.of( "192.168.1.1" ),
+				Arguments.of( "10.0.0.255" ),
+				Arguments.of( "172.16.254.1" ),
+				Arguments.of( "255.255.255.255" ),
+				Arguments.of( "0.0.0.0" ),
+				Arguments.of( "127.0.0.1" ),
+				Arguments.of( "8.8.8.8" ),
+				Arguments.of( "169.254.1.1" ),
+				Arguments.of( "192.0.2.1" ),
+				Arguments.of( "198.51.100.1" )
+		);
 	}
 
 
-	@Test(dataProvider = "invalidIPv4Addresses")
+	@ParameterizedTest
+	@MethodSource("invalidIPv4AddressesData")
 	public void invalidIPv4Addresses(String ipAddress) {
 		validator.initialize( initializeAnnotation( IpAddress.Type.IPv4 ) );
 		assertInvalidIpAddress( ipAddress );
 	}
 
-	@DataProvider(name = "invalidIPv4Addresses")
-	String[] invalidIPv4AddressesData() {
-		return new String[] {
-				"256.1.1.1",
-				"192.168.1",
-				"192.168.1.1.1",
-				"192.168.1.",
-				"192.0168.1.",
-				"192.168..1",
-				"192.168.1.01",
-				"qwe.qwe.qwe.qwe",
-				"192.168.1.1 ",
-				"192 .168.1.1",
-				"192.168.1.-1",
-				"192.168.1.",
-				"192.16.8.1.",
-				"19.2.16.8.1."
-		};
+	private static Stream<Arguments> invalidIPv4AddressesData() {
+		return Stream.of(
+				Arguments.of( "256.1.1.1" ),
+				Arguments.of( "192.168.1" ),
+				Arguments.of( "192.168.1.1.1" ),
+				Arguments.of( "192.168.1." ),
+				Arguments.of( "192.0168.1." ),
+				Arguments.of( "192.168..1" ),
+				Arguments.of( "192.168.1.01" ),
+				Arguments.of( "qwe.qwe.qwe.qwe" ),
+				Arguments.of( "192.168.1.1 " ),
+				Arguments.of( "192 .168.1.1" ),
+				Arguments.of( "192.168.1.-1" ),
+				Arguments.of( "192.168.1." ),
+				Arguments.of( "192.16.8.1." ),
+				Arguments.of( "19.2.16.8.1." )
+		);
 	}
 
-	@Test(dataProvider = "validIPv6Addresses")
+	@ParameterizedTest
+	@MethodSource("validIPv6AddressesData")
 	public void validIPv6Addresses(String ipAddress) {
 		validator.initialize( initializeAnnotation( IpAddress.Type.IPv6 ) );
 		assertValidIpAddress( ipAddress );
 	}
 
-	@DataProvider(name = "validIPv6Addresses")
-	String[] validIPv6AddressesData() {
-		return new String[] {
-				"2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-				"2001:db8:85a3:0:0:8a2e:370:7334",
-				"2001:db8:85a3::8a2e:370:7334",
-				"2001:db8::",
-				"::ffff:192.168.1.1",
-				"ff02::1",
-				"2001:0:0:1::1",
-				"2001:db8:1234:5678:90ab:cdef:1234:5678",
-				"::ffff:c0a8:101",
-				"64:ff9b::192.168.1.1",
-				"2001:20::1",
-				"fc00::1",
-				"2001:db8:a::123",
-				"1:2:3:4:5:6:7:8",
-				"a:b:c:d:e:f:1:2",
-				"fe80::215:5dff:fe00:402",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7348",
-				"::",
-				"::1",
-				"1::",
-				"::1234:5678",
-				"1:2:3:4:5:6:7::",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7348%1234556",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7348%eth0",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7348%eth1",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7348%eth2",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7348%smth",
-		};
+	private static Stream<Arguments> validIPv6AddressesData() {
+		return Stream.of(
+				Arguments.of( "2001:0db8:85a3:0000:0000:8a2e:0370:7334" ),
+				Arguments.of( "2001:db8:85a3:0:0:8a2e:370:7334" ),
+				Arguments.of( "2001:db8:85a3::8a2e:370:7334" ),
+				Arguments.of( "2001:db8::" ),
+				Arguments.of( "::ffff:192.168.1.1" ),
+				Arguments.of( "ff02::1" ),
+				Arguments.of( "2001:0:0:1::1" ),
+				Arguments.of( "2001:db8:1234:5678:90ab:cdef:1234:5678" ),
+				Arguments.of( "::ffff:c0a8:101" ),
+				Arguments.of( "64:ff9b::192.168.1.1" ),
+				Arguments.of( "2001:20::1" ),
+				Arguments.of( "fc00::1" ),
+				Arguments.of( "2001:db8:a::123" ),
+				Arguments.of( "1:2:3:4:5:6:7:8" ),
+				Arguments.of( "a:b:c:d:e:f:1:2" ),
+				Arguments.of( "fe80::215:5dff:fe00:402" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7348" ),
+				Arguments.of( "::" ),
+				Arguments.of( "::1" ),
+				Arguments.of( "1::" ),
+				Arguments.of( "::1234:5678" ),
+				Arguments.of( "1:2:3:4:5:6:7::" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7348%1234556" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7348%eth0" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7348%eth1" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7348%eth2" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7348%smth" )
+		);
 	}
 
-	@Test(dataProvider = "invalidIPv6Addresses")
+	@ParameterizedTest
+	@MethodSource("invalidIPv6AddressesData")
 	public void invalidIPv6Addresses(String ipAddress) {
 		validator.initialize( initializeAnnotation( IpAddress.Type.IPv6 ) );
 		assertInvalidIpAddress( ipAddress );
 	}
 
-	@DataProvider(name = "invalidIPv6Addresses")
-	String[] invalidIPv6AddressesData() {
-		return new String[] {
-				"2001:db8:85a3:8d3:1319:8a2e:370",
-				"2001::85a3::8a2e",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7334:",
-				":2001:db8:85a3:8d3:1319:8a2e:370:7334",
-				"2001:db8:85a3:8d3:1319:8a2e:370:733g",
-				"2001:db8:85a3:8d3:1319:8a2e:370:73345",
-				"2001:db8:85a3:8d3:1319:8a2e:370:",
-				"2001:db8:::8a2e:370:7334",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7334:abcd",
-				"2001:0db8:85a3:00000:0000:8a2e:0370:7334",
-				"02001:00db8:085a3:00000:00000:08a2e:00370:07334",
-				"::ffff:192.168.300.1",
-				"::ffff:192.168.1",
-				"::ffff:192.168.1.0.1",
-				"2001:db8:::192.1.1.1:370:7334",
-				"2001:db8:85a3:8d3:1319:8a2e:370:7334 :",
-				"2001:db8:85a3-8d3:1319:8a2e:370:7334",
-				"64:192.168.1.1::ff9b",
-				"2001::db8::1",
-				"ff02:::1",
-				"2001:db8:85a3:0:0:0:0:0:0",
-				":1",
-				"2001:db8:85a3:8d3:1319:8a2e:370:",
-				"2001:db8:xyz::1",
-				":::",
-				"1:2:3:4:5:6:7:8:9",
-				"1:2:3:4:5:6:7",
-				"1::2::3",
-				"1:2:3:4:5:6:7:8g",
-				"2001:0db8:85a3:0000:0000::8a2e:0370:7334",
-				"2001:0db8:85a3:0000:0000::8a2e:0370:0370:7334",
-		};
+	private static Stream<Arguments> invalidIPv6AddressesData() {
+		return Stream.of(
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370" ),
+				Arguments.of( "2001::85a3::8a2e" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7334:" ),
+				Arguments.of( ":2001:db8:85a3:8d3:1319:8a2e:370:7334" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:733g" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:73345" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:" ),
+				Arguments.of( "2001:db8:::8a2e:370:7334" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7334:abcd" ),
+				Arguments.of( "2001:0db8:85a3:00000:0000:8a2e:0370:7334" ),
+				Arguments.of( "02001:00db8:085a3:00000:00000:08a2e:00370:07334" ),
+				Arguments.of( "::ffff:192.168.300.1" ),
+				Arguments.of( "::ffff:192.168.1" ),
+				Arguments.of( "::ffff:192.168.1.0.1" ),
+				Arguments.of( "2001:db8:::192.1.1.1:370:7334" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:7334 :" ),
+				Arguments.of( "2001:db8:85a3-8d3:1319:8a2e:370:7334" ),
+				Arguments.of( "64:192.168.1.1::ff9b" ),
+				Arguments.of( "2001::db8::1" ),
+				Arguments.of( "ff02:::1" ),
+				Arguments.of( "2001:db8:85a3:0:0:0:0:0:0" ),
+				Arguments.of( ":1" ),
+				Arguments.of( "2001:db8:85a3:8d3:1319:8a2e:370:" ),
+				Arguments.of( "2001:db8:xyz::1" ),
+				Arguments.of( ":::" ),
+				Arguments.of( "1:2:3:4:5:6:7:8:9" ),
+				Arguments.of( "1:2:3:4:5:6:7" ),
+				Arguments.of( "1::2::3" ),
+				Arguments.of( "1:2:3:4:5:6:7:8g" ),
+				Arguments.of( "2001:0db8:85a3:0000:0000::8a2e:0370:7334" ),
+				Arguments.of( "2001:0db8:85a3:0000:0000::8a2e:0370:0370:7334" )
+		);
 	}
 
-	@Test(dataProvider = "testAnyValid")
+	@ParameterizedTest
+	@MethodSource("testAnyValidData")
 	public void testAnyValid(String ipAddress) {
 		validator.initialize( initializeAnnotation( IpAddress.Type.ANY ) );
 		assertValidIpAddress( ipAddress );
 	}
 
-	@DataProvider(name = "testAnyValid")
-	String[] testAnyValidData() {
-		return Stream.concat( Arrays.stream( validIPv4AddressesData() ), Arrays.stream( validIPv6AddressesData() ) )
-				.toArray( String[]::new );
+	private static Stream<Arguments> testAnyValidData() {
+		return Stream.concat( validIPv4AddressesData(), validIPv6AddressesData() );
 	}
 
-	@Test(dataProvider = "testAnyInvalid")
+	@ParameterizedTest
+	@MethodSource("testAnyInvalidData")
 	public void testAnyInvalid(String ipAddress) {
 		validator.initialize( initializeAnnotation( IpAddress.Type.ANY ) );
 		assertInvalidIpAddress( ipAddress );
 	}
 
-	@DataProvider(name = "testAnyInvalid")
-	String[] testAnyInvalidData() {
-		return Stream.concat( Arrays.stream( invalidIPv4AddressesData() ), Arrays.stream( invalidIPv6AddressesData() ) )
-				.toArray( String[]::new );
+	private static Stream<Arguments> testAnyInvalidData() {
+		return Stream.concat( invalidIPv4AddressesData(), invalidIPv6AddressesData() );
 	}
 
 	@Test

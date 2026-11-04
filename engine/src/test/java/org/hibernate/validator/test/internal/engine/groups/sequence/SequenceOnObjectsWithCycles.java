@@ -4,6 +4,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.sequence;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -14,8 +16,7 @@ import jakarta.validation.Validator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 @TestForIssue(jiraKey = "HV-1692")
 public class SequenceOnObjectsWithCycles {
@@ -30,7 +31,7 @@ public class SequenceOnObjectsWithCycles {
 		yourEntity1.setBean( anotherBean );
 
 		Set<ConstraintViolation<YourAnnotatedBean>> constraintViolations = validator.validate( yourEntity1 );
-		Assert.assertEquals( 0, constraintViolations.size() );
+		assertEquals( 0, constraintViolations.size() );
 
 	}
 

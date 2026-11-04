@@ -4,12 +4,13 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -37,18 +38,20 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class XmlMappingTest {
 
 	private static ValidationXmlTestHelper validationXmlTestHelper;
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupValidationXmlTestHelper() {
 		validationXmlTestHelper = new ValidationXmlTestHelper( XmlMappingTest.class );
 	}
@@ -180,25 +183,25 @@ public class XmlMappingTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for constraint mapping file: 1\\.2\\."
-	)
+	@Test
 	public void shouldFailToLoadConstraintMappingWithUnsupportedVersion() {
-		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
-		configuration.addMapping(
-				XmlMappingTest.class.getResourceAsStream(
-						"my-interface-impl-mapping-unsupported-version.xml"
-				)
-		);
+		assertThatThrownBy( () -> {
+			final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+			configuration.addMapping(
+					XmlMappingTest.class.getResourceAsStream(
+							"my-interface-impl-mapping-unsupported-version.xml"
+					)
+			);
 
-		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
-		final Validator validator = validatorFactory.getValidator();
-		final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
+			final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+			final Validator validator = validatorFactory.getValidator();
+			final Set<ConstraintViolation<MyInterfaceImpl>> violations = validator.validate( new MyInterfaceImpl() );
 
-		assertThat( violations ).containsOnlyViolations(
-				violationOf( NotNull.class )
-		);
+			assertThat( violations ).containsOnlyViolations(
+					violationOf( NotNull.class )
+			);
+		} ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000122: Unsupported schema version for constraint mapping file: 1\\.2\\." );
 	}
 
 	@Test
@@ -219,11 +222,10 @@ public class XmlMappingTest {
 
 						//then
 						assertEquals(
-								bootstrapConfiguration.getParameterNameProviderClassName(),
-								CustomParameterNameProvider.class.getName()
-						);
+								CustomParameterNameProvider.class.getName(),
+								bootstrapConfiguration.getParameterNameProviderClassName() );
 
-						assertEquals( methodDescriptor.getParameterDescriptors().get( 0 ).getName(), "param0" );
+						assertEquals( "param0", methodDescriptor.getParameterDescriptors().get( 0 ).getName() );
 					}
 				}
 		);
@@ -240,9 +242,8 @@ public class XmlMappingTest {
 
 					//then
 					assertEquals(
-							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ),
-							CustomScriptEvaluatorFactory.class.getName()
-					);
+							CustomScriptEvaluatorFactory.class.getName(),
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.SCRIPT_EVALUATOR_FACTORY_CLASSNAME ) );
 
 				}
 		);
@@ -259,9 +260,8 @@ public class XmlMappingTest {
 
 					//then
 					assertEquals(
-							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.TEMPORAL_VALIDATION_TOLERANCE ),
-							"123456"
-					);
+							"123456",
+							bootstrapConfiguration.getProperties().get( HibernateValidatorConfiguration.TEMPORAL_VALIDATION_TOLERANCE ) );
 
 				}
 		);
@@ -282,9 +282,8 @@ public class XmlMappingTest {
 						//when
 						//then
 						assertEquals(
-								bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
-								asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
-						);
+								asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS ),
+								bootstrapConfiguration.getDefaultValidatedExecutableTypes() );
 					}
 				}
 		);
@@ -300,9 +299,8 @@ public class XmlMappingTest {
 		//when
 		//then
 		assertEquals(
-				bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
-				asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
-		);
+				asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS ),
+				bootstrapConfiguration.getDefaultValidatedExecutableTypes() );
 	}
 
 	@Test
@@ -319,20 +317,16 @@ public class XmlMappingTest {
 						//when
 						//then
 						assertEquals(
-								bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ),
-								"failOnError"
-						);
+								"failOnError",
+								bootstrapConfiguration.getProperties().get( "com.acme.validation.safetyChecking" ) );
 					}
 				}
 		);
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 1\\.2\\."
-	)
+	@Test
 	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
-		validationXmlTestHelper.runWithCustomValidationXml(
+		assertThatThrownBy( () -> validationXmlTestHelper.runWithCustomValidationXml(
 				"unsupported-validation.xml", new Runnable() {
 
 					@Override
@@ -340,15 +334,13 @@ public class XmlMappingTest {
 						ValidatorUtil.getConfiguration().getBootstrapConfiguration();
 					}
 				}
-		);
+		) ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000122: Unsupported schema version for META-INF/validation.xml: 1\\.2\\." );
 	}
 
-	@Test(
-			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000100: Unable to parse META-INF/validation.xml."
-	)
+	@Test
 	public void shouldFailToLoad10ValidationXmlWithParameterNameProvider() {
-		validationXmlTestHelper.runWithCustomValidationXml(
+		assertThatThrownBy( () -> validationXmlTestHelper.runWithCustomValidationXml(
 				"invalid-bv-1.0-validation.xml", new Runnable() {
 
 					@Override
@@ -356,7 +348,8 @@ public class XmlMappingTest {
 						ValidatorUtil.getConfiguration().getBootstrapConfiguration();
 					}
 				}
-		);
+		) ).isInstanceOf( ValidationException.class )
+				.hasMessageMatching( "HV000100: Unable to parse META-INF/validation.xml." );
 	}
 
 	@Test

@@ -7,8 +7,8 @@ package org.hibernate.validator.test.constraints.annotations.hv.br;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 import java.util.Set;
@@ -22,8 +22,9 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
 import org.hibernate.validator.testutils.Mod11TestUtil;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Matheus Pereira
@@ -169,13 +170,13 @@ public class RENAVAMValidatorTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@Test(dataProvider = "renavamBoundaries")
+	@ParameterizedTest
+	@MethodSource("renavamBoundaries")
 	public void testRenavamBoundaries(CharSequence renavam, boolean valid) {
-		assertEquals( validator.validate( new Vehicle( renavam ) ).isEmpty(), valid );
+		assertEquals( valid, validator.validate( new Vehicle( renavam ) ).isEmpty() );
 	}
 
-	@DataProvider
-	public Object[][] renavamBoundaries() {
+	public static Object[][] renavamBoundaries() {
 		return new Object[][] {
 				{ "", false },
 				{ "000000000", true },
@@ -213,8 +214,8 @@ public class RENAVAMValidatorTest extends AbstractConstrainedTest {
 							? (char) ( '0' + random.nextInt( 10 ) )
 							: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 				}
-				assertEquals( validator.validate( new Vehicle( renavam ) ).isEmpty(),
-						legacyFormat.matcher( renavam ).matches() && Mod11TestUtil.isValidLegacy( renavam, 0, Integer.MAX_VALUE, -1, false, 9, '0', '0', false ), renavam.toString() );
+				assertEquals( legacyFormat.matcher( renavam ).matches() && Mod11TestUtil.isValidLegacy( renavam, 0, Integer.MAX_VALUE, -1, false, 9, '0', '0', false ),
+						validator.validate( new Vehicle( renavam ) ).isEmpty(), renavam.toString() );
 			}
 		}
 	}

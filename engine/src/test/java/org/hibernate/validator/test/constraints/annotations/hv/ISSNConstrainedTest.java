@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.ISSN;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test to make sure that elements annotated with {@link ISSN} are validated.

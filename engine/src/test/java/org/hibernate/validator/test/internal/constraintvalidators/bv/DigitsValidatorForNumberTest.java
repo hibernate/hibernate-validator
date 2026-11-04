@@ -4,18 +4,23 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import jakarta.validation.constraints.Digits;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Alaa Nassef
@@ -25,14 +30,15 @@ public class DigitsValidatorForNumberTest {
 
 	private ConstraintAnnotationDescriptor.Builder<Digits> descriptorBuilder;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() throws Exception {
 		descriptorBuilder = new ConstraintAnnotationDescriptor.Builder<>( Digits.class );
 		descriptorBuilder.setMessage( "{validator.digits}" );
 	}
 
-	@Test
-	public void testIsValid() {
+	@ParameterizedTest
+	@MethodSource("testIsValidValidData")
+	public void testIsValidValid(Number value) {
 		descriptorBuilder.setAttribute( "integer", 5 );
 		descriptorBuilder.setAttribute( "fraction", 2 );
 		Digits p = descriptorBuilder.build().getAnnotation();
@@ -40,20 +46,41 @@ public class DigitsValidatorForNumberTest {
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
 
+		assertTrue( constraint.isValid( value, null ) );
+	}
 
-		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( Byte.valueOf( "0" ), null ) );
-		assertTrue( constraint.isValid( Double.valueOf( "500.2" ), null ) );
+	private static Stream<Arguments> testIsValidValidData() {
+		return Stream.of(
+				Arguments.of( (Number) null ),
+				Arguments.of( Byte.valueOf( "0" ) ),
+				Arguments.of( Double.valueOf( "500.2" ) ),
+				Arguments.of( new BigDecimal( "-12345.12" ) ),
+				Arguments.of( Float.valueOf( "-000000000.22" ) )
+		);
+	}
 
-		assertTrue( constraint.isValid( new BigDecimal( "-12345.12" ), null ) );
-		assertFalse( constraint.isValid( new BigDecimal( "-123456.12" ), null ) );
-		assertFalse( constraint.isValid( new BigDecimal( "-123456.123" ), null ) );
-		assertFalse( constraint.isValid( new BigDecimal( "-12345.123" ), null ) );
-		assertFalse( constraint.isValid( new BigDecimal( "12345.123" ), null ) );
+	@ParameterizedTest
+	@MethodSource("testIsValidInvalidData")
+	public void testIsValidInvalid(Number value) {
+		descriptorBuilder.setAttribute( "integer", 5 );
+		descriptorBuilder.setAttribute( "fraction", 2 );
+		Digits p = descriptorBuilder.build().getAnnotation();
 
-		assertTrue( constraint.isValid( Float.valueOf( "-000000000.22" ), null ) );
-		assertFalse( constraint.isValid( Integer.valueOf( "256874" ), null ) );
-		assertFalse( constraint.isValid( Double.valueOf( "12.0001" ), null ) );
+		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+		constraint.initialize( p );
+
+		assertFalse( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testIsValidInvalidData() {
+		return Stream.of(
+				Arguments.of( new BigDecimal( "-123456.12" ) ),
+				Arguments.of( new BigDecimal( "-123456.123" ) ),
+				Arguments.of( new BigDecimal( "-12345.123" ) ),
+				Arguments.of( new BigDecimal( "12345.123" ) ),
+				Arguments.of( Integer.valueOf( "256874" ) ),
+				Arguments.of( Double.valueOf( "12.0001" ) )
+		);
 	}
 
 	@Test
@@ -71,28 +98,33 @@ public class DigitsValidatorForNumberTest {
 		assertFalse( constraint.isValid( Double.valueOf( "500.2" ), null ) );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNegativeIntegerLength() {
-		descriptorBuilder.setAttribute( "integer", -1 );
-		descriptorBuilder.setAttribute( "fraction", 1 );
-		Digits p = descriptorBuilder.build().getAnnotation();
+		assertThatThrownBy( () -> {
+			descriptorBuilder.setAttribute( "integer", -1 );
+			descriptorBuilder.setAttribute( "fraction", 1 );
+			Digits p = descriptorBuilder.build().getAnnotation();
 
-		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
-		constraint.initialize( p );
-	}
-
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testNegativeFractionLength() {
-		descriptorBuilder.setAttribute( "integer", 1 );
-		descriptorBuilder.setAttribute( "fraction", -1 );
-		Digits p = descriptorBuilder.build().getAnnotation();
-
-		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
-		constraint.initialize( p );
+			DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+			constraint.initialize( p );
+		} ).isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
-	public void testTrailingZerosAreTrimmed() {
+	public void testNegativeFractionLength() {
+		assertThatThrownBy( () -> {
+			descriptorBuilder.setAttribute( "integer", 1 );
+			descriptorBuilder.setAttribute( "fraction", -1 );
+			Digits p = descriptorBuilder.build().getAnnotation();
+
+			DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+			constraint.initialize( p );
+		} ).isInstanceOf( IllegalArgumentException.class );
+	}
+
+	@ParameterizedTest
+	@MethodSource("testTrailingZerosAreTrimmedValidData")
+	public void testTrailingZerosAreTrimmedValid(Number value) {
 		descriptorBuilder.setAttribute( "integer", 12 );
 		descriptorBuilder.setAttribute( "fraction", 3 );
 		Digits p = descriptorBuilder.build().getAnnotation();
@@ -100,9 +132,33 @@ public class DigitsValidatorForNumberTest {
 		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
 		constraint.initialize( p );
 
-		assertTrue( constraint.isValid( 0.001d, null ) );
-		assertTrue( constraint.isValid( 0.00100d, null ) );
-		assertFalse( constraint.isValid( 0.0001d, null ) );
+		assertTrue( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testTrailingZerosAreTrimmedValidData() {
+		return Stream.of(
+				Arguments.of( 0.001d ),
+				Arguments.of( 0.00100d )
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("testTrailingZerosAreTrimmedInvalidData")
+	public void testTrailingZerosAreTrimmedInvalid(Number value) {
+		descriptorBuilder.setAttribute( "integer", 12 );
+		descriptorBuilder.setAttribute( "fraction", 3 );
+		Digits p = descriptorBuilder.build().getAnnotation();
+
+		DigitsValidatorForNumber constraint = new DigitsValidatorForNumber();
+		constraint.initialize( p );
+
+		assertFalse( constraint.isValid( value, null ) );
+	}
+
+	private static Stream<Arguments> testTrailingZerosAreTrimmedInvalidData() {
+		return Stream.of(
+				Arguments.of( 0.0001d )
+		);
 	}
 
 }

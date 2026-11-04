@@ -7,9 +7,9 @@ package org.hibernate.validator.test.constraints.annotations.hv;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
 import java.util.Set;
@@ -25,8 +25,9 @@ import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedT
 import org.hibernate.validator.testutils.LuhnTestUtil;
 import org.hibernate.validator.testutils.LuhnTestUtil.RepeatedDigits;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Marko Bekhta
@@ -56,14 +57,14 @@ public class CreditCardNumberConstrainedTest extends AbstractConstrainedTest {
 				.getComposingConstraints().isEmpty() );
 	}
 
-	@Test(dataProvider = "creditCardNumbers")
+	@ParameterizedTest
+	@MethodSource("creditCardNumbers")
 	public void testCreditCardNumberBoundaries(CharSequence number, boolean strictValid, boolean ignoringValid) {
-		assertEquals( validator.validateValue( CreditCardNumbers.class, "strict", number ).isEmpty(), strictValid );
-		assertEquals( validator.validateValue( CreditCardNumbers.class, "ignoring", number ).isEmpty(), ignoringValid );
+		assertEquals( strictValid, validator.validateValue( CreditCardNumbers.class, "strict", number ).isEmpty() );
+		assertEquals( ignoringValid, validator.validateValue( CreditCardNumbers.class, "ignoring", number ).isEmpty() );
 	}
 
-	@DataProvider
-	public Object[][] creditCardNumbers() {
+	public static Object[][] creditCardNumbers() {
 		return new Object[][] {
 				{ null, true, true },
 				{ "", false, false },
@@ -106,10 +107,8 @@ public class CreditCardNumberConstrainedTest extends AbstractConstrainedTest {
 						? (char) ( '0' + random.nextInt( 10 ) )
 						: mixedCharacters.charAt( random.nextInt( mixedCharacters.length() ) ) );
 			}
-			assertEquals( validator.validateValue( CreditCardNumbers.class, "strict", number ).isEmpty(),
-					LuhnTestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, false ), number.toString() );
-			assertEquals( validator.validateValue( CreditCardNumbers.class, "ignoring", number ).isEmpty(),
-					LuhnTestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, true ), number.toString() );
+			assertEquals( LuhnTestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, false ), validator.validateValue( CreditCardNumbers.class, "strict", number ).isEmpty(), number.toString() );
+			assertEquals( LuhnTestUtil.isValidLegacy( number, 0, Integer.MAX_VALUE, -1, true ), validator.validateValue( CreditCardNumbers.class, "ignoring", number ).isEmpty(), number.toString() );
 		}
 	}
 
@@ -120,9 +119,9 @@ public class CreditCardNumberConstrainedTest extends AbstractConstrainedTest {
 		long sum = 9L * bodyLength;
 		int legacyCheck = ( 10 - (int) sum % 10 ) % 10;
 		int mathematicalCheck = (int) ( ( 10 - sum % 10 ) % 10 );
-		assertEquals( sum, 2_147_483_655L );
-		assertEquals( legacyCheck, 1 );
-		assertEquals( mathematicalCheck, 5 );
+		assertEquals( 2_147_483_655L, sum );
+		assertEquals( 1, legacyCheck );
+		assertEquals( 5, mathematicalCheck );
 		CharSequence number = new RepeatedDigits( bodyLength, '9', (char) ( '0' + legacyCheck ) );
 		assertTrue( luhnValidator( false ).isValid( number, null ) );
 		CreditCardNumberValidator creditCard = new CreditCardNumberValidator();
