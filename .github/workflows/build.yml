@@ -81,7 +81,7 @@ jobs:
     steps:
       - name: Set up RunsOn
         if: ${{ contains(inputs.initial-build-runs-on, 'runs-on') && github.repository == 'hibernate/hibernate-validator' }}
-        uses: runs-on/action@17b59092eb37ebfdbb034460892887c09100eaa3 # v2.5.0
+        uses: runs-on/action@284bff869d4a825f778ac7c38e50f1e31ef198fd # v2.6.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -250,7 +250,7 @@ jobs:
         run: git config --global core.longpaths true
       - name: Set up RunsOn
         if: ${{ contains(matrix.runs-on || '', 'runs-on') && github.repository == 'hibernate/hibernate-validator' }}
-        uses: runs-on/action@17b59092eb37ebfdbb034460892887c09100eaa3 # v2.5.0
+        uses: runs-on/action@284bff869d4a825f778ac7c38e50f1e31ef198fd # v2.6.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
