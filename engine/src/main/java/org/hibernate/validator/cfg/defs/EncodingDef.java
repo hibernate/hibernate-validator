@@ -1,0 +1,29 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright Red Hat Inc. and Hibernate Authors
+ */
+
+package org.hibernate.validator.cfg.defs;
+
+import org.hibernate.validator.Incubating;
+import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.constraints.Encoding;
+
+/**
+ * Constraint definition for {@link Encoding}.
+ *
+ * @author Andrea Boriero
+ * @since 9.2
+ */
+@Incubating
+public class EncodingDef extends ConstraintDef<EncodingDef, Encoding> {
+
+	public EncodingDef() {
+		super( Encoding.class );
+	}
+
+	public EncodingDef charset(String charset) {
+		addParameter( "charset", charset );
+		return this;
+	}
+}
