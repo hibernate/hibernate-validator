@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 /**
  * <p>ResourceBundleLocator interface. Several implementations are
  * provided in the package {@link org.hibernate.validator.resourceloading}.</p>

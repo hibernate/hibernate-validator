@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.ap;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
@@ -122,7 +118,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpectation( Kind.ERROR, 42 ), new DiagnosticExpectation( Kind.ERROR, 48 )
+				diagnostics, new DiagnosticExpectation( Kind.ERROR, 38 ), new DiagnosticExpectation( Kind.ERROR, 44 )
 		);
 	}
 
@@ -136,19 +132,19 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 36 ),
-				new DiagnosticExpectation( Kind.ERROR, 53 ),
-				new DiagnosticExpectation( Kind.ERROR, 68 ),
-				new DiagnosticExpectation( Kind.ERROR, 87 ),
-				new DiagnosticExpectation( Kind.ERROR, 141 ),
-				new DiagnosticExpectation( Kind.ERROR, 149 ),
-				new DiagnosticExpectation( Kind.ERROR, 166 ),
-				new DiagnosticExpectation( Kind.ERROR, 188 ),
-				new DiagnosticExpectation( Kind.ERROR, 216 ),
-				new DiagnosticExpectation( Kind.ERROR, 370 ),
-				new DiagnosticExpectation( Kind.ERROR, 384 ),
-				new DiagnosticExpectation( Kind.ERROR, 406 ),
-				new DiagnosticExpectation( Kind.ERROR, 431 )
+				new DiagnosticExpectation( Kind.ERROR, 32 ),
+				new DiagnosticExpectation( Kind.ERROR, 49 ),
+				new DiagnosticExpectation( Kind.ERROR, 64 ),
+				new DiagnosticExpectation( Kind.ERROR, 83 ),
+				new DiagnosticExpectation( Kind.ERROR, 137 ),
+				new DiagnosticExpectation( Kind.ERROR, 145 ),
+				new DiagnosticExpectation( Kind.ERROR, 162 ),
+				new DiagnosticExpectation( Kind.ERROR, 184 ),
+				new DiagnosticExpectation( Kind.ERROR, 212 ),
+				new DiagnosticExpectation( Kind.ERROR, 366 ),
+				new DiagnosticExpectation( Kind.ERROR, 380 ),
+				new DiagnosticExpectation( Kind.ERROR, 402 ),
+				new DiagnosticExpectation( Kind.ERROR, 427 )
 		);
 
 		assertEquals( "Method parameters do not respect the inheritance rules. "
@@ -174,6 +170,10 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 62 ),
+				new DiagnosticExpectation( Kind.ERROR, 63 ),
+				new DiagnosticExpectation( Kind.ERROR, 64 ),
+				new DiagnosticExpectation( Kind.ERROR, 65 ),
 				new DiagnosticExpectation( Kind.ERROR, 66 ),
 				new DiagnosticExpectation( Kind.ERROR, 67 ),
 				new DiagnosticExpectation( Kind.ERROR, 68 ),
@@ -190,11 +190,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 79 ),
 				new DiagnosticExpectation( Kind.ERROR, 80 ),
 				new DiagnosticExpectation( Kind.ERROR, 81 ),
-				new DiagnosticExpectation( Kind.ERROR, 82 ),
-				new DiagnosticExpectation( Kind.ERROR, 83 ),
-				new DiagnosticExpectation( Kind.ERROR, 84 ),
-				new DiagnosticExpectation( Kind.ERROR, 85 ),
-				new DiagnosticExpectation( Kind.ERROR, 97 )
+				new DiagnosticExpectation( Kind.ERROR, 93 )
 		);
 	}
 
@@ -209,16 +205,16 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 40 ),
+				new DiagnosticExpectation( Kind.ERROR, 41 ),
 				new DiagnosticExpectation( Kind.ERROR, 42 ),
-				new DiagnosticExpectation( Kind.ERROR, 43 ),
-				new DiagnosticExpectation( Kind.ERROR, 44 ),
 				new DiagnosticExpectation( Kind.ERROR, 45 ),
 				new DiagnosticExpectation( Kind.ERROR, 46 ),
-				new DiagnosticExpectation( Kind.ERROR, 49 ),
+				new DiagnosticExpectation( Kind.ERROR, 47 ),
 				new DiagnosticExpectation( Kind.ERROR, 50 ),
-				new DiagnosticExpectation( Kind.ERROR, 51 ),
-				new DiagnosticExpectation( Kind.ERROR, 54 ),
-				new DiagnosticExpectation( Kind.ERROR, 55 )
+				new DiagnosticExpectation( Kind.ERROR, 51 )
 		);
 	}
 
@@ -263,8 +259,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 )
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 )
 		);
 	}
 
@@ -292,19 +288,19 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		if ( Runtime.version().feature() >= 27 ) {
 			assertThatDiagnosticsMatch(
 					diagnostics,
-					new DiagnosticExpectation( Kind.ERROR, 9 ),
-					new DiagnosticExpectation( Kind.ERROR, 10 )
+					new DiagnosticExpectation( Kind.ERROR, 5 ),
+					new DiagnosticExpectation( Kind.ERROR, 6 )
 			);
 		}
 		else {
 			assertThatDiagnosticsMatch(
 					diagnostics,
-					new DiagnosticExpectation( Kind.ERROR, 9 ),
-					new DiagnosticExpectation( Kind.ERROR, 10 ),
+					new DiagnosticExpectation( Kind.ERROR, 5 ),
+					new DiagnosticExpectation( Kind.ERROR, 6 ),
+					new DiagnosticExpectation( Kind.ERROR, 13 ),
+					new DiagnosticExpectation( Kind.ERROR, 14 ),
 					new DiagnosticExpectation( Kind.ERROR, 17 ),
-					new DiagnosticExpectation( Kind.ERROR, 18 ),
-					new DiagnosticExpectation( Kind.ERROR, 21 ),
-					new DiagnosticExpectation( Kind.ERROR, 22 )
+					new DiagnosticExpectation( Kind.ERROR, 18 )
 			);
 		}
 	}
@@ -332,8 +328,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Kind.NOTE, Diagnostic.NOPOS ), //says that verbose messaging is enabled
-				new DiagnosticExpectation( Kind.WARNING, 42 ),
-				new DiagnosticExpectation( Kind.WARNING, 48 )
+				new DiagnosticExpectation( Kind.WARNING, 38 ),
+				new DiagnosticExpectation( Kind.WARNING, 44 )
 		);
 	}
 
@@ -356,7 +352,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				);
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 17 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 13 ) );
 	}
 
 	@Test
@@ -378,7 +374,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				);
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 17 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 13 ) );
 	}
 
 	@Test
@@ -392,14 +388,14 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 ),
-				new DiagnosticExpectation( Kind.ERROR, 27 ),
-				new DiagnosticExpectation( Kind.ERROR, 35 ),
-				new DiagnosticExpectation( Kind.ERROR, 42 ),
-				new DiagnosticExpectation( Kind.ERROR, 50 ),
-				new DiagnosticExpectation( Kind.ERROR, 58 ),
-				new DiagnosticExpectation( Kind.ERROR, 66 ),
-				new DiagnosticExpectation( Kind.ERROR, 73 )
+				new DiagnosticExpectation( Kind.ERROR, 16 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 46 ),
+				new DiagnosticExpectation( Kind.ERROR, 54 ),
+				new DiagnosticExpectation( Kind.ERROR, 62 ),
+				new DiagnosticExpectation( Kind.ERROR, 69 )
 		);
 	}
 
@@ -419,13 +415,13 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 ),
-				new DiagnosticExpectation( Kind.ERROR, 27 ),
-				new DiagnosticExpectation( Kind.ERROR, 35 ),
-				new DiagnosticExpectation( Kind.ERROR, 42 ),
-				new DiagnosticExpectation( Kind.ERROR, 58 ),
-				new DiagnosticExpectation( Kind.ERROR, 66 ),
-				new DiagnosticExpectation( Kind.ERROR, 73 )
+				new DiagnosticExpectation( Kind.ERROR, 16 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 54 ),
+				new DiagnosticExpectation( Kind.ERROR, 62 ),
+				new DiagnosticExpectation( Kind.ERROR, 69 )
 		);
 	}
 
@@ -442,7 +438,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				);
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 15 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 11 ) );
 	}
 
 	@Test
@@ -455,7 +451,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile1, sourceFile2 );
 
 		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 16 ) );
+		assertThatDiagnosticsMatch( diagnostics, new DiagnosticExpectation( Kind.ERROR, 12 ) );
 	}
 
 	@Test
@@ -491,10 +487,10 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 16 ),
-				new DiagnosticExpectation( Kind.ERROR, 28 ),
-				new DiagnosticExpectation( Kind.ERROR, 37 ),
-				new DiagnosticExpectation( Kind.ERROR, 43 )
+				new DiagnosticExpectation( Kind.ERROR, 12 ),
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 33 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 )
 		);
 	}
 
@@ -513,11 +509,11 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 24 ),
-				new DiagnosticExpectation( Kind.ERROR, 30 ),
-				new DiagnosticExpectation( Kind.ERROR, 46 ),
-				new DiagnosticExpectation( Kind.ERROR, 54 )
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 26 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 ),
+				new DiagnosticExpectation( Kind.ERROR, 50 )
 		);
 	}
 
@@ -546,7 +542,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -562,8 +558,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 16 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -579,13 +575,13 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 22 ),
-				new DiagnosticExpectation( Kind.ERROR, 28 ),
-				new DiagnosticExpectation( Kind.ERROR, 44 ),
-				new DiagnosticExpectation( Kind.ERROR, 52 ),
-				new DiagnosticExpectation( Kind.ERROR, 60 ),
-				new DiagnosticExpectation( Kind.ERROR, 68 ),
-				new DiagnosticExpectation( Kind.ERROR, 76 )
+				new DiagnosticExpectation( Kind.ERROR, 18 ),
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 40 ),
+				new DiagnosticExpectation( Kind.ERROR, 48 ),
+				new DiagnosticExpectation( Kind.ERROR, 56 ),
+				new DiagnosticExpectation( Kind.ERROR, 64 ),
+				new DiagnosticExpectation( Kind.ERROR, 72 )
 		);
 	}
 
@@ -614,12 +610,12 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 23 ),
-				new DiagnosticExpectation( Kind.ERROR, 32 ),
-				new DiagnosticExpectation( Kind.ERROR, 40 ),
-				new DiagnosticExpectation( Kind.ERROR, 48 ),
-				new DiagnosticExpectation( Kind.ERROR, 56 ),
-				new DiagnosticExpectation( Kind.ERROR, 64 )
+				new DiagnosticExpectation( Kind.ERROR, 19 ),
+				new DiagnosticExpectation( Kind.ERROR, 28 ),
+				new DiagnosticExpectation( Kind.ERROR, 36 ),
+				new DiagnosticExpectation( Kind.ERROR, 44 ),
+				new DiagnosticExpectation( Kind.ERROR, 52 ),
+				new DiagnosticExpectation( Kind.ERROR, 60 )
 		);
 	}
 
@@ -639,10 +635,10 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 62 ),
-				new DiagnosticExpectation( Kind.ERROR, 63 ),
-				new DiagnosticExpectation( Kind.ERROR, 64 ),
-				new DiagnosticExpectation( Kind.ERROR, 65 )
+				new DiagnosticExpectation( Kind.ERROR, 58 ),
+				new DiagnosticExpectation( Kind.ERROR, 59 ),
+				new DiagnosticExpectation( Kind.ERROR, 60 ),
+				new DiagnosticExpectation( Kind.ERROR, 61 )
 		);
 	}
 
@@ -693,8 +689,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 39 ),
-				new DiagnosticExpectation( Kind.ERROR, 61 )
+				new DiagnosticExpectation( Kind.ERROR, 35 ),
+				new DiagnosticExpectation( Kind.ERROR, 57 )
 		);
 
 	}
@@ -710,13 +706,13 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 31 ),
-				new DiagnosticExpectation( Kind.ERROR, 34 ),
-				new DiagnosticExpectation( Kind.ERROR, 37 ),
-				new DiagnosticExpectation( Kind.ERROR, 40 ),
-				new DiagnosticExpectation( Kind.ERROR, 43 ),
-				new DiagnosticExpectation( Kind.ERROR, 46 ),
-				new DiagnosticExpectation( Kind.WARNING, 52 )
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 33 ),
+				new DiagnosticExpectation( Kind.ERROR, 36 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 ),
+				new DiagnosticExpectation( Kind.WARNING, 48 )
 		);
 	}
 
@@ -733,7 +729,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 24 )
+				new DiagnosticExpectation( Kind.ERROR, 20 )
 		);
 	}
 
@@ -750,9 +746,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -769,9 +765,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -788,9 +784,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -807,8 +803,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -825,9 +821,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -844,8 +840,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -862,8 +858,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -879,9 +875,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 16 ),
-				new DiagnosticExpectation( Kind.ERROR, 19 ),
-				new DiagnosticExpectation( Kind.ERROR, 22 )
+				new DiagnosticExpectation( Kind.ERROR, 12 ),
+				new DiagnosticExpectation( Kind.ERROR, 15 ),
+				new DiagnosticExpectation( Kind.ERROR, 18 )
 		);
 	}
 
@@ -898,11 +894,11 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 25 ),
-				new DiagnosticExpectation( Kind.ERROR, 28 ),
-				new DiagnosticExpectation( Kind.ERROR, 31 ),
-				new DiagnosticExpectation( Kind.ERROR, 34 ),
-				new DiagnosticExpectation( Kind.ERROR, 37 )
+				new DiagnosticExpectation( Kind.ERROR, 21 ),
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 33 )
 		);
 	}
 
@@ -919,10 +915,10 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 21 ),
-				new DiagnosticExpectation( Kind.ERROR, 24 ),
-				new DiagnosticExpectation( Kind.ERROR, 27 ),
-				new DiagnosticExpectation( Kind.ERROR, 30 )
+				new DiagnosticExpectation( Kind.ERROR, 17 ),
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 ),
+				new DiagnosticExpectation( Kind.ERROR, 26 )
 		);
 	}
 
@@ -938,7 +934,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -954,7 +950,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -970,7 +966,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -986,8 +982,8 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -1004,7 +1000,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
@@ -1021,7 +1017,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 19 )
+				new DiagnosticExpectation( Kind.ERROR, 15 )
 		);
 	}
 
@@ -1038,9 +1034,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -1057,9 +1053,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -1076,9 +1072,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -1095,9 +1091,9 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 15 ),
-				new DiagnosticExpectation( Kind.ERROR, 18 ),
-				new DiagnosticExpectation( Kind.ERROR, 21 )
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
 		);
 	}
 
@@ -1113,7 +1109,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 )
+				new DiagnosticExpectation( Kind.ERROR, 13 )
 		);
 	}
 
@@ -1129,7 +1125,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 27 )
+				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
 
@@ -1145,7 +1141,7 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 17 )
+				new DiagnosticExpectation( Kind.ERROR, 13 )
 		);
 	}
 }

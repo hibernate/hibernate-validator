@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-// Copyright Red Hat Inc. and Hibernate Authors
 = Hibernate Validator {hvVersion} - Jakarta Validation Reference Implementation: Migration Guide from {hvVersionPreviousShort}
 :doctype: book
 :revdate: {docdate}

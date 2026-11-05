@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.ap.record;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
@@ -44,7 +40,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 		assertThatDiagnosticsMatch(
 				diagnostics,
 				new DiagnosticExpectation( Diagnostic.Kind.ERROR, -1 ),
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 14 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 10 )
 		);
 	}
 
@@ -65,7 +61,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 15 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 11 )
 		);
 	}
 
@@ -86,7 +82,7 @@ public class RecordConstraintValidationProcessorIT extends ConstraintValidationP
 
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 17 )
+				new DiagnosticExpectation( Diagnostic.Kind.ERROR, 13 )
 		);
 	}
 }

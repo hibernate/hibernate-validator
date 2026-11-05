@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.ap;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
@@ -49,20 +45,20 @@ public class GroupSequenceValidationIT extends ConstraintValidationProcessorITBa
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 23 ),
 				new DiagnosticExpectation( Kind.ERROR, 27 ),
-				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 ),
 				new DiagnosticExpectation( Kind.ERROR, 46 ),
-				new DiagnosticExpectation( Kind.ERROR, 50 ),
-				new DiagnosticExpectation( Kind.WARNING, 65 ),
-				new DiagnosticExpectation( Kind.ERROR, 83 ),
+				new DiagnosticExpectation( Kind.WARNING, 61 ),
+				new DiagnosticExpectation( Kind.ERROR, 79 ),
+				new DiagnosticExpectation( Kind.ERROR, 88 ),
 				new DiagnosticExpectation( Kind.ERROR, 92 ),
-				new DiagnosticExpectation( Kind.ERROR, 96 ),
-				new DiagnosticExpectation( Kind.ERROR, 111 ),
+				new DiagnosticExpectation( Kind.ERROR, 107 ),
+				new DiagnosticExpectation( Kind.ERROR, 122 ),
 				new DiagnosticExpectation( Kind.ERROR, 126 ),
 				new DiagnosticExpectation( Kind.ERROR, 130 ),
-				new DiagnosticExpectation( Kind.ERROR, 134 ),
-				new DiagnosticExpectation( Kind.ERROR, 149 ),
-				new DiagnosticExpectation( Kind.ERROR, 172 )
+				new DiagnosticExpectation( Kind.ERROR, 145 ),
+				new DiagnosticExpectation( Kind.ERROR, 168 )
 		);
 	}
 

@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: Apache-2.0
-# Copyright Red Hat Inc. and Hibernate Authors
-#
 # Hibernate Validator JMH benchmark runner with optional async-profiler
 # flamegraph support and CPU core pinning.
 
