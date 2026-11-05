@@ -58,6 +58,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NOT_COMPROMISED;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_BLANK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_EMPTY;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NUMERIC;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_POLICY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_STRENGTH;
@@ -150,6 +151,7 @@ import org.hibernate.validator.constraints.Normalized;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
+import org.hibernate.validator.constraints.Numeric;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -405,6 +407,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyVa
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForMap;
+import org.hibernate.validator.internal.constraintvalidators.hv.NumericValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForBigInteger;
@@ -1040,6 +1043,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHANUMERIC ) ) {
 			putBuiltinConstraint( tmpConstraints, Alphanumeric.class, AlphanumericValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NUMERIC ) ) {
+			putBuiltinConstraint( tmpConstraints, Numeric.class, NumericValidator.class );
 		}
 
 		return tmpConstraints;
