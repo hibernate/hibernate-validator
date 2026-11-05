@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.test.constraints.annotations.hv.pl;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;

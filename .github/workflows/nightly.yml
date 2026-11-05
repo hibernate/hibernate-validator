@@ -1,6 +1,3 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright Red Hat Inc. and Hibernate Authors
-#
 # Nightly CI: runs additional environments that are too expensive for every push/PR,
 # plus a reproducible build check across maintained branches.
 # Uses the same reusable workflow as ci.yml for the build + test pattern.

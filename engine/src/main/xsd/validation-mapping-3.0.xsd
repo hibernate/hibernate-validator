@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Jakarta Validation API
-  ~
-  ~ License: Apache License, Version 2.0
-  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
-  -->
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
            targetNamespace="https://jakarta.ee/xml/ns/validation/mapping"

@@ -1,6 +1,3 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright Red Hat Inc. and Hibernate Authors
-#
 # Main CI pipeline for push and pull request builds.
 # Delegates to the reusable build.yml workflow, which:
 # 1. Compiles sources, runs standalone tests, and builds docs (initial build)

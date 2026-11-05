@@ -1,6 +1,3 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright Red Hat Inc. and Hibernate Authors
-#
 # Reusable workflow: build once, then run additional tests in parallel.
 # Called by ci.yml and nightly.yml with different matrix entries.
 #
@@ -183,6 +180,9 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Checkstyle enforces this for the files it processes; this covers all the other ones.
+      - name: Check that no license header was reintroduced
+        run: ./build/ci/check-no-license-headers.sh
       - name: Set up Java ${{ env.MAVEN_JAVA_VERSION }}
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:

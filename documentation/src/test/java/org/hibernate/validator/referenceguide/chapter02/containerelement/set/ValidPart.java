@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.referenceguide.chapter02.containerelement.set;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;

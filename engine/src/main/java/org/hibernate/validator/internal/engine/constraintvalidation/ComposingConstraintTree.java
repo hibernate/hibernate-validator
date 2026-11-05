@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;

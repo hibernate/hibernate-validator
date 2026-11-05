@@ -1,7 +1,3 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 
 // $Id: PersonBool.java 19547 2010-05-19 15:40:07Z hardy.ferentschik $
 
