@@ -25,62 +25,62 @@ Corresponding constraint definitions are also available for programmatic constra
 |===
 | Constraint | Purpose
 
-| `@NullOrNotBlank`
-| Accepts `null` or a character sequence containing at least one non-whitespace character.
-
-| `@NullOrNotEmpty`
-| Accepts `null` or a non-empty character sequence, collection, map or array.
-
-| `@Contains`
-| Checks for specified substrings. By default all must be present; `minRequired` allows requiring a minimum number of matches.
-
-| `@StartsWith`, `@EndsWith`
-| Checks for at least one of the specified prefixes or suffixes. Case-insensitive matching is optional.
-
-| `@UpperCase`, `@LowerCase`
-| Checks the case of letters in a character sequence, ignoring non-letter characters.
-
-| `@Trimmed`
-| Checks that a character sequence has no leading or trailing whitespace, using the same whitespace definition as `String.strip()`.
-
-| `@Hexadecimal`
-| Checks hexadecimal character sequences, with options for letter case, fullwidth characters, empty values and a required prefix.
-
-| `@DateTimeFormat`
-| Checks that a character sequence represents a date and/or time matching a `DateTimeFormatter` pattern, with configurable locales and lenient parsing.
-
-| `@Port`
-| Checks that a numeric value or character sequence represents a port number between 0 and 65535, inclusive.
-
-| `@IBAN`
-| Checks International Bank Account Numbers, including country-specific lengths and check digits. Spaces are ignored; lowercase letters can be accepted with `allowLowercase`.
-
-| `@BIC`
-| Checks Bank Identifier Codes (SWIFT codes).
-
-| `@ISSN`
-| Checks International Standard Serial Numbers.
-
-| `@CUIT`, `@CUIL` (`org.hibernate.validator.constraints.ar`)
-| Checks Argentine tax and labor identification codes, respectively.
-
-| `@RUC` (`org.hibernate.validator.constraints.py`)
-| Checks Paraguayan taxpayer registration numbers.
-
-| `@RENAVAM` (`org.hibernate.validator.constraints.br`)
-| Checks Brazilian vehicle registration numbers in the current 11-digit or legacy 9-digit representation.
-
-| `@PasswordStrength`, `@NotCompromised`, `@PasswordPolicy`
-| Checks password strength, exposure in data breaches, or a configurable set of password policy rules. See the next section for configuration requirements.
-
 | `@Alphabetic`
 | Checks that every character in a character sequence is a letter, as determined by `Character.isLetter(char)`.
 
 | `@Alphanumeric`
 | Checks that every character in a character sequence is a letter or a digit, as determined by `Character.isLetterOrDigit(char)`.
 
+| `@BIC`
+| Checks Bank Identifier Codes (SWIFT codes).
+
+| `@Contains`
+| Checks for specified substrings. By default all must be present; `minRequired` allows requiring a minimum number of matches.
+
+| `@CUIT`, `@CUIL` (`org.hibernate.validator.constraints.ar`)
+| Checks Argentine tax and labor identification codes, respectively.
+
+| `@DateTimeFormat`
+| Checks that a character sequence represents a date and/or time matching a `DateTimeFormatter` pattern, with configurable locales and lenient parsing.
+
+| `@Hexadecimal`
+| Checks hexadecimal character sequences, with options for letter case, fullwidth characters, empty values and a required prefix.
+
+| `@IBAN`
+| Checks International Bank Account Numbers, including country-specific lengths and check digits. Spaces are ignored; lowercase letters can be accepted with `allowLowercase`.
+
+| `@ISSN`
+| Checks International Standard Serial Numbers.
+
+| `@NullOrNotBlank`
+| Accepts `null` or a character sequence containing at least one non-whitespace character.
+
+| `@NullOrNotEmpty`
+| Accepts `null` or a non-empty character sequence, collection, map or array.
+
 | `@Numeric`
 | Checks that every character in a character sequence is a digit, as determined by `Character.isDigit(char)`.
+
+| `@PasswordStrength`, `@NotCompromised`, `@PasswordPolicy`
+| Checks password strength, exposure in data breaches, or a configurable set of password policy rules. See the next section for configuration requirements.
+
+| `@Port`
+| Checks that a numeric value or character sequence represents a port number between 0 and 65535, inclusive.
+
+| `@RENAVAM` (`org.hibernate.validator.constraints.br`)
+| Checks Brazilian vehicle registration numbers in the current 11-digit or legacy 9-digit representation.
+
+| `@RUC` (`org.hibernate.validator.constraints.py`)
+| Checks Paraguayan taxpayer registration numbers.
+
+| `@StartsWith`, `@EndsWith`
+| Checks for at least one of the specified prefixes or suffixes. Case-insensitive matching is optional.
+
+| `@Trimmed`
+| Checks that a character sequence has no leading or trailing whitespace, using the same whitespace definition as `String.strip()`.
+
+| `@UpperCase`, `@LowerCase`
+| Checks the case of letters in a character sequence, ignoring non-letter characters.
 |===
 
 `@NullOrNotBlank` and `@NullOrNotEmpty` are particularly useful for optional values:
