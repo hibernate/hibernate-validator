@@ -1,5 +1,31 @@
 # Hibernate Validator Changelog
 
+## 9.2.0.CR1 (2026-11-10)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40493)
+
+
+### Bug
+* [HV-2283](https://hibernate.atlassian.net/browse/HV-2283) - Missing EL6.0 support for `record`s in messages
+* [HV-1316](https://hibernate.atlassian.net/browse/HV-1316) - Validator.validateProperty() honors @Valid annotation, but it shouldn't (regression)
+
+### Improvement
+* [HV-2290](https://hibernate.atlassian.net/browse/HV-2290) - Update to Hibernate Accessor 0.1.0.CR1
+* [HV-2288](https://hibernate.atlassian.net/browse/HV-2288) - Bump Hibernate Accessor to 0.1.0.Alpha7
+* [HV-2287](https://hibernate.atlassian.net/browse/HV-2287) - Bump joda-time to 2.15.1
+* [HV-2286](https://hibernate.atlassian.net/browse/HV-2286) - Update to OpenJFX to 17.0.21
+* [HV-2282](https://hibernate.atlassian.net/browse/HV-2282) - Use Class File API-generated accessor factory when/if possible
+* [HV-2280](https://hibernate.atlassian.net/browse/HV-2280) - Delay programmatic constraint mapping resolution till factory building
+* [HV-2268](https://hibernate.atlassian.net/browse/HV-2268) - Update to com.fasterxml:classmate 1.8.0
+* [HV-2267](https://hibernate.atlassian.net/browse/HV-2267) - Optimize property path parsing with a linear scan
+* [HV-2241](https://hibernate.atlassian.net/browse/HV-2241) - Migrate tests from TestNG to JUnit
+* [HV-2187](https://hibernate.atlassian.net/browse/HV-2187) - Simplify built-in constraint validators to not rely on constraint composition
+
+### New Feature
+* [HV-2285](https://hibernate.atlassian.net/browse/HV-2285) - Add @Numeric constraint
+* [HV-2269](https://hibernate.atlassian.net/browse/HV-2269) - Add @Alphanumeric constraint
+* [HV-2261](https://hibernate.atlassian.net/browse/HV-2261) - Add @Alphabetic constraint
+
 ## 9.2.0.Beta1 (2026-10-13)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/36146)
