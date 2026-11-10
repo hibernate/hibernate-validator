@@ -123,13 +123,13 @@ The following constraints now use dedicated validators instead of constraint com
 [cols="1,2",options="header"]
 |===
 |Constraint |Former composing constraints
+|`@CPF` |`@Pattern`
 |`@CreditCardNumber` |`@LuhnCheck`
 |`@EAN` |`@Mod10Check`
 |`@Range` |`@Min`, `@Max`
-|`@URL` |`@Pattern`
-|`@CPF` |`@Pattern`
 |`@RENAVAM` |`@Pattern`, `@Mod11Check`
 |`@TituloEleitoral` |`@Pattern`, `@Mod11Check`
+|`@URL` |`@Pattern`
 |===
 
 Their constraint descriptors now return an empty set from `getComposingConstraints()`.
