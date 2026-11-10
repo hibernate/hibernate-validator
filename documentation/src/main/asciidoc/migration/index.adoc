@@ -90,6 +90,25 @@ or anonymous class overriding the new method.
 The behavior of Hibernate Validator {hvVersionShort}
 is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
 
+=== Property path validation
+
+`validateProperty()` and `validateValue()` now validate property paths even when the bean
+has no constraints. Invalid paths that previously returned an empty set now cause an
+`IllegalArgumentException`. Use an existing property name; for Hibernate Validator's nested
+`validateProperty()` paths, each intermediate association must be marked with `@Valid`.
+
+=== Programmatic constraint mapping
+
+Programmatic getter mappings now use the getter selection strategy and property node name
+provider of the factory to which the mapping is added, rather than those of the configuration
+that created the mapping. Missing getters, invalid getter container types and collisions with
+explicit method declarations are reported by `buildValidatorFactory()` instead of while
+constructing the mapping. Adjust exception handling around mapping construction accordingly.
+
+Constraint definitions passed to `constraint()` are now snapshotted immediately. Configure
+a definition before adding it to a mapping; later changes to the same definition no longer
+modify constraints already added.
+
 === CPF validation
 
 `@CPF` now accepts only the fully formatted `XXX.XXX.XXX-XX` representation or an

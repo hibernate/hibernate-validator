@@ -78,6 +78,9 @@ Corresponding constraint definitions are also available for programmatic constra
 
 | `@Alphanumeric`
 | Checks that every character in a character sequence is a letter or a digit, as determined by `Character.isLetterOrDigit(char)`.
+
+| `@Numeric`
+| Checks that every character in a character sequence is a digit, as determined by `Character.isDigit(char)`.
 |===
 
 `@NullOrNotBlank` and `@NullOrNotEmpty` are particularly useful for optional values:
@@ -124,7 +127,20 @@ validation. Configure an `AccessorFactory` using `accessorFactory()` or the
 The optional factories are provided by `org.hibernate.accessor:hibernate-accessor-asm`
 and `org.hibernate.accessor:hibernate-accessor-bytebuddy`.
 
+== Programmatic constraint mapping
+
+Programmatic getter mappings are now resolved when building the validator factory, using
+that factory's getter selection strategy and property node name provider. A mapping can
+therefore be reused across factories with different strategies.
+Constraint definitions are snapshotted when passed to `constraint()`; subsequent changes
+to a definition do not alter constraints already added to a mapping.
+
 == Message interpolation improvements
+
+EL message expressions can now read record components as properties, for example
+`${validatedValue.name}` for a record with a `name` component. At the `BEAN_PROPERTIES`
+feature level, record access is restricted to component accessors and JavaBeans getters;
+arbitrary record methods require the `BEAN_METHODS` feature level.
 
 Custom message interpolators can retrieve the constraint validator payload through
 `HibernateMessageInterpolatorContext#getConstraintValidatorPayload(Class)`.
@@ -149,6 +165,10 @@ returns the name of the field or getter backing the property.
 
 Constraint validator contexts are reused where possible, and interface constraint tracking
 avoids unnecessary work for beans without interface constraints.
+Property path parsing now uses a linear scan.
+
+`validateProperty()` and `validateValue()` now check property paths even for unconstrained
+beans, rejecting invalid paths with `IllegalArgumentException` instead of returning an empty set.
 
 `@CPF` validation now rejects partially formatted identifiers; see the migration guide
 for the supported representations. The regular expression based URL validator also handles
