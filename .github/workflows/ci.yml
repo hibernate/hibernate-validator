@@ -63,7 +63,7 @@ jobs:
             "maven-args": "-am -pl :hibernate-validator-tck-runner -Dincontainer -Dincontainer-prepared",
             "runs-on": "runs-on/fleet=linux-standard/env=ibm" },
           { "name": "Sig test", "coverage": false,
-            "maven-args": "-pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner -Psigtest -DskipTests -Ddevelocity.scan.disabled=true -Dno-build-cache" },
+            "maven-args": "-pl :hibernate-validator-build-enforcer,:hibernate-validator-build-config,:hibernate-validator-tck-runner -Psigtest -DskipTests -Dno-build-cache" },
           { "name": "Windows", "full-build": true, "coverage": false,
             "runs-on": "windows-latest" }
         ]
