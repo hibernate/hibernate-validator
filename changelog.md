@@ -1,5 +1,16 @@
 # Hibernate Validator Changelog
 
+## 9.2.0.CR2 (2026-11-11)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40543)
+
+
+### Improvement
+* [HV-2291](https://hibernate.atlassian.net/browse/HV-2291) - Include programmatically mapped types in predefined scope
+
+### New Feature
+* [HV-2284](https://hibernate.atlassian.net/browse/HV-2284) - Add @Encoding constraint
+
 ## 9.2.0.CR1 (2026-11-10)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40493)
