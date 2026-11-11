@@ -15,6 +15,8 @@ import org.hibernate.validator.testutil.TestForIssue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Tests the {@link Encoding} constraint.
@@ -45,14 +47,13 @@ public class EncodingValidatorTest {
 		assertTrue( validator.isValid( null, null ) );
 	}
 
-	@Test
+	@ParameterizedTest
+	@ValueSource(strings = { "US-ASCII", "ISO-8859-1", "UTF-8", "windows-1252" })
 	@TestForIssue(jiraKey = "HV-2284")
-	public void allowsEmpty() {
-		for ( String charset : new String[] { "US-ASCII", "ISO-8859-1", "UTF-8", "windows-1252" } ) {
-			initialize( charset );
-			assertTrue( validator.isValid( "", null ), charset );
-			assertTrue( validator.isValid( new StringBuilder(), null ), charset );
-		}
+	public void allowsEmpty(String charset) {
+		initialize( charset );
+		assertTrue( validator.isValid( "", null ) );
+		assertTrue( validator.isValid( new StringBuilder(), null ) );
 	}
 
 	@Test
@@ -84,19 +85,18 @@ public class EncodingValidatorTest {
 		assertFalse( validator.isValid( "😀", null ) );
 	}
 
-	@Test
+	@ParameterizedTest
+	@ValueSource(strings = { "UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-32", "utf8" })
 	@TestForIssue(jiraKey = "HV-2284")
-	public void unicodeTransformationFormats() {
-		for ( String charset : new String[] { "UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-32", "utf8" } ) {
-			initialize( charset );
-			assertTrue( validator.isValid( "café € 中", null ), charset );
-			assertTrue( validator.isValid( "😀", null ), charset );
-			assertTrue( validator.isValid( "a😀b", null ), charset );
-			assertFalse( validator.isValid( "\uD83D", null ), charset );
-			assertFalse( validator.isValid( "a\uD83Db", null ), charset );
-			assertFalse( validator.isValid( "\uDE00", null ), charset );
-			assertFalse( validator.isValid( "\uDE00\uD83D", null ), charset );
-		}
+	public void unicodeTransformationFormats(String charset) {
+		initialize( charset );
+		assertTrue( validator.isValid( "café € 中", null ) );
+		assertTrue( validator.isValid( "😀", null ) );
+		assertTrue( validator.isValid( "a😀b", null ) );
+		assertFalse( validator.isValid( "\uD83D", null ) );
+		assertFalse( validator.isValid( "a\uD83Db", null ) );
+		assertFalse( validator.isValid( "\uDE00", null ) );
+		assertFalse( validator.isValid( "\uDE00\uD83D", null ) );
 	}
 
 	@Test

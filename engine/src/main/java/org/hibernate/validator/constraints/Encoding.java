@@ -36,8 +36,9 @@ import org.hibernate.validator.constraints.Encoding.List;
  * ({@code U+D800}-{@code U+DBFF}) followed by a low surrogate ({@code U+DC00}-{@code U+DFFF}); a surrogate
  * without its counterpart (e.g. in a string truncated in the middle of an emoji) does not represent any
  * character.</li>
- * <li>No Unicode normalization is applied: the character sequence is checked as is. Combine with
- * {@link Normalized} if the value is expected to be normalized first.</li>
+ * <li>No Unicode normalization is applied: the character sequence is checked as is. To also require the value
+ * to be in a given normalization form, add the {@link Normalized} constraint; note that it only checks the form
+ * and does not normalize the value.</li>
  * </ul>
  *
  * @author Andrea Boriero

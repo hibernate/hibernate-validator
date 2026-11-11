@@ -29,6 +29,16 @@ public class EncodingValidator implements ConstraintValidator<Encoding, CharSequ
 
 	private static final Log LOG = LoggerFactory.make( MethodHandles.lookup() );
 
+	/**
+	 * The exclusive upper bound of the characters encodable in {@code US-ASCII}.
+	 */
+	private static final int US_ASCII_MAX_EXCLUSIVE_CHAR = 0x80;
+
+	/**
+	 * The exclusive upper bound of the characters encodable in {@code ISO-8859-1}.
+	 */
+	private static final int ISO_8859_1_MAX_EXCLUSIVE_CHAR = 0x100;
+
 	private Charset charset;
 
 	/**
@@ -55,10 +65,10 @@ public class EncodingValidator implements ConstraintValidator<Encoding, CharSequ
 		// US-ASCII and ISO-8859-1 map each char 1:1 to a code point below a fixed bound, so a range check is enough;
 		// any other charset falls back to an actual CharsetEncoder.
 		if ( StandardCharsets.US_ASCII.equals( charset ) ) {
-			maxExclusiveChar = 0x80;
+			maxExclusiveChar = US_ASCII_MAX_EXCLUSIVE_CHAR;
 		}
 		else if ( StandardCharsets.ISO_8859_1.equals( charset ) ) {
-			maxExclusiveChar = 0x100;
+			maxExclusiveChar = ISO_8859_1_MAX_EXCLUSIVE_CHAR;
 		}
 		else {
 			maxExclusiveChar = -1;
