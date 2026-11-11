@@ -16,6 +16,15 @@ public interface PredefinedScopeHibernateValidatorConfiguration extends BaseHibe
 	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration builtinConstraints(Set<String> constraints);
 
+	/**
+	 * Specify the bean classes whose metadata should be initialized when building the validator factory.
+	 * Types configured through programmatic constraint mappings, including mappings created by
+	 * {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor constraint mapping contributors},
+	 * are initialized in addition to the specified classes.
+	 *
+	 * @param beanClassesToInitialize the bean classes to initialize
+	 * @return {@code this} for chaining configuration method calls
+	 */
 	@Incubating
 	PredefinedScopeHibernateValidatorConfiguration initializeBeanMetaData(Set<Class<?>> beanClassesToInitialize);
 

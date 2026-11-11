@@ -219,6 +219,11 @@ public class PredefinedScopeValidatorFactoryImpl implements PredefinedScopeHiber
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		Set<Class<?>> beanClassesToInitialize = new HashSet<>( hibernateSpecificConfig.getBeanClassesToInitialize() );
+		for ( ResolvedConstraintMapping mapping : constraintMappings ) {
+			for ( ResolvedConstraintMapping.ResolvedType<?> type : mapping.getTypes() ) {
+				beanClassesToInitialize.add( type.getBeanClass() );
+			}
+		}
 
 		XmlMetaDataProvider xmlMetaDataProvider;
 		if ( mappingParser != null && mappingParser.createConstrainedElements() ) {
