@@ -90,6 +90,12 @@ or anonymous class overriding the new method.
 The behavior of Hibernate Validator {hvVersionShort}
 is, in general, backward-compatible with Hibernate Validator {hvVersionPreviousShort}.
 
+With the predefined scope validator factory, types configured through programmatic constraint
+mappings, including mappings created by `ConstraintMappingContributor` implementations, are
+now automatically initialized in addition to the classes passed to `initializeBeanMetaData()`.
+Constraints on mapped types previously omitted from that set will now be enforced.
+This behavior is independent of `includeBeansAndConstraintsDefinedOnlyInXml()`.
+
 === Property path validation
 
 `validateProperty()` and `validateValue()` now validate property paths even when the bean

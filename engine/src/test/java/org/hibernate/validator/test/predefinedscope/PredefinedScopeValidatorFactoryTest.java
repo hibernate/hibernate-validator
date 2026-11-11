@@ -30,8 +30,13 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import org.hibernate.validator.BaseHibernateValidatorConfiguration;
 import org.hibernate.validator.PredefinedScopeHibernateValidator;
+import org.hibernate.validator.PredefinedScopeHibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.PositiveDef;
 import org.hibernate.validator.metadata.BeanMetaDataClassNormalizer;
+import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.junit.jupiter.api.Test;
@@ -362,6 +367,55 @@ public class PredefinedScopeValidatorFactoryTest {
 							violationOf( NotNull.class ).withMessage( "must not be null" )
 					);
 		}
+	}
+
+	@Test
+	public void testProgrammaticallyDefinedBeansDiscovery() {
+		PredefinedScopeHibernateValidatorConfiguration configuration = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+				.configure()
+				.builtinConstraints( Set.of( Positive.class.getName(), NotNull.class.getName(), Email.class.getName() ) )
+				.initializeBeanMetaData( Set.of( Bean.class ) )
+				.includeBeansAndConstraintsDefinedOnlyInXml( false );
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.type( ProgrammaticBean.class ).field( "value" ).constraint( new PositiveDef() );
+		configuration.addMapping( mapping );
+
+		try ( ValidatorFactory factory = configuration.buildValidatorFactory() ) {
+			Validator validator = factory.getValidator();
+			assertThat( validator.validate( new ProgrammaticBean() ) ).containsOnlyViolations(
+					violationOf( Positive.class ).withProperty( "value" )
+			);
+			assertThat( validator.validate( new Bean() ) ).containsOnlyViolations(
+					violationOf( NotNull.class ).withProperty( "property" )
+			);
+		}
+	}
+
+	@Test
+	public void testContributorDefinedBeansDiscovery() {
+		try (
+				ValidatorFactory factory = Validation.byProvider( PredefinedScopeHibernateValidator.class )
+						.configure()
+						.builtinConstraints( Set.of( Positive.class.getName() ) )
+						.initializeBeanMetaData( Collections.emptySet() )
+						.addProperty( BaseHibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTORS, ProgrammaticMappingContributor.class.getName() )
+						.buildValidatorFactory()
+		) {
+			assertThat( factory.getValidator().validate( new ProgrammaticBean() ) ).containsOnlyViolations(
+					violationOf( Positive.class ).withProperty( "value" )
+			);
+		}
+	}
+
+	public static class ProgrammaticMappingContributor implements ConstraintMappingContributor {
+		@Override
+		public void createConstraintMappings(ConstraintMappingBuilder builder) {
+			builder.addConstraintMapping().type( ProgrammaticBean.class ).field( "value" ).constraint( new PositiveDef() );
+		}
+	}
+
+	private static class ProgrammaticBean {
+		private int value;
 	}
 
 	private static ValidatorFactory getValidatorFactory() {
