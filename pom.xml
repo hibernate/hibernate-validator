@@ -8,7 +8,7 @@
 
     <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
-    <version>9.2.0-SNAPSHOT</version>
+    <version>9.2.0.CR2</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Validator</name>
@@ -101,7 +101,7 @@
     </modules>
 
     <properties>
-        <project.build.outputTimestamp>2026-11-10T23:09:20Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-11-11T17:13:59Z</project.build.outputTimestamp>
 
         <!-- Version to be used as baseline for API/SPI change reports -->
 
