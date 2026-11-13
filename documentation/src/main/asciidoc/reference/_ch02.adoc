@@ -858,6 +858,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: Any type
 	Hibernate metadata impact::: None
 
+`@SingleLine`:: Checks that the annotated character sequence contains no line break characters, i.e. it is a single line of text. The following Unicode line break characters are rejected: `\n` (LF), `\r` (CR), `\u0085` (NEL), `\u2028` (Line Separator) and `\u2029` (Paragraph Separator). `null` and empty sequences are considered valid.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@StartsWith(value=, ignoreCase=)`:: Validates that the annotated character sequence starts with at least one of the specified prefixes. When `ignoreCase` is set to `true`, the comparison is case-insensitive using `Locale.ROOT`.
     Supported data types::: `CharSequence`
     Hibernate metadata impact::: None
