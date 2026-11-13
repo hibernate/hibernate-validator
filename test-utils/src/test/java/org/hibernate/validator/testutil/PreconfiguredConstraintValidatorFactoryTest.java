@@ -12,14 +12,14 @@ import java.util.Map;
 
 import jakarta.validation.ConstraintValidatorFactory;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PreconfiguredConstraintValidatorFactoryTest {
 
 	private ConstraintValidatorFactory delegatedConstraintValidatorFactory;
 
-	@BeforeMethod
+	@BeforeEach
 	public void setUp() {
 		delegatedConstraintValidatorFactory = createMock( ConstraintValidatorFactory.class );
 	}

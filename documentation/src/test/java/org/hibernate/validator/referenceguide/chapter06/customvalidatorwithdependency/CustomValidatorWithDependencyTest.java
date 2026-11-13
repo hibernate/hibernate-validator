@@ -10,7 +10,7 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.mock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +22,7 @@ import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.testutil.PreconfiguredValidatorsValidatorFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unused")
 //tag::field[]
