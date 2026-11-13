@@ -66,6 +66,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISSN( "org.hibernate.validator.constraints.ISSN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH( "org.hibernate.validator.constraints.Length" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LOWERCASE( "org.hibernate.validator.constraints.LowerCase" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MAX_LINES( "org.hibernate.validator.constraints.MaxLines" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK( "org.hibernate.validator.constraints.LuhnCheck" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK( "org.hibernate.validator.constraints.Mod10Check" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK( "org.hibernate.validator.constraints.Mod11Check" ),

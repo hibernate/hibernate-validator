@@ -60,6 +60,7 @@ import org.hibernate.validator.constraints.ISSN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LowerCase;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.MaxLines;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
@@ -196,6 +197,7 @@ public class MessagePropertiesTest {
 							violationOf( CodePointLength.class ),
 							violationOf( Contains.class ),
 							violationOf( LuhnCheck.class ),
+							violationOf( MaxLines.class ),
 							violationOf( Mod10Check.class ),
 							violationOf( Mod11Check.class ),
 							violationOf( Normalized.class ),
@@ -372,6 +374,9 @@ public class MessagePropertiesTest {
 
 		@LuhnCheck
 		private String luhnCheck = "4";
+
+		@MaxLines(1)
+		private String maxLines = "foo\nbar";
 
 		@Mod10Check
 		private String mod10Check = "4";
