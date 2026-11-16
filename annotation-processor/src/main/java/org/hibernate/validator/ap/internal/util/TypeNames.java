@@ -103,6 +103,7 @@ public class TypeNames {
 		public static final String NULL_OR_NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NullOrNotBlank";
 		public static final String NULL_OR_NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NullOrNotEmpty";
 		public static final String UUID = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UUID";
+		public static final String MAX_LINES = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".MaxLines";
 		public static final String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
 		public static final String NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotEmpty";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
