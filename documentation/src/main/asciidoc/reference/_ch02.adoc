@@ -810,6 +810,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
+`@MaxLines(value=)`:: Checks that the annotated character sequence has at most the specified number of lines. A line is delimited by any of the Unicode line break characters: `\n` (LF), `\r` (CR), `\u0085` (NEL), `\u2028` (Line Separator) and `\u2029` (Paragraph Separator). The `\r\n` (CRLF) sequence counts as a single line break. A string with no line breaks is considered to have one line. `null` is considered valid.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@Mod10Check(multiplier=, weight=, startIndex=, endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`:: Checks that the digits within the annotated character sequence pass the generic mod 10 checksum algorithm. `multiplier` determines the multiplier for odd numbers (defaults to 3), `weight` the weight for even numbers (defaults to 1). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
