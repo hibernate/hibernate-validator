@@ -1,9 +1,4 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- * Copyright Red Hat Inc. and Hibernate Authors
- */
 package org.hibernate.validator.testutil;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.*;
