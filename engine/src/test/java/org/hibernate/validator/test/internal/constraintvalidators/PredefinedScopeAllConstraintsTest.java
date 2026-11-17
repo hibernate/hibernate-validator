@@ -44,6 +44,7 @@ import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.Alphabetic;
 import org.hibernate.validator.constraints.Alphanumeric;
 import org.hibernate.validator.constraints.BIC;
+import org.hibernate.validator.constraints.Base64;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.Contains;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -184,6 +185,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Alphabetic.class, new AlphabeticBean() );
 		testConstraint( Alphanumeric.class, new AlphanumericBean() );
 		testConstraint( Numeric.class, new NumericBean() );
+		testConstraint( Base64.class, new Base64Bean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -660,6 +662,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Numeric
 		private String numeric = "invalid1";
+	}
+
+	private static class Base64Bean {
+
+		@Base64
+		private String base64 = "invalid!";
 	}
 
 }
