@@ -202,7 +202,7 @@
         <version.com.google.guava>33.8.0-jre</version.com.google.guava>
         <version.org.springframework.spring-expression>7.0.10</version.org.springframework.spring-expression>
         <version.org.jboss.arquillian.container.arquillian-weld-embedded>4.0.1.Final</version.org.jboss.arquillian.container.arquillian-weld-embedded>
-        <version.tools.jackson.core.jackson-bom>3.2.4</version.tools.jackson.core.jackson-bom>
+        <version.tools.jackson.core.jackson-bom>3.3.0</version.tools.jackson.core.jackson-bom>
         <version.net.bytebuddy.byte-buddy>1.18.17</version.net.bytebuddy.byte-buddy>
 
         <!-- OSGi dependencies -->
@@ -233,7 +233,7 @@
 
         <version.antrun.plugin>3.2.0</version.antrun.plugin>
         <version.assembly.plugin>3.8.0</version.assembly.plugin>
-        <version.buildhelper.plugin>3.7.0</version.buildhelper.plugin>
+        <version.buildhelper.plugin>3.8.0</version.buildhelper.plugin>
         <version.bundle.plugin>6.2.0</version.bundle.plugin>
         <version.checkstyle.plugin>3.6.0</version.checkstyle.plugin>
         <version.clean.plugin>3.5.0</version.clean.plugin>
@@ -261,8 +261,8 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.flatten-maven-plugin>1.9.0</version.flatten-maven-plugin>
         <version.moditect.plugin>1.3.0.Final</version.moditect.plugin>
-        <version.sisu-maven-plugin>1.1.1</version.sisu-maven-plugin>
-        <version.versions.plugin>2.24.0</version.versions.plugin>
+        <version.sisu-maven-plugin>1.1.2</version.sisu-maven-plugin>
+        <version.versions.plugin>2.25.1</version.versions.plugin>
         <version.maven-wrapper-plugin>3.3.4</version.maven-wrapper-plugin>
         <version.spotless-maven-plugin>3.11.0</version.spotless-maven-plugin>
         <version.jacoco.plugin>0.8.16</version.jacoco.plugin>
@@ -411,7 +411,7 @@
                 - update README
                 - run mvn wrapper:wrapper to re-generate the maven wrapper
             -->
-        <maven.min.version>3.10.0</maven.min.version>
+        <maven.min.version>3.10.1</maven.min.version>
 
         <!-- Formatting -->
         <format.skip>false</format.skip>
