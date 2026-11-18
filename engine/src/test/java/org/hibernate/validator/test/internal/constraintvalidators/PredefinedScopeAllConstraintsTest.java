@@ -84,6 +84,8 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.it.CodiceFiscale;
+import org.hibernate.validator.constraints.it.PartitaIVA;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
@@ -165,6 +167,8 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CPF.class, new CPFBean() );
 		testConstraint( RENAVAM.class, new RENAVAMBean() );
 		testConstraint( TituloEleitoral.class, new TituloEleitoralBean() );
+		testConstraint( CodiceFiscale.class, new CodiceFiscaleBean() );
+		testConstraint( PartitaIVA.class, new PartitaIVABean() );
 		testConstraint( REGON.class, new REGONBean() );
 		testConstraint( NIP.class, new NIPBean() );
 		testConstraint( PESEL.class, new PESELBean() );
@@ -542,6 +546,18 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@TituloEleitoral
 		private String tituloEleitoral = "invalid";
+	}
+
+	private static class CodiceFiscaleBean {
+
+		@CodiceFiscale
+		private String codiceFiscale = "invalid";
+	}
+
+	private static class PartitaIVABean {
+
+		@PartitaIVA
+		private String partitaIva = "invalid";
 	}
 
 	private static class REGONBean {

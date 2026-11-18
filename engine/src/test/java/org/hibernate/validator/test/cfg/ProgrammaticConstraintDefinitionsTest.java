@@ -26,6 +26,8 @@ import org.hibernate.validator.cfg.defs.br.CNPJDef;
 import org.hibernate.validator.cfg.defs.br.CPFDef;
 import org.hibernate.validator.cfg.defs.br.RENAVAMDef;
 import org.hibernate.validator.cfg.defs.br.TituloEleitoralDef;
+import org.hibernate.validator.cfg.defs.it.CodiceFiscaleDef;
+import org.hibernate.validator.cfg.defs.it.PartitaIVADef;
 import org.hibernate.validator.cfg.defs.kor.KorRRNDef;
 import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
@@ -39,6 +41,8 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.it.CodiceFiscale;
+import org.hibernate.validator.constraints.it.PartitaIVA;
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
@@ -75,6 +79,9 @@ public class ProgrammaticConstraintDefinitionsTest {
 
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.INDIVIDUAL ), "127530851622", "127530851623", "invalid Russian taxpayer identification number (INN)" );
 		doProgrammaticTest( INN.class, new INNDef().type( INN.Type.JURIDICAL ), "8606995694", "8606995695", "invalid Russian taxpayer identification number (INN)" );
+
+		doProgrammaticTest( CodiceFiscale.class, new CodiceFiscaleDef(), "RSSMRA80A01H501U", "RSSMRA80A01H501V", "invalid Italian tax code (codice fiscale)" );
+		doProgrammaticTest( PartitaIVA.class, new PartitaIVADef(), "00743110157", "00743110158", "invalid Italian VAT number (partita IVA)" );
 
 		doProgrammaticTest( KorRRN.class, new KorRRNDef().validateCheckDigit( KorRRN.ValidateCheckDigit.NEVER ), "030205-1000004", "010199-1063015",
 				"invalid Korean resident registration number (KorRRN)" );

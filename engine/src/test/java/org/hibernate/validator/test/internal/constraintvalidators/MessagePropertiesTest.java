@@ -85,6 +85,8 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.it.CodiceFiscale;
+import org.hibernate.validator.constraints.it.PartitaIVA;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
@@ -214,6 +216,8 @@ public class MessagePropertiesTest {
 							violationOf( CPF.class ),
 							violationOf( RENAVAM.class ),
 							violationOf( TituloEleitoral.class ),
+							violationOf( CodiceFiscale.class ),
+							violationOf( PartitaIVA.class ),
 							violationOf( REGON.class ),
 							violationOf( NIP.class ),
 							violationOf( PESEL.class ),
@@ -426,6 +430,12 @@ public class MessagePropertiesTest {
 
 		@TituloEleitoral
 		private String tituloEleitoral = "invalid";
+
+		@CodiceFiscale
+		private String codiceFiscale = "invalid";
+
+		@PartitaIVA
+		private String partitaIva = "invalid";
 
 		@REGON
 		private String regon = "invalid";

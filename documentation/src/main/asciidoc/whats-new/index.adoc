@@ -34,6 +34,9 @@ Corresponding constraint definitions are also available for programmatic constra
 | `@BIC`
 | Checks Bank Identifier Codes (SWIFT codes).
 
+| `@CodiceFiscale`, `@PartitaIVA` (`org.hibernate.validator.constraints.it`)
+| Checks Italian tax codes and VAT numbers, respectively.
+
 | `@Contains`
 | Checks for specified substrings. By default all must be present; `minRequired` allows requiring a minimum number of matches.
 
