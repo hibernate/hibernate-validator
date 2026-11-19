@@ -1,4 +1,3 @@
-
 package org.hibernate.validator.cfg.defs;
 
 import org.hibernate.validator.Incubating;
