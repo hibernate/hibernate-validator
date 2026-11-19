@@ -26,6 +26,15 @@ public class CodiceFiscaleValidatorTest extends AbstractConstrainedTest {
 	}
 
 	@Test
+	public void last_day_of_a_month_validates() {
+		assertNoViolations( validator.validate( new Taxpayer( "RSSMRA80T31H501K" ) ) );
+		// 1980 is a leap year; 00 is accepted because 2000 is one, even though 1900 is not
+		assertNoViolations( validator.validate( new Taxpayer( "RSSMRA80B29H501Q" ) ) );
+		assertNoViolations( validator.validate( new Taxpayer( "RSSMRA80B69H501U" ) ) );
+		assertNoViolations( validator.validate( new Taxpayer( "RSSMRA00B29H501Y" ) ) );
+	}
+
+	@Test
 	public void code_with_digits_replaced_by_letters_validates() {
 		// "omocodia": the digits are replaced starting from the rightmost one, and the check character changes with them
 		assertNoViolations( validator.validate( new Taxpayer( "RSSMRA80A01H50MM" ) ) );
@@ -52,6 +61,12 @@ public class CodiceFiscaleValidatorTest extends AbstractConstrainedTest {
 		assertInvalid( "RSSMRA80A00H501V" );
 		assertInvalid( "RSSMRA80A32H501C" );
 		assertInvalid( "RSSMRA80A72H501G" );
+		// the 30th of February, the 31st of April and the 29th of February of 1981 do not exist either
+		assertInvalid( "RSSMRA80B30H501X" );
+		assertInvalid( "RSSMRA80B70H501B" );
+		assertInvalid( "RSSMRA80D31H501D" );
+		assertInvalid( "RSSMRA81B29H501R" );
+		assertInvalid( "RSSMRAUMB29H501Z" );
 		// F is not a month letter and O does not replace any digit, even with a matching check character
 		assertInvalid( "RSSMRA80F01H501G" );
 		assertInvalid( "RSSMRA80A01H50OF" );

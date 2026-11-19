@@ -898,7 +898,7 @@ Hibernate Validator!
 	Hibernate metadata impact::: None
 	Country::: Brazil
 
-`@CodiceFiscale`:: Checks that the annotated character sequence represents an Italian tax code (https://en.wikipedia.org/wiki/Italian_fiscal_code[codice fiscale]). Both the 16-character code of natural persons and the 11-digit code of legal entities are accepted. In the code of a natural person, digits may be replaced by letters to tell apart two people who would otherwise share the same code ("omocodia"). Only the format and the check character are verified, not whether the code has actually been issued
+`@CodiceFiscale`:: Checks that the annotated character sequence represents an Italian tax code (https://en.wikipedia.org/wiki/Italian_fiscal_code[codice fiscale]). Both the 16-character code of natural persons and the 11-digit code of legal entities are accepted. In the code of a natural person, digits may be replaced by letters to tell apart two people who would otherwise share the same code ("omocodia"). Only the format, the date of birth and the check character are verified, not whether the code has actually been issued
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 	Country::: Italy

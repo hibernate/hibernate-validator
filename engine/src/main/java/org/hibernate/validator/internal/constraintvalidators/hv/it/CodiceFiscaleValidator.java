@@ -20,10 +20,17 @@ public class CodiceFiscaleValidator implements ConstraintValidator<CodiceFiscale
 	private static final String DIGIT = "[0-9" + DIGIT_REPLACEMENTS + "]";
 
 	/**
+	 * The letters of the months, from January to December, and the number of days of each.
+	 */
+	private static final String MONTHS = "ABCDEHLMPRST";
+	private static final int[] DAYS_IN_MONTH = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	private static final int FEBRUARY = 1;
+
+	/**
 	 * Surname, name, year, month, day (plus 40 for women), place of birth, check character.
 	 */
 	private static final Pattern NATURAL_PERSON_PATTERN = Pattern.compile(
-			"[A-Z]{6}" + DIGIT + "{2}[ABCDEHLMPRST]" + DIGIT + "{2}[A-Z]" + DIGIT + "{3}[A-Z]",
+			"[A-Z]{6}" + DIGIT + "{2}[" + MONTHS + "]" + DIGIT + "{2}[A-Z]" + DIGIT + "{3}[A-Z]",
 			Pattern.CASE_INSENSITIVE
 	);
 
@@ -73,15 +80,25 @@ public class CodiceFiscaleValidator implements ConstraintValidator<CodiceFiscale
 		}
 		String code = value.toString().toUpperCase( Locale.ROOT );
 
-		int day = digitAt( code, 9 ) * 10 + digitAt( code, 10 );
-		if ( day > 40 ) {
-			day -= 40;
-		}
-		if ( day < 1 || day > 31 ) {
+		if ( !hasValidDateOfBirth( code ) ) {
 			return false;
 		}
 
 		return code.charAt( 15 ) == calculateCheckCharacter( code );
+	}
+
+	private static boolean hasValidDateOfBirth(String code) {
+		int year = digitAt( code, 6 ) * 10 + digitAt( code, 7 );
+		int month = MONTHS.indexOf( code.charAt( 8 ) );
+		int day = digitAt( code, 9 ) * 10 + digitAt( code, 10 );
+		if ( day > 40 ) {
+			day -= 40;
+		}
+		if ( day < 1 || day > DAYS_IN_MONTH[month] ) {
+			return false;
+		}
+		// the century is not part of the code: a 29th of February is accepted whenever the year is a leap year in at least one century
+		return month != FEBRUARY || day < 29 || year % 4 == 0;
 	}
 
 	private static int digitAt(String code, int index) {

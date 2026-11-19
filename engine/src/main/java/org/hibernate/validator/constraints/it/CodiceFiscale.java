@@ -26,7 +26,7 @@ import org.hibernate.validator.Incubating;
  * in which digits are replaced by letters to tell apart two people who would otherwise share
  * the same code ("omocodia"), and the 11-digit code of legal entities.
  * <p>
- * Only the format and the check character are verified: whether a code has actually been issued,
+ * Only the format, the date of birth and the check character are verified: whether a code has actually been issued,
  * and to whom, is known to the Italian Revenue Agency alone.
  *
  * @since 9.2
