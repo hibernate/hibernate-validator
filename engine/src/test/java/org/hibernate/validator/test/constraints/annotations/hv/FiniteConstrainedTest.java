@@ -7,10 +7,15 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.FiniteDef;
 import org.hibernate.validator.constraints.Finite;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.junit.jupiter.api.Test;
 
@@ -70,6 +75,26 @@ public class FiniteConstrainedTest extends AbstractConstrainedTest {
 		);
 	}
 
+	@Test
+	public void testProgrammaticDefinition() {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.type( Bar.class )
+				.field( "doubleValue" )
+				.constraint( new FiniteDef() )
+				.field( "floatValue" )
+				.constraint( new FiniteDef() );
+		configuration.addMapping( mapping );
+		Validator programmaticValidator = configuration.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Bar>> violations =
+				programmaticValidator.validate( new Bar( Double.NaN, Float.POSITIVE_INFINITY ) );
+		assertThat( violations ).containsOnlyViolations(
+				violationOf( Finite.class ),
+				violationOf( Finite.class )
+		);
+	}
+
 	private static class Foo {
 
 		@Finite
@@ -79,6 +104,18 @@ public class FiniteConstrainedTest extends AbstractConstrainedTest {
 		private final Float floatValue;
 
 		public Foo(Double doubleValue, Float floatValue) {
+			this.doubleValue = doubleValue;
+			this.floatValue = floatValue;
+		}
+	}
+
+	// Intentionally not annotated — used for programmatic definition test
+	private static class Bar {
+
+		private final Double doubleValue;
+		private final Float floatValue;
+
+		public Bar(Double doubleValue, Float floatValue) {
 			this.doubleValue = doubleValue;
 			this.floatValue = floatValue;
 		}
