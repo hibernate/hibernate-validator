@@ -53,6 +53,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Finite;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -230,7 +231,8 @@ public class MessagePropertiesTest {
 							violationOf( PasswordPolicy.class ),
 							violationOf( Alphabetic.class ),
 							violationOf( Alphanumeric.class ),
-							violationOf( Numeric.class )
+							violationOf( Numeric.class ),
+							violationOf( Finite.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -477,6 +479,9 @@ public class MessagePropertiesTest {
 
 		@Numeric
 		private String numeric = "invalid1";
+
+		@Finite
+		private Double finite = Double.NaN;
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;

@@ -40,6 +40,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENCODING;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENDS_WITH;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_FINITE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_HEXADEIMAL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IBAN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS;
@@ -135,6 +136,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Finite;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -382,6 +384,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatVa
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EncodingValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EndsWithValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.FiniteValidatorForDouble;
+import org.hibernate.validator.internal.constraintvalidators.hv.FiniteValidatorForFloat;
 import org.hibernate.validator.internal.constraintvalidators.hv.HexadecimalValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.IBANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
@@ -878,6 +882,12 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENDS_WITH ) ) {
 			putBuiltinConstraint( tmpConstraints, EndsWith.class, EndsWithValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_FINITE ) ) {
+			putBuiltinConstraints( tmpConstraints, Finite.class, Arrays.asList(
+					FiniteValidatorForDouble.class,
+					FiniteValidatorForFloat.class
+			) );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_HEXADEIMAL ) ) {
 			putBuiltinConstraint( tmpConstraints, Hexadecimal.class, HexadecimalValidator.class );

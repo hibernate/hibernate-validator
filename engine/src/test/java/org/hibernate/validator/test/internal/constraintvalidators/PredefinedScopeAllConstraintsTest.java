@@ -52,6 +52,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Finite;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -184,6 +185,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Alphabetic.class, new AlphabeticBean() );
 		testConstraint( Alphanumeric.class, new AlphanumericBean() );
 		testConstraint( Numeric.class, new NumericBean() );
+		testConstraint( Finite.class, new FiniteBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -660,6 +662,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Numeric
 		private String numeric = "invalid1";
+	}
+
+	private static class FiniteBean {
+
+		@Finite
+		private Double finite = Double.NaN;
 	}
 
 }
