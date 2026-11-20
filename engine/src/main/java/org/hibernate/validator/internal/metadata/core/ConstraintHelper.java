@@ -49,6 +49,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LOWERCASE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MAX_LINES;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD10_CHECK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MOD11_CHECK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NORMALIZED;
@@ -143,6 +144,7 @@ import org.hibernate.validator.constraints.IpAddress;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LowerCase;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.MaxLines;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
@@ -390,6 +392,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.IpAddressValidat
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LowerCaseValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.MaxLinesValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedValidator;
@@ -905,6 +908,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LOWERCASE ) ) {
 			putBuiltinConstraint( tmpConstraints, LowerCase.class, LowerCaseValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_MAX_LINES ) ) {
+			putBuiltinConstraint( tmpConstraints, MaxLines.class, MaxLinesValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LUHN_CHECK ) ) {
 			putBuiltinConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
