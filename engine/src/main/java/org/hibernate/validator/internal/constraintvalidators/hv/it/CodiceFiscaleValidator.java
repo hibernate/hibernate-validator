@@ -10,6 +10,14 @@ import org.hibernate.validator.constraints.it.CodiceFiscale;
 
 /**
  * Validator for {@link CodiceFiscale}.
+ * <p>
+ * The structure of the code, the letters of the months, the letters replacing the digits and the computation
+ * of the check character are defined by the Italian Ministerial Decree of 23 December 1976
+ * ("Sistemi di codificazione dei soggetti da iscrivere all'anagrafe tributaria"), published in the ordinary supplement
+ * to the Gazzetta Ufficiale no. 345 of 29 December 1976.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Italian_fiscal_code#Fiscal_code_generation">Italian fiscal code (Wikipedia)</a>
+ * @see <a href="https://it.wikipedia.org/wiki/Codice_fiscale#Per_le_persone_fisiche">Codice fiscale (Wikipedia)</a>
  */
 public class CodiceFiscaleValidator implements ConstraintValidator<CodiceFiscale, CharSequence> {
 

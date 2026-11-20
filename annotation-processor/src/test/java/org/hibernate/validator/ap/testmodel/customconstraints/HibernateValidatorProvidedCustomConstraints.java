@@ -19,8 +19,6 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
-import org.hibernate.validator.constraints.it.CodiceFiscale;
-import org.hibernate.validator.constraints.it.PartitaIVA;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
@@ -52,8 +50,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@NIP
 	@PESEL
 	@RUC
-	@CodiceFiscale
-	@PartitaIVA
 	public String string;
 
 	@DurationMax
@@ -81,8 +77,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@NIP
 	@PESEL
 	@RUC
-	@CodiceFiscale
-	@PartitaIVA
 	@DurationMax
 	@DurationMin
 	public Date date;

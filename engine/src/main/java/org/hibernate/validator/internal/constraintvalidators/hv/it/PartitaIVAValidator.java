@@ -9,6 +9,14 @@ import org.hibernate.validator.constraints.it.PartitaIVA;
 
 /**
  * Validator for {@link PartitaIVA}.
+ * <p>
+ * The last of the 11 digits is a check digit, computed as described by article 9 of the Italian Ministerial Decree
+ * of 23 December 1976 ("Sistemi di codificazione dei soggetti da iscrivere all'anagrafe tributaria"): the procedure
+ * is equivalent to the Luhn algorithm, with positions counted from the left. As the number of digits is odd,
+ * counting from the right, as Luhn is usually described, doubles the same digits.
+ *
+ * @see <a href="https://it.wikipedia.org/wiki/Partita_IVA#Calcolo_e_verifica_della_cifra_di_controllo">Partita IVA: calcolo e verifica della cifra di controllo (Wikipedia)</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Luhn_algorithm">Luhn algorithm (Wikipedia)</a>
  */
 public class PartitaIVAValidator implements ConstraintValidator<PartitaIVA, CharSequence> {
 

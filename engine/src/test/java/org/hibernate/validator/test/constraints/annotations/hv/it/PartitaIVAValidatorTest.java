@@ -6,9 +6,11 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.violati
 
 import org.hibernate.validator.constraints.it.PartitaIVA;
 import org.hibernate.validator.test.constraints.annotations.AbstractConstrainedTest;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.junit.jupiter.api.Test;
 
+@TestForIssue(jiraKey = "HV-2295")
 public class PartitaIVAValidatorTest extends AbstractConstrainedTest {
 
 	@Test
