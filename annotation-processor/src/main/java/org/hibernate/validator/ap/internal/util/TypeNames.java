@@ -94,6 +94,8 @@ public class TypeNames {
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";
 		public static final String RUC_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".py.RUC";
 		public static final String INN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ru.INN";
+		public static final String CODICE_FISCALE_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".it.CodiceFiscale";
+		public static final String PARTITA_IVA_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".it.PartitaIVA";
 		public static final String KOR_RRN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".kor.KorRRN";
 		public static final String PASSWORD_POLICY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".PasswordPolicy";
 		public static final String PASSWORD_STRENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".PasswordStrength";
