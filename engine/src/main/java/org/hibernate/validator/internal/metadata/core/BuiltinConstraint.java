@@ -49,6 +49,7 @@ enum BuiltinConstraint {
 	// Hibernate Validator specific constraints
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHABETIC( "org.hibernate.validator.constraints.Alphabetic" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHANUMERIC( "org.hibernate.validator.constraints.Alphanumeric" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BASE64( "org.hibernate.validator.constraints.Base64" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BIC( "org.hibernate.validator.constraints.BIC" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS( "org.hibernate.validator.constraints.BitcoinAddress" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_CODE_POINT_LENGTH( "org.hibernate.validator.constraints.CodePointLength" ),
