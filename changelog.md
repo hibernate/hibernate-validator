@@ -1,5 +1,13 @@
 # Hibernate Validator Changelog
 
+## 9.2.0.Final (2026-11-20)
+
+[Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40544)
+
+
+### Improvement
+* [HV-2298](https://hibernate.atlassian.net/browse/HV-2298) - Update to Hibernate Accessor 0.1.0
+
 ## 9.2.0.CR2 (2026-11-11)
 
 [Full changelog](https://hibernate.atlassian.net/projects/HV/versions/40543)
