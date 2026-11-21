@@ -39,6 +39,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNumericConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordPolicyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordStrengthConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithSingleLineConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithTrimmedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithUUIDConstraints;
@@ -1104,6 +1105,25 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void endsWithConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithEndsWithConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2292")
+	public void singleLineConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithSingleLineConstraints.class )
 		};
 
 		boolean compilationResult =

@@ -67,6 +67,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RU_INN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SINGLE_LINE;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_STARTS_WITH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MAX;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TIME_DURATION_MIN;
@@ -156,6 +157,7 @@ import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.SingleLine;
 import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.Trimmed;
 import org.hibernate.validator.constraints.URL;
@@ -430,6 +432,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorFo
 import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.hv.RangeValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.SingleLineValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.StartsWithValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.TrimmedValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
@@ -991,6 +994,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT ) ) {
 			putBuiltinConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SINGLE_LINE ) ) {
+			putBuiltinConstraint( tmpConstraints, SingleLine.class, SingleLineValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_STARTS_WITH ) ) {
 			putBuiltinConstraint( tmpConstraints, StartsWith.class, StartsWithValidator.class );
