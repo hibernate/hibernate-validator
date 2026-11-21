@@ -777,6 +777,10 @@ With one exception also these constraints apply to the field/property level, onl
     Supported data types::: `CharSequence`
     Hibernate metadata impact::: None
 
+`@Finite`:: Validates that the annotated floating-point number is finite, i.e. it is neither `NaN` nor infinite. `null` is considered valid.
+    Supported data types::: `float`, `double`, `Float`, `Double`
+    Hibernate metadata impact::: None
+
 `@Hexadecimal(letterCase=, strictness=, allowEmpty=, prefix=)`:: Validates that the annotated character sequence contains only hexadecimal characters (`0-9`, `a-f`, `A-F`). `null` is always valid. `letterCase` accepts `LOWER_CASE` (only `0-9a-f`), `UPPER_CASE` (only `0-9A-F`) or `INSENSITIVE` (default, any mix of cases). `strictness` accepts `STRICT` (default, ASCII characters only) or `LENIENT` (additionally accepts the fullwidth forms `０-９`, `ａ-ｆ`, `Ａ-Ｆ`). An empty character sequence is invalid by default; set `allowEmpty` to allow it. `prefix` is a leading marker that must be present when non-empty; the well-known prefixes `0x` and `#` are matched exactly, while any other value is treated as a regular expression anchored to the start of the value. The `letterCase` and `strictness` attributes only apply to the characters following the prefix.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None

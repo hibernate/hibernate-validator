@@ -295,6 +295,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ENCODING, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ENDS_WITH, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.FINITE, Double.class, Float.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.HEXADEIMAL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.IBAN, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.IP_ADDRESS, CharSequence.class );
