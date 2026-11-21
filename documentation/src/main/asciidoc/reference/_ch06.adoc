@@ -385,6 +385,65 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CarTest.ja
 ----
 ====
 
+[[validator-dependency-testing]]
+==== Testing constraints with preconfigured validators
+
+Constraint validators may depend on services injected by dependency injection frameworks, such as Spring.
+
+When testing constraints that use such validators, it can be useful to provide a preconfigured validator instance instead of setting up a dependency injection container. The `hibernate-validator-test-utils` module allows you to register custom validator instances, including mocks, for this purpose.
+
+To use these utilities, add the following dependency to your project:
+
+[[example-person-with-checkcase]]
+.Hibernate Validator test utilities Maven dependency
+====
+[source, xml]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator-test-utils</artifactId>
+    <version>{hvVersion}</version>
+    <scope>test</scope>
+</dependency>
+----
+====
+
+.Defining the `@ZipCode` constraint annotation
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/ZipCode.java[tags=include]
+----
+====
+
+.Applying the `@ZipCode` constraint
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/Person.java[tags=include]
+----
+====
+
+.Using injected dependency in a constraint validator
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/ZipCodeValidator.java[tags=include]
+----
+====
+
+<<example-using-validator-dependency>> demonstrates a mocked `ZipCodeValidator` is registered using `PreconfiguredValidatorsValidatorFactory`. When validating a `Person` instance, Hibernate Validator uses the supplied mock instead of creating a new validator instance. This allows the constraint's integration with the validation engine to be tested without configuring the actual repository dependency.
+
+[[example-using-validator-dependency]]
+.Validating objects with the `@ZipCode` constraint
+====
+[source, java, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/customvalidatorwithdependency/CustomValidatorWithDependencyTest.java[tags=field]
+----
+====
+
 [[section-class-level-constraints]]
 === Class-level constraints
 
