@@ -75,6 +75,12 @@ public final class DomainNameUtil {
 			return false;
 		}
 
+		// Unicode space separators such as U+00A0 and U+202F are included in the domain character class.
+		// IDN.toASCII may map them to an ASCII space, but the pattern is matched against the original string.
+		if ( domain.codePoints().anyMatch( Character::isSpaceChar ) ) {
+			return false;
+		}
+
 		String asciiString;
 		try {
 			asciiString = IDN.toASCII( domain );
