@@ -76,6 +76,9 @@ Corresponding constraint definitions are also available for programmatic constra
 | `@StartsWith`, `@EndsWith`
 | Checks for at least one of the specified prefixes or suffixes. Case-insensitive matching is optional.
 
+| `@NormalizedWhitespace`
+| Checks that whitespace in a character sequence conforms to configurable rules (e.g. only spaces, no consecutive whitespace).
+
 | `@Trimmed`
 | Checks that a character sequence has no leading or trailing whitespace, using the same whitespace definition as `String.strip()`.
 

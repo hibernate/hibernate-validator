@@ -822,6 +822,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
         Supported data types::: `CharSequence`
         Hibernate metadata impact::: None
 
+`@NormalizedWhitespace(value=)`:: Validates that whitespace in the annotated character sequence conforms to a set of rules. By default, only regular space characters are accepted and consecutive whitespace is rejected. Rules can be combined: `NO_CONSECUTIVE` rejects consecutive whitespace, `NO_TABS` rejects tabs, `NO_FORM_FEED` rejects form feed and vertical tab, and `ONLY_SPACE` rejects any whitespace other than regular space (implying `NO_TABS` and `NO_FORM_FEED`). `null` and empty sequences are considered valid.
+        Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
+
 `@NotCompromised`:: Checks that the annotated password has not been compromised in a data breach, as determined by a registered `CompromisedPasswordChecker`. `null` is considered valid. A `CompromisedPasswordChecker` must be registered as a bean before using this constraint (see <<section-bean-system>>). See <<section-password-validation-services>> for example implementations.
         Supported data types::: `CharSequence`, `char[]`
         Hibernate metadata impact::: None
