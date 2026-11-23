@@ -33,6 +33,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithKorRRNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithLowerCaseConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithNormalizedWhitespaceConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNotCompromisedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
@@ -1123,6 +1124,25 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void trimmedConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithTrimmedConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 11 ),
+				new DiagnosticExpectation( Kind.ERROR, 14 ),
+				new DiagnosticExpectation( Kind.ERROR, 17 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2296")
+	public void normalizedWhitespaceConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithNormalizedWhitespaceConstraints.class )
 		};
 
 		boolean compilationResult =
