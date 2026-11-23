@@ -1,13 +1,26 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Set;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.NormalizedWhitespaceDef;
 import org.hibernate.validator.constraints.NormalizedWhitespace;
 import org.hibernate.validator.constraints.NormalizedWhitespace.Rule;
 import org.hibernate.validator.internal.constraintvalidators.hv.NormalizedWhitespaceValidator;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.junit.jupiter.api.Test;
 
@@ -180,5 +193,34 @@ public class NormalizedWhitespaceValidatorTest {
 		NormalizedWhitespaceValidator validator = getValidator();
 		assertTrue( validator.isValid( new MyCustomStringImpl( "hello world" ), null ) );
 		assertFalse( validator.isValid( new MyCustomStringImpl( "hello\tworld" ), null ) );
+	}
+
+	@Test
+	public void testProgrammaticDefinition() {
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Foo.class )
+				.field( "value" )
+				.constraint( new NormalizedWhitespaceDef().value( Rule.ONLY_SPACE, Rule.NO_CONSECUTIVE ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Foo>> constraintViolations =
+				validator.validate( new Foo( "hello world" ) );
+		assertNoViolations( constraintViolations );
+
+		constraintViolations = validator.validate( new Foo( "hello\tworld" ) );
+		assertThat( constraintViolations ).containsOnlyViolations(
+				violationOf( NormalizedWhitespace.class )
+		);
+	}
+
+	private static class Foo {
+
+		private final String value;
+
+		public Foo(String value) {
+			this.value = value;
+		}
 	}
 }
