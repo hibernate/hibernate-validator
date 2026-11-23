@@ -63,6 +63,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.NormalizedWhitespace;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
@@ -199,6 +200,7 @@ public class MessagePropertiesTest {
 							violationOf( Mod10Check.class ),
 							violationOf( Mod11Check.class ),
 							violationOf( Normalized.class ),
+							violationOf( NormalizedWhitespace.class ),
 							violationOf( NullOrNotBlank.class ),
 							violationOf( NullOrNotEmpty.class ),
 							violationOf( Port.class ),
@@ -381,6 +383,9 @@ public class MessagePropertiesTest {
 
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
+
+		@NormalizedWhitespace
+		private String normalizedWhitespace = "hello\tworld";
 
 		@NullOrNotBlank
 		private String nullOrNotBlank = "   ";
