@@ -23,6 +23,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithEncodingConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithEndsWithConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithFiniteConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithHexadecimalConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISSNConstraints;
@@ -1115,6 +1116,24 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 11 ),
 				new DiagnosticExpectation( Kind.ERROR, 14 ),
 				new DiagnosticExpectation( Kind.ERROR, 17 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2297")
+	public void finiteConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithFiniteConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 7 ),
+				new DiagnosticExpectation( Kind.ERROR, 10 )
 		);
 	}
 

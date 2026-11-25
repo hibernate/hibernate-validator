@@ -43,6 +43,9 @@ Corresponding constraint definitions are also available for programmatic constra
 | `@DateTimeFormat`
 | Checks that a character sequence represents a date and/or time matching a `DateTimeFormatter` pattern, with configurable locales and lenient parsing.
 
+| `@Finite`
+| Checks that a floating-point value is finite (not `NaN` or infinity).
+
 | `@Hexadecimal`
 | Checks hexadecimal character sequences, with options for letter case, fullwidth characters, empty values and a required prefix.
 
