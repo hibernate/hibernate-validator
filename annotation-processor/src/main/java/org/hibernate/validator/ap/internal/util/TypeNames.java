@@ -100,6 +100,7 @@ public class TypeNames {
 		public static final String PORT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Port";
 		public static final String NOT_COMPROMISED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotCompromised";
 		public static final String NORMALIZED = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Normalized";
+		public static final String NORMALIZED_WHITESPACE = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NormalizedWhitespace";
 		public static final String NULL_OR_NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NullOrNotBlank";
 		public static final String NULL_OR_NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NullOrNotEmpty";
 		public static final String UUID = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".UUID";

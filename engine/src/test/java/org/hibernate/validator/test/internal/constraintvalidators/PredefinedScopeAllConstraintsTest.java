@@ -62,6 +62,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
+import org.hibernate.validator.constraints.NormalizedWhitespace;
 import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
@@ -150,6 +151,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Mod10Check.class, new Mod10CheckBean() );
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
 		testConstraint( Normalized.class, new NormalizedBean() );
+		testConstraint( NormalizedWhitespace.class, new NormalizedWhitespaceBean() );
 		testConstraint( NullOrNotBlank.class, new NullOrNotBlankBean() );
 		testConstraint( NullOrNotEmpty.class, new NullOrNotEmptyBean() );
 		testConstraint( Port.class, new PortBean() );
@@ -449,6 +451,13 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Normalized(form = java.text.Normalizer.Form.NFKC)
 		private String normalized = "\uFE64script\uFE65";
+
+	}
+
+	private static class NormalizedWhitespaceBean {
+
+		@NormalizedWhitespace
+		private String normalizedWhitespace = "hello\tworld";
 
 	}
 
