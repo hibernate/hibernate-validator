@@ -6,6 +6,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.it.PartitaIVA;
+import org.hibernate.validator.internal.util.DigitUtil;
+import org.hibernate.validator.internal.util.ModUtil;
 
 /**
  * Validator for {@link PartitaIVA}.
@@ -22,6 +24,7 @@ public class PartitaIVAValidator implements ConstraintValidator<PartitaIVA, Char
 
 	private static final Pattern PATTERN = Pattern.compile( "\\d{11}" );
 	private static final String ALL_ZEROS = "00000000000";
+	private static final int CHECK_DIGIT_INDEX = 10;
 
 	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
@@ -36,18 +39,8 @@ public class PartitaIVAValidator implements ConstraintValidator<PartitaIVA, Char
 			return false;
 		}
 
-		// Luhn: the digits in even positions (counting from 1) are doubled, and 9 is subtracted when the result exceeds 9
-		int total = 0;
-		for ( int i = 0; i < number.length(); i++ ) {
-			int digit = Character.digit( number.charAt( i ), 10 );
-			if ( i % 2 == 1 ) {
-				digit *= 2;
-				if ( digit > 9 ) {
-					digit -= 9;
-				}
-			}
-			total += digit;
-		}
-		return total % 10 == 0;
+		// the Luhn sum of the first ten digits doubles the rightmost of them, that is the digits in even positions (counting from 1)
+		long sum = ModUtil.calculateLuhnSum( number, 0, CHECK_DIGIT_INDEX, false );
+		return DigitUtil.getAsciiDigit( number.charAt( CHECK_DIGIT_INDEX ) ) == ( 10 - sum % 10 ) % 10;
 	}
 }

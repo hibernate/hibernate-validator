@@ -21,8 +21,10 @@ import org.hibernate.validator.Incubating;
 
 /**
  * Validates that a {@code CharSequence} is an Italian VAT number (partita IVA).
+ * <p>
+ * The supported type is {@code CharSequence}. {@code null} is considered valid.
  *
- * @since 9.2
+ * @since 10.0
  */
 @Incubating
 @Documented

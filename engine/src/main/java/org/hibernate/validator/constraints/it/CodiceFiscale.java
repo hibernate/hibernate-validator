@@ -28,8 +28,10 @@ import org.hibernate.validator.Incubating;
  * <p>
  * Only the format, the date of birth and the check character are verified: whether a code has actually been issued,
  * and to whom, is known to the Italian Revenue Agency alone.
+ * <p>
+ * The supported type is {@code CharSequence}. {@code null} is considered valid.
  *
- * @since 9.2
+ * @since 10.0
  */
 @Incubating
 @Documented

@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.it.PartitaIVA;
 /**
  * A {@link PartitaIVA} constraint definition.
  *
- * @since 9.2
+ * @since 10.0
  */
 @Incubating
 public class PartitaIVADef extends ConstraintDef<PartitaIVADef, PartitaIVA> {

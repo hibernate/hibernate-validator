@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.it.CodiceFiscale;
+import org.hibernate.validator.internal.util.DigitUtil;
 
 /**
  * Validator for {@link CodiceFiscale}.
@@ -111,14 +112,16 @@ public class CodiceFiscaleValidator implements ConstraintValidator<CodiceFiscale
 
 	private static int digitAt(String code, int index) {
 		char character = code.charAt( index );
-		return Character.isDigit( character ) ? Character.digit( character, 10 ) : DIGIT_REPLACEMENTS.indexOf( character );
+		int digit = DigitUtil.getAsciiDigit( character );
+		return digit >= 0 ? digit : DIGIT_REPLACEMENTS.indexOf( character );
 	}
 
 	private static char calculateCheckCharacter(String code) {
 		int total = 0;
 		for ( int i = 0; i < 15; i++ ) {
 			char character = code.charAt( i );
-			int index = Character.isDigit( character ) ? Character.digit( character, 10 ) : character - 'A';
+			int digit = DigitUtil.getAsciiDigit( character );
+			int index = digit >= 0 ? digit : character - 'A';
 			total += i % 2 == 0 ? ODD_POSITION_VALUES[index] : index;
 		}
 		return (char) ( 'A' + total % 26 );
