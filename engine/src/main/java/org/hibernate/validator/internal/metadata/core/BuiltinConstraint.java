@@ -93,6 +93,8 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CPF( "org.hibernate.validator.constraints.br.CPF" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_RENAVAM( "org.hibernate.validator.constraints.br.RENAVAM" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_TITULO_ELEITORAL( "org.hibernate.validator.constraints.br.TituloEleitoral" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IT_CODICE_FISCALE( "org.hibernate.validator.constraints.it.CodiceFiscale" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IT_PARTITA_IVA( "org.hibernate.validator.constraints.it.PartitaIVA" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_KOR_KORRRN( "org.hibernate.validator.constraints.kor.KorRRN" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_NIP( "org.hibernate.validator.constraints.pl.NIP" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PL_PESEL( "org.hibernate.validator.constraints.pl.PESEL" ),

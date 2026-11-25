@@ -898,6 +898,11 @@ Hibernate Validator!
 	Hibernate metadata impact::: None
 	Country::: Brazil
 
+`@CodiceFiscale`:: Checks that the annotated character sequence represents an Italian tax code (https://en.wikipedia.org/wiki/Italian_fiscal_code[codice fiscale]). Both the 16-character code of natural persons and the 11-digit code of legal entities are accepted. In the code of a natural person, digits may be replaced by letters to tell apart two people who would otherwise share the same code ("omocodia"). Only the format, the date of birth and the check character are verified, not whether the code has actually been issued
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Italy
+
 `@CPF`:: Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Física)
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
@@ -927,6 +932,11 @@ Hibernate Validator!
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 	Country::: Poland
+
+`@PartitaIVA`:: Checks that the annotated character sequence represents an Italian VAT number (https://en.wikipedia.org/wiki/VAT_identification_number[partita IVA]), made of 11 digits, without the `IT` country prefix
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Italy
 
 `@PESEL`:: Checks that the annotated character sequence represents a Polish national identification number (https://pl.wikipedia.org/wiki/PESEL[PESEL])
 	Supported data types::: `CharSequence`

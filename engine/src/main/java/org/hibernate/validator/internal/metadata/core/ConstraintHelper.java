@@ -45,6 +45,8 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISBN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ISSN;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IT_CODICE_FISCALE;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IT_PARTITA_IVA;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_KOR_KORRRN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LENGTH;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_LOWERCASE;
@@ -168,6 +170,8 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.RENAVAM;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.it.CodiceFiscale;
+import org.hibernate.validator.constraints.it.PartitaIVA;
 import org.hibernate.validator.constraints.kor.KorRRN;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
@@ -442,6 +446,8 @@ import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.RENAVAMValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.TituloEleitoralValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.it.CodiceFiscaleValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.it.PartitaIVAValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.kor.KorRRNValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharArray;
 import org.hibernate.validator.internal.constraintvalidators.hv.password.NotCompromisedValidatorForCharSequence;
@@ -976,6 +982,12 @@ public abstract class ConstraintHelper {
 				rangeValidators.add( RangeValidatorForMonetaryAmount.class );
 			}
 			putBuiltinConstraints( tmpConstraints, Range.class, rangeValidators );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IT_CODICE_FISCALE ) ) {
+			putBuiltinConstraint( tmpConstraints, CodiceFiscale.class, CodiceFiscaleValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IT_PARTITA_IVA ) ) {
+			putBuiltinConstraint( tmpConstraints, PartitaIVA.class, PartitaIVAValidator.class );
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_KOR_KORRRN ) ) {
 			putBuiltinConstraint( tmpConstraints, KorRRN.class, KorRRNValidator.class );

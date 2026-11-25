@@ -18,6 +18,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithAlphabeticConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithAlphanumericConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithBitcoinAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithCodiceFiscaleConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithContainsConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
@@ -37,6 +38,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithNotCompromisedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNumericConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithPartitaIVAConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordPolicyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordStrengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
@@ -1173,6 +1175,40 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void notCompromisedConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithNotCompromisedConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 13 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2295")
+	public void codiceFiscaleConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithCodiceFiscaleConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 13 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2295")
+	public void partitaIVAConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithPartitaIVAConstraints.class )
 		};
 
 		boolean compilationResult =
