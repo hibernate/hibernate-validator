@@ -250,6 +250,14 @@ public class EmailValidatorTest {
 		assertFalse( DomainNameUtil.isValidEmailDomainAddress( stringOfLength( 5000 ) + ".com" ) );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1869")
+	public void testEmailDomainWithUnicodeSpaceSeparatorIsInvalid() {
+		isInvalidEmail( "user@gmail.com\u202f" );
+		isInvalidEmail( "user@gmail.com\u00a0" );
+		isValidEmail( "myname@östereich.at" );
+	}
+
 	private String stringOfLength(int length) {
 		StringBuilder builder = new StringBuilder();
 		for ( int i = 0; i < length; i++ ) {

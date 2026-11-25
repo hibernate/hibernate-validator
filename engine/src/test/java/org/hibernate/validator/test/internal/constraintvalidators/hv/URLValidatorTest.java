@@ -401,6 +401,7 @@ public class URLValidatorTest {
 			assertFalse( validator.isValid( "http://foo.bar?q=Spaces should be encoded", null ) );
 			assertFalse( validator.isValid( "http:///a", null ) );
 			assertFalse( validator.isValid( "http:// shouldfail.com", null ) );
+			assertFalse( validator.isValid( "http://gmail.com\u202f", null ) );
 			assertFalse( validator.isValid( "http://foo.bar/foo(bar)baz quux", null ) );
 			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
 			assertFalse( validator.isValid( "http://-a.b.co", null ) );
