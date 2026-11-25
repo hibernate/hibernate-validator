@@ -16,6 +16,7 @@ import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInCons
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithAlphabeticConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithAlphanumericConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithBase64Constraints;
 import org.hibernate.validator.ap.testmodel.ModelWithBitcoinAddressConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithCodePointLengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithContainsConstraints;
@@ -870,6 +871,24 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 	public void numericConstraints() {
 		File[] sourceFiles = new File[] {
 				compilerHelper.getSourceFile( ModelWithNumericConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2289")
+	public void base64Constraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithBase64Constraints.class )
 		};
 
 		boolean compilationResult =

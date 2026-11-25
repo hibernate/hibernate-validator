@@ -729,6 +729,10 @@ With one exception also these constraints apply to the field/property level, onl
         Supported data types::: `CharSequence`
         Hibernate metadata impact::: None
 
+`@Base64(urlSafe=)`:: Checks that the annotated character sequence is a valid Base64 encoded string as defined by https://www.rfc-editor.org/rfc/rfc4648[RFC 4648]. By default the standard alphabet (`+` and `/`) is expected; when `urlSafe` is `true`, the URL and Filename safe alphabet (`-` and `_`) is expected instead. Padding is optional, but must be correct when present. Whitespace, line separators and characters outside the selected alphabet are rejected. Non-zero unused bits in the final unit are accepted. Validation is performed by attempting to decode the value with `java.util.Base64.Decoder`: `java.util.Base64.getUrlDecoder()` when `urlSafe` is `true`, `java.util.Base64.getDecoder()` otherwise. `null` values and empty character sequences are considered valid.
+        Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
+
 `@BIC`:: Checks that the annotated character sequence is a valid https://en.wikipedia.org/wiki/ISO_9362[BIC] (Bank Identifier Code / SWIFT code) per ISO 9362. The structural format is validated: proper length (8 or 11 characters), ASCII letters and digits with an alphanumeric institution prefix, and valid ISO 3166-1 alpha-2 country code. Optional filtering by country codes (`countryCodes`) and bank codes (`bankCodes`) is supported.
     Supported data types::: `CharSequence`
     Hibernate metadata impact::: None

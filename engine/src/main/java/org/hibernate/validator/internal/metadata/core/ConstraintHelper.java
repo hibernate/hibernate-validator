@@ -26,6 +26,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ALPHANUMERIC;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_AR_CUIL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_AR_CUIT;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BASE64;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BIC;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BITCOIN_ADDRESS;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BR_CNPJ;
@@ -125,6 +126,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.constraints.Alphabetic;
 import org.hibernate.validator.constraints.Alphanumeric;
 import org.hibernate.validator.constraints.BIC;
+import org.hibernate.validator.constraints.Base64;
 import org.hibernate.validator.constraints.BitcoinAddress;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -374,6 +376,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorprese
 import org.hibernate.validator.internal.constraintvalidators.hv.AlphabeticValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.AlphanumericValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.BICValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.Base64Validator;
 import org.hibernate.validator.internal.constraintvalidators.hv.BitcoinAddressValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.CodePointLengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ContainsValidator;
@@ -1048,6 +1051,9 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NUMERIC ) ) {
 			putBuiltinConstraint( tmpConstraints, Numeric.class, NumericValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_BASE64 ) ) {
+			putBuiltinConstraint( tmpConstraints, Base64.class, Base64Validator.class );
 		}
 
 		return tmpConstraints;

@@ -45,6 +45,7 @@ import org.hibernate.validator.bean.BeanReference;
 import org.hibernate.validator.constraints.Alphabetic;
 import org.hibernate.validator.constraints.Alphanumeric;
 import org.hibernate.validator.constraints.BIC;
+import org.hibernate.validator.constraints.Base64;
 import org.hibernate.validator.constraints.CodePointLength;
 import org.hibernate.validator.constraints.Contains;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -230,7 +231,8 @@ public class MessagePropertiesTest {
 							violationOf( PasswordPolicy.class ),
 							violationOf( Alphabetic.class ),
 							violationOf( Alphanumeric.class ),
-							violationOf( Numeric.class )
+							violationOf( Numeric.class ),
+							violationOf( Base64.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -477,6 +479,9 @@ public class MessagePropertiesTest {
 
 		@Numeric
 		private String numeric = "invalid1";
+
+		@Base64
+		private String base64 = "invalid!";
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;
