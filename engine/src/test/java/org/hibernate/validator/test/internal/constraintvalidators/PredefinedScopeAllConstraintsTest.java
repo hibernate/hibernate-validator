@@ -72,6 +72,7 @@ import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.SingleLine;
 import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.Trimmed;
 import org.hibernate.validator.constraints.URL;
@@ -173,6 +174,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( DurationMax.class, new DurationMaxBean() );
 		testConstraint( DurationMin.class, new DurationMinBean() );
 		testConstraint( ScriptAssert.class, new ScriptAssertBean() );
+		testConstraint( SingleLine.class, new SingleLineBean() );
 		testConstraint( StartsWith.class, new StartsWithBean() );
 		testConstraint( EndsWith.class, new EndsWithBean() );
 		testConstraint( UUID.class, new UUIDBean() );
@@ -476,6 +478,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
+	}
+
+	private static class SingleLineBean {
+
+		@SingleLine
+		private String singleLine = "foo\nbar";
 	}
 
 	private static class TrimmedBean {

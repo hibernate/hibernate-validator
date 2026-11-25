@@ -73,6 +73,7 @@ import org.hibernate.validator.constraints.PasswordStrength;
 import org.hibernate.validator.constraints.Port;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.SingleLine;
 import org.hibernate.validator.constraints.StartsWith;
 import org.hibernate.validator.constraints.Trimmed;
 import org.hibernate.validator.constraints.URL;
@@ -222,6 +223,7 @@ public class MessagePropertiesTest {
 							violationOf( DurationMax.class ),
 							violationOf( DurationMin.class ),
 							violationOf( ScriptAssert.class ),
+							violationOf( SingleLine.class ),
 							violationOf( StartsWith.class ),
 							violationOf( EndsWith.class ),
 							violationOf( UUID.class ),
@@ -393,6 +395,9 @@ public class MessagePropertiesTest {
 
 		@Range(min = 2, max = 4)
 		private int range = 6;
+
+		@SingleLine
+		private String singleLine = "foo\nbar";
 
 		@Trimmed
 		private String trimmed = " foo ";

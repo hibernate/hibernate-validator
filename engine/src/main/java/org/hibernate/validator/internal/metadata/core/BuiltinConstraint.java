@@ -80,6 +80,7 @@ enum BuiltinConstraint {
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PORT( "org.hibernate.validator.constraints.Port" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_RANGE( "org.hibernate.validator.constraints.Range" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SCRIPT_ASSERT( "org.hibernate.validator.constraints.ScriptAssert" ),
+	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_SINGLE_LINE( "org.hibernate.validator.constraints.SingleLine" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_STARTS_WITH( "org.hibernate.validator.constraints.StartsWith" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_TRIMMED( "org.hibernate.validator.constraints.Trimmed" ),
 	ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_UNIQUE_ELEMENTS( "org.hibernate.validator.constraints.UniqueElements" ),
