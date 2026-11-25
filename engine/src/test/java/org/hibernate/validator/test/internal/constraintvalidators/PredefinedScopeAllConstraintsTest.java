@@ -59,6 +59,7 @@ import org.hibernate.validator.constraints.ISSN;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LowerCase;
 import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.MaxLines;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Normalized;
@@ -147,6 +148,7 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( CodePointLength.class, new CodePointLengthBean() );
 		testConstraint( Contains.class, new ContainsBean() );
 		testConstraint( LuhnCheck.class, new LuhnCheckBean() );
+		testConstraint( MaxLines.class, new MaxLinesBean() );
 		testConstraint( Mod10Check.class, new Mod10CheckBean() );
 		testConstraint( Mod11Check.class, new Mod11CheckBean() );
 		testConstraint( Normalized.class, new NormalizedBean() );
@@ -425,6 +427,12 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@EndsWith("xyz")
 		private String endsWith = "no match here";
+	}
+
+	private static class MaxLinesBean {
+
+		@MaxLines(1)
+		private String maxLines = "foo\nbar";
 	}
 
 	private static class LuhnCheckBean {

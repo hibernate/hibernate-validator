@@ -32,6 +32,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithKorRRNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithLowerCaseConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithMaxLinesConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNormalizedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNotCompromisedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
@@ -789,6 +790,24 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				new DiagnosticExpectation( Kind.ERROR, 11 ),
 				new DiagnosticExpectation( Kind.ERROR, 14 ),
 				new DiagnosticExpectation( Kind.ERROR, 17 )
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-2293")
+	public void maxLinesConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithMaxLinesConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 13 ),
+				new DiagnosticExpectation( Kind.ERROR, 16 )
 		);
 	}
 
