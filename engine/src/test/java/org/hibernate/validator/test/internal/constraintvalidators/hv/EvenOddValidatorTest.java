@@ -1,10 +1,22 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNoViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.violationOf;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.util.Set;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.EvenDef;
+import org.hibernate.validator.cfg.defs.OddDef;
 import org.hibernate.validator.constraints.Even;
 import org.hibernate.validator.constraints.Odd;
 import org.hibernate.validator.internal.constraintvalidators.hv.EvenValidatorForBigInteger;
@@ -18,6 +30,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForI
 import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForLong;
 import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForShort;
 import org.hibernate.validator.internal.util.annotation.ConstraintAnnotationDescriptor;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 import org.junit.jupiter.api.Test;
 
@@ -204,6 +217,57 @@ public class EvenOddValidatorTest {
 		OddValidatorForBigInteger validator = new OddValidatorForBigInteger();
 		validator.initialize( new ConstraintAnnotationDescriptor.Builder<>( Odd.class ).build().getAnnotation() );
 		return validator;
+	}
+
+	// --- Programmatic definition ---
+
+	@Test
+	public void testEvenProgrammaticDefinition() {
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Foo.class )
+				.field( "value" )
+				.constraint( new EvenDef() );
+		config.addMapping( mapping );
+		Validator programmaticValidator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Foo>> violations = programmaticValidator.validate( new Foo( 42 ) );
+		assertNoViolations( violations );
+
+		violations = programmaticValidator.validate( new Foo( null ) );
+		assertNoViolations( violations );
+
+		violations = programmaticValidator.validate( new Foo( 3 ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( Even.class ) );
+	}
+
+	@Test
+	public void testOddProgrammaticDefinition() {
+		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Foo.class )
+				.field( "value" )
+				.constraint( new OddDef() );
+		config.addMapping( mapping );
+		Validator programmaticValidator = config.buildValidatorFactory().getValidator();
+
+		Set<ConstraintViolation<Foo>> violations = programmaticValidator.validate( new Foo( 7 ) );
+		assertNoViolations( violations );
+
+		violations = programmaticValidator.validate( new Foo( null ) );
+		assertNoViolations( violations );
+
+		violations = programmaticValidator.validate( new Foo( 4 ) );
+		assertThat( violations ).containsOnlyViolations( violationOf( Odd.class ) );
+	}
+
+	private static class Foo {
+
+		private final Integer value;
+
+		public Foo(Integer value) {
+			this.value = value;
+		}
 	}
 
 }
