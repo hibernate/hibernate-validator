@@ -23,6 +23,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateTimeFormatConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithEncodingConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithEndsWithConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithEvenConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithHexadecimalConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISBNConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithISSNConstraints;
@@ -37,6 +38,7 @@ import org.hibernate.validator.ap.testmodel.ModelWithNotCompromisedConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotBlankConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNullOrNotEmptyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithNumericConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithOddConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordPolicyConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithPasswordStrengthConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithStartsWithConstraints;
@@ -880,6 +882,40 @@ public class ConstraintValidationProcessorIT extends ConstraintValidationProcess
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 13 ),
 				new DiagnosticExpectation( Kind.ERROR, 16 )
+		);
+	}
+
+	@Test
+	public void evenConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithEvenConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 )
+		);
+	}
+
+	@Test
+	public void oddConstraints() {
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ModelWithOddConstraints.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 )
 		);
 	}
 
