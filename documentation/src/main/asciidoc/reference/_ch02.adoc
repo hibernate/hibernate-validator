@@ -777,6 +777,10 @@ With one exception also these constraints apply to the field/property level, onl
     Supported data types::: `CharSequence`
     Hibernate metadata impact::: None
 
+`@Even`:: Checks that the annotated value is an even number. `null` is considered valid.
+        Supported data types::: `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
+        Hibernate metadata impact::: None
+
 `@Hexadecimal(letterCase=, strictness=, allowEmpty=, prefix=)`:: Validates that the annotated character sequence contains only hexadecimal characters (`0-9`, `a-f`, `A-F`). `null` is always valid. `letterCase` accepts `LOWER_CASE` (only `0-9a-f`), `UPPER_CASE` (only `0-9A-F`) or `INSENSITIVE` (default, any mix of cases). `strictness` accepts `STRICT` (default, ASCII characters only) or `LENIENT` (additionally accepts the fullwidth forms `０-９`, `ａ-ｆ`, `Ａ-Ｆ`). An empty character sequence is invalid by default; set `allowEmpty` to allow it. `prefix` is a leading marker that must be present when non-empty; the well-known prefixes `0x` and `#` are matched exactly, while any other value is treated as a regular expression anchored to the start of the value. The `letterCase` and `strictness` attributes only apply to the characters following the prefix.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
@@ -836,6 +840,10 @@ The default is `ANY`, which means both IPv4 and IPv6 addresses are considered va
 
 `@Numeric`:: Checks that every character of the annotated character sequence is a digit, as determined by `Character.isDigit(char)`. Any Unicode decimal digit of the Basic Multilingual Plane is accepted (not only the ASCII digits `0-9`), while signs, decimal separators and whitespace cause validation to fail. Use `@Pattern(regexp = "[0-9]*")` to restrict values to ASCII digits. `null` values and empty character sequences are considered valid.
         Supported data types::: `CharSequence`
+        Hibernate metadata impact::: None
+
+`@Odd`:: Checks that the annotated value is an odd number. `null` is considered valid.
+        Supported data types::: `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
         Hibernate metadata impact::: None
 
 `@PasswordPolicy(value=)`:: Validates that the annotated password meets all rules defined by the referenced `PasswordPolicyDefinition`. Each failing rule produces its own constraint violation. `null` is considered valid. The `value` parameter specifies the `PasswordPolicyDefinition` class that configures the policy rules. See <<section-password-policy>> for details and examples.
