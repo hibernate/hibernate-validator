@@ -52,6 +52,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Even;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -66,6 +67,7 @@ import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.Numeric;
+import org.hibernate.validator.constraints.Odd;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -184,6 +186,8 @@ public class PredefinedScopeAllConstraintsTest {
 		testConstraint( Alphabetic.class, new AlphabeticBean() );
 		testConstraint( Alphanumeric.class, new AlphanumericBean() );
 		testConstraint( Numeric.class, new NumericBean() );
+		testConstraint( Even.class, new EvenBean() );
+		testConstraint( Odd.class, new OddBean() );
 
 		Set<ConstraintViolation<ParameterScriptAssertBean>> parameterScriptAssertBeanViolations = getValidator( ParameterScriptAssert.class,
 				ParameterScriptAssertBean.class ).forExecutables().validateParameters(
@@ -660,6 +664,18 @@ public class PredefinedScopeAllConstraintsTest {
 
 		@Numeric
 		private String numeric = "invalid1";
+	}
+
+	private static class EvenBean {
+
+		@Even
+		private int even = 3;
+	}
+
+	private static class OddBean {
+
+		@Odd
+		private int odd = 4;
 	}
 
 }

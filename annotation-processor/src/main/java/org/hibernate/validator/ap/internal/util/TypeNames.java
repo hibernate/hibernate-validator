@@ -117,6 +117,8 @@ public class TypeNames {
 		public static final String ALPHABETIC = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Alphabetic";
 		public static final String ALPHANUMERIC = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Alphanumeric";
 		public static final String NUMERIC = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Numeric";
+		public static final String EVEN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Even";
+		public static final String ODD = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Odd";
 	}
 
 	public static class JodaTypes {

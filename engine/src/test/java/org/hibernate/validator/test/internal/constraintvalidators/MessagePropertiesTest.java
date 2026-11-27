@@ -53,6 +53,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Even;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -67,6 +68,7 @@ import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.Numeric;
+import org.hibernate.validator.constraints.Odd;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -230,7 +232,9 @@ public class MessagePropertiesTest {
 							violationOf( PasswordPolicy.class ),
 							violationOf( Alphabetic.class ),
 							violationOf( Alphanumeric.class ),
-							violationOf( Numeric.class )
+							violationOf( Numeric.class ),
+							violationOf( Even.class ),
+							violationOf( Odd.class )
 					);
 
 			collectInvalidMessages( locale, invalidMessages, violations );
@@ -477,6 +481,12 @@ public class MessagePropertiesTest {
 
 		@Numeric
 		private String numeric = "invalid1";
+
+		@Even
+		private int even = 3;
+
+		@Odd
+		private int odd = 4;
 
 		@SuppressWarnings("unused")
 		private boolean scriptAssert = false;

@@ -40,6 +40,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EAN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENCODING;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENDS_WITH;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EVEN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_HEXADEIMAL;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IBAN;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_IP_ADDRESS;
@@ -56,6 +57,7 @@ import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.O
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_BLANK;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NULL_OR_NOT_EMPTY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NUMERIC;
+import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ODD;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PARAMETER_SCRIPT_ASSERT;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_POLICY;
 import static org.hibernate.validator.internal.metadata.core.BuiltinConstraint.ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_PASSWORD_STRENGTH;
@@ -135,6 +137,7 @@ import org.hibernate.validator.constraints.DateTimeFormat;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Encoding;
 import org.hibernate.validator.constraints.EndsWith;
+import org.hibernate.validator.constraints.Even;
 import org.hibernate.validator.constraints.Hexadecimal;
 import org.hibernate.validator.constraints.IBAN;
 import org.hibernate.validator.constraints.ISBN;
@@ -150,6 +153,7 @@ import org.hibernate.validator.constraints.NotCompromised;
 import org.hibernate.validator.constraints.NullOrNotBlank;
 import org.hibernate.validator.constraints.NullOrNotEmpty;
 import org.hibernate.validator.constraints.Numeric;
+import org.hibernate.validator.constraints.Odd;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.PasswordPolicy;
 import org.hibernate.validator.constraints.PasswordStrength;
@@ -382,6 +386,11 @@ import org.hibernate.validator.internal.constraintvalidators.hv.DateTimeFormatVa
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EncodingValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EndsWithValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.EvenValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.EvenValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.hv.EvenValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.EvenValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.hv.EvenValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.HexadecimalValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.IBANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ISBNValidator;
@@ -407,6 +416,11 @@ import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyVa
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.hv.NullOrNotEmptyValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.hv.NumericValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForBigInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForByte;
+import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForInteger;
+import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForLong;
+import org.hibernate.validator.internal.constraintvalidators.hv.OddValidatorForShort;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForBigDecimal;
 import org.hibernate.validator.internal.constraintvalidators.hv.PortValidatorForBigInteger;
@@ -879,6 +893,15 @@ public abstract class ConstraintHelper {
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ENDS_WITH ) ) {
 			putBuiltinConstraint( tmpConstraints, EndsWith.class, EndsWithValidator.class );
 		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_EVEN ) ) {
+			List<Class<? extends ConstraintValidator<Even, ?>>> evenValidators = new ArrayList<>( 5 );
+			evenValidators.add( EvenValidatorForInteger.class );
+			evenValidators.add( EvenValidatorForLong.class );
+			evenValidators.add( EvenValidatorForByte.class );
+			evenValidators.add( EvenValidatorForShort.class );
+			evenValidators.add( EvenValidatorForBigInteger.class );
+			putBuiltinConstraints( tmpConstraints, Even.class, evenValidators );
+		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_HEXADEIMAL ) ) {
 			putBuiltinConstraint( tmpConstraints, Hexadecimal.class, HexadecimalValidator.class );
 		}
@@ -1048,6 +1071,15 @@ public abstract class ConstraintHelper {
 		}
 		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_NUMERIC ) ) {
 			putBuiltinConstraint( tmpConstraints, Numeric.class, NumericValidator.class );
+		}
+		if ( enabledBuiltinConstraints.contains( ORG_HIBERNATE_VALIDATOR_CONSTRAINTS_ODD ) ) {
+			List<Class<? extends ConstraintValidator<Odd, ?>>> oddValidators = new ArrayList<>( 5 );
+			oddValidators.add( OddValidatorForInteger.class );
+			oddValidators.add( OddValidatorForLong.class );
+			oddValidators.add( OddValidatorForByte.class );
+			oddValidators.add( OddValidatorForShort.class );
+			oddValidators.add( OddValidatorForBigInteger.class );
+			putBuiltinConstraints( tmpConstraints, Odd.class, oddValidators );
 		}
 
 		return tmpConstraints;

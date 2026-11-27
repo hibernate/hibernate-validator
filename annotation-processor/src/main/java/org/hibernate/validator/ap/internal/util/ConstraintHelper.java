@@ -339,6 +339,8 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ALPHABETIC, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ALPHANUMERIC, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NUMERIC, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EVEN, Number.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.ODD, Number.class );
 
 		registerSupportedTypesUnwrappedByDefault( SupportedForUnwrapTypes.OPTIONAL_INT, Integer.class.getName() );
 		registerSupportedTypesUnwrappedByDefault( SupportedForUnwrapTypes.OPTIONAL_LONG, Long.class.getName() );
